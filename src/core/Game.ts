@@ -38,12 +38,14 @@ import { getMissionById, type MissionDefinition, type MissionUnitSpawn } from '.
 import type { Terrain } from '../world/Terrain';
 import type { RTSCamera } from '../camera/RTSCamera';
 import type { EventBus as EventBusType } from '../core/EventBus';
+import type { ParticleSystem } from '../rendering/ParticleSystem';
 
 export class Game {
   private scene: THREE.Scene;
   private terrain: Terrain;
   private camera: RTSCamera;
   private eventBus: EventBusType;
+  private particles: ParticleSystem;
   private pipeline: SystemPipeline;
   private map!: GeneratedMap;
 
@@ -103,11 +105,12 @@ export class Game {
   private inputSetup = false;
   private eventListenersSetup = false;
 
-  constructor(scene: THREE.Scene, terrain: Terrain, camera: RTSCamera, eventBus: EventBusType) {
+  constructor(scene: THREE.Scene, terrain: Terrain, camera: RTSCamera, eventBus: EventBusType, particles: ParticleSystem) {
     this.scene = scene;
     this.terrain = terrain;
     this.camera = camera;
     this.eventBus = eventBus;
+    this.particles = particles;
 
     this.pipeline = createGamePipeline(terrain, import.meta.env.DEV);
     this.navMesh = NavMeshManager;
@@ -166,8 +169,10 @@ export class Game {
     // 9. Setup event listeners
     this.setupEventListeners();
 
-    // 10. Init audio system
+    // 10. Init audio system + ambient sounds
     audioManager.init();
+    audioManager.startAmbient('ambient_birds');
+    audioManager.startAmbient('ambient_wind');
 
     // 11. Move camera to player base
     const playerSpawn = this.map.spawns.find(s => s.factionId === FactionId.Brabanders);
@@ -238,6 +243,12 @@ export class Game {
     this.missionSystem.start(mission, cb, wc);
     this._createMsgOverlay();
     this._createObjHUD();
+
+    // Start ambient audio
+    audioManager.init();
+    audioManager.startAmbient('ambient_birds');
+    audioManager.startAmbient('ambient_wind');
+
     console.log(`[Game] Mission "${mission.title}" initialized`);
   }
   private _spawnMissionEntities(m: MissionDefinition): void {
@@ -762,11 +773,13 @@ export class Game {
       } else {
         this.stats.enemiesKilled++;
       }
-      // Audio: play death sound at unit position
+      // Audio + death particles
       const eid = event.entityId;
       const pos = this.entityMeshMap.get(eid)?.position;
       if (pos) {
         audioManager.playSound('unit_death', { x: pos.x, z: pos.z });
+        const factionColor = event.factionId === FactionId.Brabanders ? 0xe67e22 : 0x4a4a5a;
+        this.particles.spawnDeathEffect(pos.x, pos.y, pos.z, factionColor);
       }
       // Remove mesh
       this.unitRenderer.removeUnit(eid);
@@ -787,37 +800,48 @@ export class Game {
       // Mesh creation is handled by detectAndRenderNewEntities
     });
 
-    // Audio: combat hits (sword for melee, arrow for ranged)
+    // Audio + particles: combat hits
     eventBus.on('combat-hit', (event) => {
       const targetPos = { x: event.x, z: event.z };
+      const targetY = this.terrain.getHeightAt(event.x, event.z) + 1.0;
       if (event.isRanged) {
-        // Play arrow shoot from attacker, impact at target
         const attackerPos = { x: Position.x[event.attackerEid], z: Position.z[event.attackerEid] };
         audioManager.playSound('arrow_shoot', attackerPos);
         audioManager.playSound('arrow_impact', targetPos);
       } else {
         audioManager.playSound('sword_hit', targetPos);
       }
+      this.particles.spawnCombatHit(event.x, targetY, event.z, event.isRanged);
     });
 
-    // Audio: building placed (construction start)
+    // Audio + particles: building placed
     eventBus.on('building-placed', (event) => {
+      const y = this.terrain.getHeightAt(event.x, event.z);
+      this.particles.spawnConstructionDust(event.x, y, event.z);
       if (event.factionId === FactionId.Brabanders) {
         audioManager.playSound('building_complete', { x: event.x, z: event.z });
       }
     });
 
-    // Audio: resource deposited (gold jingle)
+    // Audio + particles: resource deposited
     eventBus.on('resource-deposited', (event) => {
       if (event.factionId === FactionId.Brabanders) {
         audioManager.playSound('gold_deposit');
+        // Gold sparkle at town hall
+        const base = this.getPlayerBasePosition();
+        const y = this.terrain.getHeightAt(base.x, base.z) + 1.5;
+        this.particles.spawnGoldSparkle(base.x, y, base.z);
       }
     });
 
-    // Audio: carnavalsrage activated
+    // Audio + particles: carnavalsrage activated
     eventBus.on('carnavalsrage-activated', () => {
       audioManager.playSound('carnavalsrage');
       audioManager.duckMusic(3000);
+      // Orange ability burst around player base
+      const base = this.getPlayerBasePosition();
+      const y = this.terrain.getHeightAt(base.x, base.z) + 0.5;
+      this.particles.spawnAbilityBurst(base.x, y, base.z, 0xff6600, 8);
     });
 
     // Audio: vergadering ability

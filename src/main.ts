@@ -12,6 +12,8 @@ import { CampaignManager } from './campaign/CampaignManager';
 import { getMissionById } from './campaign/MissionDefinitions';
 import { Tutorial } from './core/Tutorial';
 import type { TutorialState as TutorialStateData } from './core/Tutorial';
+import { initAtmosphere, updateAtmosphere } from './rendering/Atmosphere';
+import { ParticleSystem } from './rendering/ParticleSystem';
 
 // ---------------------------------------------------------------------------
 // Renderer
@@ -26,21 +28,19 @@ const renderer = new THREE.WebGLRenderer({
 });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setClearColor(0x87ceeb);
+renderer.setClearColor(0x1a3a5c);
 
 // ---------------------------------------------------------------------------
 // Scene
 // ---------------------------------------------------------------------------
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87ceeb);
+
+// Atmosphere: sky dome, fog, shadow-casting sun, dust particles
+const sun = initAtmosphere(scene, renderer);
+scene.add(sun);
 
 // Ambient: slightly warm for a Brabant afternoon
 scene.add(new THREE.AmbientLight(0xfff8e8, 0.55));
-
-// Sun: warm directional light from the southwest
-const sun = new THREE.DirectionalLight(0xffeedd, 1.1);
-sun.position.set(-40, 70, -30);
-scene.add(sun);
 
 // Fill light from opposite side for softer shadows
 const fill = new THREE.DirectionalLight(0xccddff, 0.25);
@@ -84,7 +84,8 @@ const eventBus = new EventBus();
 // ---------------------------------------------------------------------------
 // Game instance (created but NOT initialized until loading state)
 // ---------------------------------------------------------------------------
-const game = new Game(scene, terrain, rtsCamera, eventBus);
+const particles = new ParticleSystem(scene);
+const game = new Game(scene, terrain, rtsCamera, eventBus, particles);
 
 // ---------------------------------------------------------------------------
 // Menu screens controller
@@ -372,6 +373,8 @@ function fixedUpdate(dt: number): void {
 }
 
 function render(_alpha: number): void {
+  updateAtmosphere(1 / 60); // dust particles
+  particles.update(1 / 60);
   renderer.render(scene, rtsCamera.camera);
   devStats?.update();
 }

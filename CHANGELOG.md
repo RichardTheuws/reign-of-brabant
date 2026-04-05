@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.3.0] - 2026-04-05
+
+### Added
+- **Sky dome**: Procedural gradient sky (deep blue → sky blue → golden horizon haze)
+- **Atmospheric fog**: Exponential fog for depth and distance haze
+- **Shadow mapping**: PCFSoft shadows from sun light (2048x2048 shadow map)
+- **Dust particles**: 200 floating golden dust motes for atmosphere
+- **Particle effects system**: 500-particle pool with 5 effect types:
+  - Gold sparkle on resource deposit
+  - Construction dust on building placement
+  - Combat hit sparks (melee red/orange, ranged blue/white)
+  - Death effect with faction-colored smoke
+  - Ability burst ring (carnavalsrage orange ring)
+- **Ambient audio**: Birds and wind loops auto-start on game init
+
+### Changed
+- **Terrain**: MeshStandardMaterial (was Lambert), richer 9-color palette with ±10% micro-variation, max height 5 (was 3), receiveShadow enabled
+- **Water**: MeshStandardMaterial with roughness 0.2, metalness 0.3, reflections
+- **Units**: 1.5x scale, shadow casting, larger blob shadows (1.2 radius), red damage flash, bigger idle bob (0.08), larger move indicators
+- **Buildings**: 1.8x scale, shadow casting, larger production gear indicator
+- **Props**: Trees 1.5x scale, rocks 1.3x scale, shadow casting on all
+- **Selection circles**: 1.5x scale, health bars 2.0x0.3 (was 1.5x0.2), Y offset 2.5 (was 1.8)
+- **HUD**: Always-visible resource bar (gold/pop/gezelligheid), restyled minimap (180x180, gold border), command panel bottom-center with 44px buttons, selection panel bottom-right, slide-in alert toasts, polished game-over screen
+
 ## [0.2.1] - 2026-04-05
 
 ### Fixed

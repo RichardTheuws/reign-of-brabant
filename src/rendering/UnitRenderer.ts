@@ -35,18 +35,18 @@ const UNIT_MODEL_PATHS: Record<string, string> = {
 const SELECTION_EMISSIVE = new THREE.Color(0x44ff44);
 const SELECTION_EMISSIVE_INTENSITY = 0.35;
 
-/** Damage flash: white flash for 0.1s when a unit takes damage. */
+/** Damage flash: red flash for 0.1s when a unit takes damage. */
 const DAMAGE_FLASH_DURATION = 0.1;
-const DAMAGE_FLASH_COLOR = new THREE.Color(0xffffff);
+const DAMAGE_FLASH_COLOR = new THREE.Color(0xff3333);
 const DAMAGE_FLASH_INTENSITY = 0.8;
 
 /** Idle bob: gentle up-and-down movement for idle units. */
-const IDLE_BOB_AMPLITUDE = 0.05;
+const IDLE_BOB_AMPLITUDE = 0.08;
 const IDLE_BOB_SPEED = 2.5;
 
 /** Blob shadow parameters. */
-const BLOB_SHADOW_SIZE = 0.8;
-const BLOB_SHADOW_OPACITY = 0.25;
+const BLOB_SHADOW_SIZE = 1.2;
+const BLOB_SHADOW_OPACITY = 0.35;
 
 // ---------------------------------------------------------------------------
 // UnitRenderer
@@ -92,7 +92,7 @@ export class UnitRenderer {
     });
 
     // Move indicator (hidden by default)
-    const moveGeo = new THREE.RingGeometry(0.4, 0.6, 16);
+    const moveGeo = new THREE.RingGeometry(0.6, 0.9, 16);
     moveGeo.rotateX(-Math.PI / 2);
     const moveMat = new THREE.MeshBasicMaterial({
       color: 0x44ff44,
@@ -116,10 +116,12 @@ export class UnitRenderer {
     const promises = entries.map(([key, path]) =>
       this.loader.loadAsync(path).then((gltf: GLTF) => {
         const root = gltf.scene;
-        // Ensure all child meshes cast & receive no shadow (PoC)
+        // Scale up units for better visibility on the map
+        root.scale.set(1.5, 1.5, 1.5);
+        // Enable shadow casting on all child meshes
         root.traverse((child) => {
           if ((child as THREE.Mesh).isMesh) {
-            child.castShadow = false;
+            child.castShadow = true;
             child.receiveShadow = false;
           }
         });

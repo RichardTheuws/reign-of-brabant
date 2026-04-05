@@ -25,6 +25,10 @@ const ROCK_PATHS = [
 
 const GOLD_MINE_PATH = 'assets/models/v01/shared/goldmine.glb';
 
+/** Scale multipliers for props. */
+const TREE_SCALE_MULTIPLIER = 1.5;
+const ROCK_SCALE_MULTIPLIER = 1.3;
+
 /** Maximum instances per variant (InstancedMesh budget). */
 const MAX_INSTANCES_PER_VARIANT = 256;
 
@@ -117,7 +121,7 @@ export class PropRenderer {
       this.sourceMaterials.push(data.material);
       const im = new THREE.InstancedMesh(data.geometry, data.material, MAX_INSTANCES_PER_VARIANT);
       im.count = 0; // Start empty
-      im.castShadow = false;
+      im.castShadow = true;
       im.receiveShadow = false;
       im.frustumCulled = false; // instances cover a wide area
       this.treeInstances.push(im);
@@ -135,17 +139,17 @@ export class PropRenderer {
       this.sourceMaterials.push(data.material);
       const im = new THREE.InstancedMesh(data.geometry, data.material, MAX_INSTANCES_PER_VARIANT);
       im.count = 0;
-      im.castShadow = false;
+      im.castShadow = true;
       im.receiveShadow = false;
       im.frustumCulled = false;
       this.rockInstances.push(im);
       this.group.add(im);
     }
 
-    // Gold mine source model
+    // Gold mine source model — enable shadow casting
     mineGltf.scene.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
-        child.castShadow = false;
+        child.castShadow = true;
         child.receiveShadow = false;
       }
     });
@@ -177,7 +181,7 @@ export class PropRenderer {
         const p = list[i];
         this._pos.set(p.x, p.y, p.z);
         this._quat.setFromAxisAngle(THREE.Object3D.DEFAULT_UP, p.rotY);
-        this._scale.setScalar(p.scale);
+        this._scale.setScalar(p.scale * TREE_SCALE_MULTIPLIER);
         this._mat4.compose(this._pos, this._quat, this._scale);
         im.setMatrixAt(i, this._mat4);
       }
@@ -205,7 +209,7 @@ export class PropRenderer {
         const p = list[i];
         this._pos.set(p.x, p.y, p.z);
         this._quat.setFromAxisAngle(THREE.Object3D.DEFAULT_UP, p.rotY);
-        this._scale.setScalar(p.scale);
+        this._scale.setScalar(p.scale * ROCK_SCALE_MULTIPLIER);
         this._mat4.compose(this._pos, this._quat, this._scale);
         im.setMatrixAt(i, this._mat4);
       }

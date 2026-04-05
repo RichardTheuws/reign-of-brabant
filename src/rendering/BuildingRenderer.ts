@@ -30,7 +30,7 @@ const GHOST_OPACITY = 0.45;
 /** Production indicator: spinning gear above producing buildings. */
 const GEAR_SPIN_SPEED = 2.0; // radians per second
 const GEAR_Y_OFFSET = 3.0;
-const GEAR_SIZE = 0.4;
+const GEAR_SIZE = 0.7;
 
 /** Damage tint: red emissive increasing as HP decreases. */
 const DAMAGE_TINT_COLOR = new THREE.Color(0xff2200);
@@ -81,9 +81,12 @@ export class BuildingRenderer {
     const promises = entries.map(([key, path]) =>
       this.loader.loadAsync(path).then((gltf: GLTF) => {
         const root = gltf.scene;
+        // Scale up buildings for proper map presence
+        root.scale.set(1.8, 1.8, 1.8);
+        // Enable shadow casting on all child meshes
         root.traverse((child) => {
           if ((child as THREE.Mesh).isMesh) {
-            child.castShadow = false;
+            child.castShadow = true;
             child.receiveShadow = false;
           }
         });

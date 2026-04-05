@@ -16,10 +16,10 @@ const MAX_SELECTION_CIRCLES = 50;
 const MAX_HEALTH_BARS = 64;
 
 const HEALTHBAR_WIDTH = 64;
-const HEALTHBAR_HEIGHT = 8;
-const HEALTHBAR_SPRITE_SCALE_X = 1.5;
-const HEALTHBAR_SPRITE_SCALE_Y = 0.2;
-const HEALTHBAR_Y_OFFSET = 1.8;
+const HEALTHBAR_HEIGHT = 10;
+const HEALTHBAR_SPRITE_SCALE_X = 2.0;
+const HEALTHBAR_SPRITE_SCALE_Y = 0.3;
+const HEALTHBAR_Y_OFFSET = 2.5;
 
 // HP colour thresholds (matching POC-UI.md: >50% green, >25% yellow, <25% red)
 const HP_COLOR_HIGH = '#4CAF50';
@@ -102,6 +102,8 @@ export class SelectionRenderer {
         }
       }
     });
+    // Scale up selection circles to match new unit scale
+    root.scale.set(1.5, 1.5, 1.5);
     this.circleSource = root;
 
     // Pre-allocate circle pool
@@ -212,8 +214,8 @@ export class SelectionRenderer {
         if (circle) {
           circle.visible = true;
           circle.position.set(data.x, data.y + 0.05, data.z);
-          // Pulse scale
-          const pulse = 1.0 + Math.sin(this.elapsedTime * SELECTION_PULSE_SPEED) * SELECTION_PULSE_AMOUNT;
+          // Pulse scale (1.5x base to match scaled units)
+          const pulse = 1.5 + Math.sin(this.elapsedTime * SELECTION_PULSE_SPEED) * SELECTION_PULSE_AMOUNT * 1.5;
           circle.scale.setScalar(pulse);
           // Tint based on faction ownership
           this.tintCircle(circle, data.isOwnFaction);

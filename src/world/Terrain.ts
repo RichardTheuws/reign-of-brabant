@@ -3,23 +3,31 @@ import { createNoise2D } from 'simplex-noise';
 
 const MAP_SIZE = 128;
 const SEGMENTS = 128;
-const MAX_HEIGHT = 3;
+const MAX_HEIGHT = 5;
 const WATER_LEVEL = 0;
 const NOISE_SCALE = 0.02;
 const OCTAVES = 4;
 const PERSISTENCE = 0.45;
 const LACUNARITY = 2.2;
 
-// Richer green palette for more natural terrain
-const COLOR_GRASS_LIGHT = new THREE.Color(0x5a9e4a);
-const COLOR_GRASS = new THREE.Color(0x4a8c3f);
-const COLOR_GRASS_DARK = new THREE.Color(0x3a7030);
+// Richer, more vibrant color palette
+const COLOR_DEEP_GRASS = new THREE.Color(0x3d7a2e);
+const COLOR_GRASS = new THREE.Color(0x5a9e4a);
+const COLOR_GRASS_LIGHT = new THREE.Color(0x7ab85a);
 const COLOR_GRASS_LUSH = new THREE.Color(0x4d9938);
-const COLOR_PATH = new THREE.Color(0x8b7355);
-const COLOR_WATER_SHORE = new THREE.Color(0x3a6a8a);
-const COLOR_SHORE_FOAM = new THREE.Color(0x6a9ab0);
+const COLOR_PATH = new THREE.Color(0x9b8365);
+const COLOR_SANDY = new THREE.Color(0xc4a968);
 const COLOR_HILL = new THREE.Color(0x6a9a50);
-const COLOR_HILL_TOP = new THREE.Color(0x7aaa5a);
+const COLOR_HILL_TOP = new THREE.Color(0x8aaa6a);
+const COLOR_WATER_EDGE = new THREE.Color(0x3a7a5a);
+
+/** Simple deterministic hash for seeded random per vertex. */
+function seededRandom(x: number, z: number): number {
+  let h = (x * 374761393 + z * 668265263 + 1013904223) | 0;
+  h = ((h ^ (h >> 13)) * 1274126177) | 0;
+  h = h ^ (h >> 16);
+  return (h & 0x7fffffff) / 0x7fffffff; // 0..1
+}
 
 export class Terrain {
   readonly mesh: THREE.Mesh;
@@ -46,9 +54,11 @@ export class Terrain {
     this.generateHeightmap();
     this.applyVertexColors();
 
-    const material = new THREE.MeshLambertMaterial({
+    const material = new THREE.MeshStandardMaterial({
       vertexColors: true,
       side: THREE.FrontSide,
+      roughness: 0.85,
+      metalness: 0.0,
     });
 
     this.mesh = new THREE.Mesh(this.geometry, material);
@@ -184,56 +194,84 @@ export class Terrain {
   }
 
   private applyVertexColors(): void {
-    const count = this.geometry.attributes.position.count;
+    const positions = this.geometry.attributes.position;
+    const count = positions.count;
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
     const tmpColor = new THREE.Color();
+    const stride = SEGMENTS + 1;
 
     for (let i = 0; i < count; i++) {
       const height = this.heightData[i];
       const detail = this.detailNoise[i]; // -1..1 range
 
+      // Derive grid coords for seeded random
+      const ix = i % stride;
+      const iz = Math.floor(i / stride);
+
       if (height <= WATER_LEVEL + 0.15) {
-        // Shore / water edge: blend between shore foam and water shore color
+        // Shore / water edge: swampy transition with sandy patches
         const shoreT = Math.max(0, (height - (WATER_LEVEL - 0.2)) / 0.35);
-        color.lerpColors(COLOR_WATER_SHORE, COLOR_SHORE_FOAM, shoreT);
-      } else if (height < MAX_HEIGHT * 0.15) {
-        // Low grass near water: lighter, lush green
-        const t = (height - (WATER_LEVEL + 0.15)) / (MAX_HEIGHT * 0.15 - WATER_LEVEL - 0.15);
-        color.lerpColors(COLOR_GRASS_LUSH, COLOR_GRASS_LIGHT, t);
-      } else if (height < MAX_HEIGHT * 0.3) {
+        color.lerpColors(COLOR_WATER_EDGE, COLOR_SANDY, shoreT);
+      } else if (height < MAX_HEIGHT * 0.1) {
+        // Low grass near water: lush meadow blending to light grass
+        const t = (height - (WATER_LEVEL + 0.15)) / (MAX_HEIGHT * 0.1 - WATER_LEVEL - 0.15);
+        color.lerpColors(COLOR_GRASS_LUSH, COLOR_GRASS_LIGHT, Math.max(0, Math.min(1, t)));
+      } else if (height < MAX_HEIGHT * 0.25) {
         // Main grassland: blend between light and standard grass using detail noise
-        const t = (height - MAX_HEIGHT * 0.15) / (MAX_HEIGHT * 0.15);
+        const t = (height - MAX_HEIGHT * 0.1) / (MAX_HEIGHT * 0.15);
         color.lerpColors(COLOR_GRASS_LIGHT, COLOR_GRASS, t);
         // Mix in lush variant based on detail noise for natural patchiness
         if (detail > 0.3) {
           const blend = (detail - 0.3) * 1.4;
           tmpColor.copy(COLOR_GRASS_LUSH);
-          color.lerp(tmpColor, blend * 0.3);
+          color.lerp(tmpColor, blend * 0.35);
         }
-      } else if (height < MAX_HEIGHT * 0.5) {
-        // Mid-height: darker grass
-        const t = (height - MAX_HEIGHT * 0.3) / (MAX_HEIGHT * 0.2);
-        color.lerpColors(COLOR_GRASS, COLOR_GRASS_DARK, t);
+      } else if (height < MAX_HEIGHT * 0.4) {
+        // Mid-height: standard to deep grass
+        const t = (height - MAX_HEIGHT * 0.25) / (MAX_HEIGHT * 0.15);
+        color.lerpColors(COLOR_GRASS, COLOR_DEEP_GRASS, t);
+      } else if (height < MAX_HEIGHT * 0.55) {
+        // Transition from deep grass to dirt/path
+        const t = (height - MAX_HEIGHT * 0.4) / (MAX_HEIGHT * 0.15);
+        color.lerpColors(COLOR_DEEP_GRASS, COLOR_PATH, t);
       } else if (height < MAX_HEIGHT * 0.7) {
-        // Transition to dirt/path
-        const t = (height - MAX_HEIGHT * 0.5) / (MAX_HEIGHT * 0.2);
-        color.lerpColors(COLOR_GRASS_DARK, COLOR_PATH, t);
+        // Path zone with sandy patches mixed in
+        const t = (height - MAX_HEIGHT * 0.55) / (MAX_HEIGHT * 0.15);
+        color.lerpColors(COLOR_PATH, COLOR_HILL, t);
+        // Sandy patches in path areas from detail noise
+        if (detail < -0.2) {
+          const blend = (-0.2 - detail) * 0.8;
+          tmpColor.copy(COLOR_SANDY);
+          color.lerp(tmpColor, Math.min(blend, 0.3));
+        }
       } else if (height < MAX_HEIGHT * 0.85) {
         // Upper hills
         const t = (height - MAX_HEIGHT * 0.7) / (MAX_HEIGHT * 0.15);
-        color.lerpColors(COLOR_PATH, COLOR_HILL, t);
-      } else {
-        // Hill tops: slightly brighter
-        const t = (height - MAX_HEIGHT * 0.85) / (MAX_HEIGHT * 0.15);
         color.lerpColors(COLOR_HILL, COLOR_HILL_TOP, t);
+      } else {
+        // Hill tops: sun-bleached
+        color.copy(COLOR_HILL_TOP);
+        // Slightly lighter at the very peak
+        const peakT = Math.min(1, (height - MAX_HEIGHT * 0.85) / (MAX_HEIGHT * 0.15));
+        color.lerp(new THREE.Color(0x9aba7a), peakT * 0.4);
       }
 
-      // Subtle variation driven by detail noise instead of pure random
-      const variation = 0.96 + (detail * 0.5 + 0.5) * 0.08;
-      colors[i * 3] = color.r * variation;
-      colors[i * 3 + 1] = color.g * variation;
-      colors[i * 3 + 2] = color.b * variation;
+      // Micro-variation: seeded random per vertex for +-10% brightness/hue shift
+      const rng = seededRandom(ix, iz); // 0..1
+      const brightnessShift = 0.90 + rng * 0.20; // 0.90 .. 1.10
+
+      // Slight hue shift: nudge green channel differently from red/blue
+      const hueShift = (seededRandom(ix + 9999, iz + 7777) - 0.5) * 0.06; // -0.03..+0.03
+
+      // Also layer in the detail noise for additional organic variation
+      const detailVariation = 0.97 + (detail * 0.5 + 0.5) * 0.06;
+
+      const finalVariation = brightnessShift * detailVariation;
+
+      colors[i * 3] = Math.min(1, color.r * finalVariation);
+      colors[i * 3 + 1] = Math.min(1, (color.g + hueShift) * finalVariation);
+      colors[i * 3 + 2] = Math.min(1, (color.b - hueShift * 0.5) * finalVariation);
     }
 
     this.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
@@ -273,10 +311,13 @@ export class Terrain {
     const waterGeo = new THREE.PlaneGeometry(MAP_SIZE, MAP_SIZE);
     waterGeo.rotateX(-Math.PI / 2);
 
-    const waterMat = new THREE.MeshLambertMaterial({
+    const waterMat = new THREE.MeshStandardMaterial({
       color: 0x2a6496,
       transparent: true,
-      opacity: 0.6,
+      opacity: 0.65,
+      roughness: 0.2,
+      metalness: 0.3,
+      envMapIntensity: 0.5,
       side: THREE.DoubleSide,
     });
 
