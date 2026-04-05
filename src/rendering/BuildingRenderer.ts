@@ -163,7 +163,7 @@ export class BuildingRenderer {
           const applyTint = (m: THREE.Material): THREE.Material => {
             const origColor = ('color' in m && m.color instanceof THREE.Color)
               ? m.color.clone() : new THREE.Color(0x888888);
-            if (tint) origColor.lerp(tint, 0.7);
+            if (tint) origColor.lerp(tint, 0.4);
             return new MeshToonMaterial({ color: origColor, transparent: true });
           };
           if (Array.isArray(mesh.material)) {

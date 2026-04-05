@@ -42,10 +42,10 @@ const STARTING_WORKERS = 3;
 const WORKER_SPACING = 2.5;
 
 /** Number of decorative trees. */
-const TREE_COUNT = 40;
+const TREE_COUNT = 120;
 
 /** Number of decorative rocks. */
-const ROCK_COUNT = 20;
+const ROCK_COUNT = 60;
 
 /** Minimum distance between decorations and bases/mines. */
 const DECO_MIN_DISTANCE = 8;

@@ -38,9 +38,9 @@ export class PostProcessing {
     // 2. Subtle bloom (glow on bright areas)
     this.bloomPass = new UnrealBloomPass(
       new THREE.Vector2(size.x, size.y),
-      0.3,  // strength  – subtle, not overpowering
-      0.4,  // radius
-      0.85, // threshold – only brightest areas bloom
+      0.45, // strength  – noticeable glow
+      0.5,  // radius
+      0.6,  // threshold – catches more bright surfaces
     );
     this.composer.addPass(this.bloomPass);
 

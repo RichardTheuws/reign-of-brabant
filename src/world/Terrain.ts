@@ -3,11 +3,11 @@ import { createNoise2D } from 'simplex-noise';
 
 const MAP_SIZE = 128;
 const SEGMENTS = 128;
-const MAX_HEIGHT = 0.4;
+const MAX_HEIGHT = 0.8;
 const WATER_LEVEL = -1;
 const NOISE_SCALE = 0.006;
-const OCTAVES = 1;
-const PERSISTENCE = 0.25;
+const OCTAVES = 3;
+const PERSISTENCE = 0.35;
 const LACUNARITY = 2.2;
 
 // Clean, saturated Brabant meadow palette
