@@ -2,12 +2,12 @@ import * as THREE from 'three';
 import { clamp, lerp } from '@utils/math';
 
 const PAN_SPEED = 30;
-const ZOOM_SPEED = 6;
+const ZOOM_SPEED = 2.5;
 const MIN_ZOOM = 8;
 const MAX_ZOOM = 80;
 const EDGE_SCROLL_THRESHOLD = 20;
 const EDGE_SCROLL_SPEED = 25;
-const SMOOTHING = 0.1;
+const SMOOTHING = 0.15;
 const CAMERA_ANGLE = (55 * Math.PI) / 180;
 
 export class RTSCamera {

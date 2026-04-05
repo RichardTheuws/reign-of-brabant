@@ -338,7 +338,7 @@ export class UnitRenderer {
       obj.scale.y = 1.0 + breathe;
 
       // Apply Y position: terrain height + offset to clear terrain + procedural bob
-      obj.position.set(data.x, data.y + 0.2 + bob, data.z);
+      obj.position.set(data.x, data.y + 0.5 + bob, data.z);
 
       // --- Facing direction ---
       // Prefer movement target if supplied, else use ry
@@ -371,7 +371,7 @@ export class UnitRenderer {
       // Sync blob shadow position (slightly above ground)
       const shadow = this.blobShadows.get(data.eid);
       if (shadow) {
-        shadow.position.set(data.x, data.y + 0.03, data.z);
+        shadow.position.set(data.x, data.y + 0.05, data.z);
       }
     }
   }
