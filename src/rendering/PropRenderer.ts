@@ -13,7 +13,7 @@ import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 // ---------------------------------------------------------------------------
 
 const TREE_PATHS = [
-  'assets/models/v01/shared/tree_pine.glb',
+  'assets/models/v02/shared/tree_pine.glb',
   'assets/models/poc/props/tree_variant_1.glb',
   'assets/models/poc/props/tree_variant_2.glb',
 ];
@@ -24,7 +24,7 @@ const ROCK_PATHS = [
   'assets/models/poc/props/rock_variant_2.glb',
 ];
 
-const GOLD_MINE_PATH = 'assets/models/v01/shared/goldmine.glb';
+const GOLD_MINE_PATH = 'assets/models/v02/shared/goldmine.glb';
 
 /** Scale multipliers for props. */
 const TREE_SCALE_MULTIPLIER = 1.5;
