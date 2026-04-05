@@ -3,11 +3,11 @@ import { createNoise2D } from 'simplex-noise';
 
 const MAP_SIZE = 128;
 const SEGMENTS = 128;
-const MAX_HEIGHT = 0.6;
-const WATER_LEVEL = 0;
-const NOISE_SCALE = 0.012;
+const MAX_HEIGHT = 1.0;
+const WATER_LEVEL = -0.5;
+const NOISE_SCALE = 0.008;
 const OCTAVES = 2;
-const PERSISTENCE = 0.3;
+const PERSISTENCE = 0.25;
 const LACUNARITY = 2.2;
 
 // Clean, saturated Brabant meadow palette
@@ -168,11 +168,9 @@ export class Terrain {
         noiseValue /= maxAmplitude;
 
         const edgeFalloff = this.edgeFalloff(nx, nz);
+        // Ensure all terrain is above 0 — gentle rolling hills, no underwater areas
         let height = ((noiseValue + 1) / 2) * MAX_HEIGHT * edgeFalloff;
-
-        if (height < WATER_LEVEL + 0.1) {
-          height = WATER_LEVEL - 0.2;
-        }
+        height = Math.max(0.05, height);
 
         this.heightData[idx] = height;
         positions.setY(idx, height);
@@ -190,8 +188,8 @@ export class Terrain {
     const dx = Math.abs(nx - 0.5) * 2;
     const dz = Math.abs(nz - 0.5) * 2;
     const d = Math.max(dx, dz);
-    if (d > 0.85) {
-      return 1 - ((d - 0.85) / 0.15);
+    if (d > 0.9) {
+      return Math.max(0.3, 1 - ((d - 0.9) / 0.1));
     }
     return 1;
   }
@@ -212,52 +210,29 @@ export class Terrain {
       const ix = i % stride;
       const iz = Math.floor(i / stride);
 
-      if (height <= WATER_LEVEL + 0.15) {
-        // Shore / water edge: swampy transition with sandy patches
-        const shoreT = Math.max(0, (height - (WATER_LEVEL - 0.2)) / 0.35);
-        color.lerpColors(COLOR_WATER_EDGE, COLOR_SANDY, shoreT);
-      } else if (height < MAX_HEIGHT * 0.1) {
-        // Low grass near water: lush meadow blending to light grass
-        const t = (height - (WATER_LEVEL + 0.15)) / (MAX_HEIGHT * 0.1 - WATER_LEVEL - 0.15);
-        color.lerpColors(COLOR_GRASS_LUSH, COLOR_GRASS_LIGHT, Math.max(0, Math.min(1, t)));
-      } else if (height < MAX_HEIGHT * 0.25) {
-        // Main grassland: blend between light and standard grass using detail noise
-        const t = (height - MAX_HEIGHT * 0.1) / (MAX_HEIGHT * 0.15);
-        color.lerpColors(COLOR_GRASS_LIGHT, COLOR_GRASS, t);
-        // Mix in lush variant based on detail noise for natural patchiness
-        if (detail > 0.3) {
-          const blend = (detail - 0.3) * 1.4;
-          tmpColor.copy(COLOR_GRASS_LUSH);
-          color.lerp(tmpColor, blend * 0.35);
+      // Simple, clean color zones — mostly green with subtle variation
+      const t = Math.min(1, height / MAX_HEIGHT); // 0..1 normalized height
+
+      if (t < 0.3) {
+        // Low areas: lush meadow green
+        color.lerpColors(COLOR_GRASS_LUSH, COLOR_GRASS, t / 0.3);
+      } else if (t < 0.6) {
+        // Mid areas: standard green with detail-based patches
+        const mt = (t - 0.3) / 0.3;
+        color.lerpColors(COLOR_GRASS, COLOR_GRASS_LIGHT, mt);
+        // Subtle dirt patches based on noise
+        if (detail > 0.4) {
+          tmpColor.copy(COLOR_PATH);
+          color.lerp(tmpColor, (detail - 0.4) * 0.3);
         }
-      } else if (height < MAX_HEIGHT * 0.4) {
-        // Mid-height: standard to deep grass
-        const t = (height - MAX_HEIGHT * 0.25) / (MAX_HEIGHT * 0.15);
-        color.lerpColors(COLOR_GRASS, COLOR_DEEP_GRASS, t);
-      } else if (height < MAX_HEIGHT * 0.55) {
-        // Transition from deep grass to dirt/path
-        const t = (height - MAX_HEIGHT * 0.4) / (MAX_HEIGHT * 0.15);
-        color.lerpColors(COLOR_DEEP_GRASS, COLOR_PATH, t);
-      } else if (height < MAX_HEIGHT * 0.7) {
-        // Path zone with sandy patches mixed in
-        const t = (height - MAX_HEIGHT * 0.55) / (MAX_HEIGHT * 0.15);
-        color.lerpColors(COLOR_PATH, COLOR_HILL, t);
-        // Sandy patches in path areas from detail noise
-        if (detail < -0.2) {
-          const blend = (-0.2 - detail) * 0.8;
-          tmpColor.copy(COLOR_SANDY);
-          color.lerp(tmpColor, Math.min(blend, 0.3));
-        }
-      } else if (height < MAX_HEIGHT * 0.85) {
-        // Upper hills
-        const t = (height - MAX_HEIGHT * 0.7) / (MAX_HEIGHT * 0.15);
-        color.lerpColors(COLOR_HILL, COLOR_HILL_TOP, t);
+      } else if (t < 0.85) {
+        // Higher areas: light grass to hill green
+        const ht = (t - 0.6) / 0.25;
+        color.lerpColors(COLOR_GRASS_LIGHT, COLOR_HILL, ht);
       } else {
         // Hill tops: sun-bleached
-        color.copy(COLOR_HILL_TOP);
-        // Slightly lighter at the very peak
-        const peakT = Math.min(1, (height - MAX_HEIGHT * 0.85) / (MAX_HEIGHT * 0.15));
-        color.lerp(new THREE.Color(0x9aba7a), peakT * 0.4);
+        const pt = (t - 0.85) / 0.15;
+        color.lerpColors(COLOR_HILL, COLOR_HILL_TOP, Math.min(1, pt));
       }
 
       // Micro-variation: seeded random per vertex for +-4% brightness/hue shift

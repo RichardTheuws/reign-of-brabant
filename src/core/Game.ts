@@ -1450,7 +1450,7 @@ export class Game {
           });
         } else {
           // Buildings & resources: position sync with Y offset to prevent terrain clipping
-          const yOffset = hasComponent(world, eid, IsBuilding) ? 0.3 : 0.1;
+          const yOffset = hasComponent(world, eid, IsBuilding) ? 0.5 : 0.15;
           mesh.position.set(Position.x[eid], Position.y[eid] + yOffset, Position.z[eid]);
         }
       }
