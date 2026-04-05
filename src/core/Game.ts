@@ -33,6 +33,7 @@ import { HUD, type SelectedUnit, type SelectedBuilding, type CommandAction } fro
 import { activateCarnavalsrage, getCarnavalsrageState, getCarnavalsrageConfig } from '../systems/AbilitySystem';
 import { activateHeroAbility } from '../systems/HeroSystem';
 import { audioManager } from '../audio/AudioManager';
+import { playUnitVoice } from '../audio/UnitVoices';
 import { MissionSystem, type MissionCallbacks } from '../campaign/MissionSystem';
 import { getMissionById, type MissionDefinition, type MissionUnitSpawn } from '../campaign/MissionDefinitions';
 import type { Terrain } from '../world/Terrain';
@@ -1031,9 +1032,13 @@ export class Game {
       Selected.by[eid] = 0; // Selected by player
     }
 
-    // Audio: play select sound when selecting own units
+    // Audio: play select sound + voice line when selecting own units
     if (entityIds.length > 0) {
       audioManager.playSound('select_unit');
+      const firstEid = entityIds[0];
+      if (hasComponent(world, firstEid, IsUnit)) {
+        playUnitVoice(Faction.id[firstEid], 'select', UnitType.id[firstEid]);
+      }
     }
 
     // Update HUD
@@ -1172,18 +1177,26 @@ export class Game {
       // Check if we clicked on an enemy or a resource
       const targetEid = this.findEntityAtPosition(point.x, point.z);
 
+      // Determine unit type of first selected unit for voice lines
+      const voiceEid = selected[0];
+      const voiceFaction = hasComponent(world, voiceEid, IsUnit) ? Faction.id[voiceEid] : FactionId.Brabanders;
+      const voiceUnitType = hasComponent(world, voiceEid, IsUnit) ? UnitType.id[voiceEid] : undefined;
+
       if (targetEid !== null && Faction.id[targetEid] !== FactionId.Brabanders &&
           (hasComponent(world, targetEid, IsUnit) || hasComponent(world, targetEid, IsBuilding))) {
         // Attack enemy unit or building
         queueCommand({ type: 'attack', targetEid });
+        playUnitVoice(voiceFaction, 'attack', voiceUnitType);
       } else if (targetEid !== null && hasComponent(world, targetEid, IsResource)) {
         // Gather from resource
         queueCommand({ type: 'gather', targetEid });
+        playUnitVoice(voiceFaction, 'gather', voiceUnitType);
       } else {
         // Move to position
         queueCommand({ type: 'move', targetX: point.x, targetZ: point.z });
         // Show green move indicator
         this.unitRenderer.showMoveIndicator(point.x, point.y, point.z);
+        playUnitVoice(voiceFaction, 'move', voiceUnitType);
       }
     }
   }

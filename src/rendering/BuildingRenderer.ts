@@ -175,9 +175,12 @@ export class BuildingRenderer {
       }
     });
 
-    clone.position.set(x, y, z);
+    // Lift buildings above terrain to prevent sinking (v02 models have center pivots)
+    const yOffset = isV02 ? 0.6 : 0.3;
+    clone.position.set(x, y + yOffset, z);
     clone.name = `building_${eid}`;
     clone.userData.eid = eid;
+    clone.userData.buildingYOffset = yOffset;
 
     this.applyBuildProgress(clone, progress);
 
@@ -327,7 +330,9 @@ export class BuildingRenderer {
     for (const data of buildings) {
       const obj = this.instances.get(data.eid);
       if (!obj) continue;
-      obj.position.set(data.x, data.y, data.z);
+      // Apply Y offset to prevent buildings sinking into terrain
+      const yOff = obj.userData.buildingYOffset ?? 0.3;
+      obj.position.set(data.x, data.y + yOff, data.z);
       this.applyBuildProgress(obj, data.progress);
 
       // Damage tint: apply red emissive based on HP ratio

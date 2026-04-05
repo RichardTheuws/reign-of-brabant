@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.5.0] - 2026-04-05
+
+### Added
+- **Campaign missions 4-6**: "De Binnendieze" (stealth commando), "Heuvelland Diplomatie" (survive Limburgse tests), "De Boerenopstand" (free tractors, destroy garrison)
+- **51 ElevenLabs voice lines**: Per-unit-type voices for Boer (calm farmer), Carnavalvierder (euphoric party animal), Kansen (whispery stealth) + Randstad generics
+- **Voice line integration**: `playUnitVoice()` triggered on select, move, attack, gather with unit-type-specific personality
+- **Per-unit voice settings**: Different ElevenLabs stability/style per unit type for distinct personalities
+- **Failed path tracking**: Voice system silently skips missing audio files without console spam
+
+### Changed
+- **UnitVoices.ts refactored**: From flat faction-only to `faction/unitType/action_n.mp3` hierarchy with fallback to generic
+- **Building Y-offset**: v02 models lifted +0.6, v01 +0.3 to prevent sinking into terrain
+- **Building update loop**: Consistent Y-offset applied via `userData.buildingYOffset` during frame updates
+
+### Fixed
+- **Building sinking**: Town Hall and Barracks no longer clip into terrain on hilly maps
+
 ## [0.4.0] - 2026-04-05
 
 ### Added
