@@ -1463,10 +1463,10 @@ export class Game {
             targetX: hasTarget ? Movement.targetX[eid] : undefined,
             targetZ: hasTarget ? Movement.targetZ[eid] : undefined,
           });
-        } else {
-          // Buildings & resources: position sync with Y offset to prevent terrain clipping
-          const yOffset = hasComponent(world, eid, IsBuilding) ? 0.8 : 0.3;
-          mesh.position.set(Position.x[eid], Position.y[eid] + yOffset, Position.z[eid]);
+        } else if (!hasComponent(world, eid, IsBuilding)) {
+          // Resources: position sync with Y offset to prevent terrain clipping
+          // Buildings are handled by syncBuildingProgress -> BuildingRenderer.update
+          mesh.position.set(Position.x[eid], Position.y[eid] + 0.3, Position.z[eid]);
         }
       }
     }

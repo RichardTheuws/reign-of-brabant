@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.2] - 2026-04-05
+
+### Fixed
+- **Double Y-offset on buildings**: `syncRenderPositions` no longer positions buildings (was fighting with `BuildingRenderer.update`). Buildings now exclusively positioned by their renderer with correct per-model offset.
+- **Movement Y-jitter**: Units now lerp to terrain height (`dt * 12` rate) instead of snapping, eliminating vertical stutter on micro-bumps.
+
 ## [0.5.1] - 2026-04-05
 
 ### Fixed

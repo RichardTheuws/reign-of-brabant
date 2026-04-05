@@ -64,8 +64,9 @@ export function createMovementSystem(terrain: Terrain) {
         Position.z[eid] += stepZ;
       }
 
-      // Snap Y to terrain height
-      Position.y[eid] = terrain.getHeightAt(Position.x[eid], Position.z[eid]);
+      // Smooth Y to terrain height (lerp to avoid vertical jitter on micro-bumps)
+      const targetY = terrain.getHeightAt(Position.x[eid], Position.z[eid]);
+      Position.y[eid] += (targetY - Position.y[eid]) * Math.min(dt * 12, 1);
 
       // Face movement direction
       Rotation.y[eid] = Math.atan2(_dx, _dz);
