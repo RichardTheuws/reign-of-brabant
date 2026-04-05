@@ -71,6 +71,8 @@ const BLOB_SHADOW_OPACITY = 0.35;
 export class UnitRenderer {
   /** Loaded & parsed source models ready to be cloned. */
   private modelCache = new Map<ModelCacheKey, THREE.Group>();
+  /** Track which models are v02 (keep PBR materials, no toon conversion). */
+  private v02Models = new Set<ModelCacheKey>();
   /** Entity id -> cloned scene root living in the scene graph. */
   private instances = new Map<number, THREE.Object3D>();
   /** Shared loader instance. */
@@ -140,8 +142,10 @@ export class UnitRenderer {
         throw new Error(`No model found for ${key}`);
       }).then((gltf: GLTF) => {
         const root = gltf.scene;
-        // Scale up units for better visibility on the map
-        root.scale.set(1.5, 1.5, 1.5);
+        const isV02 = path.includes('/v02/');
+        if (isV02) this.v02Models.add(key as ModelCacheKey);
+        // v02 models are larger — use smaller scale; v01 needs upscale
+        root.scale.set(isV02 ? 0.5 : 1.5, isV02 ? 0.5 : 1.5, isV02 ? 0.5 : 1.5);
         // Enable shadow casting on all child meshes
         root.traverse((child) => {
           if ((child as THREE.Mesh).isMesh) {
@@ -174,31 +178,33 @@ export class UnitRenderer {
     }
 
     const clone = source.clone(true);
+    const isV02 = this.v02Models.has(key);
     const tint = FACTION_TINTS[factionId];
-    // Convert materials to MeshToonMaterial for stylized cel-shaded look
+
     clone.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
-        const applyTint = (m: THREE.Material): THREE.Material => {
-          // Extract base color from original material
-          const origColor = ('color' in m && m.color instanceof THREE.Color)
-            ? m.color.clone()
-            : new THREE.Color(0x888888);
-
-          // Apply faction tint (strong: 70% blend)
-          if (tint) origColor.lerp(tint, 0.7);
-
-          // Create toon material for stylized look
-          const toon = new MeshToonMaterial({
-            color: origColor,
-            transparent: false,
-          });
-          return toon;
-        };
-        if (Array.isArray(mesh.material)) {
-          mesh.material = mesh.material.map(applyTint);
+        if (isV02) {
+          // v02: keep original PBR materials, just clone to avoid shared state
+          if (Array.isArray(mesh.material)) {
+            mesh.material = mesh.material.map((m) => m.clone());
+          } else {
+            mesh.material = mesh.material.clone();
+          }
         } else {
-          mesh.material = applyTint(mesh.material);
+          // v01: convert to toon material with faction tint
+          const applyTint = (m: THREE.Material): THREE.Material => {
+            const origColor = ('color' in m && m.color instanceof THREE.Color)
+              ? m.color.clone()
+              : new THREE.Color(0x888888);
+            if (tint) origColor.lerp(tint, 0.7);
+            return new MeshToonMaterial({ color: origColor, transparent: false });
+          };
+          if (Array.isArray(mesh.material)) {
+            mesh.material = mesh.material.map(applyTint);
+          } else {
+            mesh.material = applyTint(mesh.material);
+          }
         }
       }
     });

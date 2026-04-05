@@ -140,14 +140,16 @@ export class PropRenderer {
     ]);
 
     // Build InstancedMesh per tree variant
-    for (const gltf of treeGltfs) {
+    for (let ti = 0; ti < treeGltfs.length; ti++) {
+      const gltf = treeGltfs[ti];
       const data = extractFirstMesh(gltf.scene);
       if (!data) {
         console.warn('[PropRenderer] Tree GLB has no mesh children');
         continue;
       }
-      // Convert to toon material with green tint
-      const toonMat = toToonMaterial(data.material, '#3a8828', 0.5);
+      // v02 models keep PBR, v01/poc get toon conversion
+      const isV02 = TREE_PATHS[ti].includes('/v02/');
+      const toonMat = isV02 ? data.material : toToonMaterial(data.material, '#3a8828', 0.5);
       this.sourceGeometries.push(data.geometry);
       this.sourceMaterials.push(toonMat);
       const im = new THREE.InstancedMesh(data.geometry, toonMat, MAX_INSTANCES_PER_VARIANT);
@@ -263,13 +265,23 @@ export class PropRenderer {
     if (!this.goldMineSource) return null;
 
     const clone = this.goldMineSource.clone(true);
+    const isV02 = GOLD_MINE_PATH.includes('/v02/');
     clone.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
-        if (Array.isArray(mesh.material)) {
-          mesh.material = mesh.material.map((m) => toToonMaterial(m.clone(), '#d4a030', 0.6));
+        if (isV02) {
+          // v02: keep PBR materials
+          if (Array.isArray(mesh.material)) {
+            mesh.material = mesh.material.map((m) => m.clone());
+          } else {
+            mesh.material = mesh.material.clone();
+          }
         } else {
-          mesh.material = toToonMaterial(mesh.material.clone(), '#d4a030', 0.6);
+          if (Array.isArray(mesh.material)) {
+            mesh.material = mesh.material.map((m) => toToonMaterial(m.clone(), '#d4a030', 0.6));
+          } else {
+            mesh.material = toToonMaterial(mesh.material.clone(), '#d4a030', 0.6);
+          }
         }
       }
     });
