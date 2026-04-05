@@ -1,0 +1,417 @@
+import * as THREE from 'three';
+import { GameLoop } from './core/GameLoop';
+import { EventBus } from './core/EventBus';
+import { Terrain } from './world/Terrain';
+import { RTSCamera } from './camera/RTSCamera';
+import { Game } from './core/Game';
+import { GameStateMachine, GameStateId } from './core/GameState';
+import { MenuState, FactionSelectState, CampaignSelectState, BriefingState, LoadingState, TutorialState, PlayingState, GameOverState, setGameFlowDeps } from './core/GameStates';
+import { MenuScreens } from './ui/MenuScreens';
+import { CampaignUI } from './ui/CampaignUI';
+import { CampaignManager } from './campaign/CampaignManager';
+import { getMissionById } from './campaign/MissionDefinitions';
+import { Tutorial } from './core/Tutorial';
+import type { TutorialState as TutorialStateData } from './core/Tutorial';
+
+// ---------------------------------------------------------------------------
+// Renderer
+// ---------------------------------------------------------------------------
+const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
+if (!canvas) throw new Error('Canvas #game-canvas not found');
+
+const renderer = new THREE.WebGLRenderer({
+  canvas,
+  antialias: true,
+  powerPreference: 'high-performance',
+});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(0x87ceeb);
+
+// ---------------------------------------------------------------------------
+// Scene
+// ---------------------------------------------------------------------------
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87ceeb);
+
+// Ambient: slightly warm for a Brabant afternoon
+scene.add(new THREE.AmbientLight(0xfff8e8, 0.55));
+
+// Sun: warm directional light from the southwest
+const sun = new THREE.DirectionalLight(0xffeedd, 1.1);
+sun.position.set(-40, 70, -30);
+scene.add(sun);
+
+// Fill light from opposite side for softer shadows
+const fill = new THREE.DirectionalLight(0xccddff, 0.25);
+fill.position.set(30, 40, 40);
+scene.add(fill);
+
+// ---------------------------------------------------------------------------
+// Terrain
+// ---------------------------------------------------------------------------
+const terrain = new Terrain();
+scene.add(terrain.mesh);
+scene.add(terrain.waterMesh);
+if (terrain.gridMesh) scene.add(terrain.gridMesh);
+
+// ---------------------------------------------------------------------------
+// Camera
+// ---------------------------------------------------------------------------
+const rtsCamera = new RTSCamera(terrain.mapSize);
+
+// ---------------------------------------------------------------------------
+// Input state
+// ---------------------------------------------------------------------------
+const keysDown = new Set<string>();
+let mouseX = -1, mouseY = -1, scrollDelta = 0;
+
+window.addEventListener('keydown', (e) => keysDown.add(e.code));
+window.addEventListener('keyup', (e) => keysDown.delete(e.code));
+window.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+window.addEventListener('wheel', (e) => { e.preventDefault(); scrollDelta += e.deltaY > 0 ? 1 : -1; }, { passive: false });
+window.addEventListener('contextmenu', (e) => e.preventDefault());
+window.addEventListener('resize', () => {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  rtsCamera.resize(window.innerWidth, window.innerHeight);
+});
+
+// ---------------------------------------------------------------------------
+// Event bus
+// ---------------------------------------------------------------------------
+const eventBus = new EventBus();
+
+// ---------------------------------------------------------------------------
+// Game instance (created but NOT initialized until loading state)
+// ---------------------------------------------------------------------------
+const game = new Game(scene, terrain, rtsCamera, eventBus);
+
+// ---------------------------------------------------------------------------
+// Menu screens controller
+// ---------------------------------------------------------------------------
+const menuScreens = new MenuScreens();
+
+// ---------------------------------------------------------------------------
+// Campaign system
+// ---------------------------------------------------------------------------
+const campaignManager = new CampaignManager();
+const campaignUI = new CampaignUI(campaignManager);
+let activeMissionId: string | null = null;
+
+// ---------------------------------------------------------------------------
+// Tutorial
+// ---------------------------------------------------------------------------
+const tutorial = new Tutorial();
+let tutorialActive = false;
+
+// Track tutorial state from game events
+const tutorialState: TutorialStateData = {
+  cameraMoved: false,
+  workerSelected: false,
+  gatheringStarted: false,
+  barracksBuilt: false,
+  unitTrained: false,
+  attackIssued: false,
+  gold: 0,
+};
+
+// Camera tracking for tutorial: detect if camera has been moved
+let initialCameraX = 0;
+let initialCameraZ = 0;
+
+// ---------------------------------------------------------------------------
+// State Machine
+// ---------------------------------------------------------------------------
+const stateMachine = new GameStateMachine();
+let gameInitialized = false;
+
+// Menu camera rotation state
+let menuCameraAngle = 0;
+
+// Camera intro state
+let cameraIntroActive = false;
+let cameraIntroTimer = 0;
+const CAMERA_INTRO_DURATION = 2.0;
+let cameraIntroStartY = 80;
+let cameraIntroTargetX = 0;
+let cameraIntroTargetZ = 0;
+
+// ---------------------------------------------------------------------------
+// Wire up state machine dependencies
+// ---------------------------------------------------------------------------
+setGameFlowDeps({
+  showMainMenu: () => menuScreens.showMainMenu(),
+  hideMainMenu: () => menuScreens.hideMainMenu(),
+  showFactionSelect: () => menuScreens.showFactionSelect(),
+  hideFactionSelect: () => menuScreens.hideFactionSelect(),
+  showCampaignSelect: () => campaignUI.showCampaignSelect(),
+  hideCampaignSelect: () => campaignUI.hideCampaignSelect(),
+  showBriefing: (missionId) => campaignUI.showBriefing(missionId),
+  hideBriefing: () => campaignUI.hideBriefing(),
+  showLoadingScreen: () => menuScreens.showLoadingScreen(),
+  hideLoadingScreen: () => menuScreens.hideLoadingScreen(),
+  setGameHUDVisible: (v) => menuScreens.setGameHUDVisible(v),
+  updateLoadingProgress: (p, l) => menuScreens.updateLoadingProgress(p, l),
+  isGameInitialized: () => gameInitialized,
+
+  startGame: async (isTutorial: boolean) => {
+    if (!gameInitialized) {
+      await game.init();
+      gameInitialized = true;
+    }
+    tutorialActive = isTutorial;
+    if (isTutorial) {
+      // Reset tutorial state
+      tutorialState.cameraMoved = false;
+      tutorialState.workerSelected = false;
+      tutorialState.gatheringStarted = false;
+      tutorialState.barracksBuilt = false;
+      tutorialState.unitTrained = false;
+      tutorialState.attackIssued = false;
+    }
+  },
+
+  startMission: async (missionId: string) => {
+    activeMissionId = missionId;
+    await game.initMission(missionId);
+    gameInitialized = true;
+
+    // Wire up mission victory/defeat callbacks
+    game.onMissionVictory = (stars, time, bonuses) => {
+      const mission = getMissionById(missionId);
+      campaignManager.completeMission(missionId, stars, time, bonuses);
+      const bonusDescriptions = bonuses.map(id => {
+        const obj = mission?.objectives.find(o => o.id === id);
+        return obj?.description ?? id;
+      });
+      campaignUI.showVictoryOverlay(stars, time, bonusDescriptions, mission?.title ?? 'Missie');
+    };
+    game.onMissionDefeat = () => {
+      const mission = getMissionById(missionId);
+      campaignUI.showDefeatOverlay(mission?.title ?? 'Missie');
+    };
+  },
+
+  updateGame: (dt: number) => {
+    // Camera input (only when in-game, not during intro)
+    if (!cameraIntroActive) {
+      rtsCamera.update(dt, keysDown, mouseX, mouseY, window.innerWidth, window.innerHeight, scrollDelta);
+      scrollDelta = 0;
+
+      // Track camera movement for tutorial
+      if (tutorialActive && !tutorialState.cameraMoved) {
+        const cam = rtsCamera.camera.position;
+        const dx = Math.abs(cam.x - initialCameraX);
+        const dz = Math.abs(cam.z - initialCameraZ);
+        if (dx > 3 || dz > 3) {
+          tutorialState.cameraMoved = true;
+        }
+      }
+    }
+
+    game.update(dt);
+
+    // Update tutorial if active
+    if (tutorialActive && tutorial.isActive) {
+      // Feed game state into tutorial
+      tutorialState.gold = game.getPlayerGold();
+      tutorialState.workerSelected = game.hasWorkerSelected();
+      tutorialState.gatheringStarted = game.hasGatheringStarted();
+      tutorialState.barracksBuilt = game.hasBarracksBuilt();
+      tutorialState.unitTrained = game.hasUnitTrained();
+      tutorialState.attackIssued = game.hasAttackIssued();
+
+      tutorial.update(dt, tutorialState);
+    }
+  },
+
+  updateMenuCamera: (dt: number) => {
+    // Slowly rotate camera around the center of the map
+    menuCameraAngle += dt * 0.15;
+    const radius = 60;
+    const height = 45;
+    const cx = Math.cos(menuCameraAngle) * radius;
+    const cz = Math.sin(menuCameraAngle) * radius;
+    rtsCamera.camera.position.set(cx, height, cz);
+    rtsCamera.camera.lookAt(0, 0, 0);
+  },
+
+  startCameraIntro: () => {
+    cameraIntroActive = true;
+    cameraIntroTimer = 0;
+
+    // Start camera high above the map
+    const playerBase = game.getPlayerBasePosition();
+    cameraIntroTargetX = playerBase.x;
+    cameraIntroTargetZ = playerBase.z;
+    cameraIntroStartY = 80;
+
+    // Show and fade the black overlay
+    const overlay = document.getElementById('camera-intro-overlay');
+    if (overlay) {
+      overlay.classList.remove('is-hidden');
+      overlay.classList.remove('is-fading');
+      // Trigger fade after a small delay
+      requestAnimationFrame(() => {
+        overlay.classList.add('is-fading');
+      });
+    }
+
+    // Record initial camera position for tutorial tracking
+    initialCameraX = cameraIntroTargetX;
+    initialCameraZ = cameraIntroTargetZ;
+
+    // Start tutorial if in tutorial mode
+    if (tutorialActive) {
+      tutorial.start(() => {
+        // Tutorial completed -- just continue playing
+        tutorialActive = false;
+      });
+    }
+  },
+});
+
+// ---------------------------------------------------------------------------
+// Register states
+// ---------------------------------------------------------------------------
+stateMachine.register(new MenuState());
+stateMachine.register(new FactionSelectState());
+stateMachine.register(new CampaignSelectState());
+stateMachine.register(new BriefingState());
+stateMachine.register(new LoadingState());
+stateMachine.register(new TutorialState());
+stateMachine.register(new PlayingState());
+stateMachine.register(new GameOverState());
+
+// ---------------------------------------------------------------------------
+// Menu screen events
+// ---------------------------------------------------------------------------
+menuScreens.init({
+  onMenuAction: (action) => {
+    switch (action) {
+      case 'play':
+        stateMachine.requestTransition(GameStateId.FACTION_SELECT);
+        break;
+      case 'campaign':
+        stateMachine.requestTransition(GameStateId.CAMPAIGN_SELECT);
+        break;
+      case 'tutorial':
+        stateMachine.requestTransition(GameStateId.LOADING, { tutorial: true });
+        break;
+      case 'settings':
+        // Settings not implemented yet
+        break;
+    }
+  },
+  onFactionSelected: (_faction, _startTutorial) => {
+    stateMachine.requestTransition(GameStateId.LOADING, { tutorial: false });
+  },
+});
+
+// ---------------------------------------------------------------------------
+// Campaign UI events
+// ---------------------------------------------------------------------------
+campaignUI.init({
+  onMissionSelected: (missionId) => {
+    stateMachine.requestTransition(GameStateId.BRIEFING, { missionId });
+  },
+  onStartMission: (missionId) => {
+    stateMachine.requestTransition(GameStateId.LOADING, { missionId });
+  },
+  onBackToMenu: () => {
+    stateMachine.requestTransition(GameStateId.MENU);
+  },
+  onBackToCampaignSelect: () => {
+    stateMachine.requestTransition(GameStateId.CAMPAIGN_SELECT);
+  },
+});
+
+// ---------------------------------------------------------------------------
+// Stats (dev only)
+// ---------------------------------------------------------------------------
+let devStats: { update: () => void; dom: HTMLElement } | null = null;
+
+// ---------------------------------------------------------------------------
+// Game Loop
+// ---------------------------------------------------------------------------
+function fixedUpdate(dt: number): void {
+  // Camera intro animation
+  if (cameraIntroActive) {
+    cameraIntroTimer += dt;
+    const t = Math.min(cameraIntroTimer / CAMERA_INTRO_DURATION, 1);
+    // Smooth ease-out
+    const eased = 1 - Math.pow(1 - t, 3);
+
+    // Interpolate from high above to normal RTS view
+    const startHeight = cameraIntroStartY;
+    const endHeight = 35;
+    const currentHeight = startHeight + (endHeight - startHeight) * eased;
+
+    const offsetZ = 25 * Math.cos(Math.PI / 3); // ~60 degree angle offset
+    rtsCamera.camera.position.set(
+      cameraIntroTargetX,
+      currentHeight,
+      cameraIntroTargetZ + offsetZ + (1 - eased) * 20
+    );
+    rtsCamera.camera.lookAt(cameraIntroTargetX, 0, cameraIntroTargetZ);
+
+    if (t >= 1) {
+      cameraIntroActive = false;
+      // Snap camera to proper RTS position
+      rtsCamera.setPosition(cameraIntroTargetX, cameraIntroTargetZ);
+      // Remove overlay
+      const overlay = document.getElementById('camera-intro-overlay');
+      if (overlay) {
+        setTimeout(() => overlay.classList.add('is-hidden'), 1000);
+      }
+    }
+  }
+
+  // Update state machine (handles all state-specific updates)
+  stateMachine.update(dt);
+}
+
+function render(_alpha: number): void {
+  renderer.render(scene, rtsCamera.camera);
+  devStats?.update();
+}
+
+const gameLoop = new GameLoop(fixedUpdate, render);
+
+// ---------------------------------------------------------------------------
+// Boot
+// ---------------------------------------------------------------------------
+async function boot(): Promise<void> {
+  if (import.meta.env.DEV) {
+    try {
+      const StatsGL = (await import('stats-gl')).default;
+      devStats = new StatsGL({ trackGPU: false });
+      document.body.appendChild(devStats.dom);
+    } catch { /* stats-gl optional */ }
+  }
+
+  // Hide loading screen (it shows by default for initial page load)
+  const loadingScreen = document.getElementById('loading-screen');
+  if (loadingScreen) {
+    loadingScreen.classList.add('hidden');
+    setTimeout(() => {
+      if (loadingScreen.classList.contains('hidden')) {
+        loadingScreen.style.display = 'none';
+      }
+    }, 600);
+  }
+
+  // Start game loop (renders terrain even in menu)
+  gameLoop.start();
+
+  // Enter the main menu state
+  stateMachine.start(GameStateId.MENU);
+
+  console.log('[RoB] Reign of Brabant started -- Main Menu');
+}
+
+boot().catch((err) => {
+  console.error('[RoB] Boot failed:', err);
+  const loading = document.getElementById('loading-screen');
+  if (loading) loading.innerHTML = `<h1 style="color:red">Laden mislukt</h1><p>${err.message}</p>`;
+});

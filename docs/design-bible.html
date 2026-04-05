@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reign of Brabant — Development Bible</title>
+    <meta property="og:title" content="Reign of Brabant — Development Bible">
+    <meta property="og:description" content="Een WarCraft-geïnspireerde RTS met 4 Brabantse facties. Volledige documentatie van concept tot code.">
+    <meta property="og:image" content="assets/ui/og-image.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Faction colors */
+            --brabant-primary: #E67E22;
+            --brabant-secondary: #8B4513;
+            --brabant-accent: #2ECC71;
+            --brabant-glow: rgba(230, 126, 34, 0.3);
+
+            --randstad-primary: #3498DB;
+            --randstad-secondary: #95A5A6;
+            --randstad-accent: #ECF0F1;
+            --randstad-glow: rgba(52, 152, 219, 0.3);
+
+            --limburg-primary: #27AE60;
+            --limburg-secondary: #7F8C8D;
+            --limburg-accent: #2C3E50;
+            --limburg-glow: rgba(39, 174, 96, 0.3);
+
+            --belgen-primary: #E74C3C;
+            --belgen-secondary: #F1C40F;
+            --belgen-accent: #2C3E50;
+            --belgen-glow: rgba(231, 76, 60, 0.3);
+
+            /* UI colors */
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-elevated: #1a1a2e;
+            --text-primary: #e8e6e3;
+            --text-secondary: #8a8a9a;
+            --text-muted: #5a5a6a;
+            --border: #2a2a3e;
+            --gold: #d4a847;
+            --gold-glow: rgba(212, 168, 71, 0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, var(--brabant-glow), transparent 50%),
+                radial-gradient(ellipse at 80% 50%, var(--randstad-glow), transparent 50%),
+                radial-gradient(ellipse at 50% 80%, var(--gold-glow), transparent 40%);
+            animation: heroGlow 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes heroGlow {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+        }
+
+        .hero-logo {
+            width: min(500px, 80vw);
+            height: auto;
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 0 40px var(--gold-glow));
+            border-radius: 12px;
+        }
+
+        .hero h1 {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--gold), #f0d78c, var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 60px var(--gold-glow);
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .hero-badges {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+        }
+
+        .badge {
+            padding: 0.4rem 1rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border: 1px solid;
+        }
+
+        .badge-brabant { color: var(--brabant-primary); border-color: var(--brabant-primary); background: rgba(230, 126, 34, 0.1); }
+        .badge-randstad { color: var(--randstad-primary); border-color: var(--randstad-primary); background: rgba(52, 152, 219, 0.1); }
+        .badge-limburg { color: var(--limburg-primary); border-color: var(--limburg-primary); background: rgba(39, 174, 96, 0.1); }
+        .badge-belgen { color: var(--belgen-primary); border-color: var(--belgen-primary); background: rgba(231, 76, 60, 0.1); }
+        .badge-gold { color: var(--gold); border-color: var(--gold); background: rgba(212, 168, 71, 0.1); }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-10px); }
+        }
+
+        /* ===== NAVIGATION ===== */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 10, 15, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 2rem;
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .nav::-webkit-scrollbar { display: none; }
+
+        .nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .nav a:hover, .nav a.active {
+            color: var(--gold);
+            background: rgba(212, 168, 71, 0.1);
+        }
+
+        /* ===== SECTIONS ===== */
+        section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 5rem 2rem;
+        }
+
+        section h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--text-primary), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        section h2 .section-number {
+            font-size: 0.9rem;
+            color: var(--gold);
+            display: block;
+            margin-bottom: 0.3rem;
+            font-family: 'JetBrains Mono', monospace;
+            -webkit-text-fill-color: var(--gold);
+        }
+
+        .section-intro {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin-bottom: 3rem;
+        }
+
+        section h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            margin: 3rem 0 1rem;
+        }
+
+        /* ===== CARDS ===== */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: var(--gold);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--gold);
+        }
+
+        .card-image {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        .card-body h4 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-body p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .card-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ===== FACTION SECTIONS ===== */
+        .faction-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .faction-header.brabant { background: linear-gradient(135deg, rgba(230, 126, 34, 0.15), rgba(139, 69, 19, 0.1)); border: 1px solid rgba(230, 126, 34, 0.3); }
+        .faction-header.randstad { background: linear-gradient(135deg, rgba(52, 152, 219, 0.15), rgba(149, 165, 166, 0.1)); border: 1px solid rgba(52, 152, 219, 0.3); }
+        .faction-header.limburg { background: linear-gradient(135deg, rgba(39, 174, 96, 0.15), rgba(127, 140, 141, 0.1)); border: 1px solid rgba(39, 174, 96, 0.3); }
+        .faction-header.belgen { background: linear-gradient(135deg, rgba(231, 76, 60, 0.15), rgba(241, 196, 15, 0.1)); border: 1px solid rgba(231, 76, 60, 0.3); }
+
+        .faction-icon {
+            font-size: 3rem;
+            flex-shrink: 0;
+        }
+
+        .faction-info h3 {
+            margin: 0 0 0.3rem;
+            font-size: 1.6rem;
+        }
+
+        .faction-info .faction-tagline {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .faction-traits {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+
+        .trait {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+        }
+
+        /* ===== VOICE SAMPLES ===== */
+        .voice-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .voice-sample {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .voice-sample .play-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid var(--gold);
+            background: transparent;
+            color: var(--gold);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .voice-sample .play-btn:hover {
+            background: var(--gold);
+            color: var(--bg-dark);
+        }
+
+        .voice-info { flex: 1; }
+
+        .voice-info .voice-character {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .voice-info .voice-line {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+
+        /* ===== PROCESS TIMELINE ===== */
+        .timeline {
+            position: relative;
+            padding-left: 3rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0.75rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--gold), var(--border));
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 3rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2.35rem;
+            top: 0.5rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid var(--gold);
+            background: var(--bg-dark);
+        }
+
+        .timeline-item.completed::before {
+            background: var(--gold);
+            box-shadow: 0 0 12px var(--gold-glow);
+        }
+
+        .timeline-item.active::before {
+            background: var(--brabant-primary);
+            border-color: var(--brabant-primary);
+            box-shadow: 0 0 12px var(--brabant-glow);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 12px var(--brabant-glow); }
+            50% { box-shadow: 0 0 24px var(--brabant-glow); }
+        }
+
+        .timeline-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--gold);
+            margin-bottom: 0.3rem;
+        }
+
+        .timeline-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* ===== TABLES ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: var(--bg-elevated);
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--gold);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 0.6rem 1rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+        td:first-child {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* ===== CODE BLOCKS ===== */
+        .code-block {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .code-block .comment { color: var(--text-muted); }
+        .code-block .cmd { color: var(--brabant-primary); }
+        .code-block .flag { color: var(--randstad-primary); }
+        .code-block .string { color: var(--limburg-primary); }
+
+        /* ===== COST TABLE ===== */
+        .cost-highlight {
+            background: linear-gradient(135deg, rgba(212, 168, 71, 0.1), rgba(46, 204, 113, 0.05));
+            border: 1px solid rgba(212, 168, 71, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .cost-highlight .big-number {
+            font-family: 'Cinzel', serif;
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--gold), var(--brabant-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cost-highlight .cost-label {
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .cost-highlight .cost-compare {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+            text-decoration: line-through;
+        }
+
+        /* ===== MECHANIC SHOWCASE ===== */
+        .mechanic-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mechanic-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .mechanic-box.brabant::before { background: linear-gradient(90deg, var(--brabant-primary), transparent); }
+        .mechanic-box.randstad::before { background: linear-gradient(90deg, var(--randstad-primary), transparent); }
+
+        .mechanic-box h4 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .gezelligheid-meter {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin: 1rem 0;
+        }
+
+        .gezelligheid-bar {
+            flex: 1;
+            height: 24px;
+            background: var(--bg-elevated);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .gezelligheid-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--brabant-secondary), var(--brabant-primary), var(--gold));
+            border-radius: 12px;
+            transition: width 1s ease;
+            position: relative;
+        }
+
+        .gezelligheid-fill::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .gezelligheid-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--gold);
+            min-width: 4rem;
+            text-align: right;
+        }
+
+        /* ===== PIPELINE VIS ===== */
+        .pipeline {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .pipeline-step {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .pipeline-step .step-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pipeline-step .step-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .pipeline-step .step-tool {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--gold);
+        }
+
+        .pipeline-step .step-cost {
+            font-size: 0.8rem;
+            color: var(--limburg-primary);
+            margin-top: 0.3rem;
+        }
+
+        .pipeline-arrow {
+            display: none;
+        }
+
+        /* ===== QUOTE ===== */
+        .quote {
+            border-left: 3px solid var(--gold);
+            padding: 1rem 1.5rem;
+            margin: 2rem 0;
+            background: rgba(212, 168, 71, 0.05);
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        .quote .author {
+            display: block;
+            margin-top: 0.5rem;
+            font-style: normal;
+            font-weight: 600;
+            color: var(--gold);
+            font-size: 0.85rem;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+        }
+
+        footer .footer-logo {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .card-grid { grid-template-columns: 1fr; }
+            section { padding: 3rem 1rem; }
+            .faction-header { flex-direction: column; text-align: center; }
+            .pipeline { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<header class="hero">
+    <div class="hero-content">
+        <img src="assets/ui/logo.png" alt="Reign of Brabant" class="hero-logo" onerror="this.style.display='none'">
+        <h1>Reign of Brabant</h1>
+        <p class="hero-subtitle">Een WarCraft-geinspireerde RTS met Brabantse ziel — van concept tot code</p>
+        <div class="hero-badges">
+            <span class="badge badge-brabant">Brabanders</span>
+            <span class="badge badge-randstad">Randstad</span>
+            <span class="badge badge-limburg">Limburgers</span>
+            <span class="badge badge-belgen">Belgen</span>
+            <span class="badge badge-gold">PRD v1.0</span>
+        </div>
+    </div>
+    <div class="scroll-hint">Scroll om te ontdekken</div>
+</header>
+
+<!-- ===== NAV ===== -->
+<nav class="nav" id="nav">
+    <a href="#vision">Visie</a>
+    <a href="#factions">Facties</a>
+    <a href="#mechanics">Mechanics</a>
+    <a href="#pipeline">Pipeline</a>
+    <a href="#process">Proces</a>
+    <a href="#costs">Kosten</a>
+    <a href="#humor">Humor</a>
+    <a href="#voices">Stemmen</a>
+    <a href="#roadmap">Roadmap</a>
+    <a href="#subprds">Sub-PRDs</a>
+</nav>
+
+<!-- ===== 01: VISION ===== -->
+<section id="vision">
+    <h2><span class="section-number">01</span>De Visie</h2>
+    <p class="section-intro">Het jaar 1473. Het Gouden Worstenbroodje is gestolen. Brabant staat op. Vier facties botsen in een strijd om cultuur, identiteit en het recht op een frikandel speciaal.</p>
+
+    <div class="quote">
+        "Wat als WarCraft: Reign of Chaos zich afspeelde in Brabant, met worstenbroodjes als resources en managers die spreadsheets gooien?"
+        <span class="author">— Het idee dat alles startte</span>
+    </div>
+
+    <h3>Wat maakt dit uniek?</h3>
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-body">
+                <h4>Gezelligheid als Mechanic</h4>
+                <p>Brabandse units worden sterker naarmate ze dichter bij elkaar staan. +50% stats bij 20+ units. Nergens anders.</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h4>4 Asymmetrische Facties</h4>
+                <p>Gebaseerd op echte cultuurverschillen. Brabanders feesten, Randstad vergadert, Limburg graaft tunnels, Belgen diplomatiseren.</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h4>Humor als Feature</h4>
+                <p>Resources heten "Worstenbroodjes" en "LinkedIn Connections". De Randstad ultimate heet "Eindeloze Vergadering".</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h4>100% Browser</h4>
+                <p>Three.js + WebGPU. Geen install, direct speelbaar. Desktop-first, mobile secondary. 60fps target.</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h4>AI-Powered Pipeline</h4>
+                <p>82% van 3D assets via Blender procedureel. Voices via ElevenLabs. Muziek via Suno. Totale kosten: ~$50.</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h4>Persoonlijk Passieproject</h4>
+                <p>Gemaakt door iemand met een WarCraft: Reign of Chaos tattoo. Dit is geen clone — het is een liefdeverklaring.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== 02: FACTIONS ===== -->
+<section id="factions">
+    <h2><span class="section-number">02</span>De Facties</h2>
+    <p class="section-intro">Vier facties, elk met een unieke mechanic, playstyle en persoonlijkheid. Gebaseerd op echte regionale cultuurverschillen — met een dikke laag humor.</p>
+
+    <!-- BRABANDERS -->
+    <div class="faction-header brabant">
+        <div class="faction-icon">🧑‍🌾</div>
+        <div class="faction-info">
+            <h3 style="color: var(--brabant-primary)">De Brabanders</h3>
+            <p class="faction-tagline">"Samen staan we sterk — en we staan altijd samen"</p>
+            <div class="faction-traits">
+                <span class="trait">Deathball</span>
+                <span class="trait">Gezelligheid-mechanic</span>
+                <span class="trait">Sterk in groepen</span>
+                <span class="trait">Carnavalsrage</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-grid">
+        <div class="card">
+            <img src="assets/factions/brabanders-boer.png" alt="De Boer" class="card-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22><rect fill=%22%231a1a2e%22 width=%22400%22 height=%22400%22/><text x=%22200%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%23E67E22%22 font-size=%2260%22>🧑‍🌾</text><text x=%22200%22 y=%22260%22 text-anchor=%22middle%22 fill=%22%238a8a9a%22 font-size=%2220%22>De Boer</text></svg>'">
+            <div class="card-body">
+                <h4>De Boer <span style="color: var(--text-muted); font-size: 0.8rem">— Worker</span></h4>
+                <p>"Ja?" / "Zeg het maar" / "Moet dat?! Vooruit dan maar"</p>
+                <div class="card-stats">
+                    <div class="stat"><div class="stat-value">60</div><div class="stat-label">HP</div></div>
+                    <div class="stat"><div class="stat-value">5</div><div class="stat-label">ATK</div></div>
+                    <div class="stat"><div class="stat-value">50/0</div><div class="stat-label">Cost</div></div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <img src="assets/factions/brabanders-carnavalvierder.png" alt="Carnavalvierder" class="card-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22><rect fill=%22%231a1a2e%22 width=%22400%22 height=%22400%22/><text x=%22200%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%23E67E22%22 font-size=%2260%22>🎭</text><text x=%22200%22 y=%22260%22 text-anchor=%22middle%22 fill=%22%238a8a9a%22 font-size=%2220%22>Carnavalvierder</text></svg>'">
+            <div class="card-body">
+                <h4>Carnavalvierder <span style="color: var(--text-muted); font-size: 0.8rem">— Infantry</span></h4>
+                <p>"ALAAF!" / "Nog eentje dan!" / "Pansen erop!"</p>
+                <div class="card-stats">
+                    <div class="stat"><div class="stat-value">80</div><div class="stat-label">HP</div></div>
+                    <div class="stat"><div class="stat-value">10</div><div class="stat-label">ATK</div></div>
+                    <div class="stat"><div class="stat-value">75/25</div><div class="stat-label">Cost</div></div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <img src="assets/factions/brabanders-prins.png" alt="Prins van Brabansen" class="card-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22><rect fill=%22%231a1a2e%22 width=%22400%22 height=%22400%22/><text x=%22200%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%23d4a847%22 font-size=%2260%22>👑</text><text x=%22200%22 y=%22260%22 text-anchor=%22middle%22 fill=%22%238a8a9a%22 font-size=%2220%22>De Prins</text></svg>'">
+            <div class="card-body">
+                <h4>Prins van Brabansen <span style="color: var(--gold); font-size: 0.8rem">— HERO</span></h4>
+                <p>"De Prins is hier!" / Ultimate: "ALAAF!" — alle units 8s invincible</p>
+                <div class="card-stats">
+                    <div class="stat"><div class="stat-value">500</div><div class="stat-label">HP</div></div>
+                    <div class="stat"><div class="stat-value">25</div><div class="stat-label">ATK</div></div>
+                    <div class="stat"><div class="stat-value">350/200</div><div class="stat-label">Cost</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RANDSTAD -->
+    <div class="faction-header randstad" style="margin-top: 4rem;">
+        <div class="faction-icon">💼</div>
+        <div class="faction-info">
+            <h3 style="color: var(--randstad-primary)">De Randstad</h3>
+            <p class="faction-tagline">"Dit staat niet in de planning"</p>
+            <div class="faction-traits">
+                <span class="trait">Late-game powerhouse</span>
+                <span class="trait">Bureaucratie-mechanic</span>
+                <span class="trait">Debuff specialists</span>
+                <span class="trait">Eindeloze Vergadering</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-grid">
+        <div class="card">
+            <img src="assets/factions/randstad-stagiair.png" alt="Stagiair" class="card-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22><rect fill=%22%231a1a2e%22 width=%22400%22 height=%22400%22/><text x=%22200%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%233498DB%22 font-size=%2260%22>👨‍💼</text><text x=%22200%22 y=%22260%22 text-anchor=%22middle%22 fill=%22%238a8a9a%22 font-size=%2220%22>Stagiair</text></svg>'">
+            <div class="card-body">
+                <h4>Stagiair <span style="color: var(--text-muted); font-size: 0.8rem">— Worker</span></h4>
+                <p>"Kan ik dit op mijn LinkedIn zetten?" / "Dit stond niet in mijn takenpakket"</p>
+                <div class="card-stats">
+                    <div class="stat"><div class="stat-value">45</div><div class="stat-label">HP</div></div>
+                    <div class="stat"><div class="stat-value">3</div><div class="stat-label">ATK</div></div>
+                    <div class="stat"><div class="stat-value">35/0</div><div class="stat-label">Cost</div></div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <img src="assets/factions/randstad-manager.png" alt="Manager" class="card-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22><rect fill=%22%231a1a2e%22 width=%22400%22 height=%22400%22/><text x=%22200%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%233498DB%22 font-size=%2260%22>📊</text><text x=%22200%22 y=%22260%22 text-anchor=%22middle%22 fill=%22%238a8a9a%22 font-size=%2220%22>Manager</text></svg>'">
+            <div class="card-body">
+                <h4>Manager <span style="color: var(--text-muted); font-size: 0.8rem">— Ranged/Debuff</span></h4>
+                <p>"Even mijn agenda checken" / "Dit eskaleert!"</p>
+                <div class="card-stats">
+                    <div class="stat"><div class="stat-value">70</div><div class="stat-label">HP</div></div>
+                    <div class="stat"><div class="stat-value">9</div><div class="stat-label">ATK</div></div>
+                    <div class="stat"><div class="stat-value">90/30</div><div class="stat-label">Cost</div></div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <img src="assets/factions/randstad-ceo.png" alt="De CEO" class="card-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22><rect fill=%22%231a1a2e%22 width=%22400%22 height=%22400%22/><text x=%22200%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%23d4a847%22 font-size=%2260%22>🏢</text><text x=%22200%22 y=%22260%22 text-anchor=%22middle%22 fill=%22%238a8a9a%22 font-size=%2220%22>De CEO</text></svg>'">
+            <div class="card-body">
+                <h4>De CEO <span style="color: var(--gold); font-size: 0.8rem">— HERO</span></h4>
+                <p>"Vijandige Overname" — capture vijandelijk gebouw permanent</p>
+                <div class="card-stats">
+                    <div class="stat"><div class="stat-value">450</div><div class="stat-label">HP</div></div>
+                    <div class="stat"><div class="stat-value">20</div><div class="stat-label">ATK</div></div>
+                    <div class="stat"><div class="stat-value">400/250</div><div class="stat-label">Cost</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LIMBURG & BELGEN PREVIEW -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 4rem;">
+        <div class="faction-header limburg" style="margin: 0;">
+            <div class="faction-icon">⛏️</div>
+            <div class="faction-info">
+                <h3 style="color: var(--limburg-primary)">Limburgers</h3>
+                <p class="faction-tagline">"Limburg beugt neet" — v1.0</p>
+            </div>
+        </div>
+        <div class="faction-header belgen" style="margin: 0;">
+            <div class="faction-icon">🍟</div>
+            <div class="faction-info">
+                <h3 style="color: var(--belgen-primary)">Belgen</h3>
+                <p class="faction-tagline">"Compromis is ons middelste naam" — v2.0</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-grid" style="margin-top: 1.5rem;">
+        <div class="card">
+            <img src="assets/factions/limburgers-mijnbaas.png" alt="De Mijnbaas" class="card-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22><rect fill=%22%231a1a2e%22 width=%22400%22 height=%22400%22/><text x=%22200%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%2327AE60%22 font-size=%2260%22>⛏️</text><text x=%22200%22 y=%22260%22 text-anchor=%22middle%22 fill=%22%238a8a9a%22 font-size=%2220%22>De Mijnbaas</text></svg>'">
+            <div class="card-body">
+                <h4>De Mijnbaas <span style="color: var(--limburg-primary); font-size: 0.8rem">— HERO</span></h4>
+                <p>Underground tunnel-netwerk. "Mijnschacht Instorten" — AoE stun.</p>
+            </div>
+        </div>
+        <div class="card">
+            <img src="assets/factions/belgen-frietkoning.png" alt="De Frietkoning" class="card-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22><rect fill=%22%231a1a2e%22 width=%22400%22 height=%22400%22/><text x=%22200%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%23E74C3C%22 font-size=%2260%22>🍟</text><text x=%22200%22 y=%22260%22 text-anchor=%22middle%22 fill=%22%238a8a9a%22 font-size=%2220%22>De Frietkoning</text></svg>'">
+            <div class="card-body">
+                <h4>De Frietkoning <span style="color: var(--belgen-primary); font-size: 0.8rem">— HERO</span></h4>
+                <p>Diplomatieke Verwarring — 25% kans vijanden vallen eigen team aan.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== 03: MECHANICS ===== -->
+<section id="mechanics">
+    <h2><span class="section-number">03</span>Unieke Mechanics</h2>
+    <p class="section-intro">Elke factie heeft een mechanic die nergens anders bestaat. Gebaseerd op echte culturele stereotypen, vertaald naar strategische diepte.</p>
+
+    <div class="mechanic-box brabant">
+        <h4>🧡 Gezelligheid (Brabanders)</h4>
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Brabandse units worden sterker naarmate ze dichter bij elkaar zijn. Dit stimuleert deathball-strategieen maar maakt ze kwetsbaar voor AoE.</p>
+
+        <div style="display: grid; gap: 0.75rem;">
+            <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                    <span style="font-size: 0.85rem;">1 unit (alleen)</span>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">+0%</span>
+                </div>
+                <div class="gezelligheid-meter">
+                    <div class="gezelligheid-bar"><div class="gezelligheid-fill" style="width: 5%"></div></div>
+                </div>
+            </div>
+            <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                    <span style="font-size: 0.85rem;">6-10 units</span>
+                    <span style="font-size: 0.85rem; color: var(--brabant-primary);">+20% alle stats</span>
+                </div>
+                <div class="gezelligheid-meter">
+                    <div class="gezelligheid-bar"><div class="gezelligheid-fill" style="width: 40%"></div></div>
+                </div>
+            </div>
+            <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                    <span style="font-size: 0.85rem;">20+ units</span>
+                    <span style="font-size: 0.85rem; color: var(--gold);">+50% + damage reduction</span>
+                </div>
+                <div class="gezelligheid-meter">
+                    <div class="gezelligheid-bar"><div class="gezelligheid-fill" style="width: 100%"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mechanic-box randstad">
+        <h4>📊 Bureaucratie (Randstad)</h4>
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Elke actie duurt 20% langer. Maar elke voltooide actie geeft +3% snelheid (stapelbaar). Na 20 acties is de Randstad SNELLER dan iedereen. Plus: elke 5 minuten pauzeren alle gebouwen 8 seconden voor "werkoverleg".</p>
+
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Timing</th><th>Snelheid vs baseline</th><th>Werkoverleg</th></tr></thead>
+                <tbody>
+                    <tr><td>Start game</td><td style="color: var(--belgen-primary);">-20% (traag)</td><td>Elke 5 min: 8s pauze</td></tr>
+                    <tr><td>Na 10 acties</td><td>+10% (normaal)</td><td>Elke 5 min: 8s pauze</td></tr>
+                    <tr><td>Na 20 acties</td><td style="color: var(--limburg-primary);">+40% (snel!)</td><td>Uitschakelbaar via Tier 3 tech</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ===== 04: PIPELINE ===== -->
+<section id="pipeline">
+    <h2><span class="section-number">04</span>Asset Pipeline</h2>
+    <p class="section-intro">Een hybride AI-pipeline die 82% van alle 3D assets gratis genereert via Blender, aangevuld met Meshy/Tripo3D voor complexe modellen.</p>
+
+    <div class="pipeline">
+        <div class="pipeline-step">
+            <div class="step-icon">💡</div>
+            <div class="step-title">Concept</div>
+            <div class="step-tool">Flux Pro / Nano Banana</div>
+            <div class="step-cost">~$0.03/image</div>
+        </div>
+        <div class="pipeline-step">
+            <div class="step-icon">🧊</div>
+            <div class="step-title">3D Model</div>
+            <div class="step-tool">Blender (82%) / Meshy (18%)</div>
+            <div class="step-cost">$0 / ~$0.48</div>
+        </div>
+        <div class="pipeline-step">
+            <div class="step-icon">🦴</div>
+            <div class="step-title">Rigging</div>
+            <div class="step-tool">AccuRIG 2.0 / Tripo3D</div>
+            <div class="step-cost">GRATIS</div>
+        </div>
+        <div class="pipeline-step">
+            <div class="step-icon">🎬</div>
+            <div class="step-title">Animatie</div>
+            <div class="step-tool">Blender CLI / Cascadeur</div>
+            <div class="step-cost">GRATIS</div>
+        </div>
+        <div class="pipeline-step">
+            <div class="step-icon">🎨</div>
+            <div class="step-title">Textures</div>
+            <div class="step-tool">GenPBR / Poly Haven</div>
+            <div class="step-cost">GRATIS</div>
+        </div>
+        <div class="pipeline-step">
+            <div class="step-icon">🔊</div>
+            <div class="step-title">Audio</div>
+            <div class="step-tool">ElevenLabs / Suno</div>
+            <div class="step-cost">Bestaand abo</div>
+        </div>
+    </div>
+
+    <div class="code-block">
+<span class="comment"># Genereer ALLE Brabanders gebouwen in een keer</span>
+<span class="cmd">blender</span> <span class="flag">--background --python</span> scripts/blender/generate_rts_assets.py <span class="flag">--</span> \
+  <span class="flag">--faction</span> <span class="string">brabanders</span> \
+  <span class="flag">--output</span> <span class="string">assets/models/brabanders/</span>
+
+<span class="comment"># 8 gebouwen in 57ms. 127 modellen totaal in &lt;60 seconden.</span>
+    </div>
+</section>
+
+<!-- ===== 05: PROCESS ===== -->
+<section id="process">
+    <h2><span class="section-number">05</span>Het Proces</h2>
+    <p class="section-intro">Van een typo ("Zu") tot een volledige PRD met concept art — dit is hoe Game Master en zijn team van AI agents te werk gaan.</p>
+
+    <div class="timeline">
+        <div class="timeline-item completed">
+            <div class="timeline-date">5 april 2026 — 10:00</div>
+            <div class="timeline-title">De Vonk</div>
+            <div class="timeline-desc">Richard typt "Zu" — een typo. Maar het gesprek ontvouwt zich: twee game-ideeen. GTT (Grand Theft Tractor) en een WarCraft-clone met Brabantse facties.</div>
+        </div>
+        <div class="timeline-item completed">
+            <div class="timeline-date">10:05 — Vier agents tegelijk</div>
+            <div class="timeline-title">De Grote Brainstorm</div>
+            <div class="timeline-desc">Game Master lanceert 4 parallelle research agents: GTT haalbaarheid, WarCraft RTS haalbaarheid, API kosten, en een diepe creatieve brainstorm voor Brabantse thema's.</div>
+        </div>
+        <div class="timeline-item completed">
+            <div class="timeline-date">10:15 — Resultaten binnen</div>
+            <div class="timeline-title">De Keuze: Reign of Brabant</div>
+            <div class="timeline-desc">Verdict: WarCraft RTS wint op technische haalbaarheid (8/10 vs 4/10), scope beheersbaarheid, en persoonlijke connectie (die WarCraft tattoo!). GTT wordt bewaard als toekomstig project.</div>
+        </div>
+        <div class="timeline-item completed">
+            <div class="timeline-date">10:30 — PRD schrijven</div>
+            <div class="timeline-title">1200+ Regels Game Design</div>
+            <div class="timeline-desc">Volledige PRD met 4 facties, alle unit stats, gebouwen, tech trees, combat systeem, 12-missie campaign, AI systeem, en development phases. Elk detail vastgelegd.</div>
+        </div>
+        <div class="timeline-item completed">
+            <div class="timeline-date">10:45 — Blender research</div>
+            <div class="timeline-title">$223 Bespaard</div>
+            <div class="timeline-desc">Blender agent ontdekt dat 82% van alle 3D assets procedureel gegenereerd kan worden. 127 modellen in &lt;60 seconden. Kosten dalen van $273 naar ~$50.</div>
+        </div>
+        <div class="timeline-item completed">
+            <div class="timeline-date">11:00 — Tool discovery</div>
+            <div class="timeline-title">16 Nieuwe Tools Ontdekt</div>
+            <div class="timeline-desc">Tripo3D (auto-rig!), bitECS, Yuka.js, AccuRIG, GenPBR, Flux Kontext — een complete uitbreiding van de Game Master toolkit voor RTS development.</div>
+        </div>
+        <div class="timeline-item active">
+            <div class="timeline-date">11:15 — Nu</div>
+            <div class="timeline-title">Concept Art + Documentatie</div>
+            <div class="timeline-desc">AI-gegenereerde concept art voor alle facties. Deze documentatiepagina. Het begin van iets groots.</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-date">Volgende stap</div>
+            <div class="timeline-title">Phase 1: Core Engine</div>
+            <div class="timeline-desc">Camera, terrein, unit selectie, pathfinding — alles met gekleurde dozen. De fundering.</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== 06: COSTS ===== -->
+<section id="costs">
+    <h2><span class="section-number">06</span>Kosten</h2>
+    <p class="section-intro">Dankzij de Blender-first strategie en bestaande abonnementen kost deze game bijna niks aan tooling.</p>
+
+    <div class="cost-highlight">
+        <div class="cost-compare">$273 (oorspronkelijke schatting)</div>
+        <div class="big-number">~$50</div>
+        <div class="cost-label">Totale asset productiekosten — 82% bespaard</div>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Tool</th><th>Items</th><th>Kosten</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td>Blender procedureel</td><td>127 modellen</td><td style="color: var(--limburg-primary); font-weight: 700;">$0</td><td>&lt;60s generatietijd, alleen CPU</td></tr>
+                <tr><td>Meshy v6 / Tripo3D</td><td>28 modellen</td><td>~$48</td><td>1 maand Max plan</td></tr>
+                <tr><td>fal.ai (Flux)</td><td>30 images</td><td>~$2</td><td>Pay-per-use</td></tr>
+                <tr><td>Nano Banana</td><td>90 images</td><td style="color: var(--limburg-primary); font-weight: 700;">$0</td><td>Free tier (50/dag)</td></tr>
+                <tr><td>ElevenLabs</td><td>216 voices + 41 SFX</td><td style="color: var(--limburg-primary); font-weight: 700;">$0</td><td>Bestaand abonnement</td></tr>
+                <tr><td>Suno</td><td>10 tracks</td><td style="color: var(--limburg-primary); font-weight: 700;">$0</td><td>Bestaand abonnement</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- ===== 07: HUMOR ===== -->
+<section id="humor">
+    <h2><span class="section-number">07</span>De Humor</h2>
+    <p class="section-intro">De gouden regel: humor in de flavor, strategie in de mechanics. Unit responses doen het zware humorwerk. Abilities hebben grappige namen maar serieuze effecten.</p>
+
+    <h3>Resources per Factie</h3>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Resource</th><th style="color: var(--brabant-primary)">Brabanders</th><th style="color: var(--randstad-primary)">Randstad</th><th style="color: var(--limburg-primary)">Limburgers</th><th style="color: var(--belgen-primary)">Belgen</th></tr></thead>
+            <tbody>
+                <tr><td>Goud</td><td>Worstenbroodjes</td><td>PowerPoints</td><td>Vlaai</td><td>Frieten</td></tr>
+                <tr><td>Hout</td><td>Bier</td><td>LinkedIn Connections</td><td>Mergel</td><td>Trappist</td></tr>
+                <tr><td>Speciaal</td><td>Gezelligheid</td><td>Havermoutmelk</td><td>Kolen</td><td>Chocolade</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3>Beste Voice Lines</h3>
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-body">
+                <h4 style="color: var(--brabant-primary)">Brabanders</h4>
+                <p><strong>Boer (select):</strong> "Ja?" / "Zeg het maar"</p>
+                <p><strong>Carnavalvierder (attack):</strong> "ALAAF!" / "Pansen erop!"</p>
+                <p><strong>Kansen (move):</strong> "Sssst, ik ga al"</p>
+                <p><strong>Boerinne (select):</strong> "Hedde al gegeten?"</p>
+                <p><strong>Tractorrijder:</strong> "BANSEN UIT DE WEG!"</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h4 style="color: var(--randstad-primary)">Randstad</h4>
+                <p><strong>Stagiair:</strong> "Kan ik dit op mijn LinkedIn zetten?"</p>
+                <p><strong>Manager (attack):</strong> "Dit eskaleert!"</p>
+                <p><strong>Consultant:</strong> "Vanuit mijn optiek..."</p>
+                <p><strong>Hipster:</strong> "Dit was populairder voordat jullie het ontdekten"</p>
+                <p><strong>CEO (ultimate):</strong> "Vijandige Overname!"</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h4 style="color: var(--gold)">Cheat Codes</h4>
+                <p><strong>WANSEN:</strong> +10.000 resources</p>
+                <p><strong>GUUANSEN MANSEN:</strong> Alle muziek = Guus Meeuwis</p>
+                <p><strong>VERGANSEN DERING:</strong> Vijanden stoppen permanent</p>
+                <p><strong>VLAAI STORM:</strong> Random vlaaien uit de lucht</p>
+                <p><strong>SPROOKANSEN BOS:</strong> Unlock Efteling-factie</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== 08: VOICES ===== -->
+<section id="voices">
+    <h2><span class="section-number">08</span>Stemmen & Audio</h2>
+    <p class="section-intro">216 voice lines met echt dialect. Geen AI-Engels met een Nederlands sausje — dit wordt samen geschreven en door Richard zelf ingesproken.</p>
+
+    <div class="voice-grid">
+        <div class="voice-sample">
+            <div class="play-btn" style="border-color: var(--text-muted); color: var(--text-muted); cursor: default; font-size: 0.7rem;">TBD</div>
+            <div class="voice-info">
+                <div class="voice-character" style="color: var(--brabant-primary)">Boer — Select</div>
+                <div class="voice-line">"Ja?" / "Zeg het maar" / "Ik luister"</div>
+            </div>
+        </div>
+        <div class="voice-sample">
+            <div class="play-btn" style="border-color: var(--text-muted); color: var(--text-muted); cursor: default; font-size: 0.7rem;">TBD</div>
+            <div class="voice-info">
+                <div class="voice-character" style="color: var(--brabant-primary)">Carnavalvierder — Attack</div>
+                <div class="voice-line">"ALAAF!" / "Pansen erop!" / "Brabant vergeet niet!"</div>
+            </div>
+        </div>
+        <div class="voice-sample">
+            <div class="play-btn" style="border-color: var(--text-muted); color: var(--text-muted); cursor: default; font-size: 0.7rem;">TBD</div>
+            <div class="voice-info">
+                <div class="voice-character" style="color: var(--randstad-primary)">Manager — Select</div>
+                <div class="voice-line">"Dit staat niet in de planning!" / "Even mijn agenda checken"</div>
+            </div>
+        </div>
+        <div class="voice-sample">
+            <div class="play-btn" style="border-color: var(--text-muted); color: var(--text-muted); cursor: default; font-size: 0.7rem;">TBD</div>
+            <div class="voice-info">
+                <div class="voice-character" style="color: var(--randstad-primary)">Stagiair — Select</div>
+                <div class="voice-line">"Kan ik dit op mijn LinkedIn zetten?" / "Dit stond niet in mijn takenpakket"</div>
+            </div>
+        </div>
+        <div class="voice-sample">
+            <div class="play-btn" style="border-color: var(--text-muted); color: var(--text-muted); cursor: default; font-size: 0.7rem;">TBD</div>
+            <div class="voice-info">
+                <div class="voice-character" style="color: var(--limburg-primary)">Mijnbaas — Attack</div>
+                <div class="voice-line">"Gluck auf!" / "Limburg beugt neet!" / "Steen en been!"</div>
+            </div>
+        </div>
+        <div class="voice-sample">
+            <div class="play-btn" style="border-color: var(--text-muted); color: var(--text-muted); cursor: default; font-size: 0.7rem;">TBD</div>
+            <div class="voice-info">
+                <div class="voice-character" style="color: var(--belgen-primary)">Bierbouwer — Attack</div>
+                <div class="voice-line">"Allez hop!" / "Pour la Belgique!" / "Op uw gezondheid!"</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mechanic-box" style="border-color: var(--text-muted); margin-top: 1.5rem;">
+        <h4>📋 Voice Lines — Aparte Sessie</h4>
+        <p style="color: var(--text-secondary);">De voice lines worden in een dedicated sessie samen uitgewerkt:</p>
+        <ol style="color: var(--text-secondary); margin-top: 0.75rem; padding-left: 1.5rem; font-size: 0.9rem; line-height: 2;">
+            <li><strong>Teksten samen schrijven</strong> — Per factie het juiste dialect, humor en karakter bepalen</li>
+            <li><strong>Richard spreekt in</strong> — Basis-opnames met echt Brabants gevoel als referentie</li>
+            <li><strong>ElevenLabs voice cloning</strong> — 4 unieke factiestemmen op basis van Richards opnames</li>
+            <li><strong>Genereren + curating</strong> — 216 lines genereren, beste varianten selecteren</li>
+        </ol>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.75rem;">Play-knoppen worden actief zodra de echte samples klaar zijn.</p>
+    </div>
+
+    <h3 style="margin-top: 2rem;">Voice Pipeline</h3>
+    <div class="mechanic-box" style="border-color: var(--gold);">
+        <h4>🎙️ Zelf Inspreken + AI Voice Cloning</h4>
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">De ultieme aanpak: Richard spreekt de basis voice lines ZELF in met echt Brabants dialect. Die opnames worden via ElevenLabs voice cloning omgezet in 4 unieke factiestemmen met consistent karakter.</p>
+        <div class="pipeline" style="margin: 1rem 0;">
+            <div class="pipeline-step">
+                <div class="step-icon">🎤</div>
+                <div class="step-title">Zelf Inspreken</div>
+                <div class="step-tool">Eigen stem, echt dialect</div>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-icon">🧬</div>
+                <div class="step-title">Voice Clone</div>
+                <div class="step-tool">ElevenLabs Professional</div>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-icon">🎭</div>
+                <div class="step-title">4 Factiestemmen</div>
+                <div class="step-tool">Brabants / ABN / Limburgs / Vlaams</div>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-icon">🎮</div>
+                <div class="step-title">216 Voice Lines</div>
+                <div class="step-tool">Select / Move / Attack / Death</div>
+            </div>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.85rem;">Waarom zelf inspreken? Omdat geen AI de warmte van echt Brabants dialect kan vangen. "Hedde al gegeten?" klinkt alleen goed als het ECHT is.</p>
+    </div>
+    <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 1rem;">Klik op de play-knoppen hierboven voor een Web Speech API preview. Echte samples met Richards stem volgen in Phase 6.</p>
+</section>
+
+<!-- ===== 09: ROADMAP ===== -->
+<section id="roadmap">
+    <h2><span class="section-number">09</span>Development Roadmap</h2>
+    <p class="section-intro">7 phases van gekleurde dozen tot een volledige RTS met 4 facties, campaign en multiplayer.</p>
+
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Phase</th><th>Wat</th><th>Doorlooptijd</th><th>Status</th></tr></thead>
+            <tbody>
+                <tr><td style="color: var(--gold);">0. PRD</td><td>Game design, unit stats, tech trees</td><td>1-2 dagen</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
+                <tr><td>1. Core Engine</td><td>Camera, terrein, selectie, movement</td><td>2 weken</td><td style="color: var(--text-muted);">Pending</td></tr>
+                <tr><td>2. Economy</td><td>Resources, bouwen, unit productie</td><td>1 week</td><td style="color: var(--text-muted);">Pending</td></tr>
+                <tr><td>3. Combat</td><td>Damage, projectiles, abilities</td><td>1 week</td><td style="color: var(--text-muted);">Pending</td></tr>
+                <tr><td>4. AI</td><td>Unit FSM, strategic AI, difficulty</td><td>1-2 weken</td><td style="color: var(--text-muted);">Pending</td></tr>
+                <tr><td>5. Factions</td><td>Brabanders + Randstad implementatie</td><td>1 week</td><td style="color: var(--text-muted);">Pending</td></tr>
+                <tr><td>6. Assets</td><td>Blender, Meshy, ElevenLabs, Suno</td><td>1 week</td><td style="color: var(--text-muted);">Pending</td></tr>
+                <tr><td>7. Polish</td><td>Balancing, UI, audio, deployment</td><td>1-2 weken</td><td style="color: var(--text-muted);">Pending</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3>Map Concept: "De Kempen"</h3>
+    <div class="card" style="max-width: 800px;">
+        <img src="assets/concepts/map-de-kempen.png" alt="Map Concept" class="card-image" style="aspect-ratio: 4/3;" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 800 600%22><rect fill=%22%231a1a2e%22 width=%22800%22 height=%22600%22/><text x=%22400%22 y=%22300%22 text-anchor=%22middle%22 fill=%22%232ECC71%22 font-size=%2240%22>🗺️ De Kempen</text></svg>'">
+        <div class="card-body">
+            <h4>De Kempen — MVP Map</h4>
+            <p>256x256 game units. Vlak met heuvels, bossen, vennen. 6 gold mines, 8-10 bomen-clusters, chokepoints via water.</p>
+        </div>
+    </div>
+
+    <h3 style="margin-top: 3rem;">Battle Concept</h3>
+    <div class="card" style="max-width: 800px;">
+        <img src="assets/concepts/battle-concept.png" alt="Battle Concept" class="card-image" style="aspect-ratio: 4/3;" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 800 600%22><rect fill=%22%231a1a2e%22 width=%22800%22 height=%22600%22/><text x=%22400%22 y=%22300%22 text-anchor=%22middle%22 fill=%22%23E67E22%22 font-size=%2240%22>⚔️ Slag om Brabant</text></svg>'">
+        <div class="card-body">
+            <h4>De Slag om Brabant</h4>
+            <p>Carnavalvierders vs Corporate Managers. Confetti vs spreadsheets. Worstenbroodjes vs PowerPoints.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ===== 10: SUB-PRDs ===== -->
+<section id="subprds">
+    <h2><span class="section-number">10</span>Sub-PRDs — De Complete Blueprints</h2>
+    <p class="section-intro">6 gespecialiseerde agents werkten parallel aan 13.915 regels gedetailleerde specificaties. Elk document is direct implementeerbaar.</p>
+
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-body">
+                <h4 style="color: var(--randstad-primary);">📡 Multiplayer & P2P</h4>
+                <p>Colyseus op Mac mini M4, invite via link (geen account), ELO rating, reconnection, anti-cheat, Carnavalsmode party game.</p>
+                <div class="card-stats">
+                    <div class="stat"><div class="stat-value">1.754</div><div class="stat-label">Regels</div></div>
+                    <div class="stat"><div class="stat-value">10</div><div class="stat-label">Hoofdstukken</div></div>
+                    <div class="stat"><div class="stat-value">67K</div><div class="stat-label">Bestand</div></div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h4 style="color: var(--brabant-primary);">⚔️ Campaign & Content</h4>
+                <p>38 missies, 4 campaigns + geheime Efteling campaign, survival/tower defense/boss rush, 28 easter eggs, 30+ achievements.</p>
+                <div class="card-stats">
+                    <div class="stat"><div class="stat-value">2.553</div><div class="stat-label">Regels</div></div>
+                    <div class="stat"><div class="stat-value">38</div><div class="stat-label">Missies</div></div>
+                    <div class="stat"><div class="stat-value">28</div><div class="stat-label">Easter Eggs</div></div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h4 style="color: var(--limburg-primary);">🎨 UI/UX & Settings</h4>
+                <p>16 schermen, 39 settings, 14 error scenarios, 3 colorblind modes, 19-staps tutorial, 50 loading tips, 20 achievements.</p>
+                <div class="card-stats">
+                    <div class="stat"><div class="stat-value">2.303</div><div class="stat-label">Regels</div></div>
+                    <div class="stat"><div class="stat-value">16</div><div class="stat-label">Schermen</div></div>
+                    <div class="stat"><div class="stat-value">39</div><div class="stat-label">Settings</div></div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h4 style="color: var(--belgen-primary);">🔊 Audio Design</h4>
+                <p>516 voice line scripts, 80 SFX, 15 muziek tracks, 3D spatial audio, voice recording guide voor Richard.</p>
+                <div class="card-stats">
+                    <div class="stat"><div class="stat-value">2.062</div><div class="stat-label">Regels</div></div>
+                    <div class="stat"><div class="stat-value">516</div><div class="stat-label">Voice Lines</div></div>
+                    <div class="stat"><div class="stat-value">612</div><div class="stat-label">Audio Assets</div></div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h4>⚙️ Technische Architectuur</h4>
+                <p>bitECS met 29 systems, rendering pipeline, recast pathfinding, AI FSM, save/load, performance budgets, security.</p>
+                <div class="card-stats">
+                    <div class="stat"><div class="stat-value">3.494</div><div class="stat-label">Regels</div></div>
+                    <div class="stat"><div class="stat-value">29</div><div class="stat-label">ECS Systems</div></div>
+                    <div class="stat"><div class="stat-value">20+</div><div class="stat-label">Components</div></div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h4 style="color: var(--gold);">🎆 Klapper van de Week</h4>
+                <p>Epic Replay met AI-commentator, echt Brabants weer in-game, seizoensevents, geheime Efteling-factie, GIF generator.</p>
+                <div class="card-stats">
+                    <div class="stat"><div class="stat-value">1.749</div><div class="stat-label">Regels</div></div>
+                    <div class="stat"><div class="stat-value">10</div><div class="stat-label">Features</div></div>
+                    <div class="stat"><div class="stat-value">10/10</div><div class="stat-label">WOW Factor</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="cost-highlight" style="margin-top: 2rem;">
+        <div class="big-number">13.915</div>
+        <div class="cost-label">Regels specificatie — 626 KB aan game design</div>
+        <div style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">6 agents, parallel, in een enkele sessie</div>
+    </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+    <div class="footer-logo">Reign of Brabant</div>
+    <p>Development Bible v1.1 — 5 april 2026</p>
+    <p style="margin-top: 0.5rem;">Gebouwd met Claude Code + fal.ai + Blender + ElevenLabs + Suno</p>
+    <p style="margin-top: 0.5rem; color: var(--text-muted);">Game Master &times; Richard Theuws</p>
+</footer>
+
+<script>
+// ===== Smooth scroll =====
+document.querySelectorAll('.nav a').forEach(link => {
+    link.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.querySelector(link.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+});
+
+// ===== Active nav on scroll =====
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav a');
+
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            navLinks.forEach(l => l.classList.remove('active'));
+            const active = document.querySelector(`.nav a[href="#${entry.target.id}"]`);
+            if (active) active.classList.add('active');
+        }
+    });
+}, { threshold: 0.3 });
+
+sections.forEach(s => observer.observe(s));
+
+// ===== Gezelligheid animation on scroll =====
+const gezelObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.querySelectorAll('.gezelligheid-fill').forEach((bar, i) => {
+                setTimeout(() => {
+                    bar.style.width = bar.style.width; // trigger reflow
+                }, i * 300);
+            });
+        }
+    });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('.mechanic-box.brabant').forEach(el => gezelObserver.observe(el));
+
+// ===== Voice playback =====
+// Wordt geactiveerd zodra echte ElevenLabs samples beschikbaar zijn
+// Audio bestanden komen in assets/audio/voices/<factie>/<unit>-<type>.mp3
+function playVoice(btn) {
+    const src = btn.dataset.src;
+    if (!src) return;
+    const audio = new Audio(src);
+    audio.play();
+    btn.innerHTML = '&#9632;';
+    audio.onended = () => { btn.innerHTML = '&#9654;'; };
+}
+</script>
+</body>
+</html>

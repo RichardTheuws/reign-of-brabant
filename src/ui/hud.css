@@ -1,0 +1,1033 @@
+/* ================================================
+   REIGN OF BRABANT -- PoC HUD Stylesheet
+   ================================================
+   Overlay op Three.js canvas.
+   Alle transparante gebieden zijn doorklikbaar.
+   ================================================ */
+
+:root {
+  /* === Basis kleuren (uit SUB-PRD) === */
+  --color-parchment-gold: #D4A853;
+  --color-brabant-red: #8B1A1A;
+  --color-dark-brown: #3C1F0E;
+  --color-cream: #F5E6C8;
+  --color-randstad-grey: #4A4A5A;
+
+  /* === Factie kleuren === */
+  --faction-brabant: #E07020;
+  --faction-randstad: #5A6A7A;
+  --faction-limburg: #2D6B3F;
+  --faction-belgen: #C42020;
+
+  /* === HUD kleuren === */
+  --hud-bg: rgba(20, 12, 8, 0.85);
+  --hud-bg-solid: #140C08;
+  --hud-border: rgba(212, 168, 83, 0.4);
+  --hud-border-hover: rgba(212, 168, 83, 0.8);
+  --hud-text: #F5E6C8;
+  --hud-text-dim: rgba(245, 230, 200, 0.5);
+  --hud-text-bright: #FFFFFF;
+
+  /* === Functie kleuren === */
+  --color-hp-high: #4CAF50;
+  --color-hp-mid: #FFC107;
+  --color-hp-low: #F44336;
+  --color-gold-icon: #FFD700;
+  --color-alert-warning: #FF6B35;
+  --color-alert-info: #4A90D9;
+  --color-alert-error: #E53935;
+  --color-victory: #FFD700;
+  --color-defeat: #8B1A1A;
+
+  /* === Afmetingen === */
+  --hud-padding: 12px;
+  --hud-gap: 8px;
+  --hud-radius: 6px;
+  --hud-radius-lg: 10px;
+  --minimap-size: 200px;
+  --panel-height: 160px;
+  --portrait-size: 64px;
+  --portrait-sm: 36px;
+  --btn-size: 48px;
+
+  /* === Typografie (system fonts voor PoC) === */
+  --font-heading: 'Georgia', 'Times New Roman', serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', 'Consolas', monospace;
+
+  /* === Animatie === */
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+  --transition-slow: 500ms ease;
+}
+
+/* --- Factie Thema Switching --- */
+
+[data-faction="brabant"] {
+  --faction-accent: var(--faction-brabant);
+  --faction-accent-glow: rgba(224, 112, 32, 0.3);
+}
+
+[data-faction="randstad"] {
+  --faction-accent: var(--faction-randstad);
+  --faction-accent-glow: rgba(90, 106, 122, 0.3);
+}
+
+[data-faction="limburg"] {
+  --faction-accent: var(--faction-limburg);
+  --faction-accent-glow: rgba(45, 107, 63, 0.3);
+}
+
+[data-faction="belgen"] {
+  --faction-accent: var(--faction-belgen);
+  --faction-accent-glow: rgba(196, 32, 32, 0.3);
+}
+
+/* --- Reset & Base --------------------------------------- */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  overflow: hidden;
+  background: #000;
+  font-family: var(--font-body);
+  color: var(--hud-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- Game Canvas ---------------------------------------- */
+
+#game-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* --- HUD Overlay Container ------------------------------ */
+
+.hud-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "resources  alerts     ."
+    ".          .          ."
+    "minimap    panel      panel";
+  gap: 0;
+  padding: var(--hud-padding);
+}
+
+/* --- Shared Panel Style --------------------------------- */
+
+.hud-panel {
+  pointer-events: auto;
+  background: var(--hud-bg);
+  border: 1px solid var(--hud-border);
+  border-radius: var(--hud-radius);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* --- 1. RESOURCE BAR ------------------------------------ */
+
+.resource-bar {
+  grid-area: resources;
+  align-self: start;
+  justify-self: start;
+
+  display: flex;
+  align-items: center;
+  gap: var(--hud-gap);
+  padding: 8px 16px;
+  min-height: 44px;
+
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
+.resource-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.resource-icon {
+  font-size: 18px;
+  line-height: 1;
+  filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.3));
+}
+
+.resource-value {
+  color: var(--hud-text-bright);
+  min-width: 36px;
+}
+
+.resource-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--hud-border);
+  margin: 0 4px;
+}
+
+/* Population warning state */
+.resource-item[data-resource="population"].is-capped .resource-value {
+  color: var(--color-hp-low);
+  animation: pulse-red 1s ease-in-out infinite;
+}
+
+@keyframes pulse-red {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* --- 7. FPS COUNTER ------------------------------------- */
+
+.fps-counter {
+  position: fixed;
+  top: calc(var(--hud-padding) + 52px);
+  left: var(--hud-padding);
+  z-index: 10;
+  pointer-events: none;
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--hud-text-dim);
+  background: rgba(0, 0, 0, 0.5);
+  padding: 2px 6px;
+  border-radius: 3px;
+  user-select: none;
+}
+
+.fps-counter[hidden] {
+  display: none;
+}
+
+/* --- 5. ALERTS ------------------------------------------ */
+
+.alert-container {
+  grid-area: alerts;
+  align-self: start;
+  justify-self: center;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding-top: 4px;
+  pointer-events: none;
+  max-width: 400px;
+}
+
+.alert {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: var(--hud-radius);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  user-select: none;
+
+  background: var(--hud-bg);
+  border: 1px solid var(--hud-border);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  animation: alert-in var(--transition-normal) ease forwards;
+}
+
+.alert.is-leaving {
+  animation: alert-out 200ms ease forwards;
+}
+
+.alert--warning {
+  border-color: var(--color-alert-warning);
+  color: var(--color-alert-warning);
+}
+.alert--warning .alert__icon {
+  color: var(--color-alert-warning);
+}
+
+.alert--info {
+  border-color: var(--color-alert-info);
+  color: var(--color-alert-info);
+}
+.alert--info .alert__icon {
+  color: var(--color-alert-info);
+}
+
+.alert--error {
+  border-color: var(--color-alert-error);
+  color: var(--color-alert-error);
+}
+.alert--error .alert__icon {
+  color: var(--color-alert-error);
+}
+
+.alert__icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.alert__message {
+  font-size: 13px;
+}
+
+@keyframes alert-in {
+  from {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes alert-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+}
+
+/* --- 2. MINIMAP ----------------------------------------- */
+
+.minimap-container {
+  grid-area: minimap;
+  align-self: end;
+  justify-self: start;
+
+  position: relative;
+  width: calc(var(--minimap-size) + 2px);
+  height: calc(var(--minimap-size) + 2px);
+  padding: 0;
+  overflow: hidden;
+}
+
+.minimap-canvas {
+  display: block;
+  width: var(--minimap-size);
+  height: var(--minimap-size);
+  cursor: pointer;
+  image-rendering: pixelated;
+}
+
+.minimap-border {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--hud-border);
+  border-radius: var(--hud-radius);
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 20px rgba(0, 0, 0, 0.5),
+    0 0 12px rgba(0, 0, 0, 0.8);
+}
+
+.minimap-container:hover .minimap-border {
+  border-color: var(--hud-border-hover);
+}
+
+/* --- 3. SELECTION PANEL (unit/building) ----------------- */
+
+.selection-panel {
+  grid-area: panel;
+  align-self: end;
+  justify-self: center;
+
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  min-width: 500px;
+  max-width: 720px;
+  width: 100%;
+  min-height: var(--panel-height);
+
+  animation: panel-in 200ms ease forwards;
+}
+
+.selection-panel[hidden] {
+  display: none;
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- 3a. Single Unit View ------------------------------- */
+
+.unit-single,
+.building-panel {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  width: 100%;
+}
+
+.unit-single[hidden],
+.unit-multi[hidden],
+.building-panel[hidden] {
+  display: none;
+}
+
+/* Portrait */
+
+.unit-portrait-wrapper {
+  position: relative;
+  flex-shrink: 0;
+  padding: 12px;
+}
+
+.unit-portrait {
+  width: var(--portrait-size);
+  height: var(--portrait-size);
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid var(--faction-accent, var(--color-parchment-gold));
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.unit-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.portrait-placeholder {
+  font-size: 28px;
+  color: var(--hud-text-dim);
+  user-select: none;
+}
+
+.portrait-placeholder--sm {
+  font-size: 16px;
+}
+
+.building-portrait {
+  border-color: var(--color-parchment-gold);
+}
+
+.unit-level {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  background: var(--hud-bg-solid);
+  border: 1px solid var(--color-parchment-gold);
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-parchment-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* Unit Info */
+
+.unit-info {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px 10px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.unit-name {
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--hud-text-bright);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* HP Bar */
+
+.unit-hp-bar-container {
+  position: relative;
+  width: 100%;
+  height: 14px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.unit-hp-bar {
+  height: 100%;
+  background: var(--color-hp-high);
+  border-radius: 3px;
+  transition: width var(--transition-fast), background-color var(--transition-fast);
+}
+
+.unit-hp-bar.hp-high  { background: var(--color-hp-high); }
+.unit-hp-bar.hp-mid   { background: var(--color-hp-mid); }
+.unit-hp-bar.hp-low   { background: var(--color-hp-low); }
+
+.unit-hp-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--hud-text-bright);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+}
+
+/* Stats */
+
+.unit-stats {
+  display: flex;
+  gap: 12px;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--hud-text-dim);
+  letter-spacing: 0.06em;
+}
+
+.stat-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--hud-text-bright);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Unit Status */
+
+.unit-status {
+  font-size: 11px;
+  color: var(--hud-text-dim);
+  font-style: italic;
+}
+
+/* --- 4. COMMAND PANEL ----------------------------------- */
+
+.command-panel {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 4px;
+  padding: 10px;
+  border-left: 1px solid var(--hud-border);
+  align-self: center;
+}
+
+.command-panel[hidden] {
+  display: none;
+}
+
+.cmd-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+
+  width: var(--btn-size);
+  height: var(--btn-size);
+  padding: 4px;
+
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--hud-border);
+  border-radius: 4px;
+  color: var(--hud-text);
+  cursor: pointer;
+  user-select: none;
+
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.cmd-btn:hover {
+  background: rgba(212, 168, 83, 0.15);
+  border-color: var(--hud-border-hover);
+  transform: scale(1.05);
+}
+
+.cmd-btn:active {
+  transform: scale(0.95);
+  background: rgba(212, 168, 83, 0.25);
+}
+
+.cmd-btn:focus-visible {
+  outline: 2px solid var(--color-parchment-gold);
+  outline-offset: 2px;
+}
+
+.cmd-btn[disabled] {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.cmd-btn[disabled]:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--hud-border);
+  transform: none;
+}
+
+.cmd-hotkey {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--color-parchment-gold);
+  font-family: var(--font-mono);
+  line-height: 1;
+}
+
+.cmd-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.cmd-label {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--hud-text-dim);
+  line-height: 1;
+}
+
+.cmd-btn--build .cmd-icon {
+  font-size: 20px;
+}
+
+/* --- 3b. Multi Unit View -------------------------------- */
+
+.unit-multi {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.multi-header {
+  padding: 8px 12px 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--hud-text);
+}
+
+.multi-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px 12px 8px;
+  max-height: 88px;
+  overflow-y: auto;
+  flex: 1;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--hud-border) transparent;
+}
+
+.multi-grid::-webkit-scrollbar {
+  width: 4px;
+}
+
+.multi-grid::-webkit-scrollbar-thumb {
+  background: var(--hud-border);
+  border-radius: 2px;
+}
+
+.multi-portrait {
+  position: relative;
+  width: var(--portrait-sm);
+  height: var(--portrait-sm);
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--hud-border);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color var(--transition-fast);
+}
+
+.multi-portrait:hover {
+  border-color: var(--hud-border-hover);
+}
+
+.multi-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.multi-hp-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: var(--color-hp-high);
+  border-radius: 0 0 2px 2px;
+  transition: width var(--transition-fast);
+}
+
+/* Multi-select: command panel naast de grid */
+.unit-multi .command-panel {
+  border-top: 1px solid var(--hud-border);
+  border-left: none;
+  justify-self: end;
+  align-self: end;
+  margin-left: auto;
+
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: 1fr;
+  padding: 6px 12px 8px;
+}
+
+/* --- 3c. Building View (queue) -------------------------- */
+
+.building-queue {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.queue-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.queue-progress[hidden] {
+  display: none;
+}
+
+.queue-label {
+  flex-shrink: 0;
+  color: var(--hud-text);
+  font-weight: 500;
+  min-width: 60px;
+}
+
+.queue-bar-container {
+  flex: 1;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.queue-bar {
+  height: 100%;
+  background: var(--color-parchment-gold);
+  border-radius: 2px;
+  transition: width 100ms linear;
+}
+
+.queue-time {
+  color: var(--hud-text-dim);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  min-width: 24px;
+  text-align: right;
+}
+
+/* --- 6. GAME OVER OVERLAY ------------------------------- */
+
+.game-over-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  animation: fade-in var(--transition-slow) ease forwards;
+}
+
+.game-over-overlay[hidden] {
+  display: none;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.game-over-content {
+  text-align: center;
+  max-width: 480px;
+  width: 90%;
+  padding: 40px;
+  background: var(--hud-bg);
+  border: 1px solid var(--hud-border);
+  border-radius: var(--hud-radius-lg);
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.5);
+
+  animation: scale-in 400ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.game-over-title {
+  font-family: var(--font-heading);
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.game-over-overlay.is-victory .game-over-title {
+  color: var(--color-victory);
+  text-shadow:
+    0 0 20px rgba(255, 215, 0, 0.4),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.game-over-overlay.is-defeat .game-over-title {
+  color: var(--color-defeat);
+  text-shadow:
+    0 0 20px rgba(139, 26, 26, 0.4),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.game-over-overlay.is-defeat .game-over-content {
+  border-color: rgba(139, 26, 26, 0.4);
+}
+
+.game-over-overlay.is-victory .game-over-content {
+  border-color: rgba(255, 215, 0, 0.3);
+}
+
+.game-over-subtitle {
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-style: italic;
+  color: var(--hud-text-dim);
+  margin-bottom: 28px;
+}
+
+/* Stats tabel */
+
+.game-over-stats {
+  text-align: left;
+  margin-bottom: 28px;
+  border-top: 1px solid var(--hud-border);
+  padding-top: 16px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(212, 168, 83, 0.1);
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-row__label {
+  font-size: 13px;
+  color: var(--hud-text);
+}
+
+.stat-row__value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--hud-text-bright);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Knoppen */
+
+.game-over-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.btn {
+  padding: 10px 24px;
+  border: 1px solid var(--hud-border);
+  border-radius: var(--hud-radius);
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  user-select: none;
+
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--color-parchment-gold);
+  outline-offset: 2px;
+}
+
+.btn--primary {
+  background: var(--color-parchment-gold);
+  color: var(--hud-bg-solid);
+  border-color: var(--color-parchment-gold);
+}
+
+.btn--primary:hover {
+  background: #E0B864;
+  box-shadow: 0 0 16px rgba(212, 168, 83, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn--primary:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.btn--secondary {
+  background: transparent;
+  color: var(--hud-text);
+  border-color: var(--hud-border);
+}
+
+.btn--secondary:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--hud-border-hover);
+  transform: translateY(-1px);
+}
+
+.btn--secondary:active {
+  transform: translateY(0);
+}
+
+/* --- Responsive (1366x768 minimum) ---------------------- */
+
+@media (max-width: 1400px) {
+  :root {
+    --minimap-size: 170px;
+    --panel-height: 140px;
+    --portrait-size: 56px;
+    --btn-size: 42px;
+  }
+
+  .resource-bar {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+
+  .unit-name {
+    font-size: 13px;
+  }
+
+  .game-over-title {
+    font-size: 28px;
+  }
+
+  .selection-panel {
+    min-width: 420px;
+  }
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --minimap-size: 150px;
+    --panel-height: 130px;
+    --portrait-size: 48px;
+    --portrait-sm: 30px;
+    --btn-size: 38px;
+    --hud-padding: 8px;
+  }
+
+  .selection-panel {
+    min-width: 360px;
+    max-width: 580px;
+  }
+
+  .cmd-label {
+    display: none;
+  }
+
+  .game-over-content {
+    padding: 28px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

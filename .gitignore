@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.env
+.DS_Store
+*.listing
+
+# Large binary assets (managed separately)
+assets/models/
+assets/audio/
+
+# Keep concept art and UI assets
+!assets/concepts/
+!assets/factions/
+!assets/ui/

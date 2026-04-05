@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@core/*": ["src/core/*"],
+      "@ecs/*": ["src/ecs/*"],
+      "@systems/*": ["src/systems/*"],
+      "@world/*": ["src/world/*"],
+      "@entities/*": ["src/entities/*"],
+      "@factions/*": ["src/factions/*"],
+      "@combat/*": ["src/combat/*"],
+      "@ai/*": ["src/ai/*"],
+      "@pathfinding/*": ["src/pathfinding/*"],
+      "@camera/*": ["src/camera/*"],
+      "@input/*": ["src/input/*"],
+      "@rendering/*": ["src/rendering/*"],
+      "@ui/*": ["src/ui/*"],
+      "@audio/*": ["src/audio/*"],
+      "@assets/*": ["src/assets/*"],
+      "@types/*": ["src/types/*"],
+      "@utils/*": ["src/utils/*"]
+    },
+    "types": ["vite/client"]
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts"],
+  "exclude": ["node_modules", "dist", "scripts"]
+}

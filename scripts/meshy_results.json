@@ -1,0 +1,98 @@
+{
+  "brab_worker": {
+    "task_id": "019d5de9-8348-710d-92e0-fd367765ad54",
+    "subfolder": "brabanders",
+    "filename": "worker.glb",
+    "output_path": "/Users/richardtheuws/Documents/games/reign-of-brabant/assets/models/v01/brabanders/worker.glb",
+    "status": "COMPLETED",
+    "filesize": 946692
+  },
+  "brab_infantry": {
+    "task_id": "019d5de9-8f3d-7255-b6b3-99afd12da950",
+    "subfolder": "brabanders",
+    "filename": "infantry.glb",
+    "output_path": "/Users/richardtheuws/Documents/games/reign-of-brabant/assets/models/v01/brabanders/infantry.glb",
+    "status": "COMPLETED",
+    "filesize": 1019672
+  },
+  "brab_ranged": {
+    "task_id": "019d5de9-9ada-725c-84b7-523358134da4",
+    "subfolder": "brabanders",
+    "filename": "ranged.glb",
+    "output_path": "/Users/richardtheuws/Documents/games/reign-of-brabant/assets/models/v01/brabanders/ranged.glb",
+    "status": "COMPLETED",
+    "filesize": 998056
+  },
+  "brab_townhall": {
+    "task_id": "019d5de9-a6da-725d-958b-b86534a214ef",
+    "subfolder": "brabanders",
+    "filename": "townhall.glb",
+    "output_path": "/Users/richardtheuws/Documents/games/reign-of-brabant/assets/models/v01/brabanders/townhall.glb",
+    "status": "COMPLETED",
+    "filesize": 1159216
+  },
+  "brab_barracks": {
+    "task_id": "019d5de9-b3bb-7e3e-8f3d-717dd7b31b26",
+    "subfolder": "brabanders",
+    "filename": "barracks.glb",
+    "output_path": "/Users/richardtheuws/Documents/games/reign-of-brabant/assets/models/v01/brabanders/barracks.glb",
+    "status": "COMPLETED",
+    "filesize": 1319160
+  },
+  "rand_worker": {
+    "task_id": "019d5de9-c085-7e3e-91c7-bb80c7932efb",
+    "subfolder": "randstad",
+    "filename": "worker.glb",
+    "output_path": "/Users/richardtheuws/Documents/games/reign-of-brabant/assets/models/v01/randstad/worker.glb",
+    "status": "COMPLETED",
+    "filesize": 960668
+  },
+  "rand_infantry": {
+    "task_id": "019d5de9-cd62-7265-8936-06a9c300f45e",
+    "subfolder": "randstad",
+    "filename": "infantry.glb",
+    "output_path": "/Users/richardtheuws/Documents/games/reign-of-brabant/assets/models/v01/randstad/infantry.glb",
+    "status": "COMPLETED",
+    "filesize": 943188
+  },
+  "rand_ranged": {
+    "task_id": "019d5de9-d9de-7b9b-9129-d74045f328d0",
+    "subfolder": "randstad",
+    "filename": "ranged.glb",
+    "output_path": "/Users/richardtheuws/Documents/games/reign-of-brabant/assets/models/v01/randstad/ranged.glb",
+    "status": "COMPLETED",
+    "filesize": 1221184
+  },
+  "rand_townhall": {
+    "task_id": "019d5de9-e7b9-7143-8258-b78ed92a1f00",
+    "subfolder": "randstad",
+    "filename": "townhall.glb",
+    "output_path": "/Users/richardtheuws/Documents/games/reign-of-brabant/assets/models/v01/randstad/townhall.glb",
+    "status": "COMPLETED",
+    "filesize": 927900
+  },
+  "rand_barracks": {
+    "task_id": "019d5de9-f33e-7e53-9128-0763a5bfd973",
+    "subfolder": "randstad",
+    "filename": "barracks.glb",
+    "output_path": "/Users/richardtheuws/Documents/games/reign-of-brabant/assets/models/v01/randstad/barracks.glb",
+    "status": "COMPLETED",
+    "filesize": 1109808
+  },
+  "shared_goldmine": {
+    "task_id": "019d5dea-0d62-7e53-854d-d28c5a47c097",
+    "subfolder": "shared",
+    "filename": "goldmine.glb",
+    "output_path": "/Users/richardtheuws/Documents/games/reign-of-brabant/assets/models/v01/shared/goldmine.glb",
+    "status": "COMPLETED",
+    "filesize": 1071256
+  },
+  "shared_tree": {
+    "task_id": "019d5de7-d437-70c7-ae8e-01162681a739",
+    "subfolder": "shared",
+    "filename": "tree_pine.glb",
+    "output_path": "/Users/richardtheuws/Documents/games/reign-of-brabant/assets/models/v01/shared/tree_pine.glb",
+    "status": "COMPLETED",
+    "filesize": 1216640
+  }
+}
