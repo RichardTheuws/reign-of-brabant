@@ -31,6 +31,12 @@ const UNIT_MODEL_PATHS: Record<string, string> = {
   ranged_1: 'assets/models/v01/randstad/ranged.glb',
 };
 
+/** Faction team colors: applied as a subtle tint to unit materials. */
+const FACTION_TINTS: Record<number, THREE.Color> = {
+  [FACTION_ORANGE]: new THREE.Color(0xf5a040), // Brabanders: warm orange
+  [FACTION_BLUE]: new THREE.Color(0x6088cc),   // Randstad: cool blue-grey
+};
+
 /** Emissive glow colour for selected units. */
 const SELECTION_EMISSIVE = new THREE.Color(0x44ff44);
 const SELECTION_EMISSIVE_INTENSITY = 0.35;
@@ -150,14 +156,23 @@ export class UnitRenderer {
     }
 
     const clone = source.clone(true);
-    // Deep clone materials so highlight does not bleed to other clones
+    const tint = FACTION_TINTS[factionId];
+    // Deep clone materials, apply faction tint for team color visibility
     clone.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
+        const applyTint = (m: THREE.Material): THREE.Material => {
+          const cloned = m.clone();
+          if (tint && 'color' in cloned && cloned.color instanceof THREE.Color) {
+            // Blend original color with faction tint (60% original, 40% tint)
+            cloned.color.lerp(tint, 0.4);
+          }
+          return cloned;
+        };
         if (Array.isArray(mesh.material)) {
-          mesh.material = mesh.material.map((m) => m.clone());
+          mesh.material = mesh.material.map(applyTint);
         } else {
-          mesh.material = mesh.material.clone();
+          mesh.material = applyTint(mesh.material);
         }
       }
     });

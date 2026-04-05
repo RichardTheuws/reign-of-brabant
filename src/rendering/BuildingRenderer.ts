@@ -22,6 +22,12 @@ const BUILDING_MODEL_PATHS: Record<string, string> = {
 
 type ModelCacheKey = `${BuildingTypeName}_${number}`;
 
+/** Faction team colors: applied as a subtle tint to building materials. */
+const FACTION_TINTS: Record<number, THREE.Color> = {
+  0: new THREE.Color(0xf5a040), // Brabanders: warm orange
+  1: new THREE.Color(0x6088cc), // Randstad: cool blue-grey
+};
+
 /** Ghost colours for placement preview. */
 const GHOST_VALID_COLOR = new THREE.Color(0x00ff00);
 const GHOST_INVALID_COLOR = new THREE.Color(0xff0000);
@@ -123,18 +129,22 @@ export class BuildingRenderer {
     }
 
     const clone = source.clone(true);
+    const tint = FACTION_TINTS[factionId];
     clone.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
+        const applyTint = (m: THREE.Material): THREE.Material => {
+          const c = m.clone();
+          c.transparent = true;
+          if (tint && 'color' in c && c.color instanceof THREE.Color) {
+            c.color.lerp(tint, 0.35);
+          }
+          return c;
+        };
         if (Array.isArray(mesh.material)) {
-          mesh.material = mesh.material.map((m) => {
-            const c = m.clone();
-            c.transparent = true;
-            return c;
-          });
+          mesh.material = mesh.material.map(applyTint);
         } else {
-          mesh.material = mesh.material.clone();
-          (mesh.material as THREE.Material).transparent = true;
+          mesh.material = applyTint(mesh.material);
         }
       }
     });
