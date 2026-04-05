@@ -5,6 +5,7 @@
  */
 
 import * as THREE from 'three';
+import { MeshToonMaterial } from 'three';
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 
 // ---------------------------------------------------------------------------
@@ -68,6 +69,34 @@ function extractFirstMesh(root: THREE.Group): { geometry: THREE.BufferGeometry; 
   };
 }
 
+/**
+ * Blend two THREE.Color values by a given factor (0 = keep original, 1 = full tint).
+ */
+function blendColor(original: THREE.Color, tint: THREE.Color, factor: number): THREE.Color {
+  return new THREE.Color(
+    original.r + (tint.r - original.r) * factor,
+    original.g + (tint.g - original.g) * factor,
+    original.b + (tint.b - original.b) * factor,
+  );
+}
+
+/**
+ * Convert a material to MeshToonMaterial, blending its color with a tint.
+ */
+function toToonMaterial(
+  mat: THREE.Material,
+  tintHex: string,
+  tintFactor: number,
+): MeshToonMaterial {
+  const srcColor =
+    (mat as THREE.MeshStandardMaterial).color?.clone() ?? new THREE.Color(0x888888);
+  const tint = new THREE.Color(tintHex);
+  const blended = blendColor(srcColor, tint, tintFactor);
+  const toon = new MeshToonMaterial({ color: blended });
+  mat.dispose();
+  return toon;
+}
+
 // ---------------------------------------------------------------------------
 // PropRenderer
 // ---------------------------------------------------------------------------
@@ -117,9 +146,11 @@ export class PropRenderer {
         console.warn('[PropRenderer] Tree GLB has no mesh children');
         continue;
       }
+      // Convert to toon material with green tint
+      const toonMat = toToonMaterial(data.material, '#3a8828', 0.5);
       this.sourceGeometries.push(data.geometry);
-      this.sourceMaterials.push(data.material);
-      const im = new THREE.InstancedMesh(data.geometry, data.material, MAX_INSTANCES_PER_VARIANT);
+      this.sourceMaterials.push(toonMat);
+      const im = new THREE.InstancedMesh(data.geometry, toonMat, MAX_INSTANCES_PER_VARIANT);
       im.count = 0; // Start empty
       im.castShadow = true;
       im.receiveShadow = false;
@@ -135,9 +166,11 @@ export class PropRenderer {
         console.warn('[PropRenderer] Rock GLB has no mesh children');
         continue;
       }
+      // Convert to toon material with grey tint
+      const toonMat = toToonMaterial(data.material, '#8a8a80', 0.4);
       this.sourceGeometries.push(data.geometry);
-      this.sourceMaterials.push(data.material);
-      const im = new THREE.InstancedMesh(data.geometry, data.material, MAX_INSTANCES_PER_VARIANT);
+      this.sourceMaterials.push(toonMat);
+      const im = new THREE.InstancedMesh(data.geometry, toonMat, MAX_INSTANCES_PER_VARIANT);
       im.count = 0;
       im.castShadow = true;
       im.receiveShadow = false;
@@ -234,9 +267,9 @@ export class PropRenderer {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
         if (Array.isArray(mesh.material)) {
-          mesh.material = mesh.material.map((m) => m.clone());
+          mesh.material = mesh.material.map((m) => toToonMaterial(m.clone(), '#d4a030', 0.6));
         } else {
-          mesh.material = mesh.material.clone();
+          mesh.material = toToonMaterial(mesh.material.clone(), '#d4a030', 0.6);
         }
       }
     });

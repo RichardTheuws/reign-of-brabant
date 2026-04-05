@@ -5,6 +5,7 @@
  */
 
 import * as THREE from 'three';
+import { MeshToonMaterial } from 'three';
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 
 // ---------------------------------------------------------------------------
@@ -31,10 +32,10 @@ const UNIT_MODEL_PATHS: Record<string, string> = {
   ranged_1: 'assets/models/v01/randstad/ranged.glb',
 };
 
-/** Faction team colors: applied as a subtle tint to unit materials. */
+/** Faction team colors: applied as a strong tint to unit materials. */
 const FACTION_TINTS: Record<number, THREE.Color> = {
-  [FACTION_ORANGE]: new THREE.Color(0xf5a040), // Brabanders: warm orange
-  [FACTION_BLUE]: new THREE.Color(0x6088cc),   // Randstad: cool blue-grey
+  [FACTION_ORANGE]: new THREE.Color(0xff8830), // Brabanders: bright warm orange
+  [FACTION_BLUE]: new THREE.Color(0x4070bb),   // Randstad: clear blue
 };
 
 /** Emissive glow colour for selected units. */
@@ -157,17 +158,25 @@ export class UnitRenderer {
 
     const clone = source.clone(true);
     const tint = FACTION_TINTS[factionId];
-    // Deep clone materials, apply faction tint for team color visibility
+    // Convert materials to MeshToonMaterial for stylized cel-shaded look
     clone.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
         const applyTint = (m: THREE.Material): THREE.Material => {
-          const cloned = m.clone();
-          if (tint && 'color' in cloned && cloned.color instanceof THREE.Color) {
-            // Blend original color with faction tint (60% original, 40% tint)
-            cloned.color.lerp(tint, 0.4);
-          }
-          return cloned;
+          // Extract base color from original material
+          const origColor = ('color' in m && m.color instanceof THREE.Color)
+            ? m.color.clone()
+            : new THREE.Color(0x888888);
+
+          // Apply faction tint (strong: 70% blend)
+          if (tint) origColor.lerp(tint, 0.7);
+
+          // Create toon material for stylized look
+          const toon = new MeshToonMaterial({
+            color: origColor,
+            transparent: false,
+          });
+          return toon;
         };
         if (Array.isArray(mesh.material)) {
           mesh.material = mesh.material.map(applyTint);
@@ -338,7 +347,7 @@ export class UnitRenderer {
       const mesh = child as THREE.Mesh;
       const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
       for (const mat of mats) {
-        if (mat instanceof THREE.MeshStandardMaterial || mat instanceof THREE.MeshPhysicalMaterial) {
+        if (mat instanceof MeshToonMaterial || mat instanceof THREE.MeshStandardMaterial || mat instanceof THREE.MeshPhysicalMaterial) {
           if (highlighted) {
             mat.emissive.copy(SELECTION_EMISSIVE);
             mat.emissiveIntensity = SELECTION_EMISSIVE_INTENSITY;
@@ -357,7 +366,7 @@ export class UnitRenderer {
       const mesh = child as THREE.Mesh;
       const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
       for (const mat of mats) {
-        if (mat instanceof THREE.MeshStandardMaterial || mat instanceof THREE.MeshPhysicalMaterial) {
+        if (mat instanceof MeshToonMaterial || mat instanceof THREE.MeshStandardMaterial || mat instanceof THREE.MeshPhysicalMaterial) {
           mat.emissive.copy(DAMAGE_FLASH_COLOR);
           mat.emissiveIntensity = DAMAGE_FLASH_INTENSITY;
         }
@@ -371,7 +380,7 @@ export class UnitRenderer {
       const mesh = child as THREE.Mesh;
       const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
       for (const mat of mats) {
-        if (mat instanceof THREE.MeshStandardMaterial || mat instanceof THREE.MeshPhysicalMaterial) {
+        if (mat instanceof MeshToonMaterial || mat instanceof THREE.MeshStandardMaterial || mat instanceof THREE.MeshPhysicalMaterial) {
           mat.emissive.setScalar(0);
           mat.emissiveIntensity = 0;
         }

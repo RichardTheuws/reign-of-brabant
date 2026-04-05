@@ -2,13 +2,13 @@ import * as THREE from 'three';
 import { clamp, lerp } from '@utils/math';
 
 const PAN_SPEED = 30;
-const ZOOM_SPEED = 5;
-const MIN_ZOOM = 10;
+const ZOOM_SPEED = 6;
+const MIN_ZOOM = 8;
 const MAX_ZOOM = 80;
 const EDGE_SCROLL_THRESHOLD = 20;
 const EDGE_SCROLL_SPEED = 25;
 const SMOOTHING = 0.1;
-const CAMERA_ANGLE = (60 * Math.PI) / 180;
+const CAMERA_ANGLE = (55 * Math.PI) / 180;
 
 export class RTSCamera {
   readonly camera: THREE.PerspectiveCamera;
@@ -17,8 +17,8 @@ export class RTSCamera {
   private targetZ = 0;
   private currentX = 0;
   private currentZ = 0;
-  private targetZoom = 40;
-  private currentZoom = 40;
+  private targetZoom = 25;
+  private currentZoom = 25;
   private mapSize: number;
   private halfMap: number;
 

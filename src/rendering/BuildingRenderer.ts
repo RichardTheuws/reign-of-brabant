@@ -5,6 +5,7 @@
  */
 
 import * as THREE from 'three';
+import { MeshToonMaterial } from 'three';
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 
 // ---------------------------------------------------------------------------
@@ -22,10 +23,10 @@ const BUILDING_MODEL_PATHS: Record<string, string> = {
 
 type ModelCacheKey = `${BuildingTypeName}_${number}`;
 
-/** Faction team colors: applied as a subtle tint to building materials. */
+/** Faction team colors: applied as a strong tint to building materials. */
 const FACTION_TINTS: Record<number, THREE.Color> = {
-  0: new THREE.Color(0xf5a040), // Brabanders: warm orange
-  1: new THREE.Color(0x6088cc), // Randstad: cool blue-grey
+  0: new THREE.Color(0xff8830), // Brabanders: bright warm orange
+  1: new THREE.Color(0x4070bb), // Randstad: clear blue
 };
 
 /** Ghost colours for placement preview. */
@@ -130,16 +131,25 @@ export class BuildingRenderer {
 
     const clone = source.clone(true);
     const tint = FACTION_TINTS[factionId];
+    // Convert materials to MeshToonMaterial for stylized cel-shaded look
     clone.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
         const applyTint = (m: THREE.Material): THREE.Material => {
-          const c = m.clone();
-          c.transparent = true;
-          if (tint && 'color' in c && c.color instanceof THREE.Color) {
-            c.color.lerp(tint, 0.35);
-          }
-          return c;
+          // Extract base color from original material
+          const origColor = ('color' in m && m.color instanceof THREE.Color)
+            ? m.color.clone()
+            : new THREE.Color(0x888888);
+
+          // Apply faction tint (strong: 70% blend)
+          if (tint) origColor.lerp(tint, 0.7);
+
+          // Create toon material (transparent for build progress opacity)
+          const toon = new MeshToonMaterial({
+            color: origColor,
+            transparent: true,
+          });
+          return toon;
         };
         if (Array.isArray(mesh.material)) {
           mesh.material = mesh.material.map(applyTint);
@@ -265,7 +275,7 @@ export class BuildingRenderer {
         const mesh = child as THREE.Mesh;
         const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
         for (const mat of mats) {
-          if (mat instanceof THREE.MeshStandardMaterial || mat instanceof THREE.MeshPhysicalMaterial) {
+          if (mat instanceof MeshToonMaterial || mat instanceof THREE.MeshStandardMaterial || mat instanceof THREE.MeshPhysicalMaterial) {
             mat.emissive.copy(color);
             mat.emissiveIntensity = 0.5;
           }
@@ -347,7 +357,7 @@ export class BuildingRenderer {
       const mesh = child as THREE.Mesh;
       const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
       for (const mat of mats) {
-        if (mat instanceof THREE.MeshStandardMaterial || mat instanceof THREE.MeshPhysicalMaterial) {
+        if (mat instanceof MeshToonMaterial || mat instanceof THREE.MeshStandardMaterial || mat instanceof THREE.MeshPhysicalMaterial) {
           if (intensity > 0.01) {
             mat.emissive.copy(DAMAGE_TINT_COLOR);
             mat.emissiveIntensity = intensity;

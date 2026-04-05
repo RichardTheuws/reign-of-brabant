@@ -3,23 +3,23 @@ import { createNoise2D } from 'simplex-noise';
 
 const MAP_SIZE = 128;
 const SEGMENTS = 128;
-const MAX_HEIGHT = 5;
+const MAX_HEIGHT = 1.5;
 const WATER_LEVEL = 0;
-const NOISE_SCALE = 0.02;
-const OCTAVES = 4;
-const PERSISTENCE = 0.45;
+const NOISE_SCALE = 0.012;
+const OCTAVES = 2;
+const PERSISTENCE = 0.3;
 const LACUNARITY = 2.2;
 
-// Richer, more vibrant color palette
-const COLOR_DEEP_GRASS = new THREE.Color(0x3d7a2e);
-const COLOR_GRASS = new THREE.Color(0x5a9e4a);
-const COLOR_GRASS_LIGHT = new THREE.Color(0x7ab85a);
-const COLOR_GRASS_LUSH = new THREE.Color(0x4d9938);
-const COLOR_PATH = new THREE.Color(0x9b8365);
-const COLOR_SANDY = new THREE.Color(0xc4a968);
-const COLOR_HILL = new THREE.Color(0x6a9a50);
-const COLOR_HILL_TOP = new THREE.Color(0x8aaa6a);
-const COLOR_WATER_EDGE = new THREE.Color(0x3a7a5a);
+// Clean, saturated Brabant meadow palette
+const COLOR_DEEP_GRASS = new THREE.Color('#48a035');
+const COLOR_GRASS = new THREE.Color('#5cb840');
+const COLOR_GRASS_LIGHT = new THREE.Color('#6ec850');
+const COLOR_GRASS_LUSH = new THREE.Color('#55b042');
+const COLOR_PATH = new THREE.Color('#c4a868');
+const COLOR_SANDY = new THREE.Color('#d4b878');
+const COLOR_HILL = new THREE.Color('#5aaa45');
+const COLOR_HILL_TOP = new THREE.Color('#70b858');
+const COLOR_WATER_EDGE = new THREE.Color('#4a8a5a');
 
 /** Simple deterministic hash for seeded random per vertex. */
 function seededRandom(x: number, z: number): number {
@@ -257,15 +257,15 @@ export class Terrain {
         color.lerp(new THREE.Color(0x9aba7a), peakT * 0.4);
       }
 
-      // Micro-variation: seeded random per vertex for +-10% brightness/hue shift
+      // Micro-variation: seeded random per vertex for +-4% brightness/hue shift
       const rng = seededRandom(ix, iz); // 0..1
-      const brightnessShift = 0.90 + rng * 0.20; // 0.90 .. 1.10
+      const brightnessShift = 0.96 + rng * 0.08; // 0.96 .. 1.04
 
       // Slight hue shift: nudge green channel differently from red/blue
-      const hueShift = (seededRandom(ix + 9999, iz + 7777) - 0.5) * 0.06; // -0.03..+0.03
+      const hueShift = (seededRandom(ix + 9999, iz + 7777) - 0.5) * 0.024; // -0.012..+0.012
 
       // Also layer in the detail noise for additional organic variation
-      const detailVariation = 0.97 + (detail * 0.5 + 0.5) * 0.06;
+      const detailVariation = 0.988 + (detail * 0.5 + 0.5) * 0.024;
 
       const finalVariation = brightnessShift * detailVariation;
 
@@ -275,6 +275,7 @@ export class Terrain {
     }
 
     this.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    this.geometry.computeVertexNormals();
   }
 
   private createGridOverlay(): THREE.LineSegments {
