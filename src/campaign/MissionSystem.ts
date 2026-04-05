@@ -42,6 +42,8 @@ export interface MissionCallbacks {
   getPlayerArmyCount: () => number;
   /** Query: has a specific enemy building been destroyed? */
   isEnemyBuildingDestroyed: (factionId: FactionId, buildingType: BuildingTypeId) => boolean;
+  /** Query: how many enemy buildings of any type have been destroyed? */
+  getDestroyedEnemyBuildingCount: () => number;
   /** Query: how many player workers are alive? */
   getPlayerWorkerCount: () => number;
   /** Query: is the player Town Hall alive? */
@@ -229,8 +231,8 @@ export class MissionSystem {
           break;
 
         case 'destroy-building':
-          if (this.callbacks.isEnemyBuildingDestroyed(FactionId.AI, BuildingTypeId.TownHall)) {
-            state.currentValue = 1;
+          state.currentValue = this.callbacks.getDestroyedEnemyBuildingCount();
+          if (state.currentValue >= state.objective.targetValue) {
             state.completed = true;
           }
           break;

@@ -235,6 +235,7 @@ export class Game {
       hasPlayerBuilding: (bt) => this._hasPlayerBldg(bt),
       getPlayerArmyCount: () => this._armyCount(),
       isEnemyBuildingDestroyed: (f, bt) => this._enemyBldgDestroyed(f, bt),
+      getDestroyedEnemyBuildingCount: () => this._destroyedEnemyBldgCount(),
       getPlayerWorkerCount: () => this._workerCount(),
       isPlayerTownHallAlive: () => this._thAlive(),
       getPlayerTotalUnits: () => this._playerUnits(),
@@ -304,6 +305,7 @@ export class Game {
   private _hasPlayerBldg(bt: BuildingTypeId): boolean { for (const eid of this.knownBuildingEntities) { if (!entityExists(world, eid)) continue; if (Faction.id[eid] === FactionId.Brabanders && Building.typeId[eid] === bt && Building.complete[eid] === 1) return true; } return false; }
   private _armyCount(): number { let c = 0; for (const eid of this.knownUnitEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead) || Faction.id[eid] !== FactionId.Brabanders) continue; const ut = UnitType.id[eid]; if (ut === UnitTypeId.Infantry || ut === UnitTypeId.Ranged) c++; } return c; }
   private _enemyBldgDestroyed(fid: FactionId, bt: BuildingTypeId): boolean { for (const eid of this.knownBuildingEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead) || Health.current[eid] <= 0) continue; if (Faction.id[eid] === fid && Building.typeId[eid] === bt) return false; } return this.activeMission?.buildings.some(b => b.factionId === fid && b.buildingType === bt) ?? false; }
+  private _destroyedEnemyBldgCount(): number { let count = 0; if (!this.activeMission) return 0; for (const b of this.activeMission.buildings) { if (b.factionId === FactionId.AI) { let alive = false; for (const eid of this.knownBuildingEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead) || Health.current[eid] <= 0) continue; if (Faction.id[eid] === FactionId.AI && Building.typeId[eid] === b.buildingType && Math.abs(Position.x[eid] - b.x) < 2 && Math.abs(Position.z[eid] - b.z) < 2) { alive = true; break; } } if (!alive) count++; } } return count; }
   private _workerCount(): number { let c = 0; for (const eid of this.knownUnitEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead)) continue; if (Faction.id[eid] === FactionId.Brabanders && hasComponent(world, eid, IsWorker)) c++; } return c; }
   private _thAlive(): boolean { for (const eid of this.knownBuildingEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead) || Health.current[eid] <= 0) continue; if (Faction.id[eid] === FactionId.Brabanders && Building.typeId[eid] === BuildingTypeId.TownHall) return true; } return false; }
   private _playerUnits(): number { let c = 0; for (const eid of this.knownUnitEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead)) continue; if (Faction.id[eid] === FactionId.Brabanders) c++; } return c; }

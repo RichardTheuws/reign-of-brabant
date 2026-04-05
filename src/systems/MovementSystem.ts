@@ -47,7 +47,7 @@ export function createMovementSystem(terrain: Terrain) {
       }
 
       // Normalize direction and scale by speed * dt (with Gezelligheid bonus)
-      _invDist = 1 / _dist;
+      _invDist = 1 / Math.max(_dist, 0.001);
       const effectiveSpeed = Movement.speed[eid] * (GezeligheidBonus.speedMult[eid] || 1.0);
       const stepX = _dx * _invDist * effectiveSpeed * dt;
       const stepZ = _dz * _invDist * effectiveSpeed * dt;

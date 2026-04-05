@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.1] - 2026-04-05
+
+### Fixed
+- **CRITICAL**: `destroy-building` objective now counts ALL destroyed enemy buildings, not just TownHalls. Fixes Mission 4 bonus objective "Vernietig de 2 bevoorradingsdepots" which was impossible to complete.
+- **Division by zero guard**: MovementSystem uses `Math.max(_dist, 0.001)` to prevent NaN propagation if unit spawns exactly on target position.
+
 ## [0.5.0] - 2026-04-05
 
 ### Added
