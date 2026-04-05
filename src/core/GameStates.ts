@@ -5,7 +5,6 @@
  */
 
 import { GameStateId, type IGameState, type GameStateContext } from './GameState';
-import { audioManager } from '../audio/AudioManager';
 
 // ---------------------------------------------------------------------------
 // Shared references (set by GameFlowController at boot)

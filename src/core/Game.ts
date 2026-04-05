@@ -9,13 +9,13 @@
 import * as THREE from 'three';
 import { addEntity, addComponent, hasComponent, query, entityExists } from 'bitecs';
 
-import { world, type GameWorld } from '../ecs/world';
+import { world, resetGameWorld, type GameWorld } from '../ecs/world';
 import { Position, Faction, Health, Attack, Armor, Movement, UnitType, UnitAI, Gatherer, Visibility, Building, Resource, Selected, Production, Rotation, GezeligheidBonus, Hero, HeroAbilities } from '../ecs/components';
-import { IsUnit, IsBuilding, IsResource, IsWorker, IsDead, IsHero, IsSummon } from '../ecs/tags';
+import { IsUnit, IsBuilding, IsResource, IsWorker, IsDead, IsHero } from '../ecs/tags';
 import { FactionId, UnitTypeId, BuildingTypeId, HeroTypeId, MAP_SIZE, UnitAIState, NO_PRODUCTION, HERO_POPULATION_COST } from '../types/index';
 import { UNIT_ARCHETYPES, BUILDING_ARCHETYPES } from '../entities/archetypes';
-import { HERO_ARCHETYPES, getHeroTypesForFaction } from '../entities/heroArchetypes';
-import { createHero, isHeroActive, resetHeroTracking } from '../entities/heroFactory';
+import { HERO_ARCHETYPES } from '../entities/heroArchetypes';
+import { createHero, isHeroActive } from '../entities/heroFactory';
 import { createGamePipeline, type SystemPipeline } from '../systems/SystemPipeline';
 import { generateMap, type GeneratedMap, DecoType } from '../world/MapGenerator';
 import { queueCommand } from '../systems/CommandSystem';
@@ -31,7 +31,7 @@ import { playerState } from '../core/PlayerState';
 import { eventBus } from '../core/EventBus';
 import { HUD, type SelectedUnit, type SelectedBuilding, type CommandAction } from '../ui/HUD';
 import { activateCarnavalsrage, getCarnavalsrageState, getCarnavalsrageConfig } from '../systems/AbilitySystem';
-import { activateHeroAbility, setAbilityTarget, getPendingRevivals } from '../systems/HeroSystem';
+import { activateHeroAbility } from '../systems/HeroSystem';
 import { audioManager } from '../audio/AudioManager';
 import { MissionSystem, type MissionCallbacks } from '../campaign/MissionSystem';
 import { getMissionById, type MissionDefinition, type MissionUnitSpawn } from '../campaign/MissionDefinitions';
@@ -97,6 +97,11 @@ export class Game {
   /** Callbacks from campaign UI for victory/defeat */
   public onMissionVictory: ((stars: number, timeSeconds: number, bonusesCompleted: string[]) => void) | null = null;
   public onMissionDefeat: (() => void) | null = null;
+
+  // Track bound listeners for proper cleanup between games/missions
+  private boundCanvasListeners: Array<{ el: EventTarget; event: string; handler: EventListenerOrEventListenerObject }> = [];
+  private inputSetup = false;
+  private eventListenersSetup = false;
 
   constructor(scene: THREE.Scene, terrain: Terrain, camera: RTSCamera, eventBus: EventBusType) {
     this.scene = scene;
@@ -180,32 +185,59 @@ export class Game {
   async initMission(missionId: string): Promise<void> {
     const mission = getMissionById(missionId);
     if (!mission) throw new Error(`Unknown mission: ${missionId}`);
-    this.activeMission = mission; this.gameOver = false; this.militaryTrainedCount = 0;
+
+    // Clean up previous game/mission state to prevent listener accumulation
+    this.cleanup();
+
+    this.activeMission = mission;
     this.map = generateMap(42, (x, z) => this.terrain.getHeightAt(x, z));
-    await Promise.all([this.unitRenderer.preload(), this.buildingRenderer.preload(), this.propRenderer.preload(), this.selectionRenderer.preload()]);
+    await Promise.all([
+      this.unitRenderer.preload(),
+      this.buildingRenderer.preload(),
+      this.propRenderer.preload(),
+      this.selectionRenderer.preload(),
+    ]);
     try { await this.navMesh.init(this.terrain.mesh); } catch { /* fallback */ }
-    this.playerState.addGold(0, -this.playerState.getGold(0)); this.playerState.addGold(0, mission.startingGold);
-    this.playerState.addGold(1, -this.playerState.getGold(1)); this.playerState.addGold(1, mission.startingGoldAI);
-    this._spawnMissionEntities(mission); this.spawnProps();
+
+    // Set starting resources
+    this.playerState.addGold(0, -this.playerState.getGold(0));
+    this.playerState.addGold(0, mission.startingGold);
+    this.playerState.addGold(1, -this.playerState.getGold(1));
+    this.playerState.addGold(1, mission.startingGoldAI);
+
+    this._spawnMissionEntities(mission);
+    this.spawnProps();
     if (mission.hasAIProduction) this.configureAI();
-    this.initHUD(); this.setupInput(); this.setupEventListeners(); this._setupMissionEvents();
+
+    // Setup input, event listeners, HUD, and mission events (cleanup cleared all flags)
+    this.initHUD();
+    this.setupInput();
+    this.setupEventListeners();
+    this._setupMissionEvents();
+
     const pb = mission.buildings.find(b => b.factionId === FactionId.Brabanders);
     if (pb) this.camera.setPosition(pb.x, pb.z);
+
     this.missionSystem = new MissionSystem();
     const wc = mission.units.filter(u => u.factionId === FactionId.Brabanders && u.unitType === UnitTypeId.Worker).length;
     const cb: MissionCallbacks = {
-      showMessage: (t) => this._showMsg(t), spawnUnits: (u) => this._spawnMissionUnits(u),
+      showMessage: (t) => this._showMsg(t),
+      spawnUnits: (u) => this._spawnMissionUnits(u),
       triggerVictory: (s, t, b) => { this.gameOver = true; this.onMissionVictory?.(s, t, b); },
       triggerDefeat: () => { this.gameOver = true; this.onMissionDefeat?.(); },
       getPlayerGold: () => this.playerState.getGold(FactionId.Brabanders),
-      hasPlayerBuilding: (bt) => this._hasPlayerBldg(bt), getPlayerArmyCount: () => this._armyCount(),
+      hasPlayerBuilding: (bt) => this._hasPlayerBldg(bt),
+      getPlayerArmyCount: () => this._armyCount(),
       isEnemyBuildingDestroyed: (f, bt) => this._enemyBldgDestroyed(f, bt),
-      getPlayerWorkerCount: () => this._workerCount(), isPlayerTownHallAlive: () => this._thAlive(),
-      getPlayerTotalUnits: () => this._playerUnits(), getAITotalUnits: () => this._aiUnits(),
+      getPlayerWorkerCount: () => this._workerCount(),
+      isPlayerTownHallAlive: () => this._thAlive(),
+      getPlayerTotalUnits: () => this._playerUnits(),
+      getAITotalUnits: () => this._aiUnits(),
       getPlayerMilitaryTrained: () => this.militaryTrainedCount,
     };
     this.missionSystem.start(mission, cb, wc);
-    this._createMsgOverlay(); this._createObjHUD();
+    this._createMsgOverlay();
+    this._createObjHUD();
     console.log(`[Game] Mission "${mission.title}" initialized`);
   }
   private _spawnMissionEntities(m: MissionDefinition): void {
@@ -602,12 +634,20 @@ export class Game {
     this.hud?.showAlert('Selecteer eerst een hero!', 'warning');
   }
 
+  private addTrackedListener(el: EventTarget, event: string, handler: EventListenerOrEventListenerObject): void {
+    el.addEventListener(event, handler);
+    this.boundCanvasListeners.push({ el, event, handler });
+  }
+
   private setupInput(): void {
+    if (this.inputSetup) return;
+    this.inputSetup = true;
+
     const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
     if (!canvas) return;
 
     // Left click: select unit/building via raycasting, or place building
-    canvas.addEventListener('click', (e) => {
+    this.addTrackedListener(canvas, 'click', ((e: MouseEvent) => {
       if (e.button !== 0) return;
 
       // Build mode: place building
@@ -623,10 +663,10 @@ export class Game {
         this.selectedEntities = [];
       }
       this.onSelectionChanged(this.selectedEntities);
-    });
+    }) as EventListener);
 
     // Right click: context command
-    canvas.addEventListener('mouseup', (e) => {
+    this.addTrackedListener(canvas, 'mouseup', ((e: MouseEvent) => {
       if (e.button === 2) {
         if (this.buildMode) {
           this.exitBuildMode();
@@ -634,17 +674,17 @@ export class Game {
         }
         this.handleRightClick(e.clientX, e.clientY);
       }
-    });
+    }) as EventListener);
 
     // Mouse move for build ghost
-    canvas.addEventListener('mousemove', (e) => {
+    this.addTrackedListener(canvas, 'mousemove', ((e: MouseEvent) => {
       if (this.buildMode && this.buildGhostType) {
         this.updateBuildGhost(e.clientX, e.clientY);
       }
-    });
+    }) as EventListener);
 
     // Keyboard shortcuts
-    window.addEventListener('keydown', (e) => {
+    this.addTrackedListener(window, 'keydown', ((e: KeyboardEvent) => {
       if (e.code === 'Escape' && this.buildMode) {
         this.exitBuildMode();
       }
@@ -686,10 +726,13 @@ export class Game {
       if (e.code === 'Digit3' || e.code === 'Numpad3') {
         this.useHeroAbility(2);
       }
-    });
+    }) as EventListener);
   }
 
   private setupEventListeners(): void {
+    if (this.eventListenersSetup) return;
+    this.eventListenersSetup = true;
+
     // Listen for unit-trained events to track spawned units
     eventBus.on('unit-trained', (event) => {
       this.stats.unitsProduced++;
@@ -1851,6 +1894,61 @@ export class Game {
     // Fallback to map spawn
     const playerSpawn = this.map.spawns.find(s => s.factionId === FactionId.Brabanders);
     return playerSpawn ? { x: playerSpawn.x, z: playerSpawn.z } : { x: 0, z: 0 };
+  }
+
+  /**
+   * Clean up all event listeners, HUD, and state between games/missions.
+   * Must be called before re-initializing to prevent listener accumulation.
+   */
+  private cleanup(): void {
+    // Remove all canvas/window event listeners
+    for (const { el, event, handler } of this.boundCanvasListeners) {
+      el.removeEventListener(event, handler);
+    }
+    this.boundCanvasListeners.length = 0;
+    this.inputSetup = false;
+    this.eventListenersSetup = false;
+
+    // Clear all EventBus listeners (they'll be re-registered in setup)
+    eventBus.clear();
+
+    // Destroy HUD (removes its DOM listeners)
+    if (this.hud) {
+      this.hud.destroy();
+      this.hud = null;
+    }
+
+    // Remove all entity meshes from renderers
+    for (const eid of this.knownUnitEntities) {
+      this.unitRenderer.removeUnit(eid);
+    }
+    for (const eid of this.knownBuildingEntities) {
+      this.buildingRenderer.removeBuilding(eid);
+    }
+    this.entityMeshMap.clear();
+    this.knownUnitEntities.clear();
+    this.knownBuildingEntities.clear();
+
+    // Reset ECS world (removes all entities and components)
+    resetGameWorld();
+
+    // Reset game state
+    this.selectedEntities = [];
+    this.lastHpMap.clear();
+    this.gameOver = false;
+    this.buildMode = false;
+    this.buildGhostType = null;
+    this.stats = { unitsProduced: 0, unitsLost: 0, enemiesKilled: 0, buildingsBuilt: 0, resourcesGathered: 0 };
+    this.missionSystem = null;
+    this.activeMission = null;
+    this.missionMessageTimer = 0;
+    this.militaryTrainedCount = 0;
+
+    // Remove mission UI elements
+    const msgEl = document.getElementById('mission-message');
+    if (msgEl) msgEl.remove();
+    const objEl = document.getElementById('mission-objectives');
+    if (objEl) objEl.remove();
   }
 
   private createGoldMineEntity(x: number, z: number, amount: number): number {
