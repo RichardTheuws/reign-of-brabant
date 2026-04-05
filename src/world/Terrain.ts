@@ -3,10 +3,10 @@ import { createNoise2D } from 'simplex-noise';
 
 const MAP_SIZE = 128;
 const SEGMENTS = 128;
-const MAX_HEIGHT = 1.0;
-const WATER_LEVEL = -0.5;
-const NOISE_SCALE = 0.008;
-const OCTAVES = 2;
+const MAX_HEIGHT = 0.4;
+const WATER_LEVEL = -1;
+const NOISE_SCALE = 0.006;
+const OCTAVES = 1;
 const PERSISTENCE = 0.25;
 const LACUNARITY = 2.2;
 
@@ -168,9 +168,9 @@ export class Terrain {
         noiseValue /= maxAmplitude;
 
         const edgeFalloff = this.edgeFalloff(nx, nz);
-        // Ensure all terrain is above 0 — gentle rolling hills, no underwater areas
-        let height = ((noiseValue + 1) / 2) * MAX_HEIGHT * edgeFalloff;
-        height = Math.max(0.05, height);
+        // Gentle rolling hills — all terrain above 0, no underwater
+        const raw = ((noiseValue + 1) / 2) * MAX_HEIGHT * edgeFalloff;
+        const height = 0.1 + raw * 0.9; // range: 0.1 .. MAX_HEIGHT
 
         this.heightData[idx] = height;
         positions.setY(idx, height);
@@ -184,13 +184,8 @@ export class Terrain {
     this.geometry.computeVertexNormals();
   }
 
-  private edgeFalloff(nx: number, nz: number): number {
-    const dx = Math.abs(nx - 0.5) * 2;
-    const dz = Math.abs(nz - 0.5) * 2;
-    const d = Math.max(dx, dz);
-    if (d > 0.9) {
-      return Math.max(0.3, 1 - ((d - 0.9) / 0.1));
-    }
+  private edgeFalloff(_nx: number, _nz: number): number {
+    // No edge falloff — flat terrain to the edges, no black patches
     return 1;
   }
 
