@@ -73,6 +73,10 @@ export class UnitRenderer {
 
   /** Damage flash timers: eid -> remaining seconds. */
   private damageFlashTimers = new Map<number, number>();
+  /** Previous positions for movement detection. */
+  private prevPositions = new Map<number, { x: number; z: number }>();
+  /** Movement blend factor per unit: 0 = idle, 1 = walking. */
+  private moveBlend = new Map<number, number>();
   /** Blob shadow meshes: eid -> shadow mesh. */
   private blobShadows = new Map<number, THREE.Mesh>();
   /** Shared blob shadow geometry + material. */
@@ -214,8 +218,10 @@ export class UnitRenderer {
       this.group.remove(shadow);
       this.blobShadows.delete(eid);
     }
-    // Clean up damage flash timer
+    // Clean up per-unit state
     this.damageFlashTimers.delete(eid);
+    this.prevPositions.delete(eid);
+    this.moveBlend.delete(eid);
   }
 
   /** Get the Three.js object for an entity (used by RenderSyncSystem). */
@@ -278,19 +284,45 @@ export class UnitRenderer {
       const obj = this.instances.get(data.eid);
       if (!obj) continue;
 
-      // Base position
-      let yPos = data.y;
-
-      // Idle bob: gentle procedural up-and-down when idle
-      if (data.isIdle) {
-        // Use eid as phase offset so units don't bob in sync
-        const phase = (data.eid * 1.7) % (Math.PI * 2);
-        yPos += Math.sin(this.elapsedTime * IDLE_BOB_SPEED + phase) * IDLE_BOB_AMPLITUDE;
+      // --- Movement detection ---
+      const prev = this.prevPositions.get(data.eid);
+      const isMoving = prev !== undefined &&
+        (Math.abs(data.x - prev.x) > 0.01 || Math.abs(data.z - prev.z) > 0.01);
+      if (prev) {
+        prev.x = data.x;
+        prev.z = data.z;
+      } else {
+        this.prevPositions.set(data.eid, { x: data.x, z: data.z });
       }
 
-      obj.position.set(data.x, yPos, data.z);
+      // --- Smooth blend between idle (0) and walking (1) ---
+      const blendTarget = isMoving ? 1.0 : 0.0;
+      const blendCurrent = this.moveBlend.get(data.eid) ?? 0;
+      const blend = blendCurrent + (blendTarget - blendCurrent) * Math.min(dt * 8, 1);
+      this.moveBlend.set(data.eid, blend);
 
-      // Facing: prefer movement target if supplied, else use ry
+      // --- Procedural animation ---
+      // Idle bob: gentle sine wave with per-unit phase offset
+      const idlePhase = (data.eid * 0.7) % (Math.PI * 2);
+      const idleBob = Math.sin(this.elapsedTime * IDLE_BOB_SPEED + idlePhase) * IDLE_BOB_AMPLITUDE;
+
+      // Walk bob: bouncy footstep using abs(sin) for double-frequency bounce
+      const walkPhase = (data.eid * 1.3) % (Math.PI * 2);
+      const walkBob = Math.abs(Math.sin(this.elapsedTime * 8 + walkPhase)) * 0.12;
+
+      // Blend between idle and walk bob
+      const bob = idleBob * (1 - blend) + walkBob * blend;
+
+      // Idle breathing: subtle Y-axis scale pulse (0.98 - 1.02 at 1 Hz)
+      // Fades out when walking via (1 - blend)
+      const breathe = Math.sin(this.elapsedTime * Math.PI * 2 + data.eid * 0.5) * 0.02 * (1 - blend);
+      obj.scale.y = 1.0 + breathe;
+
+      // Apply Y position: terrain height + procedural bob
+      obj.position.set(data.x, data.y + bob, data.z);
+
+      // --- Facing direction ---
+      // Prefer movement target if supplied, else use ry
       if (data.targetX !== undefined && data.targetZ !== undefined) {
         this._vec.set(data.targetX - data.x, 0, data.targetZ - data.z);
         if (this._vec.lengthSq() > 0.01) {
@@ -300,8 +332,16 @@ export class UnitRenderer {
         obj.rotation.y = data.ry;
       }
 
-      // Selection highlight (emissive glow)
-      // Damage flash overrides selection emissive temporarily
+      // --- Walking sway & forward lean ---
+      // Side-to-side sway (half step frequency = 4 Hz)
+      const swayPhase = (data.eid * 0.9) % (Math.PI * 2);
+      const sway = Math.sin(this.elapsedTime * 4 + swayPhase) * 0.03 * blend;
+      obj.rotation.z = sway;
+
+      // Forward lean when moving (~3 degrees)
+      obj.rotation.x = blend * 0.05;
+
+      // --- Selection highlight / damage flash ---
       const isFlashing = this.damageFlashTimers.has(data.eid);
       if (isFlashing) {
         this.applyDamageFlash(obj);
@@ -408,6 +448,8 @@ export class UnitRenderer {
     this.blobShadowGeo.dispose();
     this.blobShadowMat.dispose();
     this.damageFlashTimers.clear();
+    this.prevPositions.clear();
+    this.moveBlend.clear();
 
     // Dispose move indicator
     if (this.moveIndicator) {

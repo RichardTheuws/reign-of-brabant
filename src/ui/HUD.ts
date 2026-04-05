@@ -13,6 +13,17 @@ import { audioManager } from '../audio/AudioManager';
 
 export type Faction = 'brabant' | 'randstad' | 'limburg' | 'belgen';
 export type AlertType = 'warning' | 'info' | 'error';
+
+export interface MinimapData {
+  mapSize: number;
+  units: Array<{ x: number; z: number; factionId: number; isHero: boolean }>;
+  buildings: Array<{ x: number; z: number; factionId: number }>;
+  resources: Array<{ x: number; z: number }>;
+  cameraX: number;
+  cameraZ: number;
+  cameraViewWidth: number;
+  cameraViewHeight: number;
+}
 export type UnitStatus = 'idle' | 'moving' | 'attacking' | 'gathering' | 'building' | 'fleeing';
 export type BuildingType = 'townhall' | 'barracks';
 export type CommandAction =
@@ -106,6 +117,7 @@ export class HUD {
   private gameOverTitle!: HTMLElement;
   private gameOverSubtitle!: HTMLElement;
   private minimapCanvas!: HTMLCanvasElement;
+  private minimapCtx!: CanvasRenderingContext2D;
 
   // Gezelligheid elements
   private resGezelligheid!: HTMLElement;
@@ -184,6 +196,7 @@ export class HUD {
     this.gameOverTitle = this.el('game-over-title');
     this.gameOverSubtitle = this.el('game-over-subtitle');
     this.minimapCanvas = this.el('minimap-canvas') as HTMLCanvasElement;
+    this.minimapCtx = this.minimapCanvas.getContext('2d')!;
 
     // Gezelligheid
     this.resGezelligheid = this.el('res-gezelligheid');
@@ -516,11 +529,88 @@ export class HUD {
   }
 
   // -----------------------------------------------------------------------
-  // Minimap (delegates to external minimap renderer via canvas)
+  // Minimap
   // -----------------------------------------------------------------------
 
   getMinimapCanvas(): HTMLCanvasElement {
     return this.minimapCanvas;
+  }
+
+  updateMinimap(data: MinimapData): void {
+    const ctx = this.minimapCtx;
+    if (!ctx) return;
+
+    const w = this.minimapCanvas.width;
+    const h = this.minimapCanvas.height;
+    const mapSize = data.mapSize || 1;
+
+    // 1. Background (terrain)
+    ctx.fillStyle = '#2a4a28';
+    ctx.fillRect(0, 0, w, h);
+
+    // Precompute scale factors
+    const sx = w / mapSize;
+    const sy = h / mapSize;
+
+    // 2. Resources (gold mines) - yellow dots
+    ctx.fillStyle = '#f0d060';
+    for (let i = 0, len = data.resources.length; i < len; i++) {
+      const r = data.resources[i];
+      const mx = r.x * sx;
+      const my = r.z * sy;
+      ctx.beginPath();
+      ctx.arc(mx, my, 2, 0, TWO_PI);
+      ctx.fill();
+    }
+
+    // 3. Buildings - larger squares (4x4 px)
+    for (let i = 0, len = data.buildings.length; i < len; i++) {
+      const b = data.buildings[i];
+      ctx.fillStyle = b.factionId === 0 ? '#ff8830' : '#4070bb';
+      const mx = b.x * sx;
+      const my = b.z * sy;
+      ctx.fillRect(mx - 2, my - 2, 4, 4);
+    }
+
+    // 4. Units - small dots
+    for (let i = 0, len = data.units.length; i < len; i++) {
+      const u = data.units[i];
+      const isPlayer = u.factionId === 0;
+      const color = isPlayer ? '#ff8830' : '#4070bb';
+      const mx = u.x * sx;
+      const my = u.z * sy;
+
+      if (u.isHero && isPlayer) {
+        // Hero: larger dot with white outline
+        ctx.beginPath();
+        ctx.arc(mx, my, 3, 0, TWO_PI);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      } else {
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(mx, my, 2, 0, TWO_PI);
+        ctx.fill();
+      }
+    }
+
+    // 5. Camera viewport - white rectangle outline
+    const camX = data.cameraX * sx;
+    const camY = data.cameraZ * sy;
+    const camW = data.cameraViewWidth * sx;
+    const camH = data.cameraViewHeight * sy;
+
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(
+      camX - camW * 0.5,
+      camY - camH * 0.5,
+      camW,
+      camH,
+    );
   }
 
   // -----------------------------------------------------------------------
@@ -785,3 +875,4 @@ export class HUD {
 // ---------------------------------------------------------------------------
 
 const MAX_MULTI_PORTRAITS = 24;
+const TWO_PI = Math.PI * 2;

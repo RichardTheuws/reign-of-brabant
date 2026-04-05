@@ -13,6 +13,7 @@ import { getMissionById } from './campaign/MissionDefinitions';
 import { Tutorial } from './core/Tutorial';
 import type { TutorialState as TutorialStateData } from './core/Tutorial';
 import { initAtmosphere, updateAtmosphere } from './rendering/Atmosphere';
+import { PostProcessing } from './rendering/PostProcessing';
 import { ParticleSystem } from './rendering/ParticleSystem';
 
 // ---------------------------------------------------------------------------
@@ -61,6 +62,11 @@ if (terrain.gridMesh) scene.add(terrain.gridMesh);
 const rtsCamera = new RTSCamera(terrain.mapSize);
 
 // ---------------------------------------------------------------------------
+// Post-processing (bloom + outlines)
+// ---------------------------------------------------------------------------
+const postProcessing = new PostProcessing(renderer, scene, rtsCamera.camera);
+
+// ---------------------------------------------------------------------------
 // Input state
 // ---------------------------------------------------------------------------
 const keysDown = new Set<string>();
@@ -74,6 +80,7 @@ window.addEventListener('contextmenu', (e) => e.preventDefault());
 window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
   rtsCamera.resize(window.innerWidth, window.innerHeight);
+  postProcessing.resize(window.innerWidth, window.innerHeight);
 });
 
 // ---------------------------------------------------------------------------
@@ -375,7 +382,7 @@ function fixedUpdate(dt: number): void {
 function render(_alpha: number): void {
   updateAtmosphere(1 / 60); // dust particles
   particles.update(1 / 60);
-  renderer.render(scene, rtsCamera.camera);
+  postProcessing.render(); // renders scene with bloom + outlines
   devStats?.update();
 }
 

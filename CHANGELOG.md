@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.0] - 2026-04-05
+
+### Added
+- **Post-processing pipeline**: EffectComposer with bloom (strength 0.3, threshold 0.85) and green selection outlines (OutlinePass)
+- **Procedural walk animation**: Units bob, sway, and lean forward when moving, with smooth idle-to-walk transitions
+- **Meshy v6 model generation script**: `scripts/generate_v6_models.sh` — image-to-3D using concept art references, production quality
+- **v02 model set**: New Meshy v6 production models replacing v2 preview blobs (in progress)
+
+### Changed
+- Minimap now renders with proper terrain cache, fog of war overlay, faction-colored units, and camera viewport indicator
+- HUD minimap data interface exported for type-safe updates
+
 ## [0.3.0] - 2026-04-05
 
 ### Added
