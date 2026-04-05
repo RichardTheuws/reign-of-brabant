@@ -22,8 +22,17 @@ export const FACTION_BLUE = 1;
 /** Unique cache key for a unit model. */
 type ModelCacheKey = `${UnitTypeName}_${number}`;
 
-/** Map of model GLB asset paths (v01 Meshy models). */
+/** Map of model GLB asset paths — v02 (Meshy v6 production) with v01 fallback. */
 const UNIT_MODEL_PATHS: Record<string, string> = {
+  worker_0: 'assets/models/v02/brabanders/worker.glb',
+  worker_1: 'assets/models/v02/randstad/worker.glb',
+  infantry_0: 'assets/models/v02/brabanders/infantry.glb',
+  infantry_1: 'assets/models/v02/randstad/infantry.glb',
+  ranged_0: 'assets/models/v02/brabanders/ranged.glb',
+  ranged_1: 'assets/models/v02/randstad/ranged.glb',
+};
+
+const UNIT_MODEL_FALLBACKS: Record<string, string> = {
   worker_0: 'assets/models/v01/brabanders/worker.glb',
   worker_1: 'assets/models/v01/randstad/worker.glb',
   infantry_0: 'assets/models/v01/brabanders/infantry.glb',
@@ -121,11 +130,15 @@ export class UnitRenderer {
   // Asset loading
   // -----------------------------------------------------------------------
 
-  /** Pre-load all unit GLB models and populate the cache. */
+  /** Pre-load all unit GLB models (v02 with v01 fallback). */
   async preload(): Promise<void> {
     const entries = Object.entries(UNIT_MODEL_PATHS);
     const promises = entries.map(([key, path]) =>
-      this.loader.loadAsync(path).then((gltf: GLTF) => {
+      this.loader.loadAsync(path).catch(() => {
+        const fallback = UNIT_MODEL_FALLBACKS[key];
+        if (fallback) return this.loader.loadAsync(fallback);
+        throw new Error(`No model found for ${key}`);
+      }).then((gltf: GLTF) => {
         const root = gltf.scene;
         // Scale up units for better visibility on the map
         root.scale.set(1.5, 1.5, 1.5);

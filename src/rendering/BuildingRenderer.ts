@@ -15,6 +15,13 @@ import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 export type BuildingTypeName = 'townhall' | 'barracks';
 
 const BUILDING_MODEL_PATHS: Record<string, string> = {
+  townhall_0: 'assets/models/v02/brabanders/townhall.glb',
+  townhall_1: 'assets/models/v02/randstad/townhall.glb',
+  barracks_0: 'assets/models/v02/brabanders/barracks.glb',
+  barracks_1: 'assets/models/v02/randstad/barracks.glb',
+};
+
+const BUILDING_MODEL_FALLBACKS: Record<string, string> = {
   townhall_0: 'assets/models/v01/brabanders/townhall.glb',
   townhall_1: 'assets/models/v01/randstad/townhall.glb',
   barracks_0: 'assets/models/v01/brabanders/barracks.glb',
@@ -86,7 +93,11 @@ export class BuildingRenderer {
   async preload(): Promise<void> {
     const entries = Object.entries(BUILDING_MODEL_PATHS);
     const promises = entries.map(([key, path]) =>
-      this.loader.loadAsync(path).then((gltf: GLTF) => {
+      this.loader.loadAsync(path).catch(() => {
+        const fallback = BUILDING_MODEL_FALLBACKS[key];
+        if (fallback) return this.loader.loadAsync(fallback);
+        throw new Error(`No model found for ${key}`);
+      }).then((gltf: GLTF) => {
         const root = gltf.scene;
         // Scale up buildings for proper map presence
         root.scale.set(1.8, 1.8, 1.8);
