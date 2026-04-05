@@ -1,9 +1,11 @@
 /**
- * MenuScreens.ts -- DOM controllers for main menu, faction select, and loading screens.
+ * MenuScreens.ts -- DOM controllers for main menu, faction select, loading screens, and settings.
  *
  * Each screen is a section in index.html, shown/hidden by the GameState machine.
  * All text is in Dutch as specified.
  */
+
+import { audioManager } from '../audio/AudioManager';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -15,6 +17,50 @@ export type MenuAction = 'play' | 'campaign' | 'tutorial' | 'settings';
 export interface MenuScreenEvents {
   onMenuAction: (action: MenuAction) => void;
   onFactionSelected: (faction: FactionChoice, startTutorial: boolean) => void;
+}
+
+// ---------------------------------------------------------------------------
+// Settings persistence
+// ---------------------------------------------------------------------------
+
+const SETTINGS_KEY = 'rob-settings';
+
+interface GameSettings {
+  musicVolume: number;   // 0-100
+  sfxVolume: number;     // 0-100
+  ambientVolume: number; // 0-100
+  shadows: boolean;
+  bloom: boolean;
+  particles: boolean;
+  edgeScroll: boolean;
+  grid: boolean;
+}
+
+const DEFAULT_SETTINGS: GameSettings = {
+  musicVolume: 40,
+  sfxVolume: 70,
+  ambientVolume: 30,
+  shadows: true,
+  bloom: true,
+  particles: true,
+  edgeScroll: true,
+  grid: false,
+};
+
+function loadSettings(): GameSettings {
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if (raw) {
+      return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+    }
+  } catch { /* ignore corrupt data */ }
+  return { ...DEFAULT_SETTINGS };
+}
+
+function saveSettings(s: GameSettings): void {
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
+  } catch { /* storage full / private mode */ }
 }
 
 // ---------------------------------------------------------------------------
@@ -84,11 +130,18 @@ export class MenuScreens {
   private currentTipIndex = 0;
   private tipIntervalId = 0;
   private loadingProgress = 0;
+  private settings: GameSettings;
+
+  constructor() {
+    this.settings = loadSettings();
+  }
 
   init(events: MenuScreenEvents): void {
     this.events = events;
     this.bindMainMenu();
     this.bindFactionSelect();
+    this.bindSettings();
+    this.applySettings();
   }
 
   // -----------------------------------------------------------------------
@@ -196,7 +249,7 @@ export class MenuScreens {
     btnPlay?.addEventListener('click', () => this.events?.onMenuAction('play'));
     btnCampaign?.addEventListener('click', () => this.events?.onMenuAction('campaign'));
     btnTutorial?.addEventListener('click', () => this.events?.onMenuAction('tutorial'));
-    btnSettings?.addEventListener('click', () => this.events?.onMenuAction('settings'));
+    btnSettings?.addEventListener('click', () => this.showSettings());
   }
 
   // -----------------------------------------------------------------------
@@ -280,6 +333,134 @@ export class MenuScreens {
       tipEl.textContent = LOADING_TIPS[this.currentTipIndex];
       tipEl.style.opacity = '1';
     }, 300);
+  }
+
+  // -----------------------------------------------------------------------
+  // Settings
+  // -----------------------------------------------------------------------
+
+  private showSettings(): void {
+    const panel = document.getElementById('settings-panel');
+    if (panel) {
+      panel.hidden = false;
+    }
+  }
+
+  private hideSettings(): void {
+    const panel = document.getElementById('settings-panel');
+    if (panel) {
+      panel.hidden = true;
+    }
+  }
+
+  private bindSettings(): void {
+    const backBtn = document.getElementById('settings-back');
+    backBtn?.addEventListener('click', () => this.hideSettings());
+
+    // Audio sliders
+    this.bindSlider('setting-music', 'setting-music-val', (val) => {
+      this.settings.musicVolume = val;
+      audioManager.setCategoryVolume('music', val / 100);
+      this.persistSettings();
+    });
+    this.bindSlider('setting-sfx', 'setting-sfx-val', (val) => {
+      this.settings.sfxVolume = val;
+      audioManager.setCategoryVolume('sfx', val / 100);
+      this.persistSettings();
+    });
+    this.bindSlider('setting-ambient', 'setting-ambient-val', (val) => {
+      this.settings.ambientVolume = val;
+      audioManager.setCategoryVolume('ambient', val / 100);
+      this.persistSettings();
+    });
+
+    // Graphics checkboxes
+    this.bindCheckbox('setting-shadows', (checked) => {
+      this.settings.shadows = checked;
+      this.persistSettings();
+    });
+    this.bindCheckbox('setting-bloom', (checked) => {
+      this.settings.bloom = checked;
+      this.persistSettings();
+    });
+    this.bindCheckbox('setting-particles', (checked) => {
+      this.settings.particles = checked;
+      this.persistSettings();
+    });
+
+    // Gameplay checkboxes
+    this.bindCheckbox('setting-edge-scroll', (checked) => {
+      this.settings.edgeScroll = checked;
+      this.persistSettings();
+    });
+    this.bindCheckbox('setting-grid', (checked) => {
+      this.settings.grid = checked;
+      this.persistSettings();
+    });
+  }
+
+  /**
+   * Apply persisted settings to UI controls and audio system on init.
+   */
+  private applySettings(): void {
+    const s = this.settings;
+
+    // Sliders
+    this.setSliderValue('setting-music', 'setting-music-val', s.musicVolume);
+    this.setSliderValue('setting-sfx', 'setting-sfx-val', s.sfxVolume);
+    this.setSliderValue('setting-ambient', 'setting-ambient-val', s.ambientVolume);
+
+    // Audio system
+    audioManager.setCategoryVolume('music', s.musicVolume / 100);
+    audioManager.setCategoryVolume('sfx', s.sfxVolume / 100);
+    audioManager.setCategoryVolume('ambient', s.ambientVolume / 100);
+
+    // Checkboxes
+    this.setCheckboxValue('setting-shadows', s.shadows);
+    this.setCheckboxValue('setting-bloom', s.bloom);
+    this.setCheckboxValue('setting-particles', s.particles);
+    this.setCheckboxValue('setting-edge-scroll', s.edgeScroll);
+    this.setCheckboxValue('setting-grid', s.grid);
+  }
+
+  private bindSlider(sliderId: string, labelId: string, onChange: (val: number) => void): void {
+    const slider = document.getElementById(sliderId) as HTMLInputElement | null;
+    const label = document.getElementById(labelId);
+    if (!slider) return;
+    slider.addEventListener('input', () => {
+      const val = parseInt(slider.value, 10);
+      if (label) label.textContent = `${val}%`;
+      onChange(val);
+    });
+  }
+
+  private bindCheckbox(id: string, onChange: (checked: boolean) => void): void {
+    const cb = document.getElementById(id) as HTMLInputElement | null;
+    if (!cb) return;
+    cb.addEventListener('change', () => onChange(cb.checked));
+  }
+
+  private setSliderValue(sliderId: string, labelId: string, value: number): void {
+    const slider = document.getElementById(sliderId) as HTMLInputElement | null;
+    const label = document.getElementById(labelId);
+    if (slider) slider.value = String(value);
+    if (label) label.textContent = `${value}%`;
+  }
+
+  private setCheckboxValue(id: string, checked: boolean): void {
+    const cb = document.getElementById(id) as HTMLInputElement | null;
+    if (cb) cb.checked = checked;
+  }
+
+  private persistSettings(): void {
+    saveSettings(this.settings);
+  }
+
+  /**
+   * Expose current settings for other systems to read (graphics, gameplay).
+   */
+  getSettings(): Readonly<GameSettings> {
+    return this.settings;
   }
 
   // -----------------------------------------------------------------------

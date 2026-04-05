@@ -25,6 +25,11 @@ export class RTSCamera {
   private raycaster = new THREE.Raycaster();
   private groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
 
+  private shakeIntensity = 0;
+  private shakeDuration = 0;
+  private shakeTimer = 0;
+  private shakeOffset = new THREE.Vector3();
+
   constructor(mapSize: number) {
     this.mapSize = mapSize;
     this.halfMap = mapSize / 2;
@@ -75,6 +80,35 @@ export class RTSCamera {
     this.currentZoom = lerp(this.currentZoom, this.targetZoom, smoothFactor);
 
     this.updateCameraPosition();
+
+    // Decay shake over time
+    if (this.shakeTimer > 0) {
+      this.shakeTimer -= dt;
+      const progress = this.shakeTimer / this.shakeDuration;
+      const currentIntensity = this.shakeIntensity * progress; // fade out
+
+      // Random offset (changes each frame for jitter effect)
+      this.shakeOffset.set(
+        (Math.random() - 0.5) * 2 * currentIntensity,
+        (Math.random() - 0.5) * 1 * currentIntensity, // less vertical
+        (Math.random() - 0.5) * 2 * currentIntensity,
+      );
+    } else {
+      this.shakeOffset.set(0, 0, 0);
+    }
+
+    // Apply shake offset to final camera position
+    this.camera.position.add(this.shakeOffset);
+  }
+
+  /** Trigger a camera shake effect (e.g., on explosions, heavy combat) */
+  shake(intensity: number = 0.5, duration: number = 0.3): void {
+    // Only override if new shake is stronger
+    if (intensity > this.shakeIntensity * (this.shakeTimer / this.shakeDuration || 0)) {
+      this.shakeIntensity = intensity;
+      this.shakeDuration = duration;
+      this.shakeTimer = duration;
+    }
   }
 
   worldToScreen(position: THREE.Vector3): THREE.Vector2 {

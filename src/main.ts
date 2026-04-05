@@ -13,6 +13,7 @@ import { getMissionById } from './campaign/MissionDefinitions';
 import { Tutorial } from './core/Tutorial';
 import type { TutorialState as TutorialStateData } from './core/Tutorial';
 import { initAtmosphere, updateAtmosphere } from './rendering/Atmosphere';
+import { updateWater } from './world/Terrain';
 import { PostProcessing } from './rendering/PostProcessing';
 import { ParticleSystem } from './rendering/ParticleSystem';
 
@@ -379,10 +380,14 @@ function fixedUpdate(dt: number): void {
   stateMachine.update(dt);
 }
 
+let renderElapsed = 0;
 function render(_alpha: number): void {
-  updateAtmosphere(1 / 60); // dust particles
-  particles.update(1 / 60);
-  postProcessing.render(); // renders scene with bloom + outlines
+  const dt = 1 / 60;
+  renderElapsed += dt;
+  updateAtmosphere(dt);
+  updateWater(renderElapsed);
+  particles.update(dt);
+  postProcessing.render();
   devStats?.update();
 }
 

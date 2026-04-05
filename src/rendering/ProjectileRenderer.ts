@@ -2,6 +2,9 @@
  * ProjectileRenderer.ts
  * Manages arrow projectile rendering with arc trajectories and object pooling.
  * Max 50 simultaneous projectiles, auto-cleanup on impact.
+ *
+ * Trail system: each projectile has a ribbon trail (8-point fading line) plus
+ * small spark particles that detach as it flies, creating a dramatic arc.
  */
 
 import * as THREE from 'three';
@@ -18,9 +21,17 @@ const ARC_GRAVITY = 15;
 /** Minimum arc height above the straight-line midpoint. */
 const MIN_ARC_PEAK = 2;
 
-/** Trail: thin stretched mesh behind each arrow. */
-const TRAIL_LENGTH = 1.2;
-const TRAIL_OPACITY = 0.3;
+/** Ribbon trail: number of historical positions stored per projectile. */
+const TRAIL_POINTS = 8;
+/** Minimum distance (squared) before recording a new trail point. */
+const TRAIL_MIN_DIST_SQ = 0.04; // 0.2^2
+/** Duration (seconds) for the trail to fade out after projectile impact. */
+const TRAIL_FADEOUT_DURATION = 0.2;
+
+/** Trail spark particles spawned along the flight path. */
+const MAX_TRAIL_SPARKS = MAX_PROJECTILES * 12; // 12 sparks per projectile max
+const TRAIL_SPARK_LIFETIME = 0.35; // seconds
+const TRAIL_SPARK_SPAWN_INTERVAL = 0.04; // seconds between spark spawns
 
 /** Impact dust puff parameters. */
 const MAX_IMPACTS = 30;
@@ -46,7 +57,16 @@ export interface ProjectileSpawnData {
 
 interface ActiveProjectile {
   obj: THREE.Object3D;
-  trail: THREE.Mesh;
+  /** Ribbon trail line object. */
+  trail: THREE.Line;
+  /** Ring buffer of trail positions (TRAIL_POINTS entries, each 3 floats). */
+  trailPositions: Float32Array;
+  /** Ring buffer of trail vertex colors (TRAIL_POINTS entries, each 3 floats RGB). */
+  trailColors: Float32Array;
+  /** How many points have been recorded so far (capped at TRAIL_POINTS). */
+  trailCount: number;
+  /** Timer for spark particle spawning. */
+  sparkTimer: number;
   startX: number;
   startY: number;
   startZ: number;
@@ -58,6 +78,8 @@ interface ActiveProjectile {
   /** Pre-computed arc peak height. */
   peakY: number;
   active: boolean;
+  /** When > 0 the projectile has hit and the trail is fading out. */
+  fadeOut: number;
 }
 
 /** A single dust particle in an impact effect. */
@@ -66,6 +88,14 @@ interface ImpactParticle {
   vx: number;
   vy: number;
   vz: number;
+  life: number;
+  maxLife: number;
+  active: boolean;
+}
+
+/** A small spark particle left behind along the trail. */
+interface TrailSpark {
+  mesh: THREE.Mesh;
   life: number;
   maxLife: number;
   active: boolean;
@@ -82,9 +112,13 @@ export class ProjectileRenderer {
   private arrowSource: THREE.Object3D | null = null;
   private pool: ActiveProjectile[] = [];
 
-  /** Trail shared resources. */
-  private trailGeo: THREE.PlaneGeometry;
-  private trailMat: THREE.MeshBasicMaterial;
+  /** Shared trail line material (vertex colors drive per-point opacity). */
+  private trailMat: THREE.LineBasicMaterial;
+
+  /** Trail spark pool. */
+  private trailSparks: TrailSpark[] = [];
+  private trailSparkGeo: THREE.SphereGeometry;
+  private trailSparkMat: THREE.MeshBasicMaterial;
 
   /** Impact particle pool. */
   private impactParticles: ImpactParticle[] = [];
@@ -99,13 +133,20 @@ export class ProjectileRenderer {
   constructor(parentGroup: THREE.Group) {
     this.group = parentGroup;
 
-    // Trail: a small stretched plane
-    this.trailGeo = new THREE.PlaneGeometry(0.03, TRAIL_LENGTH);
-    this.trailMat = new THREE.MeshBasicMaterial({
-      color: 0xccccaa,
+    // Trail: a line with vertex colors for per-point fade
+    this.trailMat = new THREE.LineBasicMaterial({
+      vertexColors: true,
       transparent: true,
-      opacity: TRAIL_OPACITY,
-      side: THREE.DoubleSide,
+      opacity: 0.7,
+      depthWrite: false,
+    });
+
+    // Trail spark: tiny bright sphere
+    this.trailSparkGeo = new THREE.SphereGeometry(0.04, 4, 3);
+    this.trailSparkMat = new THREE.MeshBasicMaterial({
+      color: 0xffdd88,
+      transparent: true,
+      opacity: 0.8,
       depthWrite: false,
     });
 
@@ -140,15 +181,28 @@ export class ProjectileRenderer {
       clone.visible = false;
       this.group.add(clone);
 
-      // Create trail mesh for this projectile
-      const trail = new THREE.Mesh(this.trailGeo, this.trailMat);
+      // Create ribbon trail line for this projectile
+      const trailPositions = new Float32Array(TRAIL_POINTS * 3);
+      const trailColors = new Float32Array(TRAIL_POINTS * 3);
+      const trailGeo = new THREE.BufferGeometry();
+      trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
+      trailGeo.setAttribute('color', new THREE.Float32BufferAttribute(trailColors, 3));
+      // Start with 0 draw range so nothing renders until we have points
+      trailGeo.setDrawRange(0, 0);
+
+      const trail = new THREE.Line(trailGeo, this.trailMat);
       trail.visible = false;
       trail.renderOrder = 2;
+      trail.frustumCulled = false; // trails are small, skip culling overhead
       this.group.add(trail);
 
       this.pool.push({
         obj: clone,
         trail,
+        trailPositions,
+        trailColors,
+        trailCount: 0,
+        sparkTimer: 0,
         startX: 0,
         startY: 0,
         startZ: 0,
@@ -158,6 +212,20 @@ export class ProjectileRenderer {
         duration: 1,
         elapsed: 0,
         peakY: 0,
+        active: false,
+        fadeOut: 0,
+      });
+    }
+
+    // Pre-allocate trail spark pool
+    for (let i = 0; i < MAX_TRAIL_SPARKS; i++) {
+      const mesh = new THREE.Mesh(this.trailSparkGeo, this.trailSparkMat.clone());
+      mesh.visible = false;
+      this.group.add(mesh);
+      this.trailSparks.push({
+        mesh,
+        life: 0,
+        maxLife: TRAIL_SPARK_LIFETIME,
         active: false,
       });
     }
@@ -197,6 +265,15 @@ export class ProjectileRenderer {
     slot.duration = Math.max(data.duration, 0.1);
     slot.elapsed = 0;
     slot.active = true;
+    slot.fadeOut = 0;
+
+    // Reset trail state
+    slot.trailCount = 0;
+    slot.sparkTimer = 0;
+    slot.trailPositions.fill(0);
+    slot.trailColors.fill(0);
+    (slot.trail.geometry as THREE.BufferGeometry).setDrawRange(0, 0);
+    slot.trail.visible = false;
 
     // Compute parabolic peak: midpoint Y + arc height
     const midY = (data.startY + data.targetY) * 0.5;
@@ -218,7 +295,25 @@ export class ProjectileRenderer {
 
   update(dt: number): void {
     for (const p of this.pool) {
-      if (!p.active) continue;
+      if (!p.active) {
+        // Handle post-impact trail fade-out
+        if (p.fadeOut > 0) {
+          p.fadeOut -= dt;
+          if (p.fadeOut <= 0) {
+            p.trail.visible = false;
+            p.fadeOut = 0;
+          } else {
+            // Fade all trail vertex colors toward black (simulates alpha fade)
+            const fadeFactor = Math.max(p.fadeOut / TRAIL_FADEOUT_DURATION, 0);
+            for (let i = 0; i < p.trailCount * 3; i++) {
+              p.trailColors[i] *= fadeFactor;
+            }
+            const geo = p.trail.geometry as THREE.BufferGeometry;
+            geo.attributes.color.needsUpdate = true;
+          }
+        }
+        continue;
+      }
 
       p.elapsed += dt;
       const t = Math.min(p.elapsed / p.duration, 1);
@@ -257,14 +352,15 @@ export class ProjectileRenderer {
         p.obj.lookAt(p.obj.position.x + this._dir.x, p.obj.position.y + this._dir.y, p.obj.position.z + this._dir.z);
       }
 
-      // Trail: position behind the arrow along velocity direction
-      p.trail.visible = true;
-      p.trail.position.set(
-        x - this._dir.x * TRAIL_LENGTH * 0.5,
-        y - this._dir.y * TRAIL_LENGTH * 0.5,
-        z - this._dir.z * TRAIL_LENGTH * 0.5,
-      );
-      p.trail.lookAt(x + this._dir.x, y + this._dir.y, z + this._dir.z);
+      // ------ Ribbon trail update ------
+      this.updateTrailRibbon(p, x, y, z);
+
+      // ------ Trail spark particles ------
+      p.sparkTimer += dt;
+      if (p.sparkTimer >= TRAIL_SPARK_SPAWN_INTERVAL) {
+        p.sparkTimer -= TRAIL_SPARK_SPAWN_INTERVAL;
+        this.spawnTrailSpark(x, y, z);
+      }
 
       // Auto-cleanup at impact
       if (t >= 1) {
@@ -274,8 +370,127 @@ export class ProjectileRenderer {
       }
     }
 
+    // Update trail spark particles
+    this.updateTrailSparks(dt);
+
     // Update impact particles
     this.updateImpactParticles(dt);
+  }
+
+  // -----------------------------------------------------------------------
+  // Ribbon trail helpers
+  // -----------------------------------------------------------------------
+
+  /**
+   * Push the current projectile position into the ribbon trail ring buffer
+   * and update the Line geometry + vertex colors.
+   */
+  private updateTrailRibbon(p: ActiveProjectile, x: number, y: number, z: number): void {
+    const positions = p.trailPositions;
+    const colors = p.trailColors;
+
+    // Only add a new point if the projectile moved enough since the last recorded point
+    let shouldAdd = true;
+    if (p.trailCount > 0) {
+      const li = (p.trailCount - 1) * 3;
+      const dx = x - positions[li];
+      const dy = y - positions[li + 1];
+      const dz = z - positions[li + 2];
+      if (dx * dx + dy * dy + dz * dz < TRAIL_MIN_DIST_SQ) {
+        shouldAdd = false;
+      }
+    }
+
+    if (shouldAdd) {
+      if (p.trailCount < TRAIL_POINTS) {
+        // Still filling the buffer — append
+        const idx = p.trailCount * 3;
+        positions[idx] = x;
+        positions[idx + 1] = y;
+        positions[idx + 2] = z;
+        p.trailCount++;
+      } else {
+        // Buffer full — shift everything forward, append at end
+        for (let i = 0; i < (TRAIL_POINTS - 1) * 3; i++) {
+          positions[i] = positions[i + 3];
+        }
+        const last = (TRAIL_POINTS - 1) * 3;
+        positions[last] = x;
+        positions[last + 1] = y;
+        positions[last + 2] = z;
+      }
+    } else if (p.trailCount > 0) {
+      // Update the head point in-place so the trail sticks to the projectile
+      const li = (p.trailCount - 1) * 3;
+      positions[li] = x;
+      positions[li + 1] = y;
+      positions[li + 2] = z;
+    }
+
+    // Rebuild vertex colors: tail (index 0) fades to near-black, head (last) is bright
+    // LineBasicMaterial vertex colors are RGB — fade is achieved by darkening the tail.
+    for (let i = 0; i < p.trailCount; i++) {
+      const alpha = p.trailCount > 1 ? i / (p.trailCount - 1) : 1;
+      const ci = i * 3;
+      // Warm white at head (1.0, 0.93, 0.7), fading toward dark amber at tail
+      colors[ci]     = alpha * 1.0;   // R
+      colors[ci + 1] = alpha * 0.93;  // G
+      colors[ci + 2] = alpha * 0.7;   // B
+    }
+
+    // Update geometry
+    const geo = p.trail.geometry as THREE.BufferGeometry;
+    geo.attributes.position.needsUpdate = true;
+    geo.attributes.color.needsUpdate = true;
+    geo.setDrawRange(0, p.trailCount);
+
+    p.trail.visible = p.trailCount >= 2;
+  }
+
+  // -----------------------------------------------------------------------
+  // Trail spark particles
+  // -----------------------------------------------------------------------
+
+  /**
+   * Spawn a tiny spark particle at the given world position.
+   */
+  private spawnTrailSpark(x: number, y: number, z: number): void {
+    for (const s of this.trailSparks) {
+      if (s.active) continue;
+      s.active = true;
+      s.life = 0;
+      s.maxLife = TRAIL_SPARK_LIFETIME + Math.random() * 0.1;
+      s.mesh.visible = true;
+      // Slight random offset so sparks don't stack exactly
+      s.mesh.position.set(
+        x + (Math.random() - 0.5) * 0.1,
+        y + (Math.random() - 0.5) * 0.1,
+        z + (Math.random() - 0.5) * 0.1,
+      );
+      s.mesh.scale.setScalar(0.8 + Math.random() * 0.4);
+      return;
+    }
+    // Pool exhausted — skip this spark (non-critical visual)
+  }
+
+  /**
+   * Update active trail spark particles (fade + shrink).
+   */
+  private updateTrailSparks(dt: number): void {
+    for (const s of this.trailSparks) {
+      if (!s.active) continue;
+      s.life += dt;
+      const t = s.life / s.maxLife;
+      if (t >= 1) {
+        s.active = false;
+        s.mesh.visible = false;
+        continue;
+      }
+      // Fade out and shrink
+      const alpha = 1 - t;
+      (s.mesh.material as THREE.MeshBasicMaterial).opacity = alpha * 0.8;
+      s.mesh.scale.setScalar(alpha * (0.8 + 0.4 * (1 - t)));
+    }
   }
 
   /**
@@ -352,7 +567,13 @@ export class ProjectileRenderer {
   private releaseSlot(p: ActiveProjectile): void {
     p.active = false;
     p.obj.visible = false;
-    p.trail.visible = false;
+    // Don't hide trail immediately — start fade-out so it lingers briefly
+    if (p.trailCount >= 2) {
+      p.fadeOut = TRAIL_FADEOUT_DURATION;
+    } else {
+      p.trail.visible = false;
+      p.fadeOut = 0;
+    }
   }
 
   /** Get the count of currently active projectiles. */
@@ -373,12 +594,21 @@ export class ProjectileRenderer {
       this.group.remove(p.obj);
       this.disposeObject(p.obj);
       this.group.remove(p.trail);
+      (p.trail.geometry as THREE.BufferGeometry).dispose();
     }
     this.pool.length = 0;
 
-    // Dispose trail resources
-    this.trailGeo.dispose();
+    // Dispose trail shared material
     this.trailMat.dispose();
+
+    // Dispose trail spark particles
+    for (const s of this.trailSparks) {
+      this.group.remove(s.mesh);
+      (s.mesh.material as THREE.Material).dispose();
+    }
+    this.trailSparks.length = 0;
+    this.trailSparkGeo.dispose();
+    this.trailSparkMat.dispose();
 
     // Dispose impact particles
     for (const particle of this.impactParticles) {

@@ -21,6 +21,9 @@ const COLOR_HILL = new THREE.Color('#5aaa45');
 const COLOR_HILL_TOP = new THREE.Color('#70b858');
 const COLOR_WATER_EDGE = new THREE.Color('#4a8a5a');
 
+/** Module-level reference to the water geometry so updateWater() can access it. */
+let waterGeometry: THREE.BufferGeometry | null = null;
+
 /** Simple deterministic hash for seeded random per vertex. */
 function seededRandom(x: number, z: number): number {
   let h = (x * 374761393 + z * 668265263 + 1013904223) | 0;
@@ -309,16 +312,19 @@ export class Terrain {
   }
 
   private createWaterPlane(): THREE.Mesh {
-    const waterGeo = new THREE.PlaneGeometry(MAP_SIZE, MAP_SIZE);
+    const waterGeo = new THREE.PlaneGeometry(MAP_SIZE, MAP_SIZE, 64, 64);
     waterGeo.rotateX(-Math.PI / 2);
 
+    // Store reference at module level so updateWater() can animate vertices
+    waterGeometry = waterGeo;
+
     const waterMat = new THREE.MeshStandardMaterial({
-      color: 0x2a6496,
+      color: '#2a7aa0',
       transparent: true,
-      opacity: 0.65,
-      roughness: 0.2,
-      metalness: 0.3,
-      envMapIntensity: 0.5,
+      opacity: 0.7,
+      roughness: 0.15,
+      metalness: 0.4,
+      envMapIntensity: 0.8,
       side: THREE.DoubleSide,
     });
 
@@ -326,4 +332,24 @@ export class Terrain {
     water.position.y = WATER_LEVEL;
     return water;
   }
+}
+
+/**
+ * Animate the water surface each frame with gentle overlapping sine waves.
+ * @param elapsed - Total elapsed time in seconds (e.g. from a running clock).
+ */
+export function updateWater(elapsed: number): void {
+  if (!waterGeometry) return;
+
+  const positions = waterGeometry.attributes.position as THREE.BufferAttribute;
+  for (let i = 0; i < positions.count; i++) {
+    const x = positions.getX(i);
+    const z = positions.getZ(i);
+    // Two overlapping sine waves at different frequencies and directions
+    const y = Math.sin(x * 0.5 + elapsed * 0.8) * 0.04
+            + Math.sin(z * 0.3 + elapsed * 0.6) * 0.04;
+    positions.setY(i, y);
+  }
+  positions.needsUpdate = true;
+  waterGeometry.computeVertexNormals();
 }

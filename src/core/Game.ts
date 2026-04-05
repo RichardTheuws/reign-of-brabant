@@ -812,6 +812,10 @@ export class Game {
         audioManager.playSound('sword_hit', targetPos);
       }
       this.particles.spawnCombatHit(event.x, targetY, event.z, event.isRanged);
+      // Camera shake on melee hits (subtle)
+      if (!event.isRanged) {
+        this.camera.shake(0.15, 0.15);
+      }
     });
 
     // Audio + particles: building placed
@@ -838,10 +842,11 @@ export class Game {
     eventBus.on('carnavalsrage-activated', () => {
       audioManager.playSound('carnavalsrage');
       audioManager.duckMusic(3000);
-      // Orange ability burst around player base
+      // Orange ability burst around player base + heavy shake
       const base = this.getPlayerBasePosition();
       const y = this.terrain.getHeightAt(base.x, base.z) + 0.5;
       this.particles.spawnAbilityBurst(base.x, y, base.z, 0xff6600, 8);
+      this.camera.shake(0.6, 0.5);
     });
 
     // Audio: vergadering ability

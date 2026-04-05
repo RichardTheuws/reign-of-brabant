@@ -59,9 +59,8 @@ generate_from_image() {
     base64_data=$(base64 -i "$image_path")
     local data_uri="data:${mime_type};base64,${base64_data}"
 
-    # Write payload to temp file (base64 can be very long)
-    local tmp_payload
-    tmp_payload=$(mktemp /tmp/meshy_payload_XXXXXX.json)
+    # Write payload to temp file (base64 can be very long, use PID for uniqueness)
+    local tmp_payload="/tmp/meshy_payload_${name}_$$.json"
     cat > "$tmp_payload" <<PAYLOAD_EOF
 {
     "image_url": "$data_uri",
