@@ -102,8 +102,8 @@ export class BuildingRenderer {
         const root = gltf.scene;
         const isV02 = path.includes('/v02/');
         if (isV02) this.v02Models.add(key as ModelCacheKey);
-        // v02 models are larger — use smaller scale; v01 needs upscale
-        root.scale.set(isV02 ? 0.6 : 1.8, isV02 ? 0.6 : 1.8, isV02 ? 0.6 : 1.8);
+        // v02 buildings need moderate scale; v01 needs more upscale
+        root.scale.set(isV02 ? 1.4 : 1.8, isV02 ? 1.4 : 1.8, isV02 ? 1.4 : 1.8);
         // Enable shadow casting on all child meshes
         root.traverse((child) => {
           if ((child as THREE.Mesh).isMesh) {

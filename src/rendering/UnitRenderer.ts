@@ -61,8 +61,8 @@ const IDLE_BOB_AMPLITUDE = 0.08;
 const IDLE_BOB_SPEED = 2.5;
 
 /** Blob shadow parameters. */
-const BLOB_SHADOW_SIZE = 1.2;
-const BLOB_SHADOW_OPACITY = 0.35;
+const BLOB_SHADOW_SIZE = 0.6;
+const BLOB_SHADOW_OPACITY = 0.2;
 
 // ---------------------------------------------------------------------------
 // UnitRenderer
@@ -337,8 +337,8 @@ export class UnitRenderer {
       const breathe = Math.sin(this.elapsedTime * Math.PI * 2 + data.eid * 0.5) * 0.02 * (1 - blend);
       obj.scale.y = 1.0 + breathe;
 
-      // Apply Y position: terrain height + procedural bob
-      obj.position.set(data.x, data.y + bob, data.z);
+      // Apply Y position: terrain height + offset to clear terrain + procedural bob
+      obj.position.set(data.x, data.y + 0.2 + bob, data.z);
 
       // --- Facing direction ---
       // Prefer movement target if supplied, else use ry

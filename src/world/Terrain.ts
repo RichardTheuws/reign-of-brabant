@@ -3,7 +3,7 @@ import { createNoise2D } from 'simplex-noise';
 
 const MAP_SIZE = 128;
 const SEGMENTS = 128;
-const MAX_HEIGHT = 1.5;
+const MAX_HEIGHT = 0.6;
 const WATER_LEVEL = 0;
 const NOISE_SCALE = 0.012;
 const OCTAVES = 2;
