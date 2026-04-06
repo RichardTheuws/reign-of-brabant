@@ -161,11 +161,11 @@ export class Game {
     this.playerState = playerState;
   }
 
-  async init(playerFaction: number = FactionId.Brabanders): Promise<void> {
+  async init(playerFaction: number = FactionId.Brabanders, mapTemplate: string = 'classic'): Promise<void> {
     this.playerFactionId = playerFaction as FactionId;
 
     // 1. Generate map layout (2 players for skirmish: player + 1 AI)
-    this.map = generateMap(42, (x, z) => this.terrain.getHeightAt(x, z), 2);
+    this.map = generateMap(42, (x, z) => this.terrain.getHeightAt(x, z), 2, mapTemplate as any);
 
     // Remap slot 0 to player's chosen faction (swap if needed)
     if (this.playerFactionId !== FactionId.Brabanders) {

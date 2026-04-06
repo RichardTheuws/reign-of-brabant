@@ -15,9 +15,11 @@ import { MUSIC_IDS } from '../systems/MusicSystem';
 export type FactionChoice = 'brabanders' | 'randstad' | 'limburgers' | 'belgen';
 export type MenuAction = 'play' | 'campaign' | 'tutorial' | 'settings';
 
+export type MapTemplateChoice = 'classic' | 'crossroads' | 'islands' | 'arena';
+
 export interface MenuScreenEvents {
   onMenuAction: (action: MenuAction) => void;
-  onFactionSelected: (faction: FactionChoice, startTutorial: boolean) => void;
+  onFactionSelected: (faction: FactionChoice, startTutorial: boolean, mapTemplate: MapTemplateChoice) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -141,6 +143,7 @@ const FACTIONS: FactionData[] = [
 export class MenuScreens {
   private events: MenuScreenEvents | null = null;
   private selectedFaction: FactionChoice | null = null;
+  private selectedMap: MapTemplateChoice = 'classic';
   private currentTipIndex = 0;
   private tipIntervalId = 0;
   private loadingProgress = 0;
@@ -296,9 +299,17 @@ export class MenuScreens {
     const confirmBtn = document.getElementById('faction-confirm-btn');
     confirmBtn?.addEventListener('click', () => {
       if (this.selectedFaction) {
-        this.events?.onFactionSelected(this.selectedFaction, false);
+        this.events?.onFactionSelected(this.selectedFaction, false, this.selectedMap);
       }
     });
+
+    // Map template selector
+    const mapSelect = document.getElementById('map-template-select') as HTMLSelectElement | null;
+    if (mapSelect) {
+      mapSelect.addEventListener('change', () => {
+        this.selectedMap = mapSelect.value as MapTemplateChoice;
+      });
+    }
   }
 
   private updateFactionCardSelection(): void {
