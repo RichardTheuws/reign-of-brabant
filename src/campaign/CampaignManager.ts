@@ -8,7 +8,7 @@
  * - Provide mission list for the campaign select screen
  */
 
-import { BRABANDERS_MISSIONS, type MissionDefinition } from './MissionDefinitions';
+import { BRABANDERS_MISSIONS, LIMBURGERS_MISSIONS, BELGEN_MISSIONS, type MissionDefinition } from './MissionDefinitions';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -84,6 +84,8 @@ export class CampaignManager {
       version: SAVE_VERSION,
       campaigns: [
         this.createCampaignProgress('brabanders', BRABANDERS_MISSIONS),
+        this.createCampaignProgress('limburgers', LIMBURGERS_MISSIONS),
+        this.createCampaignProgress('belgen', BELGEN_MISSIONS),
       ],
     };
   }
@@ -124,7 +126,7 @@ export class CampaignManager {
     const campaign = this.getCampaignProgress(campaignId);
     if (!campaign) return [];
 
-    const definitions = campaignId === 'brabanders' ? BRABANDERS_MISSIONS : [];
+    const definitions = campaignId === 'brabanders' ? BRABANDERS_MISSIONS : campaignId === 'limburgers' ? LIMBURGERS_MISSIONS : campaignId === 'belgen' ? BELGEN_MISSIONS : [];
     return definitions.map((def, i) => ({
       definition: def,
       progress: campaign.missions[i] ?? {
@@ -214,7 +216,7 @@ export class CampaignManager {
   resetCampaign(campaignId: string): void {
     const idx = this.data.campaigns.findIndex(c => c.campaignId === campaignId);
     if (idx >= 0) {
-      const missions = campaignId === 'brabanders' ? BRABANDERS_MISSIONS : [];
+      const missions = campaignId === 'brabanders' ? BRABANDERS_MISSIONS : campaignId === 'limburgers' ? LIMBURGERS_MISSIONS : campaignId === 'belgen' ? BELGEN_MISSIONS : [];
       this.data.campaigns[idx] = this.createCampaignProgress(campaignId, missions);
       this.save();
     }

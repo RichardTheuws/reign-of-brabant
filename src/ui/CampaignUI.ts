@@ -26,12 +26,65 @@ export interface CampaignUIEvents {
 // CampaignUI
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Faction campaign tab definitions
+// ---------------------------------------------------------------------------
+
+interface FactionCampaignTab {
+  id: string;
+  label: string;
+  icon: string;
+  subtitle: string;
+  available: boolean;
+  missionCount: number;
+  comingSoonLabel?: string;
+}
+
+const FACTION_CAMPAIGN_TABS: FactionCampaignTab[] = [
+  {
+    id: 'brabanders',
+    label: 'Brabanders',
+    icon: '\u{1F33E}',
+    subtitle: 'Het Gouden Worstenbroodje',
+    available: true,
+    missionCount: 12,
+  },
+  {
+    id: 'limburgers',
+    label: 'Limburgers',
+    icon: '\u26CF\uFE0F',
+    subtitle: 'De Mijn van Valkenburg',
+    available: false,
+    missionCount: 5,
+    comingSoonLabel: 'Binnenkort beschikbaar',
+  },
+  {
+    id: 'belgen',
+    label: 'Belgen',
+    icon: '\u{1F35F}',
+    subtitle: 'Het Compromis',
+    available: false,
+    missionCount: 3,
+    comingSoonLabel: 'Binnenkort beschikbaar',
+  },
+  {
+    id: 'randstad',
+    label: 'Randstad',
+    icon: '\u{1F4BC}',
+    subtitle: 'De Grote Fusie',
+    available: false,
+    missionCount: 0,
+    comingSoonLabel: 'Binnenkort beschikbaar',
+  },
+];
+
 export class CampaignUI {
   private events: CampaignUIEvents | null = null;
   private campaignManager: CampaignManager;
   private campaignSelectEl: HTMLElement | null = null;
   private briefingEl: HTMLElement | null = null;
   private currentMissionId: string | null = null;
+  private activeFactionTab: string = 'brabanders';
 
   constructor(campaignManager: CampaignManager) {
     this.campaignManager = campaignManager;
@@ -102,14 +155,19 @@ export class CampaignUI {
           padding: 8px 16px; border-radius: 6px; cursor: pointer;
           font-family: 'Inter', sans-serif; font-size: 0.9rem; transition: background 0.15s;
         ">&larr; Terug</button>
-        <h2 style="
+        <h2 id="campaign-title" style="
           font-family: 'Cinzel', serif; font-size: clamp(1.3rem,3vw,2rem);
           color: #d4a853; flex: 1; text-align: center; margin: 0;
         ">Campagne: Het Gouden Worstenbroodje</h2>
         <div style="width: 80px;"></div>
       </div>
 
-      <div style="
+      <div id="campaign-faction-tabs" style="
+        display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+        width: 100%; max-width: 700px; margin-bottom: 20px;
+      "></div>
+
+      <div id="campaign-subtitle" style="
         color: #a0a0a0; font-size: 0.85rem; font-style: italic; text-align: center;
         max-width: 600px; margin-bottom: 20px; line-height: 1.5;
       ">
@@ -132,6 +190,9 @@ export class CampaignUI {
     overlay.appendChild(el);
     this.campaignSelectEl = el;
 
+    // Build faction tabs
+    this.buildFactionTabs();
+
     // Bind back button
     el.querySelector('#campaign-back-btn')?.addEventListener('click', () => {
       this.events?.onBackToMenu();
@@ -144,19 +205,148 @@ export class CampaignUI {
     });
   }
 
+  // -----------------------------------------------------------------------
+  // Faction campaign tabs
+  // -----------------------------------------------------------------------
+
+  private buildFactionTabs(): void {
+    const container = document.getElementById('campaign-faction-tabs');
+    if (!container) return;
+    container.innerHTML = '';
+
+    for (const tab of FACTION_CAMPAIGN_TABS) {
+      const btn = document.createElement('button');
+      btn.dataset.factionTab = tab.id;
+      btn.style.cssText = `
+        display: flex; align-items: center; gap: 8px;
+        padding: 10px 18px; border-radius: 8px; cursor: pointer;
+        font-family: 'Cinzel', serif; font-size: 0.9rem; font-weight: 600;
+        transition: background 0.15s, border-color 0.2s, transform 0.15s;
+        border: 2px solid ${tab.id === this.activeFactionTab ? '#d4a853' : 'rgba(212,168,83,0.25)'};
+        background: ${tab.id === this.activeFactionTab ? 'rgba(212,168,83,0.15)' : 'rgba(20,15,10,0.6)'};
+        color: ${tab.id === this.activeFactionTab ? '#d4a853' : (tab.available ? '#e8e6e3' : '#666')};
+        opacity: ${tab.available ? '1' : '0.6'};
+      `;
+
+      btn.innerHTML = `
+        <span style="font-size: 1.2rem;">${tab.icon}</span>
+        <span>${tab.label}</span>
+        ${!tab.available ? '<span style="font-size: 0.6rem; padding: 2px 6px; border-radius: 8px; background: rgba(100,100,100,0.3); color: #888; margin-left: 2px;">SOON</span>' : ''}
+      `;
+
+      btn.addEventListener('click', () => {
+        this.selectFactionTab(tab.id);
+      });
+      btn.addEventListener('mouseenter', () => {
+        if (tab.id !== this.activeFactionTab) {
+          btn.style.borderColor = 'rgba(212,168,83,0.5)';
+          btn.style.background = 'rgba(212,168,83,0.08)';
+        }
+      });
+      btn.addEventListener('mouseleave', () => {
+        if (tab.id !== this.activeFactionTab) {
+          btn.style.borderColor = 'rgba(212,168,83,0.25)';
+          btn.style.background = 'rgba(20,15,10,0.6)';
+        }
+      });
+
+      container.appendChild(btn);
+    }
+  }
+
+  private selectFactionTab(factionId: string): void {
+    this.activeFactionTab = factionId;
+
+    // Update tab button styles
+    const container = document.getElementById('campaign-faction-tabs');
+    if (container) {
+      const buttons = container.querySelectorAll<HTMLButtonElement>('[data-faction-tab]');
+      for (const btn of buttons) {
+        const isActive = btn.dataset.factionTab === factionId;
+        const tabDef = FACTION_CAMPAIGN_TABS.find(t => t.id === btn.dataset.factionTab);
+        btn.style.borderColor = isActive ? '#d4a853' : 'rgba(212,168,83,0.25)';
+        btn.style.background = isActive ? 'rgba(212,168,83,0.15)' : 'rgba(20,15,10,0.6)';
+        btn.style.color = isActive ? '#d4a853' : (tabDef?.available ? '#e8e6e3' : '#666');
+      }
+    }
+
+    // Update title and subtitle
+    const tab = FACTION_CAMPAIGN_TABS.find(t => t.id === factionId);
+    if (tab) {
+      const titleEl = document.getElementById('campaign-title');
+      if (titleEl) titleEl.textContent = `Campagne: ${tab.subtitle}`;
+
+      const subtitleEl = document.getElementById('campaign-subtitle');
+      if (subtitleEl) {
+        subtitleEl.textContent = this.getFactionSubtitleText(factionId);
+      }
+    }
+
+    // Refresh mission list for the selected faction
+    this.refreshMissionList();
+  }
+
+  private getFactionSubtitleText(factionId: string): string {
+    switch (factionId) {
+      case 'brabanders':
+        return 'Van boerendorp tot de poorten van de Randstad \u2014 de reis van een volk dat niet wist dat het helden kon zijn.';
+      case 'limburgers':
+        return 'Diep in de heuvels van het zuiden broedt een volk dat al eeuwen zijn eigen weg gaat.';
+      case 'belgen':
+        return 'In een land verdeeld door taal, maar verenigd door friet, rijst een onverwachte macht.';
+      case 'randstad':
+        return 'Van vergaderzaal tot slagveld \u2014 de corporate machine draait op volle toeren.';
+      default:
+        return '';
+    }
+  }
+
   private refreshMissionList(): void {
     const listEl = document.getElementById('campaign-mission-list');
     if (!listEl) return;
 
-    const missionsWithProgress = this.campaignManager.getMissionsWithProgress('brabanders');
-    const totalStars = this.campaignManager.getTotalStars('brabanders');
-    const maxStars = this.campaignManager.getMaxStars('brabanders');
+    const factionId = this.activeFactionTab;
+    const tab = FACTION_CAMPAIGN_TABS.find(t => t.id === factionId);
+
+    listEl.innerHTML = '';
+
+    // If the faction campaign is not yet available, show "coming soon" placeholder
+    if (tab && !tab.available) {
+      const totalStars = 0;
+      const maxStars = 0;
+      const starsDisplay = document.getElementById('campaign-stars-display');
+      if (starsDisplay) starsDisplay.textContent = `${totalStars} / ${maxStars}`;
+
+      const placeholder = document.createElement('div');
+      placeholder.style.cssText = `
+        text-align: center; padding: 48px 24px; color: #a0a0a0;
+        border: 2px dashed rgba(212,168,83,0.2); border-radius: 12px;
+        background: rgba(20,15,10,0.4);
+      `;
+      placeholder.innerHTML = `
+        <div style="font-size: 3rem; margin-bottom: 16px; opacity: 0.5;">${tab.icon}</div>
+        <div style="
+          font-family: 'Cinzel', serif; font-size: 1.3rem; font-weight: 700;
+          color: #d4a853; margin-bottom: 8px;
+        ">${tab.label} Campagne</div>
+        <div style="font-size: 0.9rem; line-height: 1.6; margin-bottom: 16px;">
+          ${tab.comingSoonLabel ?? 'Binnenkort beschikbaar'}
+        </div>
+        <div style="font-size: 0.8rem; color: #666;">
+          ${tab.missionCount > 0 ? `${tab.missionCount} missies gepland` : 'Missies worden nog ontworpen'}
+        </div>
+      `;
+      listEl.appendChild(placeholder);
+      return;
+    }
+
+    const missionsWithProgress = this.campaignManager.getMissionsWithProgress(factionId);
+    const totalStars = this.campaignManager.getTotalStars(factionId);
+    const maxStars = this.campaignManager.getMaxStars(factionId);
 
     // Update stars display
     const starsDisplay = document.getElementById('campaign-stars-display');
     if (starsDisplay) starsDisplay.textContent = `${totalStars} / ${maxStars}`;
-
-    listEl.innerHTML = '';
 
     for (const { definition, progress } of missionsWithProgress) {
       const card = this.createMissionCard(definition, progress);
@@ -360,7 +550,7 @@ export class CampaignUI {
   }
 
   private renderBriefing(missionId: string): void {
-    const missionsWithProgress = this.campaignManager.getMissionsWithProgress('brabanders');
+    const missionsWithProgress = this.campaignManager.getMissionsWithProgress(this.activeFactionTab);
     const entry = missionsWithProgress.find(m => m.definition.id === missionId);
     if (!entry) return;
 

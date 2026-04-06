@@ -77,6 +77,12 @@ const DECO_MIN_DISTANCE = 8;
 // Decoration definition
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Map template type
+// ---------------------------------------------------------------------------
+
+export type MapTemplate = 'classic' | 'crossroads' | 'islands' | 'arena';
+
 export enum DecoType {
   Tree = 0,
   Rock = 1,
@@ -195,15 +201,41 @@ const BASE_POSITIONS: readonly BasePositionConfig[] = [
  *   things in water. Defaults to 0 everywhere.
  * @param playerCount - Number of players (2-4). Defaults to 2 for
  *   backwards compatibility with the original PoC layout.
+ * @param mapTemplate - Map layout template. Defaults to 'classic' for
+ *   backwards compatibility. Options: classic, crossroads, islands, arena.
  */
 export function generateMap(
   seed: number = 42,
   getHeight: HeightCallback = () => 0,
   playerCount: 2 | 3 | 4 = 2,
+  mapTemplate: MapTemplate = 'classic',
 ): GeneratedMap {
   const rng = createRng(seed);
   const halfMap = MAP_SIZE / 2;
 
+  switch (mapTemplate) {
+    case 'crossroads':
+      return generateCrossroads(rng, getHeight, playerCount, halfMap);
+    case 'islands':
+      return generateIslands(rng, getHeight, playerCount, halfMap);
+    case 'arena':
+      return generateArena(rng, getHeight, playerCount, halfMap);
+    case 'classic':
+    default:
+      return generateClassic(rng, getHeight, playerCount, halfMap);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Template: Classic (original behaviour)
+// ---------------------------------------------------------------------------
+
+function generateClassic(
+  rng: () => number,
+  getHeight: HeightCallback,
+  playerCount: 2 | 3 | 4,
+  halfMap: number,
+): GeneratedMap {
   // -----------------------------------------------------------------------
   // 1. Spawn points for all active players
   // -----------------------------------------------------------------------
@@ -349,48 +381,10 @@ export function generateMap(
   // 6. Decoration props (trees and rocks)
   // -----------------------------------------------------------------------
 
-  // Collect positions we want to avoid
-  const avoidPositions: { x: number; z: number }[] = [
-    ...spawns,
-    ...goldMines,
-    ...treeResources,
-    ...buildings,
-    ...units,
-  ];
-
-  const decorations: DecoSpawn[] = [];
-
-  // Trees
-  for (let i = 0; i < TREE_COUNT; i++) {
-    const pos = findValidDecoPosition(rng, avoidPositions, halfMap, getHeight);
-    if (pos) {
-      const deco: DecoSpawn = {
-        type: DecoType.Tree,
-        x: pos.x,
-        z: pos.z,
-        scale: 0.8 + rng() * 0.6, // 0.8 - 1.4
-        rotationY: rng() * Math.PI * 2,
-      };
-      decorations.push(deco);
-      avoidPositions.push(pos);
-    }
-  }
-
-  // Rocks
-  for (let i = 0; i < ROCK_COUNT; i++) {
-    const pos = findValidDecoPosition(rng, avoidPositions, halfMap, getHeight);
-    if (pos) {
-      const deco: DecoSpawn = {
-        type: DecoType.Rock,
-        x: pos.x,
-        z: pos.z,
-        scale: 0.5 + rng() * 0.8, // 0.5 - 1.3
-        rotationY: rng() * Math.PI * 2,
-      };
-      decorations.push(deco);
-      avoidPositions.push(pos);
-    }
-  }
+  const { decorations } = generateDecorations(
+    rng, getHeight, halfMap, TREE_COUNT, ROCK_COUNT,
+    [...spawns, ...goldMines, ...treeResources, ...buildings, ...units],
+  );
 
   // -----------------------------------------------------------------------
   // Result
@@ -406,6 +400,603 @@ export function generateMap(
     units,
     decorations,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Template: Crossroads
+//
+// Players on N/S/E/W edges. Resources at the 4 intersections.
+// Large contested gold cluster in the centre. Denser trees than default.
+// ---------------------------------------------------------------------------
+
+/**
+ * Edge positions for the crossroads template.
+ * Players sit on the N, S, E, W edges of the map.
+ * Index mapping: 0=North, 1=South, 2=East, 3=West.
+ */
+const CROSSROADS_POSITIONS: readonly {
+  /** X position offset from centre. */
+  readonly dx: number;
+  /** Z position offset from centre. */
+  readonly dz: number;
+  /** Direction X towards centre. */
+  readonly towardsCentreX: 1 | -1 | 0;
+  /** Direction Z towards centre. */
+  readonly towardsCentreZ: 1 | -1 | 0;
+  readonly factionId: FactionId;
+}[] = [
+  // Slot 0: North edge (top centre) → Brabanders
+  { dx: 0, dz: -1, towardsCentreX: 0, towardsCentreZ: 1, factionId: FactionId.Brabanders },
+  // Slot 1: South edge (bottom centre) → Randstad
+  { dx: 0, dz: 1, towardsCentreX: 0, towardsCentreZ: -1, factionId: FactionId.Randstad },
+  // Slot 2: East edge (right centre) → Limburgers
+  { dx: 1, dz: 0, towardsCentreX: -1, towardsCentreZ: 0, factionId: FactionId.Limburgers },
+  // Slot 3: West edge (left centre) → Belgen
+  { dx: -1, dz: 0, towardsCentreX: 1, towardsCentreZ: 0, factionId: FactionId.Belgen },
+];
+
+function generateCrossroads(
+  rng: () => number,
+  getHeight: HeightCallback,
+  playerCount: 2 | 3 | 4,
+  halfMap: number,
+): GeneratedMap {
+  const edgeMargin = BASE_MARGIN;
+
+  // -----------------------------------------------------------------------
+  // 1. Spawn points on N/S/E/W edges
+  // -----------------------------------------------------------------------
+
+  const spawns: SpawnPoint[] = [];
+
+  for (let slot = 0; slot < playerCount; slot++) {
+    const cfg = CROSSROADS_POSITIONS[slot];
+    spawns.push({
+      x: cfg.dx * (halfMap - edgeMargin),
+      z: cfg.dz * (halfMap - edgeMargin),
+      factionId: cfg.factionId,
+    });
+  }
+
+  // -----------------------------------------------------------------------
+  // 2. Gold mines -- 1 near each base + clusters at 4 intersections + centre
+  // -----------------------------------------------------------------------
+
+  const goldMines: GoldMineSpawn[] = [];
+
+  // 1 mine near each base (offset towards centre)
+  for (let slot = 0; slot < playerCount; slot++) {
+    const spawn = spawns[slot];
+    const cfg = CROSSROADS_POSITIONS[slot];
+    goldMines.push({
+      x: spawn.x + cfg.towardsCentreX * MINE_NEAR_OFFSET + cfg.towardsCentreZ * 4,
+      z: spawn.z + cfg.towardsCentreZ * MINE_NEAR_OFFSET + cfg.towardsCentreX * 4,
+      amount: DEFAULT_GOLD_AMOUNT,
+    });
+  }
+
+  // 4 intersection clusters (NE, SE, SW, NW quadrants)
+  const intersectionOffset = halfMap * 0.35;
+  const intersections = [
+    { x: intersectionOffset, z: -intersectionOffset },   // NE
+    { x: intersectionOffset, z: intersectionOffset },     // SE
+    { x: -intersectionOffset, z: intersectionOffset },    // SW
+    { x: -intersectionOffset, z: -intersectionOffset },   // NW
+  ];
+  for (const inter of intersections) {
+    goldMines.push({
+      x: inter.x + (rng() - 0.5) * 4,
+      z: inter.z + (rng() - 0.5) * 4,
+      amount: DEFAULT_GOLD_AMOUNT,
+    });
+  }
+
+  // Large central gold cluster (3 mines close together -- high value contested)
+  for (let i = 0; i < 3; i++) {
+    const angle = (i / 3) * Math.PI * 2 + rng() * 0.3;
+    const dist = 3 + rng() * 2;
+    goldMines.push({
+      x: Math.cos(angle) * dist,
+      z: Math.sin(angle) * dist,
+      amount: DEFAULT_GOLD_AMOUNT * 1.5,
+    });
+  }
+
+  // -----------------------------------------------------------------------
+  // 3. Buildings -- Town Hall per faction
+  // -----------------------------------------------------------------------
+
+  const buildings: BuildingSpawn[] = [];
+
+  for (let slot = 0; slot < playerCount; slot++) {
+    buildings.push({
+      factionId: spawns[slot].factionId,
+      buildingType: BuildingTypeId.TownHall,
+      x: spawns[slot].x,
+      z: spawns[slot].z,
+    });
+  }
+
+  // -----------------------------------------------------------------------
+  // 4. Starting units -- 3 workers per faction
+  // -----------------------------------------------------------------------
+
+  const units: UnitSpawn[] = [];
+
+  for (let slot = 0; slot < playerCount; slot++) {
+    const spawn = spawns[slot];
+    const cfg = CROSSROADS_POSITIONS[slot];
+    // Place workers towards centre from base
+    const workerDirX = cfg.towardsCentreX || (cfg.towardsCentreZ !== 0 ? 1 : 0);
+    const workerDirZ = cfg.towardsCentreZ || (cfg.towardsCentreX !== 0 ? 1 : 0);
+
+    for (let i = 0; i < STARTING_WORKERS; i++) {
+      units.push({
+        factionId: spawn.factionId,
+        unitType: UnitTypeId.Worker,
+        x: spawn.x + workerDirX * (3 + i * WORKER_SPACING),
+        z: spawn.z + workerDirZ * (3 + i * WORKER_SPACING),
+      });
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // 5. Tree resource groves -- denser than classic (more groves, more trees)
+  // -----------------------------------------------------------------------
+
+  const treeResources: TreeResourceSpawn[] = [];
+  const groveCenters: { x: number; z: number }[] = [];
+
+  // 2 groves near each base (flanking the approach to centre)
+  for (let slot = 0; slot < playerCount; slot++) {
+    const spawn = spawns[slot];
+    const cfg = CROSSROADS_POSITIONS[slot];
+    // Perpendicular offsets for flanking groves
+    const perpX = cfg.towardsCentreZ !== 0 ? 1 : 0;
+    const perpZ = cfg.towardsCentreX !== 0 ? 1 : 0;
+
+    groveCenters.push({
+      x: spawn.x + perpX * 14 + cfg.towardsCentreX * 8,
+      z: spawn.z + perpZ * 14 + cfg.towardsCentreZ * 8,
+    });
+    groveCenters.push({
+      x: spawn.x - perpX * 14 + cfg.towardsCentreX * 8,
+      z: spawn.z - perpZ * 14 + cfg.towardsCentreZ * 8,
+    });
+  }
+
+  // 4 groves along the "cross" paths (between intersections)
+  groveCenters.push({ x: halfMap * 0.5, z: 0 });
+  groveCenters.push({ x: -halfMap * 0.5, z: 0 });
+  groveCenters.push({ x: 0, z: halfMap * 0.5 });
+  groveCenters.push({ x: 0, z: -halfMap * 0.5 });
+
+  // Larger groves (more trees per grove for the denser feel)
+  const crossroadsTreesMin = TREES_PER_GROVE_MIN + 1;
+  const crossroadsTreesMax = TREES_PER_GROVE_MAX + 2;
+
+  for (let g = 0; g < groveCenters.length; g++) {
+    const center = groveCenters[g];
+    const treeCount = crossroadsTreesMin + Math.floor(rng() * (crossroadsTreesMax - crossroadsTreesMin + 1));
+    for (let t = 0; t < treeCount; t++) {
+      const offsetX = (rng() - 0.5) * GROVE_SPREAD * 2;
+      const offsetZ = (rng() - 0.5) * GROVE_SPREAD * 2;
+      treeResources.push({
+        x: center.x + offsetX,
+        z: center.z + offsetZ,
+        amount: DEFAULT_WOOD_AMOUNT,
+      });
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // 6. Decorations -- more trees (denser map)
+  // -----------------------------------------------------------------------
+
+  const { decorations } = generateDecorations(
+    rng, getHeight, halfMap, TREE_COUNT + 60, ROCK_COUNT,
+    [...spawns, ...goldMines, ...treeResources, ...buildings, ...units],
+  );
+
+  return {
+    size: MAP_SIZE,
+    heightScale: 10,
+    spawns,
+    goldMines,
+    treeResources,
+    buildings,
+    units,
+    decorations,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Template: Islands
+//
+// Players in corners but wider spread. Each base is a "peninsula" with
+// concentrated nearby resources. Centre has 4 large contested mines.
+// Few trees in centre (open battlefield).
+// ---------------------------------------------------------------------------
+
+function generateIslands(
+  rng: () => number,
+  getHeight: HeightCallback,
+  playerCount: 2 | 3 | 4,
+  halfMap: number,
+): GeneratedMap {
+  // Wider margin pushes bases further into corners (more spread out)
+  const islandMargin = BASE_MARGIN + 6;
+
+  // -----------------------------------------------------------------------
+  // 1. Spawn points in corners (like classic but wider margin)
+  // -----------------------------------------------------------------------
+
+  const spawns: SpawnPoint[] = [];
+
+  for (let slot = 0; slot < playerCount; slot++) {
+    const cfg = BASE_POSITIONS[slot];
+    spawns.push({
+      x: cfg.xSign * (halfMap - islandMargin),
+      z: cfg.zSign * (halfMap - islandMargin),
+      factionId: cfg.factionId,
+    });
+  }
+
+  // -----------------------------------------------------------------------
+  // 2. Gold mines -- 3 near each base (peninsula resources) + 4 large centre
+  // -----------------------------------------------------------------------
+
+  const goldMines: GoldMineSpawn[] = [];
+
+  for (let slot = 0; slot < playerCount; slot++) {
+    const spawn = spawns[slot];
+    const cfg = BASE_POSITIONS[slot];
+
+    // Mine 1: close along X
+    goldMines.push({
+      x: spawn.x + cfg.towardsCentreX * 8,
+      z: spawn.z + cfg.towardsCentreZ * 2,
+      amount: DEFAULT_GOLD_AMOUNT,
+    });
+
+    // Mine 2: close along Z
+    goldMines.push({
+      x: spawn.x + cfg.towardsCentreX * 2,
+      z: spawn.z + cfg.towardsCentreZ * 8,
+      amount: DEFAULT_GOLD_AMOUNT,
+    });
+
+    // Mine 3: diagonal close (peninsula bonus)
+    goldMines.push({
+      x: spawn.x + cfg.towardsCentreX * 6,
+      z: spawn.z + cfg.towardsCentreZ * 6,
+      amount: DEFAULT_GOLD_AMOUNT * 0.75,
+    });
+  }
+
+  // 4 large contested mines in centre (higher value)
+  const centreSpread = 10;
+  goldMines.push({ x: -centreSpread, z: 0, amount: DEFAULT_GOLD_AMOUNT * 2 });
+  goldMines.push({ x: centreSpread, z: 0, amount: DEFAULT_GOLD_AMOUNT * 2 });
+  goldMines.push({ x: 0, z: -centreSpread, amount: DEFAULT_GOLD_AMOUNT * 2 });
+  goldMines.push({ x: 0, z: centreSpread, amount: DEFAULT_GOLD_AMOUNT * 2 });
+
+  // -----------------------------------------------------------------------
+  // 3. Buildings -- Town Hall per faction
+  // -----------------------------------------------------------------------
+
+  const buildings: BuildingSpawn[] = [];
+
+  for (let slot = 0; slot < playerCount; slot++) {
+    buildings.push({
+      factionId: spawns[slot].factionId,
+      buildingType: BuildingTypeId.TownHall,
+      x: spawns[slot].x,
+      z: spawns[slot].z,
+    });
+  }
+
+  // -----------------------------------------------------------------------
+  // 4. Starting units -- 3 workers per faction
+  // -----------------------------------------------------------------------
+
+  const units: UnitSpawn[] = [];
+
+  for (let slot = 0; slot < playerCount; slot++) {
+    const spawn = spawns[slot];
+    const cfg = BASE_POSITIONS[slot];
+
+    for (let i = 0; i < STARTING_WORKERS; i++) {
+      units.push({
+        factionId: spawn.factionId,
+        unitType: UnitTypeId.Worker,
+        x: spawn.x + cfg.towardsCentreX * (3 + i * WORKER_SPACING),
+        z: spawn.z + cfg.towardsCentreZ * 3,
+      });
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // 5. Tree resource groves -- concentrated near base (peninsula feel)
+  //    Few/no groves in centre (open battlefield)
+  // -----------------------------------------------------------------------
+
+  const treeResources: TreeResourceSpawn[] = [];
+  const groveCenters: { x: number; z: number }[] = [];
+
+  // 3 groves per base, all very close (peninsula cluster)
+  for (let slot = 0; slot < playerCount; slot++) {
+    const spawn = spawns[slot];
+    const cfg = BASE_POSITIONS[slot];
+
+    // Grove cluster around base -- close offsets
+    groveCenters.push({
+      x: spawn.x + cfg.towardsCentreX * 10,
+      z: spawn.z,
+    });
+    groveCenters.push({
+      x: spawn.x,
+      z: spawn.z + cfg.towardsCentreZ * 10,
+    });
+    groveCenters.push({
+      x: spawn.x + cfg.towardsCentreX * 12,
+      z: spawn.z + cfg.towardsCentreZ * 12,
+    });
+  }
+
+  for (let g = 0; g < groveCenters.length; g++) {
+    const center = groveCenters[g];
+    const treeCount = TREES_PER_GROVE_MIN + Math.floor(rng() * (TREES_PER_GROVE_MAX - TREES_PER_GROVE_MIN + 1));
+    for (let t = 0; t < treeCount; t++) {
+      const offsetX = (rng() - 0.5) * GROVE_SPREAD * 2;
+      const offsetZ = (rng() - 0.5) * GROVE_SPREAD * 2;
+      treeResources.push({
+        x: center.x + offsetX,
+        z: center.z + offsetZ,
+        amount: DEFAULT_WOOD_AMOUNT,
+      });
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // 6. Decorations -- fewer trees (open centre), normal rocks
+  // -----------------------------------------------------------------------
+
+  const { decorations } = generateDecorations(
+    rng, getHeight, halfMap, Math.floor(TREE_COUNT * 0.6), ROCK_COUNT,
+    [...spawns, ...goldMines, ...treeResources, ...buildings, ...units],
+  );
+
+  return {
+    size: MAP_SIZE,
+    heightScale: 10,
+    spawns,
+    goldMines,
+    treeResources,
+    buildings,
+    units,
+    decorations,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Template: Arena
+//
+// All players start in a ring around map centre (radius ~25).
+// Resources in the outer ring. Forces early combat.
+// More gold mines but smaller amounts (1000 each).
+// ---------------------------------------------------------------------------
+
+function generateArena(
+  rng: () => number,
+  getHeight: HeightCallback,
+  playerCount: 2 | 3 | 4,
+  halfMap: number,
+): GeneratedMap {
+  const arenaRadius = 25;
+  const arenaGoldAmount = 1000;
+
+  // -----------------------------------------------------------------------
+  // 1. Spawn points in a ring around centre
+  // -----------------------------------------------------------------------
+
+  const spawns: SpawnPoint[] = [];
+
+  for (let slot = 0; slot < playerCount; slot++) {
+    const angle = (slot / playerCount) * Math.PI * 2 - Math.PI / 2; // start from top
+    spawns.push({
+      x: Math.cos(angle) * arenaRadius,
+      z: Math.sin(angle) * arenaRadius,
+      factionId: BASE_POSITIONS[slot].factionId,
+    });
+  }
+
+  // -----------------------------------------------------------------------
+  // 2. Gold mines -- many small mines in outer ring + a few in inner ring
+  // -----------------------------------------------------------------------
+
+  const goldMines: GoldMineSpawn[] = [];
+
+  // Outer ring: 8 mines distributed around the edges
+  const outerRadius = halfMap - 12;
+  for (let i = 0; i < 8; i++) {
+    const angle = (i / 8) * Math.PI * 2 + rng() * 0.2;
+    goldMines.push({
+      x: Math.cos(angle) * outerRadius + (rng() - 0.5) * 4,
+      z: Math.sin(angle) * outerRadius + (rng() - 0.5) * 4,
+      amount: arenaGoldAmount,
+    });
+  }
+
+  // Mid ring: 4 mines between players (contested but reachable)
+  const midRadius = halfMap * 0.55;
+  for (let i = 0; i < 4; i++) {
+    const angle = (i / 4) * Math.PI * 2 + Math.PI / 4; // offset from player positions
+    goldMines.push({
+      x: Math.cos(angle) * midRadius + (rng() - 0.5) * 3,
+      z: Math.sin(angle) * midRadius + (rng() - 0.5) * 3,
+      amount: arenaGoldAmount,
+    });
+  }
+
+  // Centre: 2 small mines (immediate fight incentive)
+  goldMines.push({
+    x: -3 + rng() * 2,
+    z: -3 + rng() * 2,
+    amount: arenaGoldAmount,
+  });
+  goldMines.push({
+    x: 3 - rng() * 2,
+    z: 3 - rng() * 2,
+    amount: arenaGoldAmount,
+  });
+
+  // -----------------------------------------------------------------------
+  // 3. Buildings -- Town Hall per faction
+  // -----------------------------------------------------------------------
+
+  const buildings: BuildingSpawn[] = [];
+
+  for (let slot = 0; slot < playerCount; slot++) {
+    buildings.push({
+      factionId: spawns[slot].factionId,
+      buildingType: BuildingTypeId.TownHall,
+      x: spawns[slot].x,
+      z: spawns[slot].z,
+    });
+  }
+
+  // -----------------------------------------------------------------------
+  // 4. Starting units -- 3 workers per faction
+  // -----------------------------------------------------------------------
+
+  const units: UnitSpawn[] = [];
+
+  for (let slot = 0; slot < playerCount; slot++) {
+    const spawn = spawns[slot];
+    // Workers placed outward from centre (towards outer ring resources)
+    const angle = (slot / playerCount) * Math.PI * 2 - Math.PI / 2;
+    const outX = Math.cos(angle);
+    const outZ = Math.sin(angle);
+
+    for (let i = 0; i < STARTING_WORKERS; i++) {
+      units.push({
+        factionId: spawn.factionId,
+        unitType: UnitTypeId.Worker,
+        x: spawn.x + outX * (3 + i * WORKER_SPACING),
+        z: spawn.z + outZ * (3 + i * WORKER_SPACING),
+      });
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // 5. Tree resource groves -- scattered in outer ring
+  // -----------------------------------------------------------------------
+
+  const treeResources: TreeResourceSpawn[] = [];
+  const groveCenters: { x: number; z: number }[] = [];
+
+  // 6 groves in the outer ring
+  for (let i = 0; i < 6; i++) {
+    const angle = (i / 6) * Math.PI * 2 + rng() * 0.3;
+    const radius = halfMap - 18 + (rng() - 0.5) * 6;
+    groveCenters.push({
+      x: Math.cos(angle) * radius,
+      z: Math.sin(angle) * radius,
+    });
+  }
+
+  // 1 small grove near each player (so they have some wood access)
+  for (let slot = 0; slot < playerCount; slot++) {
+    const spawn = spawns[slot];
+    const angle = (slot / playerCount) * Math.PI * 2 - Math.PI / 2;
+    groveCenters.push({
+      x: spawn.x + Math.cos(angle) * 10,
+      z: spawn.z + Math.sin(angle) * 10,
+    });
+  }
+
+  for (let g = 0; g < groveCenters.length; g++) {
+    const center = groveCenters[g];
+    const treeCount = TREES_PER_GROVE_MIN + Math.floor(rng() * (TREES_PER_GROVE_MAX - TREES_PER_GROVE_MIN + 1));
+    for (let t = 0; t < treeCount; t++) {
+      const offsetX = (rng() - 0.5) * GROVE_SPREAD * 2;
+      const offsetZ = (rng() - 0.5) * GROVE_SPREAD * 2;
+      treeResources.push({
+        x: center.x + offsetX,
+        z: center.z + offsetZ,
+        amount: DEFAULT_WOOD_AMOUNT,
+      });
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // 6. Decorations -- normal amount
+  // -----------------------------------------------------------------------
+
+  const { decorations } = generateDecorations(
+    rng, getHeight, halfMap, TREE_COUNT, ROCK_COUNT,
+    [...spawns, ...goldMines, ...treeResources, ...buildings, ...units],
+  );
+
+  return {
+    size: MAP_SIZE,
+    heightScale: 10,
+    spawns,
+    goldMines,
+    treeResources,
+    buildings,
+    units,
+    decorations,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Shared decoration generator (used by all templates)
+// ---------------------------------------------------------------------------
+
+function generateDecorations(
+  rng: () => number,
+  getHeight: HeightCallback,
+  halfMap: number,
+  treeCount: number,
+  rockCount: number,
+  avoidSeed: { x: number; z: number }[],
+): { decorations: DecoSpawn[] } {
+  const avoidPositions = [...avoidSeed];
+  const decorations: DecoSpawn[] = [];
+
+  // Trees
+  for (let i = 0; i < treeCount; i++) {
+    const pos = findValidDecoPosition(rng, avoidPositions, halfMap, getHeight);
+    if (pos) {
+      decorations.push({
+        type: DecoType.Tree,
+        x: pos.x,
+        z: pos.z,
+        scale: 0.8 + rng() * 0.6,
+        rotationY: rng() * Math.PI * 2,
+      });
+      avoidPositions.push(pos);
+    }
+  }
+
+  // Rocks
+  for (let i = 0; i < rockCount; i++) {
+    const pos = findValidDecoPosition(rng, avoidPositions, halfMap, getHeight);
+    if (pos) {
+      decorations.push({
+        type: DecoType.Rock,
+        x: pos.x,
+        z: pos.z,
+        scale: 0.5 + rng() * 0.8,
+        rotationY: rng() * Math.PI * 2,
+      });
+      avoidPositions.push(pos);
+    }
+  }
+
+  return { decorations };
 }
 
 // ---------------------------------------------------------------------------

@@ -2652,6 +2652,1499 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
   },
 };
 
+// ===========================================================================
+// BELGEN CAMPAIGN — "HET COMPROMIS"
+// ===========================================================================
+
+// ---------------------------------------------------------------------------
+// Belgen Missie 1: "De Eerste Frituur" (Tutorial)
+// ---------------------------------------------------------------------------
+
+const BELGEN_WAVE_SPAWN_X = 80;
+const BELGEN_WAVE_SPAWN_Z = 80;
+
+const MISSION_B1_EERSTE_FRITUUR: MissionDefinition = {
+  id: 'belgen-1-de-eerste-frituur',
+  campaignId: 'belgen',
+  missionIndex: 0,
+  title: 'De Eerste Frituur',
+  briefingTitle: 'Missie 1: De Eerste Frituur',
+  briefingText:
+    'Welkom in Antwerpen, de poort van Belgie! Ge zijt de nieuwe adviseur van de Frietkoning, ' +
+    'en uw eerste opdracht is simpel: bouw een basis, train wat mannen, en — het allerbelangrijkste — ' +
+    'produceer Frieten. Veel Frieten.\n\n' +
+    'De Randstad heeft al verkenners gestuurd. Ze praten over "synergien met de Antwerpse haven" ' +
+    'en drinken havermondmelk. Dat belooft niet veel goeds.\n\n' +
+    'Maar geen paniek! In Belgie lossen we alles op met een goede portie friet en een pintje. ' +
+    'Bouw uw Frituur, verzamel 500 Frieten, en overleef drie golven Randstad-infiltranten.\n\n' +
+    'Ceci n\'est pas une army... maar het is een begin.',
+
+  mapSize: 96,
+  startingGold: 100,
+  startingGoldAI: 0,
+
+  buildings: [
+    // Player base — west side (Antwerp harbour)
+    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.TownHall, x: -35, z: -20, complete: true },
+  ],
+
+  units: [
+    // 5 Belgian workers (Frietkraamhouders)
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -32, z: -18 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -30, z: -18 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -28, z: -18 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -32, z: -16 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -30, z: -16 },
+  ],
+
+  goldMines: [
+    // "Frieten" resource nodes near the harbour
+    { x: -25, z: -25, amount: 2000 },
+    { x: -35, z: -10, amount: 1500 },
+    { x: -15, z: -20, amount: 1500 },
+  ],
+
+  objectives: [
+    { id: 'b1-gather-500', type: 'gather-gold', description: 'Produceer 500 Frieten', targetValue: 500, isBonus: false },
+    { id: 'b1-build-barracks', type: 'build-building', description: 'Bouw een Frituur (Kazerne)', targetValue: 1, isBonus: false },
+    { id: 'b1-survive-waves', type: 'survive-waves', description: 'Overleef 3 golven Randstad-infiltranten', targetValue: 3, isBonus: false },
+    { id: 'b1-gather-1000', type: 'gather-gold', description: 'Produceer 1000 Frieten (Bonus: Extra Knapperig)', targetValue: 1000, isBonus: true },
+    { id: 'b1-no-building-dmg', type: 'no-townhall-loss', description: 'Geen enkel Belgisch gebouw verloren', targetValue: 0, isBonus: true },
+  ],
+
+  triggers: [
+    {
+      id: 'b1-intro',
+      condition: { type: 'time', seconds: 5 },
+      actions: [{
+        type: 'message',
+        text: 'De Frietkoning spreekt: "Welkom in Antwerpen! Stuur uw Frietkraamhouders naar de grondstofbronnen. En bouw een Frituur — zonder Frituur geen leger, en zonder leger geen frieten. Wacht, dat klopt niet helemaal..."',
+      }],
+      once: true,
+    },
+    {
+      id: 'b1-barracks-tip',
+      condition: { type: 'time', seconds: 45 },
+      actions: [{
+        type: 'message',
+        text: 'Tip: Selecteer een Frietkraamhouder en druk B om een Frituur te bouwen. In Belgie duurt alles drie keer langer door de bureaucratie, maar het resultaat is drie keer zo lekker.',
+      }],
+      once: true,
+    },
+    {
+      id: 'b1-barracks-built',
+      condition: { type: 'building-built', buildingType: BuildingTypeId.Barracks },
+      actions: [{
+        type: 'message',
+        text: 'De Frituur staat! Nu kunt ge eenheden trainen. De Frietkoning: "Eindelijk! Na 47 formulieren en 3 vergunningsaanvragen... een Frituur!"',
+      }],
+      once: true,
+    },
+    {
+      id: 'b1-wave-1-warning',
+      condition: { type: 'time', seconds: 90 },
+      actions: [{ type: 'message', text: 'Verkenners melden: Hipsters met laptops naderen vanuit het oosten! Ze willen de haven "optimaliseren"!' }],
+      once: true,
+    },
+    {
+      id: 'b1-wave-1-spawn',
+      condition: { type: 'time', seconds: 105 },
+      actions: [
+        { type: 'message', text: 'GOLF 1! Vier Hipsters en twee Managers. Ze ruiken naar avocadotoast!' },
+        { type: 'spawn-wave', waveIndex: 0 },
+      ],
+      once: true,
+    },
+    {
+      id: 'b1-wave-2-warning',
+      condition: { type: 'time', seconds: 225 },
+      actions: [{ type: 'message', text: 'Meer Randstedelingen in aantocht. Ze delen flyers uit over "co-working spaces"...' }],
+      once: true,
+    },
+    {
+      id: 'b1-wave-2-spawn',
+      condition: { type: 'time', seconds: 240 },
+      actions: [
+        { type: 'message', text: 'GOLF 2! Zes Hipsters en drie Consultants. Ze proberen de Frituur om te bouwen tot een poke bowl bar!' },
+        { type: 'spawn-wave', waveIndex: 1 },
+      ],
+      once: true,
+    },
+    {
+      id: 'b1-wave-3-warning',
+      condition: { type: 'time', seconds: 375 },
+      actions: [{ type: 'message', text: 'LAATSTE GOLF nadert! Een Influencer is gespot — die is gevaarlijk!' }],
+      once: true,
+    },
+    {
+      id: 'b1-wave-3-spawn',
+      condition: { type: 'time', seconds: 390 },
+      actions: [
+        { type: 'message', text: 'GOLF 3! Acht Hipsters, vier Managers en een Influencer! Ze livestreamen de aanval op TikTok!' },
+        { type: 'spawn-wave', waveIndex: 2 },
+      ],
+      once: true,
+    },
+    {
+      id: 'b1-all-waves-defeated',
+      condition: { type: 'all-waves-defeated' },
+      actions: [{
+        type: 'message',
+        text: 'Alle golven verslagen! De Frietkoning: "Magnifique! En nu... frieten voor iedereen. Dat is het Belgische antwoord op alles."',
+      }],
+      once: true,
+    },
+    {
+      id: 'b1-victory',
+      condition: { type: 'gold-reached', amount: 500 },
+      actions: [
+        {
+          type: 'message',
+          text: '500 Frieten geproduceerd! De haven is veilig, de Frituur draait, en de Randstad trekt zich terug. Een goede dag voor Belgie!',
+        },
+        { type: 'victory' },
+      ],
+      once: true,
+    },
+  ],
+
+  waves: [
+    // Wave 1 (T=105s): 4 Infantry + 2 Ranged (Hipsters + Managers)
+    {
+      index: 0,
+      spawnTime: 105,
+      units: [
+        ...createWaveUnits(4, UnitTypeId.Infantry, BELGEN_WAVE_SPAWN_X, BELGEN_WAVE_SPAWN_Z, 3),
+        ...createWaveUnits(2, UnitTypeId.Ranged, BELGEN_WAVE_SPAWN_X + 3, BELGEN_WAVE_SPAWN_Z + 3, 2),
+      ],
+      message: 'Golf 1 van 3',
+    },
+    // Wave 2 (T=240s): 6 Infantry + 3 Ranged (Hipsters + Consultants)
+    {
+      index: 1,
+      spawnTime: 240,
+      units: [
+        ...createWaveUnits(6, UnitTypeId.Infantry, BELGEN_WAVE_SPAWN_X, BELGEN_WAVE_SPAWN_Z, 4),
+        ...createWaveUnits(3, UnitTypeId.Ranged, BELGEN_WAVE_SPAWN_X + 4, BELGEN_WAVE_SPAWN_Z + 4, 3),
+      ],
+      message: 'Golf 2 van 3',
+    },
+    // Wave 3 (T=390s): 8 Infantry + 4 Ranged + 1 Heavy (Hipsters + Managers + Influencer)
+    {
+      index: 2,
+      spawnTime: 390,
+      units: [
+        ...createWaveUnits(8, UnitTypeId.Infantry, BELGEN_WAVE_SPAWN_X, BELGEN_WAVE_SPAWN_Z, 5),
+        ...createWaveUnits(4, UnitTypeId.Ranged, BELGEN_WAVE_SPAWN_X + 5, BELGEN_WAVE_SPAWN_Z + 5, 3),
+        { factionId: FactionId.Randstad, unitType: UnitTypeId.Heavy, x: BELGEN_WAVE_SPAWN_X, z: BELGEN_WAVE_SPAWN_Z },
+      ],
+      message: 'LAATSTE GOLF!',
+    },
+  ],
+
+  hasAIProduction: false,
+
+  starThresholds: {
+    threeStarTime: 360,   // 6 min
+    twoStarTime: 540,     // 9 min
+    allBonusesGrants3Stars: true,
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Belgen Missie 2: "Het Chocolade Verdrag"
+// ---------------------------------------------------------------------------
+
+const MISSION_B2_CHOCOLADE_VERDRAG: MissionDefinition = {
+  id: 'belgen-2-het-chocolade-verdrag',
+  campaignId: 'belgen',
+  missionIndex: 1,
+  title: 'Het Chocolade Verdrag',
+  briefingTitle: 'Missie 2: Het Chocolade Verdrag',
+  briefingText:
+    'Brugge — de stad van kanalen, pralines en toeristen die verdwalen. De Randstad heeft ' +
+    'ontdekt dat Belgische chocolade het geheime wapen is achter onze diplomatie. Zonder chocolade ' +
+    'geen compromissen, en zonder compromissen... ja, dan moeten we echt gaan vechten.\n\n' +
+    'Bouw een Chocolaterie en produceer genoeg Chocolade om het Chocolade Verdrag te ondertekenen. ' +
+    'Maar de Randstad stuurt plundertroepen om onze voorraden te stelen.\n\n' +
+    'Gebruik het Belgische Compromis: stel de vijandelijke aanval uit door diplomatieke onderhandelingen ' +
+    'te starten. Dat geeft u tijd om een leger op te bouwen.\n\n' +
+    'De Frietkoning fluistert: "Diplomatie is als chocolade — zoet aan de buitenkant, maar binnenin ' +
+    'zit altijd een verrassing."',
+
+  mapSize: 128,
+  startingGold: 300,
+  startingGoldAI: 500,
+
+  buildings: [
+    // Player base — centre of Brugge (market square)
+    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.TownHall, x: -10, z: -10, complete: true },
+    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.Barracks, x: -5, z: -15, complete: true },
+    // Randstad base — north-east
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: 50, z: 50, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 45, z: 55, complete: true },
+  ],
+
+  units: [
+    // Player: 4 workers + 2 infantry
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -7, z: -8 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -5, z: -8 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -3, z: -8 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -7, z: -6 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -2, z: -13 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: 0, z: -13 },
+    // Enemy: starting defenders + raid groups
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 48, z: 48 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 52, z: 48 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 50, z: 46 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 47, z: 52 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 53, z: 52 },
+  ],
+
+  goldMines: [
+    // Player-side resource nodes
+    { x: -20, z: -15, amount: 2500 },
+    { x: -15, z: 5, amount: 2000 },
+    // Contested middle
+    { x: 15, z: 15, amount: 3000 },
+    // Enemy-side
+    { x: 40, z: 40, amount: 2000 },
+  ],
+
+  objectives: [
+    { id: 'b2-build-chocolaterie', type: 'build-building', description: 'Bouw een Chocolaterie (Tertiaire Resource Gebouw)', targetValue: 1, isBonus: false },
+    { id: 'b2-gather-800', type: 'gather-gold', description: 'Verzamel 800 Frieten voor het Chocolade Verdrag', targetValue: 800, isBonus: false },
+    { id: 'b2-destroy-enemy-th', type: 'destroy-building', description: 'Vernietig het Randstad Hoofdkantoor (als het verdrag mislukt)', targetValue: 1, isBonus: false },
+    { id: 'b2-train-10', type: 'train-units', description: 'Train 10 militaire eenheden', targetValue: 10, isBonus: true },
+    { id: 'b2-no-th-loss', type: 'no-townhall-loss', description: 'Verlies het Belgisch Raadhuis niet', targetValue: 0, isBonus: true },
+  ],
+
+  triggers: [
+    {
+      id: 'b2-intro',
+      condition: { type: 'time', seconds: 5 },
+      actions: [{
+        type: 'message',
+        text: 'De Frietkoning: "Brugge! De parel van Belgie! Bouw een Chocolaterie — we hebben Chocolade nodig voor het verdrag. En voor mijn dessert."',
+      }],
+      once: true,
+    },
+    {
+      id: 'b2-chocolaterie-hint',
+      condition: { type: 'time', seconds: 60 },
+      actions: [{
+        type: 'message',
+        text: 'Tip: Bouw een Chocolaterie (Tertiaire Resource Gebouw) met een Frietkraamhouder. De Chocolade versterkt uw diplomatieke positie... en uw moraal.',
+      }],
+      once: true,
+    },
+    {
+      id: 'b2-chocolaterie-built',
+      condition: { type: 'building-built', buildingType: BuildingTypeId.TertiaryResourceBuilding },
+      actions: [{
+        type: 'message',
+        text: 'De Chocolaterie staat! De Frietkoning: "Ah, de geur van pralines! Nu begint de echte Belgische diplomatie. Stap 1: chocolade. Stap 2: compromis. Stap 3: nog meer chocolade."',
+      }],
+      once: true,
+    },
+    {
+      id: 'b2-compromis-event',
+      condition: { type: 'time', seconds: 150 },
+      actions: [{
+        type: 'message',
+        text: 'BELGISCH COMPROMIS GEACTIVEERD! De Frietkoning opent onderhandelingen met de Randstad. "Laten we praten over de situatie... bij een koffie en een praline." De vijand is 120 seconden afgeleid door het diplomatieke proces. Bouw snel uw leger op!',
+      }],
+      once: true,
+    },
+    {
+      id: 'b2-compromis-fails',
+      condition: { type: 'time', seconds: 270 },
+      actions: [{
+        type: 'message',
+        text: 'Het Compromis is mislukt! De Randstad-delegatie: "We eisen 200% belastingverhoging op frieten!" De Frietkoning: "DIT IS OORLOG." De vijand valt aan!',
+      }],
+      once: true,
+    },
+    {
+      id: 'b2-raid-1',
+      condition: { type: 'time', seconds: 285 },
+      actions: [
+        { type: 'message', text: 'Randstad-plundertroepen naderen! Ze willen de Chocolaterie! Verdedig de pralines!' },
+        { type: 'spawn-wave', waveIndex: 0 },
+      ],
+      once: true,
+    },
+    {
+      id: 'b2-raid-2',
+      condition: { type: 'time', seconds: 420 },
+      actions: [
+        { type: 'message', text: 'Nog meer plundertroepen! De Randstad stuurt nu ook Consultants — ze proberen uw Chocolaterie te "restructureren"!' },
+        { type: 'spawn-wave', waveIndex: 1 },
+      ],
+      once: true,
+    },
+    {
+      id: 'b2-army-ready',
+      condition: { type: 'army-count', count: 10 },
+      actions: [{
+        type: 'message',
+        text: 'Uw leger groeit! De Frietkoning: "Tien man! In Belgische termen is dat een heel kabinet. Tijd om de Randstad een bezoekje te brengen."',
+      }],
+      once: true,
+    },
+    {
+      id: 'b2-victory-destroy',
+      condition: { type: 'building-destroyed', factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall },
+      actions: [
+        {
+          type: 'message',
+          text: 'Het Randstad Hoofdkantoor is vernietigd! De Frietkoning: "Het Chocolade Verdrag is getekend — in ONZE voorwaarden. Alle pralines blijven in Belgie. Punt."',
+        },
+        { type: 'victory' },
+      ],
+      once: true,
+    },
+  ],
+
+  waves: [
+    // Raid 1 (T=285s): 4 Infantry + 3 Ranged (targeted raid on Chocolaterie)
+    {
+      index: 0,
+      spawnTime: 285,
+      units: [
+        ...createWaveUnits(4, UnitTypeId.Infantry, 40, 0, 3),
+        ...createWaveUnits(3, UnitTypeId.Ranged, 43, 3, 2),
+      ],
+      message: 'Plundertroepen!',
+    },
+    // Raid 2 (T=420s): 6 Infantry + 4 Ranged + 1 Heavy
+    {
+      index: 1,
+      spawnTime: 420,
+      units: [
+        ...createWaveUnits(6, UnitTypeId.Infantry, 40, 0, 4),
+        ...createWaveUnits(4, UnitTypeId.Ranged, 44, 4, 3),
+        { factionId: FactionId.Randstad, unitType: UnitTypeId.Heavy, x: 42, z: 2 },
+      ],
+      message: 'Meer plundertroepen!',
+    },
+  ],
+
+  hasAIProduction: true,
+
+  starThresholds: {
+    threeStarTime: 600,   // 10 min
+    twoStarTime: 900,     // 15 min
+    allBonusesGrants3Stars: true,
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Belgen Missie 3: "De Commissievergadering"
+// ---------------------------------------------------------------------------
+
+const MISSION_B3_COMMISSIEVERGADERING: MissionDefinition = {
+  id: 'belgen-3-de-commissievergadering',
+  campaignId: 'belgen',
+  missionIndex: 2,
+  title: 'De Commissievergadering',
+  briefingTitle: 'Missie 3: De Commissievergadering',
+  briefingText:
+    'Brussel — het kloppend hart van de Europese bureaucratie. De Brabanders rukken op vanuit ' +
+    'het zuiden, en ze zijn niet in de stemming voor compromissen. Hun Carnavalvierders maken een ' +
+    'hels kabaal en hun Worstenbroodjekanons staan op scherp.\n\n' +
+    'Maar wij zijn Belgen. Wij hebben een wapen dat machtiger is dan elk leger: DE COMMISSIE.\n\n' +
+    'Richt een Commissie op (via het Raadhuis) om de vijandelijke productie te vertragen. ' +
+    'Terwijl de Brabanders verstrikt raken in subcommissies, amendementen en koffiepauzes, ' +
+    'bouwt ge uw eigen leger op voor de tegenaanval.\n\n' +
+    'De Frietkoning grijnst: "Ze zeggen dat een Belgische commissie sneller een kameel ontwerpt ' +
+    'dan een paard. Maar een kameel wint WEL in de woestijn."',
+
+  mapSize: 128,
+  startingGold: 400,
+  startingGoldAI: 800,
+
+  buildings: [
+    // Player base — west (Belgian district of Brussels)
+    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.TownHall, x: -45, z: 0, complete: true },
+    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.Barracks, x: -38, z: -5, complete: true },
+    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.TertiaryResourceBuilding, x: -38, z: 5, complete: true },
+    // Enemy base — east (Brabanders encampment)
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: 45, z: 0, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: 38, z: -5, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: 38, z: 5, complete: true },
+  ],
+
+  units: [
+    // Player: 5 workers + 3 infantry + 1 ranged
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -42, z: -2 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -40, z: -2 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -42, z: 2 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -40, z: 2 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -41, z: 0 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -35, z: -3 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -35, z: 0 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -35, z: 3 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -33, z: 0 },
+    // Enemy: Brabanders with strong starting force + AI production
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 42, z: -2 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 42, z: 2 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 44, z: 0 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 36, z: -3 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 36, z: 0 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 36, z: 3 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 34, z: -2 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 34, z: 2 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 35, z: -5 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 35, z: 5 },
+  ],
+
+  goldMines: [
+    // Player-side
+    { x: -35, z: -15, amount: 2500 },
+    { x: -35, z: 15, amount: 2500 },
+    // Contested centre (no man's land)
+    { x: 0, z: -10, amount: 3000 },
+    { x: 0, z: 10, amount: 3000 },
+    // Enemy-side
+    { x: 35, z: -15, amount: 2000 },
+    { x: 35, z: 15, amount: 2000 },
+  ],
+
+  objectives: [
+    { id: 'b3-build-special', type: 'build-building', description: 'Richt een Commissie op (Factie Speciaal Gebouw)', targetValue: 1, isBonus: false },
+    { id: 'b3-destroy-enemy-th', type: 'destroy-building', description: 'Vernietig de Brabanders Boerderij', targetValue: 1, isBonus: false },
+    { id: 'b3-train-15', type: 'train-units', description: 'Train 15 militaire eenheden', targetValue: 15, isBonus: false },
+    { id: 'b3-no-worker-loss', type: 'no-worker-loss', description: 'Verlies geen Frietkraamhouders (Bonus: "Frieten voor Iedereen")', targetValue: 0, isBonus: true },
+    { id: 'b3-have-20-units', type: 'have-units-at-end', description: 'Heb 20+ eenheden aan het einde', targetValue: 20, isBonus: true },
+  ],
+
+  triggers: [
+    {
+      id: 'b3-intro',
+      condition: { type: 'time', seconds: 5 },
+      actions: [{
+        type: 'message',
+        text: 'De Frietkoning: "Brussel! De stad waar vergaderen een olympische sport is. De Brabanders naderen, maar wij hebben iets beters dan een leger: een Commissie. Bouw er een via het Raadhuis!"',
+      }],
+      once: true,
+    },
+    {
+      id: 'b3-commission-hint',
+      condition: { type: 'time', seconds: 45 },
+      actions: [{
+        type: 'message',
+        text: 'Tip: Bouw een Factie Speciaal Gebouw om de Commissie op te richten. De Commissie vertraagt vijandelijke productie in een groot gebied. Hoe meer bureaucratie, hoe langzamer de vijand.',
+      }],
+      once: true,
+    },
+    {
+      id: 'b3-commission-built',
+      condition: { type: 'building-built', buildingType: BuildingTypeId.FactionSpecial1 },
+      actions: [{
+        type: 'message',
+        text: 'COMMISSIE OPGERICHT! De Brabanders productie wordt vertraagd! De Frietkoning: "Subcommissie A heeft het amendement op paragraaf 7b doorgestuurd naar Werkgroep C. Verwachte levertijd: wanneer de zon opbrandt."',
+      }],
+      once: true,
+    },
+    {
+      id: 'b3-early-pressure',
+      condition: { type: 'time', seconds: 120 },
+      actions: [
+        {
+          type: 'message',
+          text: 'Brabanders verkenners naderen! Ze schreeuwen iets over worstenbroodjes...',
+        },
+        {
+          type: 'spawn-units',
+          units: [
+            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 20, z: -5 },
+            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 20, z: 0 },
+            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 20, z: 5 },
+          ],
+        },
+      ],
+      once: true,
+    },
+    {
+      id: 'b3-commission-effect',
+      condition: { type: 'time', seconds: 180 },
+      actions: [{
+        type: 'message',
+        text: 'De Commissie werkt! Brabanders rapport: "We kunnen niet aanvallen, we zitten vast in een vergadering over de aanvalsplanning. Er is een BEZWAAR op het bezwaar." Gebruik deze tijd om uw leger op te bouwen!',
+      }],
+      once: true,
+    },
+    {
+      id: 'b3-wave-1',
+      condition: { type: 'time', seconds: 300 },
+      actions: [
+        { type: 'message', text: 'De Brabanders hebben eindelijk een besluit genomen! Een aanvalsgolf breekt door! GOLF 1!' },
+        { type: 'spawn-wave', waveIndex: 0 },
+      ],
+      once: true,
+    },
+    {
+      id: 'b3-wave-2-warning',
+      condition: { type: 'time', seconds: 465 },
+      actions: [{ type: 'message', text: 'De Brabanders hergroeperen... ze sturen een grotere golf. De Commissie kan ze niet meer tegenhouden!' }],
+      once: true,
+    },
+    {
+      id: 'b3-wave-2',
+      condition: { type: 'time', seconds: 480 },
+      actions: [
+        { type: 'message', text: 'GOLF 2! Carnavalvierders EN Boogschutters! De Frietkoning: "Tijd voor de tegenaanval! Laat zien wat Belgische bureaucratie kan bereiken!"' },
+        { type: 'spawn-wave', waveIndex: 1 },
+      ],
+      once: true,
+    },
+    {
+      id: 'b3-counterattack-tip',
+      condition: { type: 'army-count', count: 15 },
+      actions: [{
+        type: 'message',
+        text: 'Vijftien eenheden! De Frietkoning: "Een heel regiment! In Belgie noemen we dat een werkgroep. AANVALLEN!"',
+      }],
+      once: true,
+    },
+    {
+      id: 'b3-victory',
+      condition: { type: 'building-destroyed', factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall },
+      actions: [
+        {
+          type: 'message',
+          text: 'De Brabanders Boerderij is gevallen! De Frietkoning: "En DAT is de kracht van Belgische bureaucratie. Ze kwamen met worstenbroodjes, wij kwamen met FORMULIEREN. En een leger. Maar vooral formulieren."',
+        },
+        { type: 'victory' },
+      ],
+      once: true,
+    },
+  ],
+
+  waves: [
+    // Wave 1 (T=300s): 6 Infantry + 3 Ranged (Carnavalvierders + Boogschutters)
+    {
+      index: 0,
+      spawnTime: 300,
+      units: [
+        ...createWaveUnits(6, UnitTypeId.Infantry, 25, 0, 4),
+        ...createWaveUnits(3, UnitTypeId.Ranged, 28, 3, 2),
+      ],
+      message: 'Golf 1 van 2',
+    },
+    // Wave 2 (T=480s): 8 Infantry + 5 Ranged + 2 Heavy (full Brabanders assault)
+    {
+      index: 1,
+      spawnTime: 480,
+      units: [
+        ...createWaveUnits(8, UnitTypeId.Infantry, 25, 0, 5),
+        ...createWaveUnits(5, UnitTypeId.Ranged, 29, 4, 3),
+        ...createWaveUnits(2, UnitTypeId.Heavy, 27, -3, 2),
+      ],
+      message: 'Golf 2 van 2 — TEGENAANVAL!',
+    },
+  ],
+
+  hasAIProduction: true,
+
+  starThresholds: {
+    threeStarTime: 720,    // 12 min
+    twoStarTime: 1080,     // 18 min
+    allBonusesGrants3Stars: true,
+  },
+};
+
+// ===========================================================================
+// LIMBURGERS CAMPAIGN — "De Schaduwen van het Heuvelland"
+// ===========================================================================
+
+// ---------------------------------------------------------------------------
+// Helper: create wave units for Limburgers campaign
+// ---------------------------------------------------------------------------
+
+const LIMB_WAVE_EAST_X = 45;
+const LIMB_WAVE_EAST_Z = 0;
+
+function createLimbWaveUnits(
+  count: number,
+  type: UnitTypeId,
+  baseX: number,
+  baseZ: number,
+  spread: number,
+  faction: FactionId = FactionId.Randstad,
+): MissionUnitSpawn[] {
+  const units: MissionUnitSpawn[] = [];
+  for (let i = 0; i < count; i++) {
+    const angle = (i / count) * Math.PI * 2;
+    units.push({
+      factionId: faction,
+      unitType: type,
+      x: baseX + Math.cos(angle) * spread,
+      z: baseZ + Math.sin(angle) * spread,
+    });
+  }
+  return units;
+}
+
+// ---------------------------------------------------------------------------
+// Limburgers Missie 1: "De Eerste Schacht" (Tutorial)
+// ---------------------------------------------------------------------------
+
+const LIMBURGERS_MISSION_1_EERSTE_SCHACHT: MissionDefinition = {
+  id: 'limburgers-1-de-eerste-schacht',
+  campaignId: 'limburgers',
+  missionIndex: 0,
+  title: 'De Eerste Schacht',
+  briefingTitle: 'Missie 1: De Eerste Schacht',
+  briefingText:
+    'Diep onder Valkenburg trillen de grotten. De Mijnbaas voelt het in zijn botten — ' +
+    'iets klopt niet. Maar eerst: de basis moet draaien.\n\n' +
+    'Bouw een Mijnschacht om Kolen te winnen, verzamel Vlaai en Mergel, en train je ' +
+    'eerste Mijnwerkers. De Limburgse economie draait op wat je uit de grond haalt.\n\n' +
+    'En houd je ogen open. Die trillingen komen niet van een aardbeving.',
+
+  mapSize: 96,
+  startingGold: 100,
+  startingGoldAI: 0,
+
+  buildings: [
+    // Player: Grottentempel (TownHall) in south-center of map
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.TownHall, x: -5, z: -35, complete: true },
+  ],
+
+  units: [
+    // Player: 4 Mijnwerkers (workers)
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -3, z: -33 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -1, z: -33 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: 1, z: -33 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -3, z: -31 },
+  ],
+
+  goldMines: [
+    { x: 5, z: -35, amount: 1500 },   // Close to start
+    { x: -15, z: -25, amount: 1500 },  // Medium distance
+    { x: 10, z: -20, amount: 2000 },   // Contested area
+  ],
+
+  treeResources: [
+    { x: -10, z: -30, amount: 800 },
+    { x: 0, z: -25, amount: 800 },
+    { x: -15, z: -35, amount: 600 },
+    { x: 10, z: -30, amount: 600 },
+  ],
+
+  objectives: [
+    { id: 'gather-400', type: 'gather-gold', description: 'Verzamel 400 Vlaai', targetValue: 400, isBonus: false },
+    { id: 'build-barracks', type: 'build-building', description: 'Bouw een Heuvelfort (Kazerne)', targetValue: 1, isBonus: false },
+    { id: 'train-3-units', type: 'train-units', description: 'Train 3 Schutterij-soldaten', targetValue: 3, isBonus: false },
+    { id: 'no-worker-loss', type: 'no-worker-loss', description: 'Verlies geen Mijnwerkers', targetValue: 0, isBonus: true },
+  ],
+
+  triggers: [
+    {
+      id: 'start-narrator',
+      condition: { type: 'time', seconds: 3 },
+      actions: [{ type: 'message', text: 'Welkom in de grotten van Valkenburg. De Mijnbaas rekent op je. Bouw een Mijnschacht en begin met het verzamelen van Vlaai.' }],
+      once: true,
+    },
+    {
+      id: 'tip-60s',
+      condition: { type: 'time', seconds: 60 },
+      actions: [{ type: 'message', text: 'Stuur je Mijnwerkers naar de Vlaaimijnen. In Limburg halen we alles uit de grond — letterlijk.' }],
+      once: true,
+    },
+    {
+      id: 'barracks-built',
+      condition: { type: 'building-built', buildingType: BuildingTypeId.Barracks },
+      actions: [{ type: 'message', text: 'Het Heuvelfort staat! Train nu Schutterij-soldaten. De grotten zijn niet zo veilig als ze lijken...' }],
+      once: true,
+    },
+    {
+      id: 'first-attack-warning',
+      condition: { type: 'time', seconds: 180 },
+      actions: [{ type: 'message', text: 'De grond trilt! Dat zijn geen aardbevingen... er komt iets van het noorden!' }],
+      once: true,
+    },
+    {
+      id: 'first-attack',
+      condition: { type: 'time', seconds: 200 },
+      actions: [
+        { type: 'message', text: 'Randstad-verkenners! Ze hebben onze grotten gevonden! Verdedig de Grottentempel!' },
+        {
+          type: 'spawn-units',
+          units: [
+            { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 20, z: 30 },
+            { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 22, z: 28 },
+            { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 18, z: 28 },
+          ],
+        },
+      ],
+      once: true,
+    },
+    {
+      id: 'victory-gather',
+      condition: { type: 'gold-reached', amount: 400 },
+      actions: [
+        { type: 'message', text: 'De Mijnbaas knikt goedkeurend. "Goed werk. Maar dit was nog maar het begin. Ik hoor boorgeluiden onder de Maas..."' },
+        { type: 'victory' },
+      ],
+      once: true,
+    },
+  ],
+
+  waves: [],
+  hasAIProduction: false,
+
+  starThresholds: {
+    threeStarTime: 240,  // 4 min
+    twoStarTime: 420,    // 7 min
+    allBonusesGrants3Stars: true,
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Limburgers Missie 2: "Duisternis Beneden" (Tunnel network + destroy)
+// ---------------------------------------------------------------------------
+
+const LIMBURGERS_MISSION_2_DUISTERNIS_BENEDEN: MissionDefinition = {
+  id: 'limburgers-2-duisternis-beneden',
+  campaignId: 'limburgers',
+  missionIndex: 1,
+  title: 'Duisternis Beneden',
+  briefingTitle: 'Missie 2: Duisternis Beneden',
+  briefingText:
+    'De Randstad boort tunnels onder de Maas. Maar wij kennen het ondergrondse beter ' +
+    'dan wie dan ook. Bouw het Limburgse tunnelnetwerk en gebruik het om je eenheden ' +
+    'snel door het Heuvelland te verplaatsen.\n\n' +
+    'Verbind drie grotten tot een netwerk, transporteer je troepen ondergronds, en ' +
+    'vernietig de Randstad-boorinstallatie voordat ze jouw basis bereiken.\n\n' +
+    'Onder de grond zijn wij onverslaanbaar.',
+
+  mapSize: 128,
+  startingGold: 250,
+  startingGoldAI: 200,
+
+  buildings: [
+    // Player: Grottentempel + Heuvelfort (barracks) in southwest
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.TownHall, x: -45, z: -40, complete: true },
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.Barracks, x: -37, z: -40, complete: true },
+    // Enemy: Boorinstallatie (TownHall proxy) in northeast + barracks
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: 40, z: 35, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 35, z: 40, complete: true },
+  ],
+
+  units: [
+    // Player: 5 workers + 2 infantry
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -43, z: -38 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -41, z: -38 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -39, z: -38 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -43, z: -36 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -41, z: -36 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -35, z: -38 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -35, z: -36 },
+    // Enemy: static defenders around boorinstallatie
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 38, z: 33 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 42, z: 33 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 40, z: 37 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 38, z: 37 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 42, z: 37 },
+    // Enemy: patrol in center
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 0, z: 0 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 2, z: -2 },
+  ],
+
+  goldMines: [
+    { x: -35, z: -35, amount: 2000 },  // Near player base
+    { x: -40, z: -20, amount: 2000 },  // Second node southwest
+    { x: 0, z: -10, amount: 2500 },    // Center, contested
+    { x: 30, z: 25, amount: 2000 },    // Near enemy
+  ],
+
+  treeResources: [
+    { x: -30, z: -30, amount: 1000 },
+    { x: -20, z: -20, amount: 800 },
+    { x: 10, z: 10, amount: 800 },
+    { x: -10, z: 0, amount: 600 },
+  ],
+
+  objectives: [
+    { id: 'destroy-boorinstallatie', type: 'destroy-building', description: 'Vernietig de Randstad-boorinstallatie', targetValue: 1, isBonus: false },
+    { id: 'train-8-units', type: 'train-units', description: 'Train 8 militaire eenheden', targetValue: 8, isBonus: false },
+    { id: 'no-th-loss', type: 'no-townhall-loss', description: 'Verlies je Grottentempel niet', targetValue: 0, isBonus: true },
+    { id: 'have-12-units', type: 'have-units-at-end', description: 'Heb 12+ eenheden aan het einde', targetValue: 12, isBonus: true },
+  ],
+
+  triggers: [
+    {
+      id: 'start-narrator',
+      condition: { type: 'time', seconds: 3 },
+      actions: [{ type: 'message', text: 'De Mijnbaas: "Ze boren. Die Randstedelingen boren recht naar ons toe. Dit stoppen we. NU."' }],
+      once: true,
+    },
+    {
+      id: 'tip-tunnels',
+      condition: { type: 'time', seconds: 20 },
+      actions: [{ type: 'message', text: 'Bouw Grotten (LumberCamp) op strategische punten. Ze functioneren als tunneluitgangen — je eenheden kunnen er snel tussen bewegen.' }],
+      once: true,
+    },
+    {
+      id: 'patrol-warning',
+      condition: { type: 'time', seconds: 120 },
+      actions: [{ type: 'message', text: 'Randstad-patrouilles gesignaleerd in het centrum. Gebruik je tunnelnetwerk om ze te omsingelen!' }],
+      once: true,
+    },
+    {
+      id: 'reinforcements-1',
+      condition: { type: 'time', seconds: 240 },
+      actions: [
+        { type: 'message', text: 'Meer Randstad-troepen stromen de tunnel in! Ze versterken de boorinstallatie!' },
+        {
+          type: 'spawn-units',
+          units: [
+            { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 44, z: 40 },
+            { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 44, z: 38 },
+            { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 44, z: 42 },
+          ],
+        },
+      ],
+      once: true,
+    },
+    {
+      id: 'timer-warning',
+      condition: { type: 'time', seconds: 480 },
+      actions: [{ type: 'message', text: 'De boormachine komt dichterbij! Vernietig de installatie voordat ze onze basis bereiken!' }],
+      once: true,
+    },
+    {
+      id: 'victory-destroy',
+      condition: { type: 'building-destroyed', factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall },
+      actions: [
+        { type: 'message', text: 'De boorinstallatie is vernietigd! Manager: "Maar de projectleider zei dat dit een risicoloos project was!" De Mijnbaas grijnst.' },
+        { type: 'victory' },
+      ],
+      once: true,
+    },
+  ],
+
+  waves: [],
+  hasAIProduction: false,
+
+  starThresholds: {
+    threeStarTime: 420,  // 7 min
+    twoStarTime: 600,    // 10 min
+    allBonusesGrants3Stars: true,
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Limburgers Missie 3: "De Vlaaiproductie" (Economy + defense)
+// ---------------------------------------------------------------------------
+
+const LIMBURGERS_MISSION_3_VLAAIPRODUCTIE: MissionDefinition = {
+  id: 'limburgers-3-de-vlaaiproductie',
+  campaignId: 'limburgers',
+  missionIndex: 2,
+  title: 'De Vlaaiproductie',
+  briefingTitle: 'Missie 3: De Vlaaiproductie',
+  briefingText:
+    'Maastricht heeft honger. De stad vraagt 500 Vlaai om de wintervoorraad te vullen — ' +
+    'en jij bent de enige die kan leveren. Maar de Randstad weet dat ook.\n\n' +
+    'Ze sturen plunderaars om je Vlaaimijnen te saboteren en je transport te onderscheppen. ' +
+    'Bouw een sterke economie, verdedig je Mijnwerkers tegen raids, en lever de Vlaai ' +
+    'voordat Maastricht hongert.\n\n' +
+    'In Limburg zeggen ze: "Wie de Vlaai beheerst, beheerst het land."',
+
+  mapSize: 128,
+  startingGold: 150,
+  startingGoldAI: 0,
+
+  buildings: [
+    // Player: Grottentempel + LumberCamp (tunnel node) + Barracks in center-west
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.TownHall, x: -40, z: 0, complete: true },
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.LumberCamp, x: -32, z: 0, complete: true },
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.Barracks, x: -40, z: 8, complete: true },
+  ],
+
+  units: [
+    // Player: 6 workers (economy focus) + 2 infantry + 1 ranged
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -38, z: -2 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -36, z: -2 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -34, z: -2 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -38, z: 2 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -36, z: 2 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -34, z: 2 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -30, z: -2 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -30, z: 2 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: -28, z: 0 },
+  ],
+
+  goldMines: [
+    { x: -30, z: -10, amount: 2500 },  // Close, southwest
+    { x: -30, z: 10, amount: 2500 },   // Close, northwest
+    { x: -15, z: 0, amount: 3000 },    // Center, exposed
+    { x: 10, z: -15, amount: 2000 },   // Far, near raid spawns
+    { x: 10, z: 15, amount: 2000 },    // Far, near raid spawns
+  ],
+
+  treeResources: [
+    { x: -35, z: -15, amount: 1000 },
+    { x: -35, z: 15, amount: 1000 },
+    { x: -20, z: -10, amount: 800 },
+    { x: -20, z: 10, amount: 800 },
+    { x: 0, z: 0, amount: 600 },
+  ],
+
+  objectives: [
+    { id: 'gather-500', type: 'gather-gold', description: 'Verzamel 500 Vlaai voor Maastricht', targetValue: 500, isBonus: false },
+    { id: 'survive-raids', type: 'survive-waves', description: 'Overleef alle 4 Randstad-plunderaarsraids', targetValue: 4, isBonus: false },
+    { id: 'no-worker-loss', type: 'no-worker-loss', description: 'Verlies geen Mijnwerkers', targetValue: 0, isBonus: true },
+    { id: 'have-15-units', type: 'have-units-at-end', description: 'Heb 15+ eenheden aan het einde', targetValue: 15, isBonus: true },
+  ],
+
+  triggers: [
+    {
+      id: 'start-narrator',
+      condition: { type: 'time', seconds: 3 },
+      actions: [{ type: 'message', text: 'De Mijnbaas: "Maastricht hongert. 500 Vlaai. Geen excuses. En pas op — de Randstad wil onze economie ontwrichten."' }],
+      once: true,
+    },
+    {
+      id: 'tip-economy',
+      condition: { type: 'time', seconds: 30 },
+      actions: [{ type: 'message', text: 'Focus op Vlaai-verzameling. Stuur meerdere Mijnwerkers naar elke mijn. Bouw extra tunnels om snel tussen mijnen te wisselen.' }],
+      once: true,
+    },
+    {
+      id: 'raid-1-warning',
+      condition: { type: 'time', seconds: 75 },
+      actions: [{ type: 'message', text: 'Verkenners melden: Randstad-plunderaars naderen vanuit het oosten!' }],
+      once: true,
+    },
+    {
+      id: 'raid-1-spawn',
+      condition: { type: 'time', seconds: 90 },
+      actions: [
+        { type: 'message', text: 'RAID 1! Randstad-plunderaars vallen je Mijnwerkers aan! Bescherm de mijnen!' },
+        { type: 'spawn-wave', waveIndex: 0 },
+      ],
+      once: true,
+    },
+    {
+      id: 'raid-2-warning',
+      condition: { type: 'time', seconds: 195 },
+      actions: [{ type: 'message', text: 'Meer plunderaars in aantocht... ze komen van twee kanten!' }],
+      once: true,
+    },
+    {
+      id: 'raid-2-spawn',
+      condition: { type: 'time', seconds: 210 },
+      actions: [
+        { type: 'message', text: 'RAID 2! Een grotere groep — ze richten zich op je buitenste mijnen!' },
+        { type: 'spawn-wave', waveIndex: 1 },
+      ],
+      once: true,
+    },
+    {
+      id: 'raid-3-warning',
+      condition: { type: 'time', seconds: 345 },
+      actions: [{ type: 'message', text: 'De Randstad stuurt nu serieuze troepen. Ze willen je economie permanent platleggen.' }],
+      once: true,
+    },
+    {
+      id: 'raid-3-spawn',
+      condition: { type: 'time', seconds: 360 },
+      actions: [
+        { type: 'message', text: 'RAID 3! Infanterie en boogschutters! Verdedig de Vlaaiproductie!' },
+        { type: 'spawn-wave', waveIndex: 2 },
+      ],
+      once: true,
+    },
+    {
+      id: 'raid-4-warning',
+      condition: { type: 'time', seconds: 495 },
+      actions: [{ type: 'message', text: 'LAATSTE RAID nadert! Dit is hun grootste poging om je te stoppen!' }],
+      once: true,
+    },
+    {
+      id: 'raid-4-spawn',
+      condition: { type: 'time', seconds: 510 },
+      actions: [
+        { type: 'message', text: 'RAID 4! Alles of niets — de Randstad gooit er alles tegenaan!' },
+        { type: 'spawn-wave', waveIndex: 3 },
+      ],
+      once: true,
+    },
+    {
+      id: 'all-raids-survived',
+      condition: { type: 'all-waves-defeated' },
+      actions: [
+        { type: 'message', text: 'Alle raids afgeslagen! Blijf Vlaai verzamelen voor Maastricht.' },
+      ],
+      once: true,
+    },
+    {
+      id: 'victory-gather',
+      condition: { type: 'gold-reached', amount: 500 },
+      actions: [
+        { type: 'message', text: '500 Vlaai geleverd! Maastricht juicht! De Mijnbaas: "Wie de Vlaai beheerst, beheerst het land. En dat zijn wij."' },
+        { type: 'victory' },
+      ],
+      once: true,
+    },
+  ],
+
+  waves: [
+    // Raid 1 (T=90s): 3 Infantry — light raid from east
+    {
+      index: 0,
+      spawnTime: 90,
+      units: createLimbWaveUnits(3, UnitTypeId.Infantry, 40, 0, 3),
+      message: 'Raid 1 van 4',
+    },
+    // Raid 2 (T=210s): 4 Infantry + 2 Ranged — two-pronged from northeast/southeast
+    {
+      index: 1,
+      spawnTime: 210,
+      units: [
+        ...createLimbWaveUnits(2, UnitTypeId.Infantry, 35, -20, 2),
+        ...createLimbWaveUnits(2, UnitTypeId.Infantry, 35, 20, 2),
+        ...createLimbWaveUnits(1, UnitTypeId.Ranged, 37, -18, 1),
+        ...createLimbWaveUnits(1, UnitTypeId.Ranged, 37, 18, 1),
+      ],
+      message: 'Raid 2 van 4',
+    },
+    // Raid 3 (T=360s): 5 Infantry + 3 Ranged — main force from east
+    {
+      index: 2,
+      spawnTime: 360,
+      units: [
+        ...createLimbWaveUnits(5, UnitTypeId.Infantry, LIMB_WAVE_EAST_X, LIMB_WAVE_EAST_Z, 4),
+        ...createLimbWaveUnits(3, UnitTypeId.Ranged, LIMB_WAVE_EAST_X + 3, LIMB_WAVE_EAST_Z + 3, 2),
+      ],
+      message: 'Raid 3 van 4',
+    },
+    // Raid 4 (T=510s): 7 Infantry + 4 Ranged + 1 Heavy — full assault
+    {
+      index: 3,
+      spawnTime: 510,
+      units: [
+        ...createLimbWaveUnits(7, UnitTypeId.Infantry, LIMB_WAVE_EAST_X, LIMB_WAVE_EAST_Z, 5),
+        ...createLimbWaveUnits(4, UnitTypeId.Ranged, LIMB_WAVE_EAST_X + 4, LIMB_WAVE_EAST_Z + 4, 3),
+        ...createLimbWaveUnits(1, UnitTypeId.Heavy, LIMB_WAVE_EAST_X, LIMB_WAVE_EAST_Z, 1),
+      ],
+      message: 'LAATSTE RAID!',
+    },
+  ],
+
+  hasAIProduction: false,
+
+  starThresholds: {
+    threeStarTime: 540,   // 9 min
+    twoStarTime: 780,     // 13 min
+    allBonusesGrants3Stars: true,
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Limburgers Missie 4: "Verrassingsaanval" (Tunnel assault — AI production)
+// ---------------------------------------------------------------------------
+
+const LIMBURGERS_MISSION_4_VERRASSINGSAANVAL: MissionDefinition = {
+  id: 'limburgers-4-verrassingsaanval',
+  campaignId: 'limburgers',
+  missionIndex: 3,
+  title: 'Verrassingsaanval',
+  briefingTitle: 'Missie 4: Verrassingsaanval',
+  briefingText:
+    'De Randstad heeft een voorpost gebouwd in Venlo. Ze bewaken de bruggen en controleren ' +
+    'de handelsroutes. Een frontale aanval is zelfmoord — ze hebben te veel troepen.\n\n' +
+    'Maar ze vergeten een ding: Limburgers komen niet over de weg. Wij komen van onder de grond.\n\n' +
+    'Bouw een tunnelnetwerk tot achter hun linies, sla toe waar ze het niet verwachten, en ' +
+    'vernietig het Randstad-Hoofdkantoor voordat ze doorhebben wat er gebeurt.\n\n' +
+    'De Mijnbaas: "Laat ze voelen hoe het is als de grond onder hun voeten vandaan wordt gehaald."',
+
+  mapSize: 128,
+  startingGold: 350,
+  startingGoldAI: 500,
+
+  buildings: [
+    // Player: base in southwest with tunnel node
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.TownHall, x: -45, z: -40, complete: true },
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.Barracks, x: -37, z: -40, complete: true },
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.LumberCamp, x: -45, z: -32, complete: true },
+    // Enemy: fortified base in northeast — heavy front defense, weak rear
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: 40, z: 35, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 32, z: 35, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 40, z: 27, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Blacksmith, x: 35, z: 30, complete: true },
+  ],
+
+  units: [
+    // Player: 5 workers + 3 infantry + 2 ranged
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -43, z: -38 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -41, z: -38 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -39, z: -38 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -43, z: -36 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -41, z: -36 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -35, z: -38 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -35, z: -36 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -33, z: -37 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: -33, z: -39 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: -33, z: -35 },
+    // Enemy: heavy front line (facing southwest — bridge chokepoint)
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 20, z: 15 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 22, z: 13 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 18, z: 17 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 24, z: 15 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 22, z: 17 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 20, z: 13 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Heavy, x: 21, z: 15 },
+    // Enemy: light rear guard (vulnerable to tunnel attack)
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 42, z: 38 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 38, z: 38 },
+  ],
+
+  goldMines: [
+    { x: -35, z: -40, amount: 2500 },  // Near player
+    { x: -40, z: -25, amount: 2500 },  // Southwest
+    { x: 0, z: 0, amount: 3000 },      // Center — contested, risky
+    { x: 35, z: 40, amount: 2000 },    // Behind enemy (reward for tunneling)
+  ],
+
+  treeResources: [
+    { x: -40, z: -35, amount: 1000 },
+    { x: -30, z: -25, amount: 800 },
+    { x: -10, z: -10, amount: 600 },
+    { x: 20, z: 20, amount: 600 },
+  ],
+
+  objectives: [
+    { id: 'destroy-enemy-th', type: 'destroy-building', description: 'Vernietig het Randstad-Hoofdkantoor', targetValue: 1, isBonus: false },
+    { id: 'train-10-units', type: 'train-units', description: 'Train 10 militaire eenheden', targetValue: 10, isBonus: false },
+    { id: 'no-th-loss', type: 'no-townhall-loss', description: 'Verlies je Grottentempel niet', targetValue: 0, isBonus: true },
+    { id: 'destroy-all-barracks', type: 'destroy-building', description: 'Vernietig alle vijandelijke Kazernes', targetValue: 2, isBonus: true },
+  ],
+
+  triggers: [
+    {
+      id: 'start-narrator',
+      condition: { type: 'time', seconds: 3 },
+      actions: [{ type: 'message', text: 'De Mijnbaas: "De bruggen zijn bewaakt. Maar wie zegt dat we over bruggen moeten? Graaf tunnels. Sla toe van achteren."' }],
+      once: true,
+    },
+    {
+      id: 'tip-tunnels',
+      condition: { type: 'time', seconds: 20 },
+      actions: [{ type: 'message', text: 'Bouw Grotten achter de vijandelijke linies. Hun front is sterk, maar hun achterkant is onbewaakt. Dat is hun fout.' }],
+      once: true,
+    },
+    {
+      id: 'army-5',
+      condition: { type: 'army-count', count: 5 },
+      actions: [{ type: 'message', text: 'Je leger groeit. Gebruik tunnels om snel achter de vijand te verschijnen. Ze bewaken de bruggen — wij graven eronderdoor.' }],
+      once: true,
+    },
+    {
+      id: 'enemy-reinforcements',
+      condition: { type: 'time', seconds: 300 },
+      actions: [
+        { type: 'message', text: 'Randstad-versterkingen arriveren bij de bruggen! Hun front wordt sterker — maar de achterkant blijft kwetsbaar!' },
+        {
+          type: 'spawn-units',
+          units: [
+            { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 16, z: 12 },
+            { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 24, z: 18 },
+            { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 20, z: 18 },
+            { factionId: FactionId.Randstad, unitType: UnitTypeId.Heavy, x: 20, z: 12 },
+          ],
+        },
+      ],
+      once: true,
+    },
+    {
+      id: 'enemy-barracks-destroyed',
+      condition: { type: 'building-destroyed', factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks },
+      actions: [{ type: 'message', text: 'Een vijandelijke Kazerne is vernietigd! Ze kunnen minder troepen trainen. Druk door!' }],
+      once: true,
+    },
+    {
+      id: 'victory-destroy',
+      condition: { type: 'building-destroyed', factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall },
+      actions: [
+        { type: 'message', text: 'Het Randstad-Hoofdkantoor ligt in puin! De Mijnbaas: "Venlo is van ons. Ze hadden moeten weten: de Limburger komt altijd van onderen."' },
+        { type: 'victory' },
+      ],
+      once: true,
+    },
+  ],
+
+  waves: [],
+  hasAIProduction: true,
+
+  starThresholds: {
+    threeStarTime: 600,   // 10 min
+    twoStarTime: 900,     // 15 min
+    allBonusesGrants3Stars: true,
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Limburgers Missie 5: "De Mergelmuren" (Fortress defense — 5 waves)
+// ---------------------------------------------------------------------------
+
+const LIMB_DEFENSE_SPAWN_NE_X = 45;
+const LIMB_DEFENSE_SPAWN_NE_Z = 35;
+const LIMB_DEFENSE_SPAWN_NW_X = -20;
+const LIMB_DEFENSE_SPAWN_NW_Z = 40;
+
+const LIMBURGERS_MISSION_5_MERGELMUREN: MissionDefinition = {
+  id: 'limburgers-5-de-mergelmuren',
+  campaignId: 'limburgers',
+  missionIndex: 4,
+  title: 'De Mergelmuren',
+  briefingTitle: 'Missie 5: De Mergelmuren',
+  briefingText:
+    'De Randstad is woedend over Venlo. Ze sturen een invasiemacht — de grootste die ' +
+    'Limburg ooit heeft gezien. Maar wij zijn voorbereid.\n\n' +
+    'De Mergelmuren staan: een verdedigingslinie door de heuvels, versterkt met ' +
+    'tunneluitgangen voor snelle hergroepering. Vijf golven komen eraan. ' +
+    'Gebruik het terrein, gebruik de tunnels, en gebruik de Vlaai.\n\n' +
+    'De Mijnbaas: "Ze denken dat ze kunnen binnenvallen? Laat ze lopen tegen ons mergel. ' +
+    'Mergel breekt niet."',
+
+  mapSize: 128,
+  startingGold: 500,
+  startingGoldAI: 0,
+
+  buildings: [
+    // Player: fortified position in south-center with tunnel nodes
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.TownHall, x: 0, z: -40, complete: true },
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.Barracks, x: 8, z: -40, complete: true },
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.Barracks, x: -8, z: -40, complete: true },
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.Blacksmith, x: 0, z: -48, complete: true },
+    // Forward tunnel nodes (LumberCamps as tunnel exits)
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.LumberCamp, x: -20, z: -20, complete: true },
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.LumberCamp, x: 20, z: -20, complete: true },
+  ],
+
+  units: [
+    // Player: 5 workers + 6 infantry + 3 ranged + 1 heavy
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -2, z: -38 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: 0, z: -38 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: 2, z: -38 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -2, z: -36 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: 2, z: -36 },
+    // Forward defenders — left flank
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -18, z: -18 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -22, z: -18 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: -20, z: -16 },
+    // Forward defenders — right flank
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 18, z: -18 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 22, z: -18 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 20, z: -16 },
+    // Center reserve
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -2, z: -30 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 2, z: -30 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 0, z: -28 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 0, z: -32 },
+  ],
+
+  goldMines: [
+    { x: -10, z: -40, amount: 3000 },  // Near base, left
+    { x: 10, z: -40, amount: 3000 },   // Near base, right
+    { x: 0, z: -50, amount: 2500 },    // Behind base, safe
+    { x: -25, z: -30, amount: 2000 },  // Left flank, exposed
+    { x: 25, z: -30, amount: 2000 },   // Right flank, exposed
+  ],
+
+  treeResources: [
+    { x: -15, z: -40, amount: 1000 },
+    { x: 15, z: -40, amount: 1000 },
+    { x: -5, z: -45, amount: 800 },
+    { x: 5, z: -45, amount: 800 },
+    { x: -30, z: -25, amount: 600 },
+    { x: 30, z: -25, amount: 600 },
+  ],
+
+  objectives: [
+    { id: 'survive-waves', type: 'survive-waves', description: 'Overleef 5 Randstad-aanvalsgolven', targetValue: 5, isBonus: false },
+    { id: 'no-th-loss', type: 'no-townhall-loss', description: 'Verlies je Grottentempel niet', targetValue: 0, isBonus: true },
+    { id: 'have-25-units', type: 'have-units-at-end', description: 'Heb 25+ eenheden aan het einde', targetValue: 25, isBonus: true },
+  ],
+
+  triggers: [
+    {
+      id: 'start-narrator',
+      condition: { type: 'time', seconds: 3 },
+      actions: [{ type: 'message', text: 'De Mergelmuren staan. De tunnels zijn klaar. Nu wachten we. De Mijnbaas: "Laat ze maar komen."' }],
+      once: true,
+    },
+    {
+      id: 'tip-defense',
+      condition: { type: 'time', seconds: 15 },
+      actions: [{ type: 'message', text: 'Gebruik de tunneluitgangen om troepen snel te hergroeperen. Train meer eenheden — de golven worden steeds groter.' }],
+      once: true,
+    },
+    {
+      id: 'wave-1-warning',
+      condition: { type: 'time', seconds: 55 },
+      actions: [{ type: 'message', text: 'Stof aan de horizon! De eerste golf van de Randstad-invasie nadert vanuit het noordoosten!' }],
+      once: true,
+    },
+    {
+      id: 'wave-1-spawn',
+      condition: { type: 'time', seconds: 70 },
+      actions: [
+        { type: 'message', text: 'GOLF 1! Randstad-infanterie! Houd de Mergelmuren!' },
+        { type: 'spawn-wave', waveIndex: 0 },
+      ],
+      once: true,
+    },
+    {
+      id: 'wave-2-warning',
+      condition: { type: 'time', seconds: 190 },
+      actions: [{ type: 'message', text: 'De tweede golf formeert zich... ze sturen nu boogschutters mee.' }],
+      once: true,
+    },
+    {
+      id: 'wave-2-spawn',
+      condition: { type: 'time', seconds: 210 },
+      actions: [
+        { type: 'message', text: 'GOLF 2! Gemengde troepen vanuit het noorden! Verdedig beide flanken!' },
+        { type: 'spawn-wave', waveIndex: 1 },
+      ],
+      once: true,
+    },
+    {
+      id: 'wave-3-warning',
+      condition: { type: 'time', seconds: 345 },
+      actions: [{ type: 'message', text: 'De grond dreunt... ze brengen zware eenheden. Gebruik je tunnels om te hergroeperen!' }],
+      once: true,
+    },
+    {
+      id: 'wave-3-spawn',
+      condition: { type: 'time', seconds: 360 },
+      actions: [
+        { type: 'message', text: 'GOLF 3! Zware infanterie en boogschutters vanuit twee richtingen!' },
+        { type: 'spawn-wave', waveIndex: 2 },
+      ],
+      once: true,
+    },
+    {
+      id: 'wave-4-warning',
+      condition: { type: 'time', seconds: 495 },
+      actions: [{ type: 'message', text: 'De Mijnbaas: "Dit wordt de zwaarste tot nu toe. Iedereen op zijn positie!"' }],
+      once: true,
+    },
+    {
+      id: 'wave-4-spawn',
+      condition: { type: 'time', seconds: 510 },
+      actions: [
+        { type: 'message', text: 'GOLF 4! Een massaal offensief! Ze willen de tunnels doorbreken!' },
+        { type: 'spawn-wave', waveIndex: 3 },
+      ],
+      once: true,
+    },
+    {
+      id: 'wave-5-warning',
+      condition: { type: 'time', seconds: 645 },
+      actions: [{ type: 'message', text: 'LAATSTE GOLF nadert! Alles wat de Randstad heeft stroomt over de heuvels! Dit is het moment van de waarheid!' }],
+      once: true,
+    },
+    {
+      id: 'wave-5-spawn',
+      condition: { type: 'time', seconds: 660 },
+      actions: [
+        { type: 'message', text: 'LAATSTE GOLF! DE VOLLEDIGE RANDSTAD-INVASIEMACHT! HOUD STAND VOOR LIMBURG!' },
+        { type: 'spawn-wave', waveIndex: 4 },
+      ],
+      once: true,
+    },
+    {
+      id: 'all-waves-victory',
+      condition: { type: 'all-waves-defeated' },
+      actions: [
+        { type: 'message', text: 'De Randstad trekt zich terug! De Mergelmuren houden stand! De Mijnbaas heft zijn houweel: "Mergel breekt niet. En wij ook niet."' },
+        { type: 'victory' },
+      ],
+      once: true,
+    },
+  ],
+
+  waves: [
+    // Wave 1 (T=70s): 5 Infantry from northeast — probing attack
+    {
+      index: 0,
+      spawnTime: 70,
+      units: createLimbWaveUnits(5, UnitTypeId.Infantry, LIMB_DEFENSE_SPAWN_NE_X, LIMB_DEFENSE_SPAWN_NE_Z, 3),
+      message: 'Golf 1 van 5',
+    },
+    // Wave 2 (T=210s): 6 Infantry + 3 Ranged from both flanks
+    {
+      index: 1,
+      spawnTime: 210,
+      units: [
+        ...createLimbWaveUnits(3, UnitTypeId.Infantry, LIMB_DEFENSE_SPAWN_NE_X, LIMB_DEFENSE_SPAWN_NE_Z, 3),
+        ...createLimbWaveUnits(3, UnitTypeId.Infantry, LIMB_DEFENSE_SPAWN_NW_X, LIMB_DEFENSE_SPAWN_NW_Z, 3),
+        ...createLimbWaveUnits(2, UnitTypeId.Ranged, LIMB_DEFENSE_SPAWN_NE_X + 3, LIMB_DEFENSE_SPAWN_NE_Z + 3, 2),
+        ...createLimbWaveUnits(1, UnitTypeId.Ranged, LIMB_DEFENSE_SPAWN_NW_X - 3, LIMB_DEFENSE_SPAWN_NW_Z + 3, 1),
+      ],
+      message: 'Golf 2 van 5',
+    },
+    // Wave 3 (T=360s): 8 Infantry + 4 Ranged + 2 Heavy — serious assault
+    {
+      index: 2,
+      spawnTime: 360,
+      units: [
+        ...createLimbWaveUnits(4, UnitTypeId.Infantry, LIMB_DEFENSE_SPAWN_NE_X, LIMB_DEFENSE_SPAWN_NE_Z, 4),
+        ...createLimbWaveUnits(4, UnitTypeId.Infantry, LIMB_DEFENSE_SPAWN_NW_X, LIMB_DEFENSE_SPAWN_NW_Z, 4),
+        ...createLimbWaveUnits(2, UnitTypeId.Ranged, LIMB_DEFENSE_SPAWN_NE_X + 4, LIMB_DEFENSE_SPAWN_NE_Z, 2),
+        ...createLimbWaveUnits(2, UnitTypeId.Ranged, LIMB_DEFENSE_SPAWN_NW_X - 4, LIMB_DEFENSE_SPAWN_NW_Z, 2),
+        ...createLimbWaveUnits(1, UnitTypeId.Heavy, LIMB_DEFENSE_SPAWN_NE_X, LIMB_DEFENSE_SPAWN_NE_Z - 2, 1),
+        ...createLimbWaveUnits(1, UnitTypeId.Heavy, LIMB_DEFENSE_SPAWN_NW_X, LIMB_DEFENSE_SPAWN_NW_Z - 2, 1),
+      ],
+      message: 'Golf 3 van 5',
+    },
+    // Wave 4 (T=510s): 10 Infantry + 5 Ranged + 3 Heavy — massive push
+    {
+      index: 3,
+      spawnTime: 510,
+      units: [
+        ...createLimbWaveUnits(5, UnitTypeId.Infantry, LIMB_DEFENSE_SPAWN_NE_X, LIMB_DEFENSE_SPAWN_NE_Z, 5),
+        ...createLimbWaveUnits(5, UnitTypeId.Infantry, LIMB_DEFENSE_SPAWN_NW_X, LIMB_DEFENSE_SPAWN_NW_Z, 5),
+        ...createLimbWaveUnits(3, UnitTypeId.Ranged, LIMB_DEFENSE_SPAWN_NE_X + 5, LIMB_DEFENSE_SPAWN_NE_Z, 3),
+        ...createLimbWaveUnits(2, UnitTypeId.Ranged, LIMB_DEFENSE_SPAWN_NW_X - 5, LIMB_DEFENSE_SPAWN_NW_Z, 2),
+        ...createLimbWaveUnits(2, UnitTypeId.Heavy, LIMB_DEFENSE_SPAWN_NE_X - 2, LIMB_DEFENSE_SPAWN_NE_Z - 2, 2),
+        ...createLimbWaveUnits(1, UnitTypeId.Heavy, LIMB_DEFENSE_SPAWN_NW_X + 2, LIMB_DEFENSE_SPAWN_NW_Z - 2, 1),
+      ],
+      message: 'Golf 4 van 5',
+    },
+    // Wave 5 (T=660s): 12 Infantry + 6 Ranged + 4 Heavy — all-out invasion
+    {
+      index: 4,
+      spawnTime: 660,
+      units: [
+        ...createLimbWaveUnits(6, UnitTypeId.Infantry, LIMB_DEFENSE_SPAWN_NE_X, LIMB_DEFENSE_SPAWN_NE_Z, 6),
+        ...createLimbWaveUnits(6, UnitTypeId.Infantry, LIMB_DEFENSE_SPAWN_NW_X, LIMB_DEFENSE_SPAWN_NW_Z, 6),
+        ...createLimbWaveUnits(3, UnitTypeId.Ranged, LIMB_DEFENSE_SPAWN_NE_X + 5, LIMB_DEFENSE_SPAWN_NE_Z + 3, 3),
+        ...createLimbWaveUnits(3, UnitTypeId.Ranged, LIMB_DEFENSE_SPAWN_NW_X - 5, LIMB_DEFENSE_SPAWN_NW_Z + 3, 3),
+        ...createLimbWaveUnits(2, UnitTypeId.Heavy, LIMB_DEFENSE_SPAWN_NE_X, LIMB_DEFENSE_SPAWN_NE_Z - 3, 2),
+        ...createLimbWaveUnits(2, UnitTypeId.Heavy, LIMB_DEFENSE_SPAWN_NW_X, LIMB_DEFENSE_SPAWN_NW_Z - 3, 2),
+      ],
+      message: 'LAATSTE GOLF!',
+    },
+  ],
+
+  hasAIProduction: false,
+
+  starThresholds: {
+    threeStarTime: 780,   // 13 min
+    twoStarTime: 1020,    // 17 min
+    allBonusesGrants3Stars: true,
+  },
+};
+
 // ---------------------------------------------------------------------------
 // Exports
 // ---------------------------------------------------------------------------
@@ -2671,12 +4164,33 @@ export const BRABANDERS_MISSIONS: readonly MissionDefinition[] = [
   MISSION_12_GOUDEN_WORSTENBROODJE,
 ];
 
+export const LIMBURGERS_MISSIONS: readonly MissionDefinition[] = [
+  LIMBURGERS_MISSION_1_EERSTE_SCHACHT,
+  LIMBURGERS_MISSION_2_DUISTERNIS_BENEDEN,
+  LIMBURGERS_MISSION_3_VLAAIPRODUCTIE,
+  LIMBURGERS_MISSION_4_VERRASSINGSAANVAL,
+  LIMBURGERS_MISSION_5_MERGELMUREN,
+];
+
+export const BELGEN_MISSIONS: readonly MissionDefinition[] = [
+  MISSION_B1_EERSTE_FRITUUR,
+  MISSION_B2_CHOCOLADE_VERDRAG,
+  MISSION_B3_COMMISSIEVERGADERING,
+];
+
+/** All missions across all campaigns. */
+const ALL_MISSIONS: readonly MissionDefinition[] = [
+  ...BRABANDERS_MISSIONS,
+  ...LIMBURGERS_MISSIONS,
+  ...BELGEN_MISSIONS,
+];
+
 /** Get a mission by its id. */
 export function getMissionById(id: string): MissionDefinition | undefined {
-  return BRABANDERS_MISSIONS.find(m => m.id === id);
+  return ALL_MISSIONS.find(m => m.id === id);
 }
 
 /** Get all missions for a campaign. */
 export function getCampaignMissions(campaignId: string): readonly MissionDefinition[] {
-  return BRABANDERS_MISSIONS.filter(m => m.campaignId === campaignId);
+  return ALL_MISSIONS.filter(m => m.campaignId === campaignId);
 }

@@ -158,10 +158,11 @@ export enum ExtendedFactionId {
  */
 export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
   // =========================================================================
-  // BRABANDERS
+  // BRABANDERS -- Average base stats, shine when grouped (Gezelligheid)
+  // Strength: Speed & group synergy | Weakness: Low individual armor
   // =========================================================================
   [ExtendedFactionId.Brabanders]: [
-    // Boer (Worker)
+    // Boer (Worker) -- balanced worker, average carry
     {
       typeId: UnitTypeId.Worker,
       name: 'Boer',
@@ -180,7 +181,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       sightRange: 8,
       carryCapacity: 10,
     },
-    // Carnavalvierder (Infantry -- melee)
+    // Carnavalvierder (Infantry -- melee) -- fast, mid HP, low armor
     {
       typeId: UnitTypeId.Infantry,
       name: 'Carnavalvierder',
@@ -199,7 +200,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       sightRange: 8,
       carryCapacity: 0,
     },
-    // Kansen (Ranged / Stealth)
+    // Kansen (Ranged / Stealth) -- fast ranged, glass cannon
     {
       typeId: UnitTypeId.Ranged,
       name: 'Kansen',
@@ -218,13 +219,13 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       sightRange: 10,
       carryCapacity: 0,
     },
-    // Boerinne (Support / Healer)
+    // Boerinne (Support / Healer) -- fragile healer, decent range
     {
       typeId: UnitTypeId.Ranged, // healer uses ranged slot
       name: 'Boerinne',
       brabantName: 'Boerinne',
       hp: 50,
-      attack: 8,
+      attack: 6,
       attackSpeed: 1.5,
       armor: 0,
       armorType: ArmorType.Light,
@@ -236,8 +237,9 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       population: 1,
       sightRange: 8,
       carryCapacity: 0,
+      healRate: 7,
     },
-    // Muzikant (Buffer / Debuffer) [Tier 2]
+    // Muzikant (Buffer / Debuffer) [Tier 2] -- utility, very low combat
     {
       typeId: UnitTypeId.Ranged,
       name: 'Muzikant',
@@ -256,15 +258,15 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       sightRange: 10,
       carryCapacity: 0,
     },
-    // Tractorrijder (Heavy / Cavalry) [Tier 2]
+    // Tractorrijder (Heavy / Cavalry) [Tier 2] -- mid-tank, mid-speed for Brabanders
     {
       typeId: UnitTypeId.Infantry,
       name: 'Tractorrijder',
       brabantName: 'Tractorrijder',
       hp: 200,
-      attack: 22,
+      attack: 20,
       attackSpeed: 2.0,
-      armor: 4,
+      armor: 3,
       armorType: ArmorType.Heavy,
       speed: 4.0,
       range: 0,
@@ -275,13 +277,13 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       sightRange: 8,
       carryCapacity: 0,
     },
-    // Frituurmeester (Siege) [Tier 3]
+    // Frituurmeester (Siege) [Tier 3] -- anti-building specialist
     {
       typeId: UnitTypeId.Ranged,
       name: 'Frituurmeester',
       brabantName: 'Frituurmeester',
-      hp: 100,
-      attack: 15, // 15 vs units, 45 vs buildings (building bonus handled in combat)
+      hp: 90,
+      attack: 14, // 14 vs units, 42 vs buildings (3x siegeBonus)
       attackSpeed: 3.0,
       armor: 1,
       armorType: ArmorType.Medium,
@@ -293,14 +295,15 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       population: 3,
       sightRange: 10,
       carryCapacity: 0,
+      siegeBonus: 3.0,
     },
-    // Praalwagen (Super Siege) [Tier 3]
+    // Praalwagen (Super Siege) [Tier 3] -- slow, expensive, building-destroyer
     {
       typeId: UnitTypeId.Ranged,
       name: 'Praalwagen',
       brabantName: 'Praalwagen',
-      hp: 300,
-      attack: 60, // buildings only
+      hp: 280,
+      attack: 55, // primarily buildings
       attackSpeed: 4.0,
       armor: 3,
       armorType: ArmorType.Heavy,
@@ -312,14 +315,16 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       population: 4,
       sightRange: 10,
       carryCapacity: 0,
+      siegeBonus: 4.0,
     },
   ],
 
   // =========================================================================
-  // RANDSTAD
+  // RANDSTAD -- Slow start, late-game power. Higher individual stats, expensive.
+  // Strength: High individual unit power & range | Weakness: Slow speed, expensive early game
   // =========================================================================
   [ExtendedFactionId.Randstad]: [
-    // Stagiair (Worker)
+    // Stagiair (Worker) -- cheap but fragile, low carry
     {
       typeId: UnitTypeId.Worker,
       name: 'Stagiair',
@@ -338,32 +343,32 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       sightRange: 8,
       carryCapacity: 8,
     },
-    // Manager (Ranged / Debuff)
+    // Manager (Ranged / Debuff) -- strong ranged harasser, expensive
     {
       typeId: UnitTypeId.Infantry,
       name: 'Manager',
       brabantName: 'Manager',
-      hp: 70,
-      attack: 9,
+      hp: 75,
+      attack: 10,
       attackSpeed: 1.5,
       armor: 1,
       armorType: ArmorType.Medium,
       speed: 4.5,
       range: 7,
       buildTime: 22,
-      costGold: 90,
-      costSecondary: 30,
+      costGold: 95,
+      costSecondary: 35,
       population: 1,
       sightRange: 9,
       carryCapacity: 0,
     },
-    // Consultant (Debuff specialist)
+    // Consultant (Debuff specialist) -- 0 direct damage is intentional
     {
       typeId: UnitTypeId.Ranged,
       name: 'Consultant',
       brabantName: 'Consultant',
       hp: 55,
-      attack: 0, // does NO direct damage
+      attack: 3, // minimal damage, primarily a debuffer
       attackSpeed: 1.8,
       armor: 0,
       armorType: ArmorType.Light,
@@ -376,7 +381,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       sightRange: 11,
       carryCapacity: 0,
     },
-    // Hipster (Scout) [Tier 2]
+    // Hipster (Scout) [Tier 2] -- very fast, fragile, great vision
     {
       typeId: UnitTypeId.Ranged,
       name: 'Hipster',
@@ -395,74 +400,75 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       sightRange: 14,
       carryCapacity: 0,
     },
-    // HR-Medewerker (Support / Healer) [Tier 2]
+    // HR-Medewerker (Support / Healer) [Tier 2] -- better range than Boerinne, costlier
     {
       typeId: UnitTypeId.Ranged,
       name: 'HR-Medewerker',
       brabantName: 'HR-Medewerker',
       hp: 55,
-      attack: 5,
+      attack: 4,
       attackSpeed: 1.5,
       armor: 0,
       armorType: ArmorType.Light,
       speed: 4.5,
       range: 7,
       buildTime: 25,
-      costGold: 90,
+      costGold: 95,
       costSecondary: 70,
       population: 1,
-      sightRange: 8,
+      sightRange: 9,
       carryCapacity: 0,
+      healRate: 8,
     },
-    // Corporate Advocaat (Heavy melee) [Tier 2]
+    // Corporate Advocaat (Heavy melee) [Tier 2] -- expensive powerhouse
     {
       typeId: UnitTypeId.Infantry,
       name: 'Corporate Advocaat',
       brabantName: 'Corporate Advocaat',
-      hp: 180,
+      hp: 190,
       attack: 18,
       attackSpeed: 2.0,
       armor: 4,
       armorType: ArmorType.Heavy,
       speed: 3.5,
       range: 0,
-      buildTime: 35,
-      costGold: 175,
-      costSecondary: 125,
+      buildTime: 38,
+      costGold: 185,
+      costSecondary: 130,
       population: 2,
       sightRange: 8,
       carryCapacity: 0,
     },
-    // Influencer (Ranged / AoE) [Tier 2]
+    // Influencer (Ranged / AoE) [Tier 2] -- high range, glass cannon
     {
       typeId: UnitTypeId.Ranged,
       name: 'Influencer',
       brabantName: 'Influencer',
       hp: 45,
-      attack: 8,
+      attack: 9,
       attackSpeed: 1.5,
       armor: 0,
       armorType: ArmorType.Light,
       speed: 5.5,
       range: 8,
       buildTime: 20,
-      costGold: 80,
+      costGold: 85,
       costSecondary: 60,
       population: 1,
       sightRange: 10,
       carryCapacity: 0,
     },
-    // Vastgoedmakelaar (Siege) [Tier 3]
+    // Vastgoedmakelaar (Siege) [Tier 3] -- longest range siege, slow fire rate
     {
       typeId: UnitTypeId.Ranged,
       name: 'Vastgoedmakelaar',
       brabantName: 'Vastgoedmakelaar',
-      hp: 90,
-      attack: 10, // 10 vs units, 50 vs buildings
+      hp: 85,
+      attack: 12, // 12 vs units, 48 vs buildings (4x siegeBonus)
       attackSpeed: 3.5,
       armor: 1,
       armorType: ArmorType.Medium,
-      speed: 3.5,
+      speed: 3.0,
       range: 11,
       buildTime: 45,
       costGold: 225,
@@ -470,128 +476,132 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       population: 3,
       sightRange: 10,
       carryCapacity: 0,
+      siegeBonus: 4.0,
     },
   ],
 
   // =========================================================================
-  // LIMBURGERS
+  // LIMBURGERS -- Durable but slow. High HP/Armor, low speed. Cheaper units.
+  // Strength: HP & Armor (tankiest faction) | Weakness: Speed (slowest faction)
   // =========================================================================
   [ExtendedFactionId.Limburgers]: [
-    // Mijnwerker (Worker)
+    // Mijnwerker (Worker) -- toughest worker, slow, armored
     {
       typeId: UnitTypeId.Worker,
       name: 'Mijnwerker',
       brabantName: 'Mijnwerker',
-      hp: 65,
+      hp: 70,
       attack: 7,
       attackSpeed: 1.5,
       armor: 1,
       armorType: ArmorType.Light,
-      speed: 4.5,
+      speed: 4.0,
       range: 0,
       buildTime: 16,
-      costGold: 55,
+      costGold: 50,
       costSecondary: 0,
       population: 1,
-      sightRange: 8,
+      sightRange: 7,
       carryCapacity: 10,
     },
-    // Schutterij (Infantry -- ranged)
+    // Schutterij (Infantry -- ranged) -- durable ranged, slow, armored
     {
       typeId: UnitTypeId.Ranged,
       name: 'Schutterij',
       brabantName: 'Schutterij',
-      hp: 70,
-      attack: 14,
+      hp: 75,
+      attack: 13,
       attackSpeed: 1.8,
-      armor: 1,
+      armor: 2,
       armorType: ArmorType.Medium,
-      speed: 4.5,
+      speed: 4.0,
       range: 9,
       buildTime: 22,
-      costGold: 85,
-      costSecondary: 35,
+      costGold: 80,
+      costSecondary: 30,
       population: 1,
       sightRange: 10,
       carryCapacity: 0,
     },
-    // Vlaaienwerper (Ranged / Specialist)
+    // Vlaaienwerper (Ranged / Specialist) -- AoE debuffer, cheap
     {
       typeId: UnitTypeId.Ranged,
       name: 'Vlaaienwerper',
       brabantName: 'Vlaaienwerper',
-      hp: 50,
+      hp: 55,
       attack: 10,
       attackSpeed: 1.6,
       armor: 0,
       armorType: ArmorType.Light,
-      speed: 5.0,
+      speed: 4.5,
       range: 8,
       buildTime: 18,
-      costGold: 65,
-      costSecondary: 45,
+      costGold: 60,
+      costSecondary: 40,
       population: 1,
       sightRange: 9,
       carryCapacity: 0,
     },
-    // Mergelridder (Heavy / Cavalry)
+    // Mergelridder (Heavy / Cavalry) -- tankiest unit in the game, very slow
     {
       typeId: UnitTypeId.Infantry,
       name: 'Mergelridder',
       brabantName: 'Mergelridder',
-      hp: 250,
-      attack: 20,
-      attackSpeed: 2.0,
-      armor: 5,
+      hp: 280,
+      attack: 18,
+      attackSpeed: 2.2,
+      armor: 6,
       armorType: ArmorType.Heavy,
-      speed: 3.0,
+      speed: 2.8,
       range: 0,
-      buildTime: 35,
-      costGold: 175,
-      costSecondary: 125,
+      buildTime: 38,
+      costGold: 160,
+      costSecondary: 110,
       population: 2,
-      sightRange: 8,
+      sightRange: 7,
       carryCapacity: 0,
     },
-    // Kolenbrander (Siege) [Tier 3]
+    // Kolenbrander (Siege) [Tier 3] -- durable siege, DoT damage
     {
       typeId: UnitTypeId.Ranged,
       name: 'Kolenbrander',
       brabantName: 'Kolenbrander',
-      hp: 95,
-      attack: 12, // 12 vs units, 48 vs buildings
+      hp: 110,
+      attack: 12, // 12 vs units, 48 vs buildings (4x siegeBonus)
       attackSpeed: 3.0,
-      armor: 1,
+      armor: 2,
       armorType: ArmorType.Medium,
-      speed: 3.5,
+      speed: 3.0,
       range: 10,
       buildTime: 40,
-      costGold: 200,
-      costSecondary: 150,
+      costGold: 180,
+      costSecondary: 130,
       population: 3,
-      sightRange: 10,
+      sightRange: 9,
       carryCapacity: 0,
+      siegeBonus: 4.0,
     },
-    // Sjpion (Support / Healer)
+    // Sjpion (Support / Healer) -- sturdy healer, moderate speed
     {
       typeId: UnitTypeId.Ranged,
       name: 'Sjpion',
       brabantName: 'Sjpion',
-      hp: 55,
+      hp: 60,
       attack: 6,
       attackSpeed: 1.5,
-      armor: 0,
+      armor: 1,
       armorType: ArmorType.Light,
-      speed: 5.0,
+      speed: 4.5,
       range: 7,
       buildTime: 25,
-      costGold: 85,
-      costSecondary: 65,
+      costGold: 80,
+      costSecondary: 55,
       population: 1,
       sightRange: 9,
       carryCapacity: 0,
+      healRate: 7,
     },
-    // Mijnrat (Stealth / Sabotage) [Tier 3]
+    // Mijnrat (Stealth / Sabotage) [Tier 3] -- exception to slow rule: fast saboteur
     {
       typeId: UnitTypeId.Ranged,
       name: 'Mijnrat',
@@ -604,13 +614,13 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       speed: 6.0,
       range: 0,
       buildTime: 20,
-      costGold: 50,
-      costSecondary: 40,
+      costGold: 45,
+      costSecondary: 35,
       population: 1,
       sightRange: 8,
       carryCapacity: 0,
     },
-    // Heuvelansen (Scout) [Tier 1]
+    // Heuvelansen (Scout) [Tier 1] -- exception: fast scout, signature Limburgers unit
     {
       typeId: UnitTypeId.Ranged,
       name: 'Heuvelansen',
@@ -620,11 +630,11 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       attackSpeed: 1.5,
       armor: 0,
       armorType: ArmorType.Light,
-      speed: 8.0,
+      speed: 7.5,
       range: 4,
       buildTime: 12,
-      costGold: 40,
-      costSecondary: 20,
+      costGold: 35,
+      costSecondary: 15,
       population: 1,
       sightRange: 14,
       carryCapacity: 0,
@@ -632,138 +642,141 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
   ],
 
   // =========================================================================
-  // BELGEN
+  // BELGEN -- Versatile but fragile. High damage, low HP. Medium cost.
+  // Strength: Damage output & versatility | Weakness: Low HP (most fragile faction)
   // =========================================================================
   [ExtendedFactionId.Belgen]: [
-    // Frietkraamhouder (Worker)
+    // Frietkraamhouder (Worker) -- high carry capacity, fragile
     {
       typeId: UnitTypeId.Worker,
       name: 'Frietkraamhouder',
       brabantName: 'Frietkraamhouder',
-      hp: 55,
-      attack: 5,
+      hp: 50,
+      attack: 4,
       attackSpeed: 1.5,
       armor: 0,
       armorType: ArmorType.Light,
-      speed: 4.5,
+      speed: 4.8,
       range: 0,
-      buildTime: 15,
-      costGold: 50,
+      buildTime: 14,
+      costGold: 45,
       costSecondary: 0,
       population: 1,
       sightRange: 8,
       carryCapacity: 12,
     },
-    // Bierbouwer (Infantry -- melee)
+    // Bierbouwer (Infantry -- melee) -- high DPS, fragile for melee
     {
       typeId: UnitTypeId.Infantry,
       name: 'Bierbouwer',
       brabantName: 'Bierbouwer',
-      hp: 90,
-      attack: 12,
+      hp: 75,
+      attack: 13,
       attackSpeed: 1.2,
-      armor: 1,
+      armor: 0,
       armorType: ArmorType.Light,
-      speed: 5.0,
+      speed: 5.2,
       range: 0,
-      buildTime: 18,
-      costGold: 80,
-      costSecondary: 30,
+      buildTime: 17,
+      costGold: 75,
+      costSecondary: 25,
       population: 1,
       sightRange: 8,
       carryCapacity: 0,
     },
-    // Chocolatier (Ranged)
+    // Chocolatier (Ranged) -- highest T1 ranged damage, glass cannon
     {
       typeId: UnitTypeId.Ranged,
       name: 'Chocolatier',
       brabantName: 'Chocolatier',
-      hp: 50,
-      attack: 15,
+      hp: 40,
+      attack: 14,
       attackSpeed: 1.8,
       armor: 0,
       armorType: ArmorType.Light,
-      speed: 4.5,
+      speed: 4.8,
       range: 8,
       buildTime: 22,
-      costGold: 100,
-      costSecondary: 60,
+      costGold: 90,
+      costSecondary: 55,
       population: 1,
       sightRange: 10,
       carryCapacity: 0,
     },
-    // Frituurridder (Heavy / Cavalry)
+    // Frituurridder (Heavy / Cavalry) -- aggressive heavy, lower armor than Mergelridder
     {
       typeId: UnitTypeId.Infantry,
       name: 'Frituurridder',
       brabantName: 'Frituurridder',
-      hp: 220,
-      attack: 22,
-      attackSpeed: 2.0,
-      armor: 4,
+      hp: 200,
+      attack: 24,
+      attackSpeed: 1.8,
+      armor: 3,
       armorType: ArmorType.Heavy,
       speed: 4.0,
       range: 0,
-      buildTime: 35,
-      costGold: 180,
-      costSecondary: 130,
+      buildTime: 34,
+      costGold: 170,
+      costSecondary: 120,
       population: 2,
       sightRange: 8,
       carryCapacity: 0,
     },
-    // Manneken Pis-kanon (Siege)
+    // Manneken Pis-kanon (Siege) -- highest building DPS, fragile
     {
       typeId: UnitTypeId.Ranged,
       name: 'Manneken Pis-kanon',
       brabantName: 'Manneken Pis-kanon',
-      hp: 80,
-      attack: 12, // 12 vs units, 55 vs buildings
-      attackSpeed: 3.0,
-      armor: 1,
-      armorType: ArmorType.Medium,
-      speed: 3.0,
+      hp: 70,
+      attack: 14, // 14 vs units, 56 vs buildings (4x siegeBonus)
+      attackSpeed: 2.8,
+      armor: 0,
+      armorType: ArmorType.Light,
+      speed: 3.2,
       range: 10,
       buildTime: 40,
-      costGold: 200,
-      costSecondary: 150,
+      costGold: 190,
+      costSecondary: 140,
       population: 3,
       sightRange: 10,
       carryCapacity: 0,
+      siegeBonus: 4.0,
     },
-    // Wafelzuster (Support / Healer)
+    // Wafelzuster (Support / Healer) -- fast heal cycle, fragile
     {
       typeId: UnitTypeId.Ranged,
       name: 'Wafelzuster',
       brabantName: 'Wafelzuster',
-      hp: 55,
-      attack: 6,
+      hp: 45,
+      attack: 5,
       attackSpeed: 1.5,
       armor: 0,
       armorType: ArmorType.Light,
-      speed: 4.5,
+      speed: 4.8,
       range: 6,
-      buildTime: 25,
-      costGold: 90,
-      costSecondary: 65,
+      buildTime: 24,
+      costGold: 85,
+      costSecondary: 60,
       population: 1,
       sightRange: 8,
       carryCapacity: 0,
+      healRate: 7,
     },
-    // Dubbele Spion (Stealth / Sabotage)
+    // Dubbele Spion (Stealth / Sabotage) -- infiltrator, fragile but fast
     {
       typeId: UnitTypeId.Ranged,
       name: 'Dubbele Spion',
       brabantName: 'Dubbele Spion',
-      hp: 40,
-      attack: 6,
-      attackSpeed: 1.5,
+      hp: 35,
+      attack: 8,
+      attackSpeed: 1.3,
       armor: 0,
       armorType: ArmorType.Light,
-      speed: 6.0,
+      speed: 6.5,
       range: 0,
-      buildTime: 28,
-      costGold: 90,
-      costSecondary: 70,
+      buildTime: 26,
+      costGold: 80,
+      costSecondary: 60,
       population: 1,
       sightRange: 10,
       carryCapacity: 0,
@@ -918,19 +931,19 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
   // RANDSTAD
   // =========================================================================
   [ExtendedFactionId.Randstad]: [
-    // Hoofdkantoor (Town Hall)
+    // Hoofdkantoor (Town Hall) -- Randstad buildings are sturdier but more expensive
     {
       typeId: BuildingTypeId.TownHall,
       name: 'Hoofdkantoor',
       brabantName: 'Hoofdkantoor',
-      hp: 1800,
+      hp: 1700,
       costGold: 0,
       costSecondary: 0,
       buildTime: 0,
       sightRange: 12,
       produces: [UnitTypeId.Worker],
     },
-    // Vergaderzaal (Barracks)
+    // Vergaderzaal (Barracks) -- expensive but high HP
     {
       typeId: BuildingTypeId.Barracks,
       name: 'Vergaderzaal',
@@ -966,7 +979,7 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       sightRange: 8,
       produces: [],
     },
-    // Coworking Space (Tech / Upgrade)
+    // Coworking Space (Tech / Upgrade) -- most expensive tech building
     {
       typeId: BuildingTypeId.Blacksmith,
       name: 'Coworking Space',
@@ -995,7 +1008,7 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       typeId: BuildingTypeId.LumberCamp,
       name: 'Vinex-wijk',
       brabantName: 'Vinex-wijk',
-      hp: 600,
+      hp: 550,
       costGold: 125,
       costSecondary: 75,
       buildTime: 24,
@@ -1020,38 +1033,38 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
   // LIMBURGERS
   // =========================================================================
   [ExtendedFactionId.Limburgers]: [
-    // Mergelhoeve (Town Hall)
+    // Mergelhoeve (Town Hall) -- Limburgers buildings are tankiest
     {
       typeId: BuildingTypeId.TownHall,
       name: 'Mergelhoeve',
       brabantName: 'Mergelhoeve',
-      hp: 1600,
+      hp: 1800,
       costGold: 0,
       costSecondary: 0,
       buildTime: 0,
-      sightRange: 12,
+      sightRange: 11,
       produces: [UnitTypeId.Worker],
     },
-    // Schuttershal (Barracks)
+    // Schuttershal (Barracks) -- high HP barracks
     {
       typeId: BuildingTypeId.Barracks,
       name: 'Schuttershal',
       brabantName: 'Schuttershal',
-      hp: 850,
-      costGold: 225,
+      hp: 950,
+      costGold: 200,
       costSecondary: 0,
-      buildTime: 32,
+      buildTime: 34,
       sightRange: 10,
       produces: [UnitTypeId.Ranged], // Schutterij, Vlaaienwerper, Heuvelansen
     },
-    // Vlaaibakkerij (Resource gen -- primary)
+    // Vlaaibakkerij (Resource gen -- primary) -- sturdy resource building
     {
       typeId: BuildingTypeId.LumberCamp,
       name: 'Vlaaibakkerij',
       brabantName: 'Vlaaibakkerij',
-      hp: 600,
-      costGold: 150,
-      costSecondary: 50,
+      hp: 700,
+      costGold: 130,
+      costSecondary: 40,
       buildTime: 25,
       sightRange: 8,
       produces: [],
@@ -1061,81 +1074,81 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       typeId: BuildingTypeId.LumberCamp,
       name: 'Mergelgroeve',
       brabantName: 'Mergelgroeve',
-      hp: 600,
-      costGold: 100,
-      costSecondary: 100,
+      hp: 700,
+      costGold: 90,
+      costSecondary: 90,
       buildTime: 25,
       sightRange: 8,
       produces: [],
     },
-    // Mijnschacht (Tertiary resource + Tunnel)
+    // Mijnschacht (Tertiary resource + Tunnel) -- key strategic building
     {
       typeId: BuildingTypeId.LumberCamp,
       name: 'Mijnschacht',
       brabantName: 'Mijnschacht',
-      hp: 750,
-      costGold: 200,
-      costSecondary: 150,
+      hp: 850,
+      costGold: 175,
+      costSecondary: 125,
       buildTime: 40,
       sightRange: 8,
       produces: [],
     },
-    // Grot (Tunnel endpoint)
+    // Grot (Tunnel endpoint) -- cheaper tunnel endpoint, moderate HP
     {
       typeId: BuildingTypeId.LumberCamp,
       name: 'Grot',
       brabantName: 'Grot',
-      hp: 500,
-      costGold: 150,
-      costSecondary: 100,
-      buildTime: 30,
+      hp: 550,
+      costGold: 125,
+      costSecondary: 75,
+      buildTime: 28,
       sightRange: 4,
       produces: [],
     },
-    // Klooster (Tech / Upgrade)
+    // Klooster (Tech / Upgrade) -- sturdy tech building
     {
       typeId: BuildingTypeId.Blacksmith,
       name: 'Klooster',
       brabantName: 'Klooster',
-      hp: 800,
-      costGold: 275,
-      costSecondary: 175,
+      hp: 900,
+      costGold: 250,
+      costSecondary: 150,
       buildTime: 45,
       sightRange: 8,
       produces: [],
     },
-    // Wachttoren (Defense tower)
+    // Wachttoren (Defense tower) -- strongest defense tower
     {
       typeId: BuildingTypeId.Barracks,
       name: 'Wachttoren',
       brabantName: 'Wachttoren',
-      hp: 900,
+      hp: 1050,
       costGold: 200,
-      costSecondary: 200,
+      costSecondary: 175,
       buildTime: 35,
       sightRange: 12,
       produces: [],
     },
-    // Mijnwerkerskamp (Advanced unit building)
+    // Mijnwerkerskamp (Advanced unit building) -- cheaper than Randstad equivalent
     {
       typeId: BuildingTypeId.Barracks,
       name: 'Mijnwerkerskamp',
       brabantName: 'Mijnwerkerskamp',
-      hp: 850,
-      costGold: 325,
-      costSecondary: 225,
-      buildTime: 48,
+      hp: 950,
+      costGold: 300,
+      costSecondary: 200,
+      buildTime: 46,
       sightRange: 10,
       produces: [UnitTypeId.Infantry, UnitTypeId.Ranged],
     },
-    // Huuske (Housing)
+    // Huuske (Housing) -- sturdy but cheap housing
     {
       typeId: BuildingTypeId.LumberCamp,
       name: 'Huuske',
       brabantName: 'Huuske',
-      hp: 500,
-      costGold: 100,
-      costSecondary: 50,
+      hp: 550,
+      costGold: 85,
+      costSecondary: 40,
       buildTime: 20,
       sightRange: 8,
       produces: [],
@@ -1146,39 +1159,39 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
   // BELGEN
   // =========================================================================
   [ExtendedFactionId.Belgen]: [
-    // Stadhuis (Town Hall)
+    // Stadhuis (Town Hall) -- Belgen buildings are cheaper/faster but lower HP
     {
       typeId: BuildingTypeId.TownHall,
       name: 'Stadhuis',
       brabantName: 'Stadhuis',
-      hp: 1600,
+      hp: 1400,
       costGold: 0,
       costSecondary: 0,
       buildTime: 0,
       sightRange: 12,
       produces: [UnitTypeId.Worker],
     },
-    // Frituur (Barracks)
+    // Frituur (Barracks) -- cheap barracks, fast build, lower HP
     {
       typeId: BuildingTypeId.Barracks,
       name: 'Frituur',
       brabantName: 'Frituur',
-      hp: 850,
-      costGold: 200,
+      hp: 750,
+      costGold: 175,
       costSecondary: 0,
-      buildTime: 32,
+      buildTime: 28,
       sightRange: 10,
       produces: [UnitTypeId.Infantry, UnitTypeId.Ranged],
     },
-    // Abdij (Resource gen -- secondary / Trappist)
+    // Abdij (Resource gen -- secondary / Trappist) -- cheap resource building
     {
       typeId: BuildingTypeId.LumberCamp,
       name: 'Abdij',
       brabantName: 'Abdij',
-      hp: 650,
-      costGold: 150,
-      costSecondary: 75,
-      buildTime: 28,
+      hp: 550,
+      costGold: 130,
+      costSecondary: 60,
+      buildTime: 25,
       sightRange: 8,
       produces: [],
     },
@@ -1187,34 +1200,34 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       typeId: BuildingTypeId.LumberCamp,
       name: 'Frietfabriek',
       brabantName: 'Frietfabriek',
-      hp: 600,
-      costGold: 125,
-      costSecondary: 50,
-      buildTime: 25,
+      hp: 500,
+      costGold: 110,
+      costSecondary: 40,
+      buildTime: 22,
       sightRange: 8,
       produces: [],
     },
-    // Chocolaterie (Tertiary resource)
+    // Chocolaterie (Tertiary resource) -- key strategic building, medium HP
     {
       typeId: BuildingTypeId.LumberCamp,
       name: 'Chocolaterie',
       brabantName: 'Chocolaterie',
-      hp: 600,
-      costGold: 200,
-      costSecondary: 100,
-      buildTime: 30,
+      hp: 550,
+      costGold: 180,
+      costSecondary: 90,
+      buildTime: 28,
       sightRange: 8,
       produces: [],
     },
-    // EU-Parlement (Tech / Upgrade)
+    // EU-Parlement (Tech / Upgrade) -- expensive but crucial
     {
       typeId: BuildingTypeId.Blacksmith,
       name: 'EU-Parlement',
       brabantName: 'EU-Parlement',
-      hp: 800,
-      costGold: 300,
-      costSecondary: 175,
-      buildTime: 45,
+      hp: 700,
+      costGold: 275,
+      costSecondary: 150,
+      buildTime: 42,
       sightRange: 8,
       produces: [],
     },
@@ -1223,34 +1236,34 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       typeId: BuildingTypeId.Barracks,
       name: 'Rijschool',
       brabantName: 'Rijschool',
-      hp: 800,
-      costGold: 300,
-      costSecondary: 200,
-      buildTime: 42,
+      hp: 700,
+      costGold: 275,
+      costSecondary: 175,
+      buildTime: 38,
       sightRange: 10,
       produces: [UnitTypeId.Infantry, UnitTypeId.Ranged],
     },
-    // Wafelkraam (Support -- mobile heal)
+    // Wafelkraam (Support -- mobile heal) -- cheap, fragile
     {
       typeId: BuildingTypeId.Blacksmith,
       name: 'Wafelkraam',
       brabantName: 'Wafelkraam',
-      hp: 300,
-      costGold: 100,
-      costSecondary: 50,
-      buildTime: 15,
+      hp: 250,
+      costGold: 80,
+      costSecondary: 40,
+      buildTime: 12,
       sightRange: 6,
       produces: [],
     },
-    // Brusselse Woning (Housing)
+    // Brusselse Woning (Housing) -- cheap housing
     {
       typeId: BuildingTypeId.LumberCamp,
       name: 'Brusselse Woning',
       brabantName: 'Brusselse Woning',
-      hp: 500,
-      costGold: 100,
-      costSecondary: 50,
-      buildTime: 20,
+      hp: 450,
+      costGold: 85,
+      costSecondary: 40,
+      buildTime: 18,
       sightRange: 8,
       produces: [],
     },
@@ -1259,34 +1272,34 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       typeId: BuildingTypeId.Barracks,
       name: 'Surrealistisch Atelier',
       brabantName: 'Surrealistisch Atelier',
-      hp: 700,
-      costGold: 250,
-      costSecondary: 200,
-      buildTime: 40,
+      hp: 600,
+      costGold: 225,
+      costSecondary: 175,
+      buildTime: 36,
       sightRange: 10,
       produces: [UnitTypeId.Ranged],
     },
-    // Commissiegebouw (Defense tower)
+    // Commissiegebouw (Defense tower) -- moderate defense
     {
       typeId: BuildingTypeId.Barracks,
       name: 'Commissiegebouw',
       brabantName: 'Commissiegebouw',
-      hp: 900,
-      costGold: 225,
-      costSecondary: 225,
-      buildTime: 35,
+      hp: 800,
+      costGold: 200,
+      costSecondary: 200,
+      buildTime: 32,
       sightRange: 10,
       produces: [],
     },
-    // Diplomatiek Salon (Diplomatie hub -- Tier 3)
+    // Diplomatiek Salon (Diplomatie hub -- Tier 3) -- expensive strategic building
     {
       typeId: BuildingTypeId.Blacksmith,
       name: 'Diplomatiek Salon',
       brabantName: 'Diplomatiek Salon',
-      hp: 750,
-      costGold: 350,
-      costSecondary: 250,
-      buildTime: 50,
+      hp: 650,
+      costGold: 325,
+      costSecondary: 225,
+      buildTime: 46,
       sightRange: 10,
       produces: [],
     },
