@@ -201,8 +201,9 @@ export class TechTreeSystem {
   /** Reset all research state (new game). */
   reset(): void {
     this.factions.clear();
-    this.factions.set(FactionId.Brabanders, { completed: new Set(), activeResearch: new Map() });
-    this.factions.set(FactionId.AI, { completed: new Set(), activeResearch: new Map() });
+    for (let i = 0; i < 4; i++) {
+      this.factions.set(i, { completed: new Set(), activeResearch: new Map() });
+    }
   }
 
   // -------------------------------------------------------------------------

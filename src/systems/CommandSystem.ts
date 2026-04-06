@@ -24,7 +24,8 @@ import {
 } from '../ecs/components';
 import { IsUnit, IsWorker, IsBuilding, NeedsPathfinding } from '../ecs/tags';
 import { playerState } from '../core/PlayerState';
-import { UnitAIState, FactionId, NO_ENTITY, NO_PRODUCTION } from '../types/index';
+import { UnitAIState, NO_ENTITY, NO_PRODUCTION } from '../types/index';
+import { gameConfig } from '../core/GameConfig';
 import type { GameWorld } from '../ecs/world';
 
 // ---------------------------------------------------------------------------
@@ -107,7 +108,7 @@ export function createCommandSystem() {
     const allUnits = query(world, [Selected, Position, IsUnit]);
     const selectedUnits: number[] = [];
     for (const eid of allUnits) {
-      if (Selected.by[eid] === 0 && Faction.id[eid] === FactionId.Brabanders) {
+      if (Selected.by[eid] === 0 && gameConfig.isPlayerFaction(Faction.id[eid])) {
         selectedUnits.push(eid);
       }
     }

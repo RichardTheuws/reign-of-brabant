@@ -17,7 +17,8 @@ import {
   Faction,
 } from '../ecs/components';
 import { IsDead } from '../ecs/tags';
-import { FactionId, FOW_UPDATE_RATE, MAP_SIZE } from '../types/index';
+import { FOW_UPDATE_RATE, MAP_SIZE } from '../types/index';
+import { gameConfig } from '../core/GameConfig';
 import type { GameWorld } from '../ecs/world';
 
 // ---------------------------------------------------------------------------
@@ -73,7 +74,7 @@ export function createVisionSystem() {
     for (const eid of allEntities) {
       if (hasComponent(world, eid, IsDead)) continue;
 
-      if (Faction.id[eid] === FactionId.Brabanders) {
+      if (gameConfig.isPlayerFaction(Faction.id[eid])) {
         const wx = Position.x[eid];
         const wz = Position.z[eid];
         const range = Visibility.range[eid];
@@ -97,7 +98,7 @@ export function createVisionSystem() {
 
     // Determine which enemy entities are visible
     for (const eid of allEntities) {
-      if (Faction.id[eid] === FactionId.Brabanders) continue;
+      if (gameConfig.isPlayerFaction(Faction.id[eid])) continue;
       if (hasComponent(world, eid, IsDead)) continue;
 
       const bufIdx = worldToBufferIndex(Position.x[eid], Position.z[eid]);

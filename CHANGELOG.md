@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.9.1] - 2026-04-06
+
+### Fixed
+- **CRITICAL: VisionSystem hardcoded to Brabanders** — Non-Brabanders players got no fog-of-war vision. Now uses shared `gameConfig.playerFactionId`
+- **CRITICAL: CommandSystem hardcoded to Brabanders** — Non-Brabanders players could not issue move/attack/gather commands. Now uses `gameConfig.isPlayerFaction()`
+- **CRITICAL: AISystem.setFaction() never called** — AI controlled wrong faction when player picked Randstad (faction swap). Now called in `Game.init()` after remap
+- **HIGH: TechTreeSystem only initialized 2 factions** — Limburgers/Belgen had no tech tree state. Now initializes all 4 factions
+
+### Added
+- **GameConfig singleton** (`src/core/GameConfig.ts`) — Shared runtime config for player faction, accessible by all ECS systems
+- **53 automated tests** — MapGenerator (13), PlayerState (24), AIController (16) via Vitest
+
 ## [0.9.0] - 2026-04-06
 
 ### Added

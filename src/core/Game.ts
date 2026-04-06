@@ -21,6 +21,7 @@ import { generateMap, type GeneratedMap, DecoType } from '../world/MapGenerator'
 import { queueCommand } from '../systems/CommandSystem';
 import { NavMeshManager } from '../pathfinding/NavMeshManager';
 import { AISystem } from '../ai/AISystem';
+import { gameConfig } from '../core/GameConfig';
 import { UnitRenderer } from '../rendering/UnitRenderer';
 import { BuildingRenderer } from '../rendering/BuildingRenderer';
 import { PropRenderer } from '../rendering/PropRenderer';
@@ -163,6 +164,10 @@ export class Game {
     if (this.playerFactionId !== FactionId.Brabanders) {
       this.remapFactions();
     }
+
+    // Set shared game config so all systems know the player's faction
+    gameConfig.setPlayerFaction(this.playerFactionId);
+    AISystem.setFaction(this.getAIFactionId());
 
     // 2. Load all GLB models
     await Promise.all([
