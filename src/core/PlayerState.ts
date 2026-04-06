@@ -22,6 +22,8 @@ interface PlayerData {
   populationCurrent: number;
   populationMax: number;
   gezelligheid: number;
+  /** Generic tertiary resource (Kolen, Chocolade, Havermoutmelk). Not used for Brabanders (use gezelligheid). */
+  tertiary: number;
   /** Bureaucracy efficiency stacks (Randstad only). 0 for non-Randstad factions. */
   efficiencyStacks: number;
 }
@@ -45,8 +47,8 @@ class PlayerStateManager {
    */
   reset(): void {
     this.players = [
-      { gold: 100, wood: 0, populationCurrent: 0, populationMax: 10, gezelligheid: 0, efficiencyStacks: 0 },
-      { gold: 100, wood: 0, populationCurrent: 0, populationMax: 10, gezelligheid: 0, efficiencyStacks: 0 },
+      { gold: 100, wood: 0, populationCurrent: 0, populationMax: 10, gezelligheid: 0, tertiary: 0, efficiencyStacks: 0 },
+      { gold: 100, wood: 0, populationCurrent: 0, populationMax: 10, gezelligheid: 0, tertiary: 0, efficiencyStacks: 0 },
     ];
   }
 
@@ -159,6 +161,32 @@ class PlayerStateManager {
     if (this.players[factionId].gezelligheid < amount) return false;
     this.players[factionId].gezelligheid -= amount;
     return true;
+  }
+
+  // -------------------------------------------------------------------------
+  // Tertiary Resource (Kolen, Chocolade, Havermoutmelk -- non-Brabanders)
+  // -------------------------------------------------------------------------
+
+  /** Get current tertiary resource for a faction. */
+  getTertiary(factionId: number): number {
+    return this.players[factionId].tertiary;
+  }
+
+  /** Add tertiary resource to a faction. */
+  addTertiary(factionId: number, amount: number): void {
+    this.players[factionId].tertiary += amount;
+  }
+
+  /** Spend tertiary resource. Returns false if insufficient. */
+  spendTertiary(factionId: number, amount: number): boolean {
+    if (this.players[factionId].tertiary < amount) return false;
+    this.players[factionId].tertiary -= amount;
+    return true;
+  }
+
+  /** Check if a faction can afford a tertiary resource cost. */
+  canAffordTertiary(factionId: number, cost: number): boolean {
+    return this.players[factionId].tertiary >= cost;
   }
 
   // -------------------------------------------------------------------------
