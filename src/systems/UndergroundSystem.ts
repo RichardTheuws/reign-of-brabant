@@ -20,7 +20,7 @@
  *   - 'tunnel-network-changed': fired when endpoints are added/removed
  */
 
-import { query, hasComponent } from 'bitecs';
+import { query, hasComponent, addComponent } from 'bitecs';
 import {
   Position,
   Faction,
@@ -452,7 +452,7 @@ export function createUndergroundSystem(): SystemFn {
   function spawnUnitsAtPosition(
     transits: TransitUnit[],
     pos: { x: number; z: number },
-    _world: GameWorld,
+    world: GameWorld,
   ): void {
     const count = transits.length;
     const spreadRadius = Math.min(count * 0.5, 4);
@@ -468,7 +468,7 @@ export function createUndergroundSystem(): SystemFn {
       Position.y[eid] = transit.originalY;
 
       // Apply surprise attack buff: +25% damage for 3 seconds
-      applySurpriseAttackBuff(eid);
+      applySurpriseAttackBuff(world, eid);
     }
   }
 
@@ -476,7 +476,10 @@ export function createUndergroundSystem(): SystemFn {
    * Apply the surprise attack buff to a unit that just exited a tunnel.
    * Uses the StatBuff component for temporary stat boosts.
    */
-  function applySurpriseAttackBuff(eid: number): void {
+  function applySurpriseAttackBuff(world: GameWorld, eid: number): void {
+    if (!hasComponent(world, eid, StatBuff)) {
+      addComponent(world, eid, StatBuff);
+    }
     StatBuff.attackMult[eid] = SURPRISE_ATTACK_BONUS;
     StatBuff.speedMult[eid] = 1.0;
     StatBuff.armorMult[eid] = 1.0;

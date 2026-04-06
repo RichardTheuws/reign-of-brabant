@@ -30,6 +30,7 @@ export type CommandAction =
   | 'move' | 'attack' | 'stop' | 'hold'
   | 'train-worker' | 'train-infantry' | 'train-ranged' | 'rally-point'
   | 'build-townhall' | 'build-barracks' | 'build-lumbercamp' | 'build-blacksmith'
+  | 'build-mijnschacht' | 'build-chocolaterie'
   | 'train-hero-prins' | 'train-hero-boer'
   | 'hero-ability-q' | 'hero-ability-w' | 'hero-ability-e'
   | 'research-upgrade';
@@ -97,6 +98,78 @@ const UNIT_EMOJI: Record<string, string> = {
   ceo: '\u{1F4BC}',                        // briefcase
   politicus: '\u{1F3DB}\uFE0F',           // classical building
   hero: '\u2B50',                          // star (fallback hero)
+  // Randstad
+  stagiair: '\u{1F9D1}\u200D\u{1F4BB}',  // technologist
+  manager: '\u{1F4BC}',                    // briefcase
+  consultant: '\u{1F4C8}',                 // chart
+  // Limburgers
+  mijnwerker: '\u26CF\uFE0F',             // pick
+  schutterij: '\u{1F3F9}',                // bow
+  vlaaienwerper: '\u{1F967}',              // pie
+  // Belgen
+  frietkraamhouder: '\u{1F35F}',           // fries
+  bierbouwer: '\u{1F37A}',                 // beer
+  chocolatier: '\u{1F36B}',                // chocolate
+};
+
+// ---------------------------------------------------------------------------
+// Faction-specific unit display names (Worker / Infantry / Ranged)
+// ---------------------------------------------------------------------------
+
+const FACTION_UNIT_NAMES: Record<Faction, { worker: string; infantry: string; ranged: string }> = {
+  brabant:  { worker: 'Boer',               infantry: 'Carnavalvierder', ranged: 'Kansen' },
+  randstad: { worker: 'Stagiair',           infantry: 'Manager',         ranged: 'Consultant' },
+  limburg:  { worker: 'Mijnwerker',         infantry: 'Schutterij',      ranged: 'Vlaaienwerper' },
+  belgen:   { worker: 'Frietkraamhouder',   infantry: 'Bierbouwer',      ranged: 'Chocolatier' },
+};
+
+// ---------------------------------------------------------------------------
+// Faction-specific worker build commands
+// ---------------------------------------------------------------------------
+
+interface WorkerBuildCmd {
+  action: CommandAction;
+  icon: string;
+  label: string;
+  hotkey?: string;
+}
+
+const BASE_WORKER_CMDS: WorkerBuildCmd[] = [
+  { action: 'move', icon: '\u{1F4CD}', label: '', hotkey: 'W' },
+  { action: 'stop', icon: '\u{1F6D1}', label: '', hotkey: 'E' },
+];
+
+const FACTION_WORKER_BUILDS: Record<Faction, WorkerBuildCmd[]> = {
+  brabant: [
+    { action: 'build-barracks',    icon: '\u{1F3D7}\uFE0F', label: 'Kazerne',      hotkey: 'Q' },
+    { action: 'build-lumbercamp',  icon: '\u{1FAB5}',        label: 'Houtzagerij' },
+    { action: 'build-blacksmith',  icon: '\u2692\uFE0F',     label: 'Smederij',     hotkey: 'R' },
+  ],
+  randstad: [
+    { action: 'build-barracks',    icon: '\u{1F3D7}\uFE0F', label: 'Vergaderzaal',  hotkey: 'Q' },
+    { action: 'build-lumbercamp',  icon: '\u{1FAB5}',        label: 'Starbucks' },
+    { action: 'build-blacksmith',  icon: '\u2692\uFE0F',     label: 'CoworkingSpace', hotkey: 'R' },
+  ],
+  limburg: [
+    { action: 'build-barracks',    icon: '\u{1F3D7}\uFE0F', label: 'Schuttershal',  hotkey: 'Q' },
+    { action: 'build-lumbercamp',  icon: '\u{1FAB5}',        label: 'Vlaaibakkerij' },
+    { action: 'build-blacksmith',  icon: '\u2692\uFE0F',     label: 'Klooster',     hotkey: 'R' },
+    { action: 'build-mijnschacht', icon: '\u26CF\uFE0F',     label: 'Mijnschacht' },
+  ],
+  belgen: [
+    { action: 'build-barracks',    icon: '\u{1F3D7}\uFE0F', label: 'Frituur',       hotkey: 'Q' },
+    { action: 'build-lumbercamp',  icon: '\u{1FAB5}',        label: 'Frietfabriek' },
+    { action: 'build-blacksmith',  icon: '\u2692\uFE0F',     label: 'EU-Parlement',  hotkey: 'R' },
+    { action: 'build-chocolaterie', icon: '\u{1F36B}',       label: 'Chocolaterie' },
+  ],
+};
+
+// Faction-specific building command labels (train panel)
+const FACTION_BUILDING_LABELS: Record<Faction, { worker: string; infantry: string; ranged: string }> = {
+  brabant:  { worker: 'Boer',               infantry: 'Infanterie', ranged: 'Kansen' },
+  randstad: { worker: 'Stagiair',           infantry: 'Manager',    ranged: 'Consultant' },
+  limburg:  { worker: 'Mijnwerker',         infantry: 'Schutterij', ranged: 'Vlaaienwerper' },
+  belgen:   { worker: 'Frietkraamhouder',   infantry: 'Bierbouwer', ranged: 'Chocolatier' },
 };
 
 // ---------------------------------------------------------------------------
@@ -104,6 +177,9 @@ const UNIT_EMOJI: Record<string, string> = {
 // ---------------------------------------------------------------------------
 
 export class HUD {
+  // Current faction (used for faction-specific labels)
+  private currentFaction: Faction = 'brabant';
+
   // DOM element cache
   private resGold!: HTMLElement;
   private resWood!: HTMLElement;
@@ -378,7 +454,7 @@ export class HUD {
     }
 
     this.unitLevel.textContent = String(unit.level);
-    this.unitName.textContent = unit.name;
+    this.unitName.textContent = this.getFactionUnitName(unit.name);
 
     // HP bar
     const ratio = unit.maxHp > 0 ? unit.hp / unit.maxHp : 0;
@@ -712,7 +788,9 @@ export class HUD {
     this.gameOverOverlay.classList.toggle('is-defeat', !victory);
 
     this.gameOverTitle.textContent = victory ? 'OVERWINNING!' : 'VERSLAGEN';
-    this.gameOverSubtitle.textContent = victory ? 'Brabant is veilig!' : 'Brabant is gevallen...';
+    const factionNames: Record<string, string> = { brabant: 'Brabant', randstad: 'De Randstad', limburg: 'Limburg', belgen: 'België' };
+    const name = factionNames[document.body.dataset.faction ?? 'brabant'] ?? 'Brabant';
+    this.gameOverSubtitle.textContent = victory ? `${name} is veilig!` : `${name} is gevallen...`;
 
     this.statDuration.textContent = this.formatTime(stats.durationSeconds);
     this.statProduced.textContent = String(stats.unitsProduced);
@@ -744,7 +822,97 @@ export class HUD {
   // -----------------------------------------------------------------------
 
   setFaction(faction: Faction): void {
+    this.currentFaction = faction;
     document.body.dataset.faction = faction;
+    this.rebuildWorkerCommands(faction);
+    this.rebuildBuildingLabels(faction);
+  }
+
+  /**
+   * Rebuild the worker command panel buttons based on the active faction.
+   * This replaces the static HTML buttons with faction-specific build options.
+   */
+  private rebuildWorkerCommands(faction: Faction): void {
+    if (!this.cmdWorker) return;
+    this.cmdWorker.innerHTML = '';
+
+    const builds = FACTION_WORKER_BUILDS[faction] ?? FACTION_WORKER_BUILDS.brabant;
+    const baseCmds = BASE_WORKER_CMDS;
+
+    // Faction-specific build buttons first
+    for (const cmd of builds) {
+      const btn = this.createCommandButton(cmd);
+      this.cmdWorker.appendChild(btn);
+    }
+
+    // Then generic move/stop
+    for (const cmd of baseCmds) {
+      const btn = this.createCommandButton(cmd);
+      this.cmdWorker.appendChild(btn);
+    }
+  }
+
+  /**
+   * Update the building (production) command panel labels based on faction.
+   * Worker/Infantry/Ranged train buttons get faction-specific unit names.
+   */
+  private rebuildBuildingLabels(faction: Faction): void {
+    const labels = FACTION_BUILDING_LABELS[faction] ?? FACTION_BUILDING_LABELS.brabant;
+
+    const workerBtn = this.cmdBuilding.querySelector<HTMLButtonElement>('[data-action="train-worker"]');
+    const infantryBtn = this.cmdBuilding.querySelector<HTMLButtonElement>('[data-action="train-infantry"]');
+    const rangedBtn = this.cmdBuilding.querySelector<HTMLButtonElement>('[data-action="train-ranged"]');
+
+    if (workerBtn) {
+      const labelSpan = workerBtn.querySelector('span:nth-child(2)');
+      if (labelSpan) labelSpan.textContent = labels.worker;
+    }
+    if (infantryBtn) {
+      const labelSpan = infantryBtn.querySelector('span:nth-child(2)');
+      if (labelSpan) labelSpan.textContent = labels.infantry;
+    }
+    if (rangedBtn) {
+      const labelSpan = rangedBtn.querySelector('span:nth-child(2)');
+      if (labelSpan) labelSpan.textContent = labels.ranged;
+    }
+  }
+
+  /**
+   * Create a command button element matching the existing cmd-btn pattern.
+   */
+  private createCommandButton(cmd: WorkerBuildCmd): HTMLButtonElement {
+    const btn = document.createElement('button');
+    btn.className = 'cmd-btn';
+    btn.dataset.action = cmd.action;
+    if (cmd.hotkey) btn.dataset.hotkey = cmd.hotkey;
+
+    const iconSpan = document.createElement('span');
+    iconSpan.className = 'btn-icon';
+    iconSpan.textContent = cmd.icon;
+    btn.appendChild(iconSpan);
+
+    if (cmd.label) {
+      const labelSpan = document.createElement('span');
+      labelSpan.textContent = cmd.label;
+      btn.appendChild(labelSpan);
+    }
+
+    if (cmd.hotkey) {
+      const hotkeySpan = document.createElement('span');
+      hotkeySpan.className = 'hotkey';
+      hotkeySpan.textContent = cmd.hotkey;
+      btn.appendChild(hotkeySpan);
+    }
+
+    // Bind click handler
+    const handler = () => {
+      audioManager.playSound('click');
+      this.events?.onCommand(cmd.action);
+    };
+    btn.addEventListener('click', handler);
+    this.boundHandlers.push({ el: btn, event: 'click', handler: handler as EventListener });
+
+    return btn;
   }
 
   // -----------------------------------------------------------------------
@@ -922,6 +1090,24 @@ export class HUD {
       if (lower.includes(key)) return emoji;
     }
     return '?';
+  }
+
+  /**
+   * Map a base unit name (from Game.ts, always Brabanders names) to the
+   * faction-specific display name based on the currently active faction.
+   * Hero names and unknown names are passed through unchanged.
+   */
+  private getFactionUnitName(baseName: string): string {
+    const names = FACTION_UNIT_NAMES[this.currentFaction];
+    if (!names) return baseName;
+
+    const lower = baseName.toLowerCase();
+    // Map Brabanders base names to faction equivalents
+    if (lower === 'boer' || lower === 'worker') return names.worker;
+    if (lower === 'carnavalvierder' || lower === 'infantry') return names.infantry;
+    if (lower === 'kansen' || lower === 'ranged') return names.ranged;
+    // Pass through hero names and any others unchanged
+    return baseName;
   }
 
   private capitalise(s: string): string {

@@ -44,6 +44,13 @@ import type { RTSCamera } from '../camera/RTSCamera';
 import type { EventBus as EventBusType } from '../core/EventBus';
 import type { ParticleSystem } from '../rendering/ParticleSystem';
 
+const MINIMAP_COLORS: Record<number, string> = {
+  [FactionId.Brabanders]: '#FF8C00',
+  [FactionId.Randstad]: '#4DA6FF',
+  [FactionId.Limburgers]: '#44CC44',
+  [FactionId.Belgen]: '#FF4060',
+};
+
 const FACTION_DEATH_COLORS: Record<number, number> = {
   [FactionId.Brabanders]: 0xe67e22,
   [FactionId.Randstad]: 0x4a4a5a,
@@ -1931,8 +1938,7 @@ export class Game {
       if (!this.fogOfWarRenderer.isExplored(wx, wz)) continue;
       const mx = toMiniX(wx);
       const my = toMiniY(wz);
-      // Brighter faction colors on minimap
-      ctx.fillStyle = Faction.id[eid] === this.playerFactionId ? '#FF8C00' : '#4DA6FF';
+      ctx.fillStyle = MINIMAP_COLORS[Faction.id[eid]] ?? '#888888';
       ctx.fillRect(mx - 3, my - 3, 7, 7);
     }
 
@@ -1947,7 +1953,7 @@ export class Game {
       if (!isOwn && !this.fogOfWarRenderer.isVisible(wx, wz)) continue;
       const mx = toMiniX(wx);
       const my = toMiniY(wz);
-      ctx.fillStyle = isOwn ? '#FFA500' : '#FF4444';
+      ctx.fillStyle = MINIMAP_COLORS[Faction.id[eid]] ?? '#888888';
       ctx.fillRect(mx - 1, my - 1, 3, 3);
     }
 
