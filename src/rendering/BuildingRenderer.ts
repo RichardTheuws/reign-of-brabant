@@ -25,6 +25,16 @@ const BUILDING_MODEL_PATHS: Record<string, string> = {
   // Blacksmith reuses barracks model until dedicated model is created
   blacksmith_0: 'assets/models/v02/brabanders/barracks.glb',
   blacksmith_1: 'assets/models/v02/randstad/barracks.glb',
+  // Limburgers (reuse Brabanders models, distinguished by green tint)
+  townhall_2: 'assets/models/v02/brabanders/townhall.glb',
+  barracks_2: 'assets/models/v02/brabanders/barracks.glb',
+  lumbercamp_2: 'assets/models/v02/brabanders/barracks.glb',
+  blacksmith_2: 'assets/models/v02/brabanders/barracks.glb',
+  // Belgen (reuse Brabanders models, distinguished by burgundy tint)
+  townhall_3: 'assets/models/v02/brabanders/townhall.glb',
+  barracks_3: 'assets/models/v02/brabanders/barracks.glb',
+  lumbercamp_3: 'assets/models/v02/brabanders/barracks.glb',
+  blacksmith_3: 'assets/models/v02/brabanders/barracks.glb',
 };
 
 const BUILDING_MODEL_FALLBACKS: Record<string, string> = {
@@ -36,6 +46,16 @@ const BUILDING_MODEL_FALLBACKS: Record<string, string> = {
   lumbercamp_1: 'assets/models/v01/randstad/barracks.glb',
   blacksmith_0: 'assets/models/v01/brabanders/barracks.glb',
   blacksmith_1: 'assets/models/v01/randstad/barracks.glb',
+  // Limburgers (reuse Brabanders v01 models as fallback)
+  townhall_2: 'assets/models/v01/brabanders/townhall.glb',
+  barracks_2: 'assets/models/v01/brabanders/barracks.glb',
+  lumbercamp_2: 'assets/models/v01/brabanders/barracks.glb',
+  blacksmith_2: 'assets/models/v01/brabanders/barracks.glb',
+  // Belgen (reuse Brabanders v01 models as fallback)
+  townhall_3: 'assets/models/v01/brabanders/townhall.glb',
+  barracks_3: 'assets/models/v01/brabanders/barracks.glb',
+  lumbercamp_3: 'assets/models/v01/brabanders/barracks.glb',
+  blacksmith_3: 'assets/models/v01/brabanders/barracks.glb',
 };
 
 type ModelCacheKey = `${BuildingTypeName}_${number}`;
@@ -44,6 +64,8 @@ type ModelCacheKey = `${BuildingTypeName}_${number}`;
 const FACTION_TINTS: Record<number, THREE.Color> = {
   0: new THREE.Color(0xff8830), // Brabanders: bright warm orange
   1: new THREE.Color(0x4070bb), // Randstad: clear blue
+  2: new THREE.Color(0x3a7d32), // Limburgers: dark mining green
+  3: new THREE.Color(0xa01030), // Belgen: burgundy red
 };
 
 /** Ghost colours for placement preview. */

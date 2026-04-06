@@ -109,7 +109,10 @@ let callbacks: AISystemCallbacks | null = null;
 // The AI controller instance
 // ---------------------------------------------------------------------------
 
-const aiController = new AIController();
+/** The faction the AI plays as. Default: Randstad for backwards compatibility. */
+let aiFactionId: FactionId = FactionId.Randstad;
+
+let aiController = new AIController(aiFactionId);
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -123,6 +126,24 @@ export const AISystem = {
   configure(components: ECSComponents, cbs: AISystemCallbacks): void {
     ecs = components;
     callbacks = cbs;
+  },
+
+  /**
+   * Set the faction the AI plays as. Creates a new AIController with
+   * faction-specific strategy. Call before the game starts or after reset().
+   *
+   * @default FactionId.Randstad (backwards compatible)
+   */
+  setFaction(factionId: FactionId): void {
+    aiFactionId = factionId;
+    aiController = new AIController(factionId);
+  },
+
+  /**
+   * Get the faction the AI is currently playing as.
+   */
+  get factionId(): FactionId {
+    return aiFactionId;
   },
 
   /**
@@ -147,10 +168,10 @@ export const AISystem = {
   },
 
   /**
-   * Reset the AI state (new game).
+   * Reset the AI state (new game). Preserves the current faction setting.
    */
   reset(): void {
-    aiController.reset();
+    aiController = new AIController(aiFactionId);
   },
 
   /**
@@ -165,6 +186,13 @@ export const AISystem = {
    */
   get wavesSent() {
     return aiController.wavesSent;
+  },
+
+  /**
+   * Get the AI strategy name for debug display.
+   */
+  get strategyName() {
+    return aiController.strategyName;
   },
 
   /**
@@ -188,17 +216,28 @@ function buildSnapshot(
 ): AIWorldSnapshot {
   const allIds = cb.getAllEntityIds();
 
+  // Determine which faction the AI is and which faction the player is.
+  // The player faction is whichever faction is NOT the AI.
+  const aiFaction = aiFactionId;
+  // For player detection: any faction that isn't the AI's is a potential enemy.
+  // In a 2-player game, the player is always the "other" faction.
+  const isEnemyFaction = (fid: number): boolean => fid !== aiFaction;
+
   const workers: EntityId[] = [];
   const infantry: EntityId[] = [];
   const ranged: EntityId[] = [];
+  const heavy: EntityId[] = [];
+  const support: EntityId[] = [];
   const townHalls: EntityId[] = [];
   const barracks: EntityId[] = [];
+  const tertiaryBuildings: EntityId[] = [];
   const army: EntityId[] = [];
   const playerTownHallPositions: { x: number; z: number }[] = [];
   const goldMines: { eid: EntityId; x: number; z: number; amount: number }[] = [];
   const enemyUnitPositions: { eid: EntityId; x: number; z: number }[] = [];
 
   let barracksUnderConstruction = false;
+  let tertiaryUnderConstruction = false;
   let isTraining = false;
   let baseX = MAP_SIZE / 4;
   let baseZ = MAP_SIZE / 4;
@@ -211,8 +250,8 @@ function buildSnapshot(
 
     const fid = c.factionId[eid];
 
-    // AI units
-    if (fid === FactionId.AI && c.isUnit[eid] === 1) {
+    // AI units (match on the AI's actual faction)
+    if (fid === aiFaction && c.isUnit[eid] === 1) {
       const unitType = c.unitTypeId[eid];
       switch (unitType) {
         case UnitTypeId.Worker:
@@ -226,11 +265,19 @@ function buildSnapshot(
           ranged.push(eid);
           army.push(eid);
           break;
+        case UnitTypeId.Heavy:
+          heavy.push(eid);
+          army.push(eid);
+          break;
+        case UnitTypeId.Support:
+          support.push(eid);
+          army.push(eid);
+          break;
       }
     }
 
     // AI buildings
-    if (fid === FactionId.AI && c.isBuilding[eid] === 1) {
+    if (fid === aiFaction && c.isBuilding[eid] === 1) {
       const buildingType = c.buildingTypeId[eid];
       if (buildingType === BuildingTypeId.TownHall) {
         townHalls.push(eid);
@@ -244,6 +291,13 @@ function buildSnapshot(
         } else {
           barracksUnderConstruction = true;
         }
+      } else if (buildingType === BuildingTypeId.TertiaryResourceBuilding) {
+        // Tertiary resource buildings (Mijnschacht / Chocolaterie)
+        if (c.healthCurrent[eid] > 0 && c.healthCurrent[eid] >= c.healthMax[eid]) {
+          tertiaryBuildings.push(eid);
+        } else {
+          tertiaryUnderConstruction = true;
+        }
       }
 
       // Check if any building is training
@@ -252,8 +306,8 @@ function buildSnapshot(
       }
     }
 
-    // Player Town Halls (attack target)
-    if (fid === FactionId.Brabanders && c.isBuilding[eid] === 1) {
+    // Enemy Town Halls (attack target) -- any non-AI faction
+    if (isEnemyFaction(fid) && c.isBuilding[eid] === 1) {
       if (c.buildingTypeId[eid] === BuildingTypeId.TownHall) {
         playerTownHallPositions.push({
           x: c.positionX[eid],
@@ -272,8 +326,8 @@ function buildSnapshot(
       });
     }
 
-    // Player (enemy) units -- for Vergadering targeting
-    if (fid === FactionId.Brabanders && c.isUnit[eid] === 1) {
+    // Enemy units -- for Vergadering targeting and other abilities
+    if (isEnemyFaction(fid) && c.isUnit[eid] === 1) {
       enemyUnitPositions.push({
         eid,
         x: c.positionX[eid],
@@ -282,28 +336,27 @@ function buildSnapshot(
     }
   }
 
-  // Check if a barracks is under construction (has health < max and is AI's)
-  // For PoC simplicity, we track this via a flag
-  // A building "under construction" has buildingTypeId === Barracks but
-  // health < healthMax (or buildProgress < 1.0)
-
   return {
     gold: cb.getGold(),
     elapsedTime,
     workers,
     infantry,
     ranged,
+    heavy,
+    support,
     townHalls,
     barracks,
+    tertiaryBuildings,
     army,
     playerTownHallPositions,
     goldMinePositions: goldMines,
     baseX,
     baseZ,
     barracksUnderConstruction,
+    tertiaryUnderConstruction,
     isTraining,
 
-    // Randstad Bureaucracy data
+    // Randstad Bureaucracy data (returns 0/false for non-Randstad factions)
     efficiencyStacks: getRandstadEfficiencyStacks(),
     werkoverlegActive: isWerkoverlegActive(),
     vergaderingReady: isVergaderingReady(),
@@ -340,13 +393,13 @@ function tryTrainAIHeroes(
   // Need 10+ army units before training heroes
   if (snapshot.army.length < 10) return;
 
-  const heroTypes = getHeroTypesForFaction(FactionId.Randstad);
+  const heroTypes = getHeroTypesForFaction(aiFactionId);
   for (const heroTypeId of heroTypes) {
-    if (isHeroActive(FactionId.Randstad, heroTypeId)) continue;
+    if (isHeroActive(aiFactionId, heroTypeId)) continue;
 
     const arch = HERO_ARCHETYPES[heroTypeId];
     if (cb.getGold() < arch.costGold) continue;
-    if (!playerState.hasPopulationRoom(FactionId.Randstad, HERO_POPULATION_COST)) continue;
+    if (!playerState.hasPopulationRoom(aiFactionId, HERO_POPULATION_COST)) continue;
 
     // Find AI barracks for spawn point
     let barracksX = snapshot.baseX;
@@ -370,14 +423,14 @@ function tryTrainAIHeroes(
     const heroEid = createHero(
       ecsWorld,
       heroTypeId,
-      FactionId.Randstad,
+      aiFactionId,
       barracksX + 4,
       barracksZ + 2,
       thX,
       thZ,
     );
     if (heroEid >= 0) {
-      playerState.addPopulation(FactionId.Randstad, HERO_POPULATION_COST);
+      playerState.addPopulation(aiFactionId, HERO_POPULATION_COST);
     }
     break; // Only one hero per check cycle
   }
@@ -432,8 +485,23 @@ function executeCommand(
       const cost = 200; // BARRACKS_COST
       if (!cb.deductGold(cost)) break;
 
-      // Spawn barracks entity
-      cb.spawnBuilding(BuildingTypeId.Barracks, FactionId.AI, cmd.targetX, cmd.targetZ);
+      // Spawn barracks entity (use the AI's actual faction)
+      cb.spawnBuilding(BuildingTypeId.Barracks, aiFactionId, cmd.targetX, cmd.targetZ);
+
+      // Add obstacle to navmesh
+      NavMeshManager.addBoxObstacle(cmd.targetX, cmd.targetZ, 2, 2, 4);
+      break;
+    }
+
+    case AICommandType.BuildTertiaryBuilding: {
+      if (cmd.targetX == null || cmd.targetZ == null) break;
+
+      // Tertiary building costs same as barracks (200 gold)
+      const cost = 200;
+      if (!cb.deductGold(cost)) break;
+
+      // Spawn tertiary resource building (Mijnschacht / Chocolaterie)
+      cb.spawnBuilding(BuildingTypeId.TertiaryResourceBuilding, aiFactionId, cmd.targetX, cmd.targetZ);
 
       // Add obstacle to navmesh
       NavMeshManager.addBoxObstacle(cmd.targetX, cmd.targetZ, 2, 2, 4);
@@ -443,10 +511,12 @@ function executeCommand(
     case AICommandType.TrainUnit: {
       if (cmd.targetEntityId == null || cmd.unitType == null) break;
 
-      // Check gold cost
-      let cost = 50;
+      // Check gold cost (must match AIController costs)
+      let cost = 50; // Worker default
       if (cmd.unitType === UnitTypeId.Infantry) cost = 60;
       if (cmd.unitType === UnitTypeId.Ranged) cost = 80;
+      if (cmd.unitType === UnitTypeId.Heavy) cost = 120;
+      if (cmd.unitType === UnitTypeId.Support) cost = 100;
 
       if (!cb.deductGold(cost)) break;
 

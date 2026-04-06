@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.9.0] - 2026-04-06
+
+### Added
+- **4 playable factions**: Limburgers and Belgen now fully selectable in faction chooser alongside Brabanders and Randstad
+- **Faction systems wired into pipeline**: UndergroundSystem (Limburgers tunnels), DiplomacySystem (Belgen compromis), TertiaryResourceSystem (Kolen/Chocolade/Havermoutmelk) now active in game loop
+- **Multi-player map generator**: Supports 2-4 player spawns with balanced resource distribution, 4-corner spawn positions
+- **Faction-aware AI**: Per-faction strategies — Brabanders (Gezelligheid rush), Randstad (Corporate expansion), Limburgers (Underground ambush), Belgen (Diplomatic siege)
+- **4-faction rendering**: Limburgers (dark green #3a7d32) and Belgen (burgundy #a01030) faction tint colors in UnitRenderer and BuildingRenderer, model path entries with fallback to Brabanders models
+- **Player faction choice**: Selected faction flows from menu → game init, all game systems use playerFactionId instead of hardcoded Brabanders
+- **Faction-specific HUD**: Tertiary resource display for non-Brabanders, Gezelligheid hidden for non-Brabanders, death particles colored per faction
+- **PlayerState 4-player support**: Expanded from 2 to 4 player slots
+- **Faction remap system**: Player's chosen faction swapped into slot 0 for consistent spawn positions
+
+### Changed
+- **Game.ts refactored**: ~60 hardcoded `FactionId.Brabanders` references replaced with dynamic `playerFactionId`
+- **Binary faction mapping removed**: All `FACTION_ORANGE`/`FACTION_BLUE` ternaries replaced with direct factionId usage
+- **AI opponent detection**: Game-over check now uses "not player faction" instead of hardcoded FactionId.AI
+- **Building completion**: AI building instant-complete now checks "not player faction" instead of FactionId.AI
+
 ## [0.8.0] - 2026-04-06
 
 ### Added

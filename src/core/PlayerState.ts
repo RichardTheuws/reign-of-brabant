@@ -2,7 +2,7 @@
  * Reign of Brabant -- Player State
  *
  * Manages gold count and population per player.
- * 2 players: index 0 = human (Brabanders), index 1 = AI.
+ * Up to 4 players: index = FactionId (0=Brabanders, 1=Randstad, 2=Limburgers, 3=Belgen).
  * Exists outside ECS as singleton runtime state.
  */
 
@@ -40,16 +40,16 @@ class PlayerStateManager {
 
   /**
    * Reset to initial values for a new game.
-   * Player 0 (human) and Player 1 (AI) each start with:
+   * Creates 4 player slots (one per faction). Each starts with:
    *   - 100 gold
    *   - 0 current population (units are added at map setup)
    *   - 10 max population (from starting Town Hall)
    */
-  reset(): void {
-    this.players = [
-      { gold: 100, wood: 0, populationCurrent: 0, populationMax: 10, gezelligheid: 0, tertiary: 0, efficiencyStacks: 0 },
-      { gold: 100, wood: 0, populationCurrent: 0, populationMax: 10, gezelligheid: 0, tertiary: 0, efficiencyStacks: 0 },
-    ];
+  reset(playerCount: number = 4): void {
+    this.players = [];
+    for (let i = 0; i < playerCount; i++) {
+      this.players.push({ gold: 100, wood: 0, populationCurrent: 0, populationMax: 10, gezelligheid: 0, tertiary: 0, efficiencyStacks: 0 });
+    }
   }
 
   // -------------------------------------------------------------------------

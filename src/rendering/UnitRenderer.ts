@@ -18,6 +18,8 @@ export type UnitTypeName = 'worker' | 'infantry' | 'ranged';
 /** Faction identifier as stored in the ECS Faction.id component. */
 export const FACTION_ORANGE = 0;
 export const FACTION_BLUE = 1;
+export const FACTION_GREEN = 2;
+export const FACTION_RED = 3;
 
 /** Unique cache key for a unit model. */
 type ModelCacheKey = `${UnitTypeName}_${number}`;
@@ -30,6 +32,14 @@ const UNIT_MODEL_PATHS: Record<string, string> = {
   infantry_1: 'assets/models/v02/randstad/infantry.glb',
   ranged_0: 'assets/models/v02/brabanders/ranged.glb',
   ranged_1: 'assets/models/v02/randstad/ranged.glb',
+  // Limburgers (reuse Brabanders models, distinguished by green tint)
+  worker_2: 'assets/models/v02/brabanders/worker.glb',
+  infantry_2: 'assets/models/v02/brabanders/infantry.glb',
+  ranged_2: 'assets/models/v02/brabanders/ranged.glb',
+  // Belgen (reuse Brabanders models, distinguished by burgundy tint)
+  worker_3: 'assets/models/v02/brabanders/worker.glb',
+  infantry_3: 'assets/models/v02/brabanders/infantry.glb',
+  ranged_3: 'assets/models/v02/brabanders/ranged.glb',
 };
 
 const UNIT_MODEL_FALLBACKS: Record<string, string> = {
@@ -39,12 +49,22 @@ const UNIT_MODEL_FALLBACKS: Record<string, string> = {
   infantry_1: 'assets/models/v01/randstad/infantry.glb',
   ranged_0: 'assets/models/v01/brabanders/ranged.glb',
   ranged_1: 'assets/models/v01/randstad/ranged.glb',
+  // Limburgers (reuse Brabanders v01 models as fallback)
+  worker_2: 'assets/models/v01/brabanders/worker.glb',
+  infantry_2: 'assets/models/v01/brabanders/infantry.glb',
+  ranged_2: 'assets/models/v01/brabanders/ranged.glb',
+  // Belgen (reuse Brabanders v01 models as fallback)
+  worker_3: 'assets/models/v01/brabanders/worker.glb',
+  infantry_3: 'assets/models/v01/brabanders/infantry.glb',
+  ranged_3: 'assets/models/v01/brabanders/ranged.glb',
 };
 
 /** Faction team colors: applied as a strong tint to unit materials. */
 const FACTION_TINTS: Record<number, THREE.Color> = {
   [FACTION_ORANGE]: new THREE.Color(0xff8830), // Brabanders: bright warm orange
   [FACTION_BLUE]: new THREE.Color(0x4070bb),   // Randstad: clear blue
+  [FACTION_GREEN]: new THREE.Color(0x3a7d32),  // Limburgers: dark mining green
+  [FACTION_RED]: new THREE.Color(0xa01030),    // Belgen: burgundy red
 };
 
 /** Selection highlight color (green tint on instance color). */

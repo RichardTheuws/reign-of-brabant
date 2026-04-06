@@ -189,6 +189,9 @@ import { createProductionSystem } from './ProductionSystem';
 import { createBuildSystem } from './BuildSystem';
 import { createTechTreeSystem } from './TechTreeSystem';
 import { createBureaucracySystem } from './BureaucracySystem';
+import { createTertiaryResourceSystem } from './TertiaryResourceSystem';
+import { createUndergroundSystem } from './UndergroundSystem';
+import { createDiplomacySystem } from './DiplomacySystem';
 import { createDeathSystem } from './DeathSystem';
 import { createVisionSystem } from './VisionSystem';
 import type { Terrain } from '../world/Terrain';
@@ -224,6 +227,15 @@ export function createGamePipeline(terrain: Terrain, devMode = false): SystemPip
 
   // Phase 4.7: Bureaucracy (Randstad faction -- runs before economy so werkoverleg pauses are applied)
   pipeline.add('BureaucracySystem', createBureaucracySystem(), 'faction');
+
+  // Phase 4.8: Tertiary resources (Kolen, Chocolade, Havermoutmelk -- generated before faction systems that consume them)
+  pipeline.add('TertiaryResourceSystem', createTertiaryResourceSystem(), 'faction');
+
+  // Phase 4.81: Underground tunnels (Limburgers faction -- needs Kolen from TertiaryResourceSystem)
+  pipeline.add('UndergroundSystem', createUndergroundSystem(), 'faction');
+
+  // Phase 4.82: Diplomacy (Belgen faction -- needs Chocolade from TertiaryResourceSystem)
+  pipeline.add('DiplomacySystem', createDiplomacySystem(), 'faction');
 
   // Phase 5: Combat & Economy
   pipeline.add('CombatSystem', createCombatSystem(), 'combat');

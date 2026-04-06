@@ -753,15 +753,13 @@
             <span class="faction-card-icon">&#x1F3E2;</span>
             <div class="faction-card-name">Randstad</div>
           </div>
-          <div class="faction-card is-locked" title="Beschikbaar in v1.0">
+          <div class="faction-card" id="faction-card-limburgers" data-faction="limburgers">
             <span class="faction-card-icon">&#x26CF;&#xFE0F;</span>
             <div class="faction-card-name">Limburgers</div>
-            <div class="faction-card-lock">&#x1F512; v1.0</div>
           </div>
-          <div class="faction-card is-locked" title="Beschikbaar in v2.0">
+          <div class="faction-card" id="faction-card-belgen" data-faction="belgen">
             <span class="faction-card-icon">&#x1F35F;</span>
             <div class="faction-card-name">Belgen</div>
-            <div class="faction-card-lock">&#x1F512; v2.0</div>
           </div>
         </div>
 
@@ -791,6 +789,10 @@
           <div class="resource-item" data-resource="population">
             <span class="resource-icon">&#x1F465;</span>
             <span><span class="resource-value" id="res-pop">0</span> / <span id="res-pop-max">10</span></span>
+          </div>
+          <div class="resource-item tertiary-resource-item" id="tertiary-resource" style="display: none; border-left: 1px solid rgba(212, 168, 83, 0.25); padding-left: 16px;">
+            <span class="resource-icon" id="res-tertiary-icon">⛏️</span>
+            <span class="resource-value" id="res-tertiary">0</span>
           </div>
           <div class="resource-item gezelligheid-item" data-resource="gezelligheid">
             <span class="resource-icon">&#x1F37A;</span>

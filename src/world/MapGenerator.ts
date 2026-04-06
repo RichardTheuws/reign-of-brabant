@@ -1,15 +1,21 @@
 /**
- * MapGenerator -- Map setup for the PoC
+ * MapGenerator -- Map setup for 2-4 player games
  *
  * Generates the initial game state:
- * - Player start position (top-left corner)
- * - AI start position (bottom-right corner)
- * - 4 gold mines (2 near each start, 2 contested in centre)
+ * - 2-4 player start positions in clockwise pattern:
+ *     Position 0 (Brabanders): top-left
+ *     Position 1 (Randstad):   bottom-right
+ *     Position 2 (Limburgers): top-right
+ *     Position 3 (Belgen):     bottom-left
+ * - Balanced gold mines (2 near each base + contested centre mines)
+ * - Tree groves (1+ near each base)
  * - Decoration props (trees, rocks) scattered across the map
  * - Starting units: 3 workers + 1 Town Hall per faction
  *
- * Returns a MapDefinition with all positions so that the ECS world
+ * Returns a GeneratedMap with all positions so that the ECS world
  * and renderer can be populated.
+ *
+ * When playerCount=2, the layout is identical to the original PoC map.
  */
 
 import {
@@ -39,7 +45,7 @@ const DEFAULT_GOLD_AMOUNT = 2000;
 /** Default wood per tree resource node. */
 const DEFAULT_WOOD_AMOUNT = 300;
 
-/** Number of tree resource clusters (groves). */
+/** Number of tree resource clusters (groves) for 2-player maps. */
 const TREE_GROVE_COUNT = 4;
 
 /** Trees per grove. */
@@ -140,101 +146,130 @@ function createRng(seed: number): () => number {
 type HeightCallback = (x: number, z: number) => number;
 
 // ---------------------------------------------------------------------------
+// Spawn position configuration (clockwise from top-left)
+// ---------------------------------------------------------------------------
+
+/**
+ * Base positions for up to 4 players, defined as offsets from map centre.
+ * Index matches the player slot:
+ *   0 = top-left     (Brabanders)
+ *   1 = bottom-right  (Randstad)
+ *   2 = top-right     (Limburgers)
+ *   3 = bottom-left   (Belgen)
+ *
+ * Each entry also defines a "direction towards centre" unit vector
+ * used for placing nearby mines, groves, and worker rows.
+ */
+interface BasePositionConfig {
+  /** X position (will be computed from halfMap + BASE_MARGIN). */
+  readonly xSign: -1 | 1;
+  /** Z position (will be computed from halfMap + BASE_MARGIN). */
+  readonly zSign: -1 | 1;
+  /** Faction assigned to this slot. */
+  readonly factionId: FactionId;
+  /** Direction towards map centre (unit vector components, +1 or -1). */
+  readonly towardsCentreX: 1 | -1;
+  readonly towardsCentreZ: 1 | -1;
+}
+
+const BASE_POSITIONS: readonly BasePositionConfig[] = [
+  // Slot 0: top-left → Brabanders
+  { xSign: -1, zSign: -1, factionId: FactionId.Brabanders, towardsCentreX: 1, towardsCentreZ: 1 },
+  // Slot 1: bottom-right → Randstad
+  { xSign: 1, zSign: 1, factionId: FactionId.Randstad, towardsCentreX: -1, towardsCentreZ: -1 },
+  // Slot 2: top-right → Limburgers
+  { xSign: 1, zSign: -1, factionId: FactionId.Limburgers, towardsCentreX: -1, towardsCentreZ: 1 },
+  // Slot 3: bottom-left → Belgen
+  { xSign: -1, zSign: 1, factionId: FactionId.Belgen, towardsCentreX: 1, towardsCentreZ: -1 },
+];
+
+// ---------------------------------------------------------------------------
 // Generator
 // ---------------------------------------------------------------------------
 
 /**
- * Generate a complete map layout for the PoC.
+ * Generate a complete map layout for 2-4 players.
  *
  * @param seed - Random seed for deterministic generation.
  * @param getHeight - Optional terrain height callback to avoid placing
  *   things in water. Defaults to 0 everywhere.
+ * @param playerCount - Number of players (2-4). Defaults to 2 for
+ *   backwards compatibility with the original PoC layout.
  */
 export function generateMap(
   seed: number = 42,
   getHeight: HeightCallback = () => 0,
+  playerCount: 2 | 3 | 4 = 2,
 ): GeneratedMap {
   const rng = createRng(seed);
   const halfMap = MAP_SIZE / 2;
 
   // -----------------------------------------------------------------------
-  // 1. Player & AI spawn points
+  // 1. Spawn points for all active players
   // -----------------------------------------------------------------------
 
-  // Player: top-left (negative X, negative Z in centered coordinate space)
-  const playerSpawn: SpawnPoint = {
-    x: -halfMap + BASE_MARGIN,
-    z: -halfMap + BASE_MARGIN,
-    factionId: FactionId.Brabanders,
-  };
+  const spawns: SpawnPoint[] = [];
 
-  // AI: bottom-right
-  const aiSpawn: SpawnPoint = {
-    x: halfMap - BASE_MARGIN,
-    z: halfMap - BASE_MARGIN,
-    factionId: FactionId.AI,
-  };
+  for (let slot = 0; slot < playerCount; slot++) {
+    const cfg = BASE_POSITIONS[slot];
+    spawns.push({
+      x: cfg.xSign * (halfMap - BASE_MARGIN),
+      z: cfg.zSign * (halfMap - BASE_MARGIN),
+      factionId: cfg.factionId,
+    });
+  }
 
   // -----------------------------------------------------------------------
-  // 2. Gold mines -- 2 near each player, 2 in contested centre
+  // 2. Gold mines -- 2 near each base + contested centre mines
   // -----------------------------------------------------------------------
 
-  const goldMines: GoldMineSpawn[] = [
-    // Near player (slightly offset to force worker travel)
-    {
-      x: playerSpawn.x + MINE_NEAR_OFFSET,
-      z: playerSpawn.z + 2,
-      amount: DEFAULT_GOLD_AMOUNT,
-    },
-    {
-      x: playerSpawn.x + 2,
-      z: playerSpawn.z + MINE_NEAR_OFFSET,
-      amount: DEFAULT_GOLD_AMOUNT,
-    },
+  const goldMines: GoldMineSpawn[] = [];
 
-    // Near AI
-    {
-      x: aiSpawn.x - MINE_NEAR_OFFSET,
-      z: aiSpawn.z - 2,
-      amount: DEFAULT_GOLD_AMOUNT,
-    },
-    {
-      x: aiSpawn.x - 2,
-      z: aiSpawn.z - MINE_NEAR_OFFSET,
-      amount: DEFAULT_GOLD_AMOUNT,
-    },
+  for (let slot = 0; slot < playerCount; slot++) {
+    const spawn = spawns[slot];
+    const cfg = BASE_POSITIONS[slot];
 
-    // Contested centre mines
-    {
-      x: -8 + rng() * 4,
-      z: 8 - rng() * 4,
-      amount: DEFAULT_GOLD_AMOUNT * 1.5,
-    },
-    {
-      x: 8 - rng() * 4,
-      z: -8 + rng() * 4,
-      amount: DEFAULT_GOLD_AMOUNT * 1.5,
-    },
-  ];
+    // Mine 1: offset along X axis towards centre
+    goldMines.push({
+      x: spawn.x + cfg.towardsCentreX * MINE_NEAR_OFFSET,
+      z: spawn.z + cfg.towardsCentreZ * 2,
+      amount: DEFAULT_GOLD_AMOUNT,
+    });
+
+    // Mine 2: offset along Z axis towards centre
+    goldMines.push({
+      x: spawn.x + cfg.towardsCentreX * 2,
+      z: spawn.z + cfg.towardsCentreZ * MINE_NEAR_OFFSET,
+      amount: DEFAULT_GOLD_AMOUNT,
+    });
+  }
+
+  // Contested centre mines (always 2, richer than base mines)
+  goldMines.push({
+    x: -8 + rng() * 4,
+    z: 8 - rng() * 4,
+    amount: DEFAULT_GOLD_AMOUNT * 1.5,
+  });
+  goldMines.push({
+    x: 8 - rng() * 4,
+    z: -8 + rng() * 4,
+    amount: DEFAULT_GOLD_AMOUNT * 1.5,
+  });
 
   // -----------------------------------------------------------------------
   // 3. Buildings -- Town Hall per faction
   // -----------------------------------------------------------------------
 
-  const buildings: BuildingSpawn[] = [
-    {
-      factionId: FactionId.Brabanders,
+  const buildings: BuildingSpawn[] = [];
+
+  for (let slot = 0; slot < playerCount; slot++) {
+    buildings.push({
+      factionId: spawns[slot].factionId,
       buildingType: BuildingTypeId.TownHall,
-      x: playerSpawn.x,
-      z: playerSpawn.z,
-    },
-    {
-      factionId: FactionId.AI,
-      buildingType: BuildingTypeId.TownHall,
-      x: aiSpawn.x,
-      z: aiSpawn.z,
-    },
-  ];
+      x: spawns[slot].x,
+      z: spawns[slot].z,
+    });
+  }
 
   // -----------------------------------------------------------------------
   // 4. Starting units -- 3 workers per faction
@@ -242,22 +277,18 @@ export function generateMap(
 
   const units: UnitSpawn[] = [];
 
-  for (let i = 0; i < STARTING_WORKERS; i++) {
-    // Player workers, arranged in a row near Town Hall
-    units.push({
-      factionId: FactionId.Brabanders,
-      unitType: UnitTypeId.Worker,
-      x: playerSpawn.x + 3 + i * WORKER_SPACING,
-      z: playerSpawn.z + 3,
-    });
+  for (let slot = 0; slot < playerCount; slot++) {
+    const spawn = spawns[slot];
+    const cfg = BASE_POSITIONS[slot];
 
-    // AI workers
-    units.push({
-      factionId: FactionId.AI,
-      unitType: UnitTypeId.Worker,
-      x: aiSpawn.x - 3 - i * WORKER_SPACING,
-      z: aiSpawn.z - 3,
-    });
+    for (let i = 0; i < STARTING_WORKERS; i++) {
+      units.push({
+        factionId: spawn.factionId,
+        unitType: UnitTypeId.Worker,
+        x: spawn.x + cfg.towardsCentreX * (3 + i * WORKER_SPACING),
+        z: spawn.z + cfg.towardsCentreZ * 3,
+      });
+    }
   }
 
   // -----------------------------------------------------------------------
@@ -265,18 +296,42 @@ export function generateMap(
   // -----------------------------------------------------------------------
 
   const treeResources: TreeResourceSpawn[] = [];
+  const groveCenters: { x: number; z: number }[] = [];
 
-  // Grove centers: 2 near player, 2 near AI
-  const groveCenters = [
-    // Near player
-    { x: playerSpawn.x + GROVE_NEAR_OFFSET, z: playerSpawn.z + GROVE_NEAR_OFFSET * 0.5 },
-    { x: playerSpawn.x + GROVE_NEAR_OFFSET * 0.5, z: playerSpawn.z + GROVE_NEAR_OFFSET },
-    // Near AI
-    { x: aiSpawn.x - GROVE_NEAR_OFFSET, z: aiSpawn.z - GROVE_NEAR_OFFSET * 0.5 },
-    { x: aiSpawn.x - GROVE_NEAR_OFFSET * 0.5, z: aiSpawn.z - GROVE_NEAR_OFFSET },
-  ];
+  if (playerCount === 2) {
+    // Original 2-player layout: 2 groves near each base (4 total)
+    for (let slot = 0; slot < 2; slot++) {
+      const spawn = spawns[slot];
+      const cfg = BASE_POSITIONS[slot];
 
-  for (let g = 0; g < TREE_GROVE_COUNT; g++) {
+      groveCenters.push({
+        x: spawn.x + cfg.towardsCentreX * GROVE_NEAR_OFFSET,
+        z: spawn.z + cfg.towardsCentreZ * GROVE_NEAR_OFFSET * 0.5,
+      });
+      groveCenters.push({
+        x: spawn.x + cfg.towardsCentreX * GROVE_NEAR_OFFSET * 0.5,
+        z: spawn.z + cfg.towardsCentreZ * GROVE_NEAR_OFFSET,
+      });
+    }
+  } else {
+    // 3-4 player layout: 1 grove near each base + 2 contested in centre
+    for (let slot = 0; slot < playerCount; slot++) {
+      const spawn = spawns[slot];
+      const cfg = BASE_POSITIONS[slot];
+
+      // 1 grove per base, placed diagonally towards centre
+      groveCenters.push({
+        x: spawn.x + cfg.towardsCentreX * GROVE_NEAR_OFFSET * 0.75,
+        z: spawn.z + cfg.towardsCentreZ * GROVE_NEAR_OFFSET * 0.75,
+      });
+    }
+
+    // 2 contested groves near map centre (mirrored)
+    groveCenters.push({ x: -12, z: -12 });
+    groveCenters.push({ x: 12, z: 12 });
+  }
+
+  for (let g = 0; g < groveCenters.length; g++) {
     const center = groveCenters[g];
     const treeCount = TREES_PER_GROVE_MIN + Math.floor(rng() * (TREES_PER_GROVE_MAX - TREES_PER_GROVE_MIN + 1));
     for (let t = 0; t < treeCount; t++) {
@@ -296,8 +351,7 @@ export function generateMap(
 
   // Collect positions we want to avoid
   const avoidPositions: { x: number; z: number }[] = [
-    playerSpawn,
-    aiSpawn,
+    ...spawns,
     ...goldMines,
     ...treeResources,
     ...buildings,
@@ -345,7 +399,7 @@ export function generateMap(
   return {
     size: MAP_SIZE,
     heightScale: 10,
-    spawns: [playerSpawn, aiSpawn],
+    spawns,
     goldMines,
     treeResources,
     buildings,

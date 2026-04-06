@@ -21,7 +21,7 @@ import { generateMap, type GeneratedMap, DecoType } from '../world/MapGenerator'
 import { queueCommand } from '../systems/CommandSystem';
 import { NavMeshManager } from '../pathfinding/NavMeshManager';
 import { AISystem } from '../ai/AISystem';
-import { UnitRenderer, FACTION_ORANGE, FACTION_BLUE } from '../rendering/UnitRenderer';
+import { UnitRenderer } from '../rendering/UnitRenderer';
 import { BuildingRenderer } from '../rendering/BuildingRenderer';
 import { PropRenderer } from '../rendering/PropRenderer';
 import { SelectionRenderer, type SelectionData } from '../rendering/SelectionRenderer';
@@ -42,6 +42,19 @@ import type { Terrain } from '../world/Terrain';
 import type { RTSCamera } from '../camera/RTSCamera';
 import type { EventBus as EventBusType } from '../core/EventBus';
 import type { ParticleSystem } from '../rendering/ParticleSystem';
+
+const FACTION_DEATH_COLORS: Record<number, number> = {
+  [FactionId.Brabanders]: 0xe67e22,
+  [FactionId.Randstad]: 0x4a4a5a,
+  [FactionId.Limburgers]: 0x3a7d32,
+  [FactionId.Belgen]: 0xa01030,
+};
+
+function unitTypeName(unitType: number): 'worker' | 'infantry' | 'ranged' {
+  if (unitType === UnitTypeId.Worker) return 'worker';
+  if (unitType === UnitTypeId.Ranged) return 'ranged';
+  return 'infantry';
+}
 
 export class Game {
   private scene: THREE.Scene;
@@ -69,6 +82,9 @@ export class Game {
   // Building placement mode
   private buildMode = false;
   private buildGhostType: 'barracks' | 'blacksmith' | 'lumbercamp' | null = null;
+
+  // Player's chosen faction (0=Brabanders, 1=Randstad, 2=Limburgers, 3=Belgen)
+  private playerFactionId: FactionId = FactionId.Brabanders;
 
   // Game over state
   private gameOver = false;
@@ -137,9 +153,16 @@ export class Game {
     this.playerState = playerState;
   }
 
-  async init(): Promise<void> {
-    // 1. Generate map layout
-    this.map = generateMap(42, (x, z) => this.terrain.getHeightAt(x, z));
+  async init(playerFaction: number = FactionId.Brabanders): Promise<void> {
+    this.playerFactionId = playerFaction as FactionId;
+
+    // 1. Generate map layout (2 players for skirmish: player + 1 AI)
+    this.map = generateMap(42, (x, z) => this.terrain.getHeightAt(x, z), 2);
+
+    // Remap slot 0 to player's chosen faction (swap if needed)
+    if (this.playerFactionId !== FactionId.Brabanders) {
+      this.remapFactions();
+    }
 
     // 2. Load all GLB models
     await Promise.all([
@@ -179,10 +202,10 @@ export class Game {
     audioManager.init();
     audioManager.startAmbient('ambient_birds');
     audioManager.startAmbient('ambient_wind');
-    this.musicSystem.start(FactionId.Brabanders);
+    this.musicSystem.start(this.playerFactionId);
 
     // 11. Move camera to player base
-    const playerSpawn = this.map.spawns.find(s => s.factionId === FactionId.Brabanders);
+    const playerSpawn = this.map.spawns.find(s => s.factionId === this.playerFactionId);
     if (playerSpawn) {
       this.camera.setPosition(playerSpawn.x, playerSpawn.z);
     }
@@ -237,7 +260,7 @@ export class Game {
       spawnUnits: (u) => this._spawnMissionUnits(u),
       triggerVictory: (s, t, b) => { this.gameOver = true; this.musicSystem.playVictory(); this.onMissionVictory?.(s, t, b); },
       triggerDefeat: () => { this.gameOver = true; this.musicSystem.playDefeat(); this.onMissionDefeat?.(); },
-      getPlayerGold: () => this.playerState.getGold(FactionId.Brabanders),
+      getPlayerGold: () => this.playerState.getGold(this.playerFactionId),
       hasPlayerBuilding: (bt) => this._hasPlayerBldg(bt),
       getPlayerArmyCount: () => this._armyCount(),
       isEnemyBuildingDestroyed: (f, bt) => this._enemyBldgDestroyed(f, bt),
@@ -264,7 +287,7 @@ export class Game {
     for (const b of m.buildings) {
       const eid = this.createBuildingEntity(b.buildingType, b.factionId, b.x, b.z);
       Building.complete[eid] = b.complete ? 1 : 0; Building.progress[eid] = b.complete ? 1 : 0;
-      const fi = b.factionId === FactionId.Brabanders ? FACTION_ORANGE : FACTION_BLUE;
+      const fi = b.factionId;
       const tn = this.getBuildingRendererType(b.buildingType);
       const y = this.terrain.getHeightAt(b.x, b.z);
       const mesh = this.buildingRenderer.addBuilding(eid, tn, fi, b.x, y, b.z, b.complete ? 1.0 : 0.0);
@@ -273,8 +296,8 @@ export class Game {
     }
     for (const u of m.units) {
       const eid = this.createUnitEntity(u.unitType, u.factionId, u.x, u.z);
-      const fi = u.factionId === FactionId.Brabanders ? FACTION_ORANGE : FACTION_BLUE;
-      const tn = u.unitType === UnitTypeId.Worker ? 'worker' : u.unitType === UnitTypeId.Infantry ? 'infantry' : 'ranged';
+      const fi = u.factionId;
+      const tn = unitTypeName(u.unitType);
       const mesh = this.unitRenderer.addUnit(eid, tn, fi);
       if (mesh) { mesh.position.set(u.x, this.terrain.getHeightAt(u.x, u.z), u.z); mesh.userData.eid = eid; this.entityMeshMap.set(eid, mesh); }
       this.knownUnitEntities.add(eid);
@@ -298,8 +321,8 @@ export class Game {
     const ids: number[] = [];
     for (const u of units) {
       const eid = this.createUnitEntity(u.unitType, u.factionId, u.x, u.z);
-      const fi = u.factionId === FactionId.Brabanders ? FACTION_ORANGE : FACTION_BLUE;
-      const tn = u.unitType === UnitTypeId.Worker ? 'worker' : u.unitType === UnitTypeId.Infantry ? 'infantry' : 'ranged';
+      const fi = u.factionId;
+      const tn = unitTypeName(u.unitType);
       const mesh = this.unitRenderer.addUnit(eid, tn, fi);
       if (mesh) { mesh.position.set(u.x, this.terrain.getHeightAt(u.x, u.z), u.z); mesh.userData.eid = eid; this.entityMeshMap.set(eid, mesh); }
       this.knownUnitEntities.add(eid);
@@ -313,17 +336,17 @@ export class Game {
     return ids;
   }
   private _setupMissionEvents(): void {
-    eventBus.on('unit-trained', (ev) => { if (ev.factionId === FactionId.Brabanders && (ev.unitTypeId === UnitTypeId.Infantry || ev.unitTypeId === UnitTypeId.Ranged)) { this.militaryTrainedCount++; this.missionSystem?.onMilitaryTrained(); } });
-    eventBus.on('unit-died', (ev) => { if (ev.factionId === FactionId.Brabanders && ev.unitTypeId === UnitTypeId.Worker) this.missionSystem?.onWorkerLost(); });
-    eventBus.on('building-destroyed', (ev) => { if (ev.factionId === FactionId.Brabanders && ev.buildingTypeId === BuildingTypeId.TownHall) this.missionSystem?.onTownHallLost(); });
+    eventBus.on('unit-trained', (ev) => { if (ev.factionId === this.playerFactionId && (ev.unitTypeId === UnitTypeId.Infantry || ev.unitTypeId === UnitTypeId.Ranged)) { this.militaryTrainedCount++; this.missionSystem?.onMilitaryTrained(); } });
+    eventBus.on('unit-died', (ev) => { if (ev.factionId === this.playerFactionId && ev.unitTypeId === UnitTypeId.Worker) this.missionSystem?.onWorkerLost(); });
+    eventBus.on('building-destroyed', (ev) => { if (ev.factionId === this.playerFactionId && ev.buildingTypeId === BuildingTypeId.TownHall) this.missionSystem?.onTownHallLost(); });
   }
-  private _hasPlayerBldg(bt: BuildingTypeId): boolean { for (const eid of this.knownBuildingEntities) { if (!entityExists(world, eid)) continue; if (Faction.id[eid] === FactionId.Brabanders && Building.typeId[eid] === bt && Building.complete[eid] === 1) return true; } return false; }
-  private _armyCount(): number { let c = 0; for (const eid of this.knownUnitEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead) || Faction.id[eid] !== FactionId.Brabanders) continue; const ut = UnitType.id[eid]; if (ut === UnitTypeId.Infantry || ut === UnitTypeId.Ranged) c++; } return c; }
+  private _hasPlayerBldg(bt: BuildingTypeId): boolean { for (const eid of this.knownBuildingEntities) { if (!entityExists(world, eid)) continue; if (Faction.id[eid] === this.playerFactionId && Building.typeId[eid] === bt && Building.complete[eid] === 1) return true; } return false; }
+  private _armyCount(): number { let c = 0; for (const eid of this.knownUnitEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead) || Faction.id[eid] !== this.playerFactionId) continue; const ut = UnitType.id[eid]; if (ut === UnitTypeId.Infantry || ut === UnitTypeId.Ranged) c++; } return c; }
   private _enemyBldgDestroyed(fid: FactionId, bt: BuildingTypeId): boolean { for (const eid of this.knownBuildingEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead) || Health.current[eid] <= 0) continue; if (Faction.id[eid] === fid && Building.typeId[eid] === bt) return false; } return this.activeMission?.buildings.some(b => b.factionId === fid && b.buildingType === bt) ?? false; }
   private _destroyedEnemyBldgCount(): number { let count = 0; if (!this.activeMission) return 0; for (const b of this.activeMission.buildings) { if (b.factionId === FactionId.AI) { let alive = false; for (const eid of this.knownBuildingEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead) || Health.current[eid] <= 0) continue; if (Faction.id[eid] === FactionId.AI && Building.typeId[eid] === b.buildingType && Math.abs(Position.x[eid] - b.x) < 2 && Math.abs(Position.z[eid] - b.z) < 2) { alive = true; break; } } if (!alive) count++; } } return count; }
-  private _workerCount(): number { let c = 0; for (const eid of this.knownUnitEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead)) continue; if (Faction.id[eid] === FactionId.Brabanders && hasComponent(world, eid, IsWorker)) c++; } return c; }
-  private _thAlive(): boolean { for (const eid of this.knownBuildingEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead) || Health.current[eid] <= 0) continue; if (Faction.id[eid] === FactionId.Brabanders && Building.typeId[eid] === BuildingTypeId.TownHall) return true; } return false; }
-  private _playerUnits(): number { let c = 0; for (const eid of this.knownUnitEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead)) continue; if (Faction.id[eid] === FactionId.Brabanders) c++; } return c; }
+  private _workerCount(): number { let c = 0; for (const eid of this.knownUnitEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead)) continue; if (Faction.id[eid] === this.playerFactionId && hasComponent(world, eid, IsWorker)) c++; } return c; }
+  private _thAlive(): boolean { for (const eid of this.knownBuildingEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead) || Health.current[eid] <= 0) continue; if (Faction.id[eid] === this.playerFactionId && Building.typeId[eid] === BuildingTypeId.TownHall) return true; } return false; }
+  private _playerUnits(): number { let c = 0; for (const eid of this.knownUnitEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead)) continue; if (Faction.id[eid] === this.playerFactionId) c++; } return c; }
   private _aiUnits(): number { let c = 0; for (const eid of this.knownUnitEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead)) continue; if (Faction.id[eid] === FactionId.AI) c++; } return c; }
   private _createMsgOverlay(): void {
     if (document.getElementById('mission-message')) return;
@@ -373,7 +396,7 @@ export class Game {
     // Spawn buildings (Town Halls)
     for (const b of this.map.buildings) {
       const eid = this.createBuildingEntity(b.buildingType, b.factionId, b.x, b.z);
-      const factionIdx = b.factionId === FactionId.Brabanders ? FACTION_ORANGE : FACTION_BLUE;
+      const factionIdx = b.factionId;
       const typeName = this.getBuildingRendererType(b.buildingType);
       const y = this.terrain.getHeightAt(b.x, b.z);
       const mesh = this.buildingRenderer.addBuilding(eid, typeName, factionIdx, b.x, y, b.z, 1.0);
@@ -387,8 +410,8 @@ export class Game {
     // Spawn units
     for (const u of this.map.units) {
       const eid = this.createUnitEntity(u.unitType, u.factionId, u.x, u.z);
-      const factionIdx = u.factionId === FactionId.Brabanders ? FACTION_ORANGE : FACTION_BLUE;
-      const typeName = u.unitType === UnitTypeId.Worker ? 'worker' : u.unitType === UnitTypeId.Infantry ? 'infantry' : 'ranged';
+      const factionIdx = u.factionId;
+      const typeName = unitTypeName(u.unitType);
       const mesh = this.unitRenderer.addUnit(eid, typeName, factionIdx);
       if (mesh) {
         mesh.position.set(u.x, this.terrain.getHeightAt(u.x, u.z), u.z);
@@ -420,9 +443,10 @@ export class Game {
       }
     }
 
-    // Starting resources
-    this.playerState.addGold(0, 200);  // Player starts with 200 gold
-    this.playerState.addGold(1, 200);  // AI starts with 200 gold
+    // Starting resources for all active factions
+    for (const spawn of this.map.spawns) {
+      this.playerState.addGold(spawn.factionId, 200);
+    }
   }
 
   private spawnProps(): void {
@@ -476,10 +500,10 @@ export class Game {
         onMenu: () => window.location.reload(),
       });
       this.hud.updateResources(
-        this.playerState.getGold(0),
-        this.playerState.getWood(0),
-        this.playerState.getPopulation(0),
-        this.playerState.getPopulationMax(0)
+        this.playerState.getGold(this.playerFactionId),
+        this.playerState.getWood(this.playerFactionId),
+        this.playerState.getPopulation(this.playerFactionId),
+        this.playerState.getPopulationMax(this.playerFactionId)
       );
     } catch (e) {
       console.warn('[Game] HUD init failed:', e);
@@ -544,7 +568,7 @@ export class Game {
   private enterBuildMode(type: 'barracks' | 'lumbercamp' | 'blacksmith'): void {
     // Check if we have a worker selected
     const hasWorker = this.selectedEntities.some(eid =>
-      hasComponent(world, eid, IsWorker) && Faction.id[eid] === FactionId.Brabanders
+      hasComponent(world, eid, IsWorker) && Faction.id[eid] === this.playerFactionId
     );
     if (!hasWorker) {
       this.hud?.showAlert('Selecteer een worker om te bouwen', 'warning');
@@ -556,7 +580,7 @@ export class Game {
       : BuildingTypeId.Barracks;
     // Check cost
     const cost = BUILDING_ARCHETYPES[buildingTypeId].costGold;
-    if (!this.playerState.canAfford(FactionId.Brabanders, cost)) {
+    if (!this.playerState.canAfford(this.playerFactionId, cost)) {
       this.hud?.showAlert('Niet genoeg goud!', 'warning');
       return;
     }
@@ -578,7 +602,7 @@ export class Game {
     // Find selected building that can train this unit type
     for (const eid of this.selectedEntities) {
       if (!hasComponent(world, eid, IsBuilding)) continue;
-      if (Faction.id[eid] !== FactionId.Brabanders) continue;
+      if (Faction.id[eid] !== this.playerFactionId) continue;
       if (Building.complete[eid] !== 1) continue;
 
       const buildingType = Building.typeId[eid];
@@ -600,29 +624,29 @@ export class Game {
   private trainHero(heroTypeId: HeroTypeId): void {
     const arch = HERO_ARCHETYPES[heroTypeId];
     if (!arch) return;
-    if (isHeroActive(FactionId.Brabanders, heroTypeId)) {
+    if (isHeroActive(this.playerFactionId, heroTypeId)) {
       this.hud?.showAlert(`${arch.name} is al in het spel!`, 'warning');
       return;
     }
-    if (!this.playerState.canAfford(FactionId.Brabanders, arch.costGold)) {
+    if (!this.playerState.canAfford(this.playerFactionId, arch.costGold)) {
       this.hud?.showAlert(`Niet genoeg goud! (${arch.costGold} nodig)`, 'warning');
       return;
     }
-    if (!this.playerState.hasPopulationRoom(FactionId.Brabanders, HERO_POPULATION_COST)) {
+    if (!this.playerState.hasPopulationRoom(this.playerFactionId, HERO_POPULATION_COST)) {
       this.hud?.showAlert(`Niet genoeg populatie! (${HERO_POPULATION_COST} nodig)`, 'warning');
       return;
     }
     let barracksEid = -1;
     for (const eid of this.selectedEntities) {
       if (!hasComponent(world, eid, IsBuilding)) continue;
-      if (Faction.id[eid] !== FactionId.Brabanders) continue;
+      if (Faction.id[eid] !== this.playerFactionId) continue;
       if (Building.complete[eid] !== 1) continue;
       if (Building.typeId[eid] === BuildingTypeId.Barracks) { barracksEid = eid; break; }
     }
     if (barracksEid < 0) {
       const allBlds = query(world, [Building, IsBuilding]);
       for (const eid of allBlds) {
-        if (Faction.id[eid] !== FactionId.Brabanders) continue;
+        if (Faction.id[eid] !== this.playerFactionId) continue;
         if (Building.complete[eid] !== 1) continue;
         if (Building.typeId[eid] === BuildingTypeId.Barracks) { barracksEid = eid; break; }
       }
@@ -631,22 +655,22 @@ export class Game {
       this.hud?.showAlert('Bouw eerst een Cafe (Barracks)!', 'warning');
       return;
     }
-    this.playerState.spend(FactionId.Brabanders, arch.costGold);
+    this.playerState.spend(this.playerFactionId, arch.costGold);
     let thX = Position.x[barracksEid];
     let thZ = Position.z[barracksEid];
     const thBlds = query(world, [Building, IsBuilding]);
     for (const eid of thBlds) {
-      if (Faction.id[eid] !== FactionId.Brabanders) continue;
+      if (Faction.id[eid] !== this.playerFactionId) continue;
       if (Building.typeId[eid] === BuildingTypeId.TownHall) {
         thX = Position.x[eid]; thZ = Position.z[eid]; break;
       }
     }
     const spawnX = Position.x[barracksEid] + 4;
     const spawnZ = Position.z[barracksEid] + 2;
-    const heroEid = createHero(world, heroTypeId, FactionId.Brabanders, spawnX, spawnZ, thX, thZ);
+    const heroEid = createHero(world, heroTypeId, this.playerFactionId, spawnX, spawnZ, thX, thZ);
     if (heroEid >= 0) {
-      this.playerState.addPopulation(FactionId.Brabanders, HERO_POPULATION_COST);
-      const mesh = this.unitRenderer.addUnit(heroEid, 'infantry', FACTION_ORANGE);
+      this.playerState.addPopulation(this.playerFactionId, HERO_POPULATION_COST);
+      const mesh = this.unitRenderer.addUnit(heroEid, 'infantry', this.playerFactionId);
       if (mesh) {
         const y = this.terrain.getHeightAt(spawnX, spawnZ);
         mesh.position.set(spawnX, y, spawnZ);
@@ -663,7 +687,7 @@ export class Game {
     for (const eid of this.selectedEntities) {
       if (!hasComponent(world, eid, IsHero)) continue;
       if (hasComponent(world, eid, IsDead)) continue;
-      if (Faction.id[eid] !== FactionId.Brabanders) continue;
+      if (Faction.id[eid] !== this.playerFactionId) continue;
       const success = activateHeroAbility(world, eid, slot);
       if (success) {
         const htId = Hero.heroTypeId[eid] as HeroTypeId;
@@ -708,7 +732,7 @@ export class Game {
       }
 
       const hit = this.raycastEntities(e.clientX, e.clientY);
-      if (hit !== null && Faction.id[hit] === FactionId.Brabanders) {
+      if (hit !== null && Faction.id[hit] === this.playerFactionId) {
         this.selectedEntities = [hit];
       } else {
         this.selectedEntities = [];
@@ -742,7 +766,7 @@ export class Game {
       // B key for build barracks (when worker selected)
       if (e.code === 'KeyB') {
         const hasWorker = this.selectedEntities.some(eid =>
-          hasComponent(world, eid, IsWorker) && Faction.id[eid] === FactionId.Brabanders
+          hasComponent(world, eid, IsWorker) && Faction.id[eid] === this.playerFactionId
         );
         if (hasWorker) {
           this.enterBuildMode('barracks');
@@ -761,7 +785,7 @@ export class Game {
           } else if (state.cooldownRemaining > 0) {
             this.hud?.showAlert(`Carnavalsrage cooldown: ${Math.ceil(state.cooldownRemaining)}s`, 'warning');
           } else {
-            const current = Math.floor(this.playerState.getGezelligheid(FactionId.Brabanders));
+            const current = Math.floor(this.playerState.getGezelligheid(this.playerFactionId));
             this.hud?.showAlert(`Niet genoeg Gezelligheid! (${current}/${config.cost})`, 'warning');
           }
         }
@@ -790,9 +814,8 @@ export class Game {
       // Create mesh for newly trained unit
       const eid = event.entityId;
       if (!this.entityMeshMap.has(eid)) {
-        const factionIdx = event.factionId === FactionId.Brabanders ? FACTION_ORANGE : FACTION_BLUE;
-        const typeName = event.unitTypeId === UnitTypeId.Worker ? 'worker'
-          : event.unitTypeId === UnitTypeId.Infantry ? 'infantry' : 'ranged';
+        const factionIdx = event.factionId;
+        const typeName = unitTypeName(event.unitTypeId);
         const mesh = this.unitRenderer.addUnit(eid, typeName, factionIdx);
         if (mesh) {
           mesh.position.set(Position.x[eid], Position.y[eid], Position.z[eid]);
@@ -805,13 +828,13 @@ export class Game {
         techTreeSystem.applyAllUpgradesToNewUnit(eid, event.factionId);
       }
       // Audio: play unit trained horn (only for player units)
-      if (event.factionId === FactionId.Brabanders) {
+      if (event.factionId === this.playerFactionId) {
         audioManager.playSound('unit_trained');
       }
     });
 
     eventBus.on('unit-died', (event) => {
-      if (event.factionId === FactionId.Brabanders) {
+      if (event.factionId === this.playerFactionId) {
         this.stats.unitsLost++;
       } else {
         this.stats.enemiesKilled++;
@@ -821,7 +844,7 @@ export class Game {
       const pos = this.entityMeshMap.get(eid)?.position;
       if (pos) {
         audioManager.playSound('unit_death', { x: pos.x, z: pos.z });
-        const factionColor = event.factionId === FactionId.Brabanders ? 0xe67e22 : 0x4a4a5a;
+        const factionColor = FACTION_DEATH_COLORS[event.factionId] ?? 0x4a4a5a;
         this.particles.spawnDeathEffect(pos.x, pos.y, pos.z, factionColor);
       }
       // Remove mesh
@@ -867,14 +890,14 @@ export class Game {
     eventBus.on('building-placed', (event) => {
       const y = this.terrain.getHeightAt(event.x, event.z);
       this.particles.spawnConstructionDust(event.x, y, event.z);
-      if (event.factionId === FactionId.Brabanders) {
+      if (event.factionId === this.playerFactionId) {
         audioManager.playSound('building_complete', { x: event.x, z: event.z });
       }
     });
 
     // Audio + particles: resource deposited
     eventBus.on('resource-deposited', (event) => {
-      if (event.factionId === FactionId.Brabanders) {
+      if (event.factionId === this.playerFactionId) {
         audioManager.playSound('gold_deposit');
         // Gold sparkle at town hall
         const base = this.getPlayerBasePosition();
@@ -901,7 +924,7 @@ export class Game {
 
     // Tech tree: research completed notification
     eventBus.on('research-completed', (event) => {
-      if (event.factionId === FactionId.Brabanders) {
+      if (event.factionId === this.playerFactionId) {
         this.hud?.showAlert(`Onderzoek voltooid: ${event.upgradeName}`, 'info');
         audioManager.playSound('unit_trained'); // reuse fanfare sound
       }
@@ -928,16 +951,16 @@ export class Game {
         : this.buildGhostType === 'lumbercamp' ? 'Houtzagerij'
         : 'Barracks';
 
-      if (!this.playerState.canAfford(FactionId.Brabanders, cost)) {
+      if (!this.playerState.canAfford(this.playerFactionId, cost)) {
         this.hud?.showAlert('Niet genoeg goud!', 'warning');
         return;
       }
 
       // Deduct gold
-      this.playerState.spend(FactionId.Brabanders, cost);
+      this.playerState.spend(this.playerFactionId, cost);
 
       // Spawn building
-      const eid = this.spawnBuildingAtRuntime(buildingTypeId, FactionId.Brabanders, point.x, point.z);
+      const eid = this.spawnBuildingAtRuntime(buildingTypeId, this.playerFactionId, point.x, point.z);
 
       // Send nearest worker to build site
       queueCommand({
@@ -970,7 +993,7 @@ export class Game {
       const ghostModel = 'barracks';
       this.buildingRenderer.showGhost(
         ghostModel,
-        FACTION_ORANGE,
+        this.playerFactionId,
         point.x,
         point.y,
         point.z,
@@ -983,7 +1006,7 @@ export class Game {
   private spawnBuildingAtRuntime(type: BuildingTypeId, faction: FactionId, x: number, z: number): number {
     const eid = this.createBuildingEntity(type, faction, x, z);
 
-    if (faction === FactionId.AI) {
+    if (faction !== this.playerFactionId) {
       // AI buildings complete instantly (AI paid gold upfront)
       Building.complete[eid] = 1;
       Building.progress[eid] = 1;
@@ -995,10 +1018,10 @@ export class Game {
       Building.maxProgress[eid] = arch.buildTime;
     }
 
-    const factionIdx = faction === FactionId.Brabanders ? FACTION_ORANGE : FACTION_BLUE;
+    const factionIdx = faction;
     const typeName = this.getBuildingRendererType(type);
     const y = this.terrain.getHeightAt(x, z);
-    const startProgress = faction === FactionId.AI ? 1.0 : 0.0;
+    const startProgress = faction !== this.playerFactionId ? 1.0 : 0.0;
     const mesh = this.buildingRenderer.addBuilding(eid, typeName, factionIdx, x, y, z, startProgress);
     if (mesh) {
       mesh.userData.eid = eid;
@@ -1106,7 +1129,7 @@ export class Game {
       const firstEid = entityIds[0];
 
       // Check if it's a building
-      if (hasComponent(world, firstEid, IsBuilding) && Faction.id[firstEid] === FactionId.Brabanders) {
+      if (hasComponent(world, firstEid, IsBuilding) && Faction.id[firstEid] === this.playerFactionId) {
         const buildingType = Building.typeId[firstEid];
         const buildingName = this.getBuildingName(buildingType);
         const buildingHudType = this.getBuildingHudType(buildingType);
@@ -1251,10 +1274,10 @@ export class Game {
 
       // Determine unit type of first selected unit for voice lines
       const voiceEid = selected[0];
-      const voiceFaction = hasComponent(world, voiceEid, IsUnit) ? Faction.id[voiceEid] : FactionId.Brabanders;
+      const voiceFaction = hasComponent(world, voiceEid, IsUnit) ? Faction.id[voiceEid] : this.playerFactionId;
       const voiceUnitType = hasComponent(world, voiceEid, IsUnit) ? UnitType.id[voiceEid] : undefined;
 
-      if (targetEid !== null && Faction.id[targetEid] !== FactionId.Brabanders &&
+      if (targetEid !== null && Faction.id[targetEid] !== this.playerFactionId &&
           (hasComponent(world, targetEid, IsUnit) || hasComponent(world, targetEid, IsBuilding))) {
         // Attack enemy unit or building
         queueCommand({ type: 'attack', targetEid });
@@ -1364,7 +1387,7 @@ export class Game {
    */
   private showBlacksmithResearchUI(blacksmithEid: number): void {
     if (!this.hud) return;
-    const factionId = FactionId.Brabanders;
+    const factionId = this.playerFactionId;
 
     // Build upgrade button data
     const upgrades = UPGRADE_DEFINITIONS.map(def => ({
@@ -1522,11 +1545,11 @@ export class Game {
       startTraining: (buildingEid: number, unitType: UnitTypeId) => {
         return this.startTrainingUnit(buildingEid, unitType);
       },
-      deductGold: (amount: number) => {
-        return this.playerState.spend(FactionId.AI, amount);
+      deductGold: (amount: number, factionId?: number) => {
+        return this.playerState.spend(factionId ?? this.getAIFactionId(), amount);
       },
-      getGold: () => {
-        return this.playerState.getGold(FactionId.AI);
+      getGold: (factionId?: number) => {
+        return this.playerState.getGold(factionId ?? this.getAIFactionId());
       },
       getAllEntityIds: () => {
         return this.getAllLivingEntityIds();
@@ -1544,10 +1567,9 @@ export class Game {
       if (hasComponent(world, eid, IsDead)) continue;
 
       // New unit without a mesh -- create one
-      const factionIdx = Faction.id[eid] === FactionId.Brabanders ? FACTION_ORANGE : FACTION_BLUE;
+      const factionIdx = Faction.id[eid];
       const unitType = UnitType.id[eid];
-      const typeName = unitType === UnitTypeId.Worker ? 'worker'
-        : unitType === UnitTypeId.Infantry ? 'infantry' : 'ranged';
+      const typeName = unitTypeName(unitType);
       const mesh = this.unitRenderer.addUnit(eid, typeName, factionIdx);
       if (mesh) {
         mesh.position.set(Position.x[eid], Position.y[eid], Position.z[eid]);
@@ -1676,7 +1698,7 @@ export class Game {
         y: Position.y[eid],
         z: Position.z[eid],
         selected: true,
-        isOwnFaction: Faction.id[eid] === FactionId.Brabanders,
+        isOwnFaction: Faction.id[eid] === this.playerFactionId,
         hp: Health.current[eid],
         maxHp: Health.max[eid],
       });
@@ -1712,22 +1734,42 @@ export class Game {
     if (!this.hud) return;
 
     this.hud.updateResources(
-      this.playerState.getGold(0),
-      this.playerState.getWood(0),
-      this.playerState.getPopulation(0),
-      this.playerState.getPopulationMax(0)
+      this.playerState.getGold(this.playerFactionId),
+      this.playerState.getWood(this.playerFactionId),
+      this.playerState.getPopulation(this.playerFactionId),
+      this.playerState.getPopulationMax(this.playerFactionId)
     );
 
-    // Update Gezelligheid meter and Carnavalsrage state
-    const rageState = getCarnavalsrageState();
-    const rageConfig = getCarnavalsrageConfig();
-    this.hud.updateGezelligheid(
-      this.playerState.getGezelligheid(FactionId.Brabanders),
-      rageConfig.cost,
-      rageState.active,
-      rageState.remainingDuration,
-      rageState.cooldownRemaining,
-    );
+    // Update tertiary resource for non-Brabanders factions
+    if (this.playerFactionId !== FactionId.Brabanders) {
+      const tertiaryEl = document.getElementById('tertiary-resource');
+      const tertiaryVal = document.getElementById('res-tertiary');
+      const tertiaryIcon = document.getElementById('res-tertiary-icon');
+      if (tertiaryEl && tertiaryVal) {
+        tertiaryEl.style.display = 'flex';
+        tertiaryVal.textContent = String(Math.floor(this.playerState.getTertiary(this.playerFactionId)));
+        if (tertiaryIcon) {
+          const icons: Record<number, string> = { 1: '\u2615', 2: '\u26CF\uFE0F', 3: '\u{1F36B}' };
+          tertiaryIcon.textContent = icons[this.playerFactionId] ?? '\u26CF\uFE0F';
+        }
+      }
+    }
+
+    // Update Gezelligheid meter (Brabanders only) or hide it
+    if (this.playerFactionId === FactionId.Brabanders) {
+      const rageState = getCarnavalsrageState();
+      const rageConfig = getCarnavalsrageConfig();
+      this.hud.updateGezelligheid(
+        this.playerState.getGezelligheid(this.playerFactionId),
+        rageConfig.cost,
+        rageState.active,
+        rageState.remainingDuration,
+        rageState.cooldownRemaining,
+      );
+    } else {
+      const gezEl = document.querySelector('.gezelligheid-item') as HTMLElement | null;
+      if (gezEl) gezEl.style.display = 'none';
+    }
 
     // Update selected unit/building info
     if (this.selectedEntities.length > 0) {
@@ -1748,7 +1790,7 @@ export class Game {
           // Update Blacksmith research progress (refreshes every frame)
           if (Building.typeId[firstEid] === BuildingTypeId.Blacksmith &&
               Building.complete[firstEid] === 1 &&
-              Faction.id[firstEid] === FactionId.Brabanders) {
+              Faction.id[firstEid] === this.playerFactionId) {
             this.showBlacksmithResearchUI(firstEid);
           }
         }
@@ -1876,7 +1918,7 @@ export class Game {
       const mx = toMiniX(wx);
       const my = toMiniY(wz);
       // Brighter faction colors on minimap
-      ctx.fillStyle = Faction.id[eid] === FactionId.Brabanders ? '#FF8C00' : '#4DA6FF';
+      ctx.fillStyle = Faction.id[eid] === this.playerFactionId ? '#FF8C00' : '#4DA6FF';
       ctx.fillRect(mx - 3, my - 3, 7, 7);
     }
 
@@ -1886,13 +1928,12 @@ export class Game {
       if (hasComponent(world, eid, IsDead)) continue;
       const wx = Position.x[eid];
       const wz = Position.z[eid];
-      const isOwn = Faction.id[eid] === FactionId.Brabanders;
+      const isOwn = Faction.id[eid] === this.playerFactionId;
       // Only show enemy units if they're currently visible
       if (!isOwn && !this.fogOfWarRenderer.isVisible(wx, wz)) continue;
       const mx = toMiniX(wx);
       const my = toMiniY(wz);
-      // Bright orange for Brabanders, bright blue for Randstad
-      ctx.fillStyle = isOwn ? '#FFA500' : '#4488FF';
+      ctx.fillStyle = isOwn ? '#FFA500' : '#FF4444';
       ctx.fillRect(mx - 1, my - 1, 3, 3);
     }
 
@@ -1918,9 +1959,9 @@ export class Game {
       if (hasComponent(world, eid, IsDead)) continue;
       if (Health.current[eid] <= 0) continue;
       if (Building.typeId[eid] === BuildingTypeId.TownHall) {
-        if (Faction.id[eid] === FactionId.Brabanders) {
+        if (Faction.id[eid] === this.playerFactionId) {
           playerTownHallAlive = true;
-        } else if (Faction.id[eid] === FactionId.AI) {
+        } else {
           aiTownHallAlive = true;
         }
       }
@@ -2031,13 +2072,13 @@ export class Game {
 
   /** Get current player gold amount. */
   getPlayerGold(): number {
-    return this.playerState.getGold(FactionId.Brabanders);
+    return this.playerState.getGold(this.playerFactionId);
   }
 
   /** Whether the player currently has a worker selected. */
   hasWorkerSelected(): boolean {
     return this.selectedEntities.some(eid =>
-      entityExists(world, eid) && hasComponent(world, eid, IsWorker) && Faction.id[eid] === FactionId.Brabanders
+      entityExists(world, eid) && hasComponent(world, eid, IsWorker) && Faction.id[eid] === this.playerFactionId
     );
   }
 
@@ -2045,7 +2086,7 @@ export class Game {
   hasGatheringStarted(): boolean {
     for (const eid of this.knownUnitEntities) {
       if (!entityExists(world, eid)) continue;
-      if (Faction.id[eid] !== FactionId.Brabanders) continue;
+      if (Faction.id[eid] !== this.playerFactionId) continue;
       if (!hasComponent(world, eid, IsWorker)) continue;
       const state = UnitAI.state[eid];
       if (state === UnitAIState.MovingToResource || state === UnitAIState.Gathering || state === UnitAIState.Returning) {
@@ -2059,7 +2100,7 @@ export class Game {
   hasBarracksBuilt(): boolean {
     for (const eid of this.knownBuildingEntities) {
       if (!entityExists(world, eid)) continue;
-      if (Faction.id[eid] !== FactionId.Brabanders) continue;
+      if (Faction.id[eid] !== this.playerFactionId) continue;
       if (Building.typeId[eid] === BuildingTypeId.Barracks && Building.complete[eid] === 1) {
         return true;
       }
@@ -2072,7 +2113,7 @@ export class Game {
     // Check if player has any infantry or ranged units
     for (const eid of this.knownUnitEntities) {
       if (!entityExists(world, eid)) continue;
-      if (Faction.id[eid] !== FactionId.Brabanders) continue;
+      if (Faction.id[eid] !== this.playerFactionId) continue;
       const unitType = UnitType.id[eid];
       if (unitType === UnitTypeId.Infantry || unitType === UnitTypeId.Ranged) {
         return true;
@@ -2086,7 +2127,7 @@ export class Game {
     // Check if any player unit is currently attacking an AI entity
     for (const eid of this.knownUnitEntities) {
       if (!entityExists(world, eid)) continue;
-      if (Faction.id[eid] !== FactionId.Brabanders) continue;
+      if (Faction.id[eid] !== this.playerFactionId) continue;
       if (UnitAI.state[eid] === UnitAIState.Attacking) {
         return true;
       }
@@ -2098,14 +2139,39 @@ export class Game {
   getPlayerBasePosition(): { x: number; z: number } {
     for (const eid of this.knownBuildingEntities) {
       if (!entityExists(world, eid)) continue;
-      if (Faction.id[eid] !== FactionId.Brabanders) continue;
+      if (Faction.id[eid] !== this.playerFactionId) continue;
       if (Building.typeId[eid] === BuildingTypeId.TownHall) {
         return { x: Position.x[eid], z: Position.z[eid] };
       }
     }
     // Fallback to map spawn
-    const playerSpawn = this.map.spawns.find(s => s.factionId === FactionId.Brabanders);
+    const playerSpawn = this.map.spawns.find(s => s.factionId === this.playerFactionId);
     return playerSpawn ? { x: playerSpawn.x, z: playerSpawn.z } : { x: 0, z: 0 };
+  }
+
+  private remapFactions(): void {
+    // Swap faction IDs in map data so slot 0 = player's faction
+    const oldPlayerFaction = this.map.spawns[0]?.factionId ?? FactionId.Brabanders;
+    const newPlayerFaction = this.playerFactionId;
+    if (oldPlayerFaction === newPlayerFaction) return;
+
+    const remap = (fid: number) => {
+      if (fid === oldPlayerFaction) return newPlayerFaction;
+      if (fid === newPlayerFaction) return oldPlayerFaction;
+      return fid;
+    };
+
+    // Create mutable copies with swapped factionIds
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const map = this.map as any;
+    map.spawns = this.map.spawns.map(s => ({ ...s, factionId: remap(s.factionId) }));
+    map.buildings = this.map.buildings.map(b => ({ ...b, factionId: remap(b.factionId) }));
+    map.units = this.map.units.map(u => ({ ...u, factionId: remap(u.factionId) }));
+  }
+
+  private getAIFactionId(): FactionId {
+    const aiSpawn = this.map.spawns.find(s => s.factionId !== this.playerFactionId);
+    return aiSpawn ? aiSpawn.factionId as FactionId : FactionId.Randstad;
   }
 
   /**

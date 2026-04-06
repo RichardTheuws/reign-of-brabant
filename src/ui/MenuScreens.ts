@@ -12,7 +12,7 @@ import { MUSIC_IDS } from '../systems/MusicSystem';
 // Types
 // ---------------------------------------------------------------------------
 
-export type FactionChoice = 'brabanders' | 'randstad';
+export type FactionChoice = 'brabanders' | 'randstad' | 'limburgers' | 'belgen';
 export type MenuAction = 'play' | 'campaign' | 'tutorial' | 'settings';
 
 export interface MenuScreenEvents {
@@ -114,11 +114,24 @@ const FACTIONS: FactionData[] = [
     image: 'assets/factions/randstad-ceo.png',
     available: true,
   },
-];
-
-const LOCKED_FACTIONS = [
-  { name: 'Limburgers', version: 'v1.0' },
-  { name: 'Belgen', version: 'v2.0' },
+  {
+    id: 'limburgers',
+    name: 'De Limburgers',
+    subtitle: 'Meesters van de Ondergrond',
+    description: 'Vanuit hun uitgebreide mijnnetwerk beheersen de Limburgers het ondergrondse. Hun tunnels maken verrassingsaanvallen mogelijk die geen vijand ziet aankomen. Met Kolen als brandstof voor hun industrie bouwen ze een onzichtbaar imperium.',
+    traits: ['Tunnelnetwerk', 'Verrassingsaanvallen', 'Kolen-economie', 'Defensief sterk'],
+    image: 'assets/factions/limburgers-mijnwerker.png',
+    available: true,
+  },
+  {
+    id: 'belgen',
+    name: 'De Belgen',
+    subtitle: 'Diplomaten en Compromismeesters',
+    description: 'Waarom vechten als ge kunt onderhandelen? De Belgen winnen oorlogen met woorden, Chocolade en eindeloos overleg. Hun Commissies vertragen vijanden, hun Compromissen kopen tijd, en hun Chocolade-Overtuiging steelt vijandelijke eenheden.',
+    traits: ['Diplomatie', 'Compromis-abilities', 'Chocolade-overtuiging', 'Commissie-sabotage'],
+    image: 'assets/factions/belgen-diplomaat.png',
+    available: true,
+  },
 ];
 
 // ---------------------------------------------------------------------------

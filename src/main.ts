@@ -106,6 +106,7 @@ const menuScreens = new MenuScreens();
 const campaignManager = new CampaignManager();
 const campaignUI = new CampaignUI(campaignManager);
 let activeMissionId: string | null = null;
+let selectedPlayerFaction: number = 0; // FactionId: 0=Brabanders, 1=Randstad, 2=Limburgers, 3=Belgen
 
 // ---------------------------------------------------------------------------
 // Tutorial
@@ -165,7 +166,7 @@ setGameFlowDeps({
 
   startGame: async (isTutorial: boolean) => {
     if (!gameInitialized) {
-      await game.init();
+      await game.init(selectedPlayerFaction);
       gameInitialized = true;
     }
     tutorialActive = isTutorial;
@@ -312,7 +313,9 @@ menuScreens.init({
         break;
     }
   },
-  onFactionSelected: (_faction, _startTutorial) => {
+  onFactionSelected: (faction, _startTutorial) => {
+    const factionMap: Record<string, number> = { brabanders: 0, randstad: 1, limburgers: 2, belgen: 3 };
+    selectedPlayerFaction = factionMap[faction] ?? 0;
     stateMachine.requestTransition(GameStateId.LOADING, { tutorial: false });
   },
 });
