@@ -20,6 +20,7 @@ import {
   Faction,
   Selected,
   Attack,
+  Resource,
 } from '../ecs/components';
 import { IsUnit, IsWorker, IsBuilding, NeedsPathfinding, IsResource } from '../ecs/tags';
 import { playerState } from '../core/PlayerState';
@@ -199,6 +200,8 @@ function handleGather(world: GameWorld, units: number[], cmd: GatherCommand): vo
     Gatherer.state[eid] = 1; // MOVING_TO_RESOURCE
     Gatherer.targetEid[eid] = cmd.targetEid;
     Gatherer.carrying[eid] = 0;
+    // Auto-detect resource type from the target resource node
+    Gatherer.resourceType[eid] = Resource.type[cmd.targetEid];
 
     // Move to resource
     Movement.targetX[eid] = Position.x[cmd.targetEid];

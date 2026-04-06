@@ -118,6 +118,11 @@ export class PropRenderer {
   /** Placed gold mines: eid -> Object3D. */
   private goldMines = new Map<number, THREE.Object3D>();
 
+  /** Tree resource source model (uses first tree variant, tinted green). */
+  private treeResourceSource: THREE.Group | null = null;
+  /** Placed tree resources: eid -> Object3D. */
+  private treeResourceNodes = new Map<number, THREE.Object3D>();
+
   /** Temporary matrix for setting instance transforms. */
   private _mat4 = new THREE.Matrix4();
   private _pos = new THREE.Vector3();
@@ -189,6 +194,18 @@ export class PropRenderer {
       }
     });
     this.goldMineSource = mineGltf.scene;
+
+    // Tree resource source model — uses first tree variant with brighter green tint
+    if (treeGltfs.length > 0) {
+      const treeScene = treeGltfs[0].scene.clone(true);
+      treeScene.traverse((child) => {
+        if ((child as THREE.Mesh).isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = false;
+        }
+      });
+      this.treeResourceSource = treeScene;
+    }
   }
 
   // -----------------------------------------------------------------------
@@ -308,6 +325,55 @@ export class PropRenderer {
   }
 
   // -----------------------------------------------------------------------
+  // Tree resources (harvestable wood nodes)
+  // -----------------------------------------------------------------------
+
+  /**
+   * Add a tree resource node to the scene.
+   * These are larger, brighter trees distinguishable from decoration trees.
+   * @returns The placed Object3D or null if the source model is missing.
+   */
+  addTreeResource(eid: number, x: number, y: number, z: number): THREE.Object3D | null {
+    if (this.treeResourceNodes.has(eid)) return this.treeResourceNodes.get(eid)!;
+    if (!this.treeResourceSource) return null;
+
+    const clone = this.treeResourceSource.clone(true);
+    clone.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh;
+        // Apply a bright green tint to distinguish from decoration trees
+        if (Array.isArray(mesh.material)) {
+          mesh.material = mesh.material.map((m) => toToonMaterial(m.clone(), '#228b22', 0.7));
+        } else {
+          mesh.material = toToonMaterial(mesh.material.clone(), '#228b22', 0.7);
+        }
+      }
+    });
+
+    // Tree resources are slightly larger than decoration trees
+    clone.scale.setScalar(TREE_SCALE_MULTIPLIER * 1.3);
+    clone.position.set(x, y, z);
+    clone.name = `tree_resource_${eid}`;
+    clone.userData.eid = eid;
+    this.treeResourceNodes.set(eid, clone);
+    this.group.add(clone);
+    return clone;
+  }
+
+  /** Remove a depleted tree resource. */
+  removeTreeResource(eid: number): void {
+    const obj = this.treeResourceNodes.get(eid);
+    if (!obj) return;
+    this.group.remove(obj);
+    this.disposeObject(obj);
+    this.treeResourceNodes.delete(eid);
+  }
+
+  getTreeResourceObject(eid: number): THREE.Object3D | undefined {
+    return this.treeResourceNodes.get(eid);
+  }
+
+  // -----------------------------------------------------------------------
   // Cleanup
   // -----------------------------------------------------------------------
 
@@ -338,6 +404,17 @@ export class PropRenderer {
     if (this.goldMineSource) {
       this.disposeObject(this.goldMineSource);
       this.goldMineSource = null;
+    }
+
+    for (const [, obj] of this.treeResourceNodes) {
+      this.group.remove(obj);
+      this.disposeObject(obj);
+    }
+    this.treeResourceNodes.clear();
+
+    if (this.treeResourceSource) {
+      this.disposeObject(this.treeResourceSource);
+      this.treeResourceSource = null;
     }
   }
 

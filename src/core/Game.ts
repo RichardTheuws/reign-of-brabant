@@ -12,7 +12,7 @@ import { addEntity, addComponent, hasComponent, query, entityExists } from 'bite
 import { world, resetGameWorld, type GameWorld } from '../ecs/world';
 import { Position, Faction, Health, Attack, Armor, Movement, UnitType, UnitAI, Gatherer, Visibility, Building, Resource, Selected, Production, Rotation, GezeligheidBonus, Hero, HeroAbilities } from '../ecs/components';
 import { IsUnit, IsBuilding, IsResource, IsWorker, IsDead, IsHero } from '../ecs/tags';
-import { FactionId, UnitTypeId, BuildingTypeId, HeroTypeId, MAP_SIZE, UnitAIState, NO_PRODUCTION, HERO_POPULATION_COST } from '../types/index';
+import { FactionId, UnitTypeId, BuildingTypeId, HeroTypeId, UpgradeId, ResourceType, MAP_SIZE, UnitAIState, NO_PRODUCTION, HERO_POPULATION_COST } from '../types/index';
 import { UNIT_ARCHETYPES, BUILDING_ARCHETYPES } from '../entities/archetypes';
 import { HERO_ARCHETYPES } from '../entities/heroArchetypes';
 import { createHero, isHeroActive } from '../entities/heroFactory';
@@ -34,6 +34,8 @@ import { activateCarnavalsrage, getCarnavalsrageState, getCarnavalsrageConfig } 
 import { activateHeroAbility } from '../systems/HeroSystem';
 import { audioManager } from '../audio/AudioManager';
 import { playUnitVoice } from '../audio/UnitVoices';
+import { techTreeSystem, UPGRADE_DEFINITIONS, getUpgradeDefinition } from '../systems/TechTreeSystem';
+import { createMusicSystem, type MusicSystem } from '../systems/MusicSystem';
 import { MissionSystem, type MissionCallbacks } from '../campaign/MissionSystem';
 import { getMissionById, type MissionDefinition, type MissionUnitSpawn } from '../campaign/MissionDefinitions';
 import type { Terrain } from '../world/Terrain';
@@ -66,7 +68,7 @@ export class Game {
 
   // Building placement mode
   private buildMode = false;
-  private buildGhostType: 'barracks' | null = null;
+  private buildGhostType: 'barracks' | 'blacksmith' | 'lumbercamp' | null = null;
 
   // Game over state
   private gameOver = false;
@@ -90,6 +92,9 @@ export class Game {
   // AI refresh timer (don't reconfigure AI every frame)
   private aiRefreshTimer = 0;
   private aiRefreshInterval = 0.5; // every 500ms
+
+  // Music system -- dynamic battle/faction music
+  private musicSystem: MusicSystem = createMusicSystem();
 
   // Campaign mission system
   private missionSystem: MissionSystem | null = null;
@@ -170,10 +175,11 @@ export class Game {
     // 9. Setup event listeners
     this.setupEventListeners();
 
-    // 10. Init audio system + ambient sounds
+    // 10. Init audio system + ambient sounds + faction music
     audioManager.init();
     audioManager.startAmbient('ambient_birds');
     audioManager.startAmbient('ambient_wind');
+    this.musicSystem.start(FactionId.Brabanders);
 
     // 11. Move camera to player base
     const playerSpawn = this.map.spawns.find(s => s.factionId === FactionId.Brabanders);
@@ -229,8 +235,8 @@ export class Game {
     const cb: MissionCallbacks = {
       showMessage: (t) => this._showMsg(t),
       spawnUnits: (u) => this._spawnMissionUnits(u),
-      triggerVictory: (s, t, b) => { this.gameOver = true; this.onMissionVictory?.(s, t, b); },
-      triggerDefeat: () => { this.gameOver = true; this.onMissionDefeat?.(); },
+      triggerVictory: (s, t, b) => { this.gameOver = true; this.musicSystem.playVictory(); this.onMissionVictory?.(s, t, b); },
+      triggerDefeat: () => { this.gameOver = true; this.musicSystem.playDefeat(); this.onMissionDefeat?.(); },
       getPlayerGold: () => this.playerState.getGold(FactionId.Brabanders),
       hasPlayerBuilding: (bt) => this._hasPlayerBldg(bt),
       getPlayerArmyCount: () => this._armyCount(),
@@ -246,10 +252,11 @@ export class Game {
     this._createMsgOverlay();
     this._createObjHUD();
 
-    // Start ambient audio
+    // Start ambient audio + faction music
     audioManager.init();
     audioManager.startAmbient('ambient_birds');
     audioManager.startAmbient('ambient_wind');
+    this.musicSystem.start(FactionId.Brabanders);
 
     console.log(`[Game] Mission "${mission.title}" initialized`);
   }
@@ -258,7 +265,7 @@ export class Game {
       const eid = this.createBuildingEntity(b.buildingType, b.factionId, b.x, b.z);
       Building.complete[eid] = b.complete ? 1 : 0; Building.progress[eid] = b.complete ? 1 : 0;
       const fi = b.factionId === FactionId.Brabanders ? FACTION_ORANGE : FACTION_BLUE;
-      const tn = b.buildingType === BuildingTypeId.TownHall ? 'townhall' : 'barracks';
+      const tn = this.getBuildingRendererType(b.buildingType);
       const y = this.terrain.getHeightAt(b.x, b.z);
       const mesh = this.buildingRenderer.addBuilding(eid, tn, fi, b.x, y, b.z, b.complete ? 1.0 : 0.0);
       if (mesh) { mesh.userData.eid = eid; this.entityMeshMap.set(eid, mesh); }
@@ -277,6 +284,14 @@ export class Game {
       const y = this.terrain.getHeightAt(g.x, g.z);
       const mesh = this.propRenderer.addGoldMine(eid, g.x, y, g.z);
       if (mesh) { mesh.userData.eid = eid; this.entityMeshMap.set(eid, mesh); }
+    }
+    if (m.treeResources) {
+      for (const t of m.treeResources) {
+        const eid = this.createTreeResourceEntity(t.x, t.z, t.amount);
+        const y = this.terrain.getHeightAt(t.x, t.z);
+        const mesh = this.propRenderer.addTreeResource(eid, t.x, y, t.z);
+        if (mesh) { mesh.userData.eid = eid; this.entityMeshMap.set(eid, mesh); }
+      }
     }
   }
   private _spawnMissionUnits(units: MissionUnitSpawn[]): number[] {
@@ -359,7 +374,7 @@ export class Game {
     for (const b of this.map.buildings) {
       const eid = this.createBuildingEntity(b.buildingType, b.factionId, b.x, b.z);
       const factionIdx = b.factionId === FactionId.Brabanders ? FACTION_ORANGE : FACTION_BLUE;
-      const typeName = b.buildingType === BuildingTypeId.TownHall ? 'townhall' : 'barracks';
+      const typeName = this.getBuildingRendererType(b.buildingType);
       const y = this.terrain.getHeightAt(b.x, b.z);
       const mesh = this.buildingRenderer.addBuilding(eid, typeName, factionIdx, b.x, y, b.z, 1.0);
       if (mesh) {
@@ -388,6 +403,17 @@ export class Game {
       const eid = this.createGoldMineEntity(g.x, g.z, g.amount);
       const y = this.terrain.getHeightAt(g.x, g.z);
       const mesh = this.propRenderer.addGoldMine(eid, g.x, y, g.z);
+      if (mesh) {
+        mesh.userData.eid = eid;
+        this.entityMeshMap.set(eid, mesh);
+      }
+    }
+
+    // Spawn tree resources
+    for (const t of this.map.treeResources) {
+      const eid = this.createTreeResourceEntity(t.x, t.z, t.amount);
+      const y = this.terrain.getHeightAt(t.x, t.z);
+      const mesh = this.propRenderer.addTreeResource(eid, t.x, y, t.z);
       if (mesh) {
         mesh.userData.eid = eid;
         this.entityMeshMap.set(eid, mesh);
@@ -451,6 +477,7 @@ export class Game {
       });
       this.hud.updateResources(
         this.playerState.getGold(0),
+        this.playerState.getWood(0),
         this.playerState.getPopulation(0),
         this.playerState.getPopulationMax(0)
       );
@@ -472,6 +499,12 @@ export class Game {
         break;
       case 'build-barracks':
         this.enterBuildMode('barracks');
+        break;
+      case 'build-lumbercamp':
+        this.enterBuildMode('lumbercamp');
+        break;
+      case 'build-blacksmith':
+        this.enterBuildMode('blacksmith');
         break;
       case 'train-worker':
         this.trainFromSelectedBuilding(UnitTypeId.Worker);
@@ -508,7 +541,7 @@ export class Game {
     this.camera.setPosition(worldX, worldZ);
   }
 
-  private enterBuildMode(type: 'barracks'): void {
+  private enterBuildMode(type: 'barracks' | 'lumbercamp' | 'blacksmith'): void {
     // Check if we have a worker selected
     const hasWorker = this.selectedEntities.some(eid =>
       hasComponent(world, eid, IsWorker) && Faction.id[eid] === FactionId.Brabanders
@@ -517,8 +550,12 @@ export class Game {
       this.hud?.showAlert('Selecteer een worker om te bouwen', 'warning');
       return;
     }
+    // Map ghost type to BuildingTypeId
+    const buildingTypeId = type === 'blacksmith' ? BuildingTypeId.Blacksmith
+      : type === 'lumbercamp' ? BuildingTypeId.LumberCamp
+      : BuildingTypeId.Barracks;
     // Check cost
-    const cost = BUILDING_ARCHETYPES[BuildingTypeId.Barracks].costGold;
+    const cost = BUILDING_ARCHETYPES[buildingTypeId].costGold;
     if (!this.playerState.canAfford(FactionId.Brabanders, cost)) {
       this.hud?.showAlert('Niet genoeg goud!', 'warning');
       return;
@@ -763,6 +800,9 @@ export class Game {
           this.entityMeshMap.set(eid, mesh);
         }
         this.knownUnitEntities.add(eid);
+
+        // Apply completed tech tree upgrades to newly trained unit
+        techTreeSystem.applyAllUpgradesToNewUnit(eid, event.factionId);
       }
       // Audio: play unit trained horn (only for player units)
       if (event.factionId === FactionId.Brabanders) {
@@ -794,12 +834,14 @@ export class Game {
 
     // Hero events
     eventBus.on('hero-died', (event) => {
-      this.hud?.showAlert(`${HERO_ARCHETYPES[event.heroTypeId].name} is gevallen! Revival in 60s...`, 'warning');
+      const archetype = HERO_ARCHETYPES[event.heroTypeId];
+      if (archetype) this.hud?.showAlert(`${archetype.name} is gevallen! Revival in 60s...`, 'warning');
     });
 
     eventBus.on('hero-revived', (event) => {
       const eid = event.entityId;
-      this.hud?.showAlert(`${HERO_ARCHETYPES[event.heroTypeId].name} is terug!`, 'info');
+      const archetype = HERO_ARCHETYPES[event.heroTypeId];
+      if (archetype) this.hud?.showAlert(`${archetype.name} is terug!`, 'info');
       // Mesh creation is handled by detectAndRenderNewEntities
     });
 
@@ -856,6 +898,14 @@ export class Game {
     eventBus.on('vergadering', (event) => {
       audioManager.playSound('vergadering', { x: event.x, z: event.z });
     });
+
+    // Tech tree: research completed notification
+    eventBus.on('research-completed', (event) => {
+      if (event.factionId === FactionId.Brabanders) {
+        this.hud?.showAlert(`Onderzoek voltooid: ${event.upgradeName}`, 'info');
+        audioManager.playSound('unit_trained'); // reuse fanfare sound
+      }
+    });
   }
 
   private handleBuildPlacement(screenX: number, screenY: number): void {
@@ -870,7 +920,13 @@ export class Game {
 
     if (hits.length > 0) {
       const point = hits[0].point;
-      const cost = BUILDING_ARCHETYPES[BuildingTypeId.Barracks].costGold;
+      const buildingTypeId = this.buildGhostType === 'blacksmith' ? BuildingTypeId.Blacksmith
+        : this.buildGhostType === 'lumbercamp' ? BuildingTypeId.LumberCamp
+        : BuildingTypeId.Barracks;
+      const cost = BUILDING_ARCHETYPES[buildingTypeId].costGold;
+      const buildingLabel = this.buildGhostType === 'blacksmith' ? 'Smederij'
+        : this.buildGhostType === 'lumbercamp' ? 'Houtzagerij'
+        : 'Barracks';
 
       if (!this.playerState.canAfford(FactionId.Brabanders, cost)) {
         this.hud?.showAlert('Niet genoeg goud!', 'warning');
@@ -881,19 +937,19 @@ export class Game {
       this.playerState.spend(FactionId.Brabanders, cost);
 
       // Spawn building
-      const eid = this.spawnBuildingAtRuntime(BuildingTypeId.Barracks, FactionId.Brabanders, point.x, point.z);
+      const eid = this.spawnBuildingAtRuntime(buildingTypeId, FactionId.Brabanders, point.x, point.z);
 
       // Send nearest worker to build site
       queueCommand({
         type: 'build',
-        buildingTypeId: BuildingTypeId.Barracks,
+        buildingTypeId,
         x: point.x,
         z: point.z,
       });
 
       this.stats.buildingsBuilt++;
       audioManager.playSound('building_place', { x: point.x, z: point.z });
-      this.hud?.showAlert('Barracks wordt gebouwd!', 'info');
+      this.hud?.showAlert(`${buildingLabel} wordt gebouwd!`, 'info');
       this.exitBuildMode();
     }
   }
@@ -910,8 +966,10 @@ export class Game {
 
     if (hits.length > 0) {
       const point = hits[0].point;
+      // Use 'barracks' ghost model for buildings without dedicated model
+      const ghostModel = 'barracks';
       this.buildingRenderer.showGhost(
-        'barracks',
+        ghostModel,
         FACTION_ORANGE,
         point.x,
         point.y,
@@ -938,7 +996,7 @@ export class Game {
     }
 
     const factionIdx = faction === FactionId.Brabanders ? FACTION_ORANGE : FACTION_BLUE;
-    const typeName = type === BuildingTypeId.TownHall ? 'townhall' : 'barracks';
+    const typeName = this.getBuildingRendererType(type);
     const y = this.terrain.getHeightAt(x, z);
     const startProgress = faction === FactionId.AI ? 1.0 : 0.0;
     const mesh = this.buildingRenderer.addBuilding(eid, typeName, factionIdx, x, y, z, startProgress);
@@ -1050,7 +1108,8 @@ export class Game {
       // Check if it's a building
       if (hasComponent(world, firstEid, IsBuilding) && Faction.id[firstEid] === FactionId.Brabanders) {
         const buildingType = Building.typeId[firstEid];
-        const buildingName = buildingType === BuildingTypeId.TownHall ? 'Boerderij' : 'Cafe';
+        const buildingName = this.getBuildingName(buildingType);
+        const buildingHudType = this.getBuildingHudType(buildingType);
         const queueItems = this.getBuildingQueue(firstEid);
 
         this.hud.showBuildingPanel({
@@ -1058,13 +1117,23 @@ export class Game {
           name: buildingName,
           hp: Health.current[firstEid],
           maxHp: Health.max[firstEid],
-          type: buildingType === BuildingTypeId.TownHall ? 'townhall' : 'barracks',
+          type: buildingHudType,
           queue: queueItems,
         });
 
-        // Show building command panel
-        const cmdBuilding = document.getElementById('cmd-building');
-        if (cmdBuilding) cmdBuilding.hidden = false;
+        // Hide blacksmith panel by default (shown only for Blacksmith selection)
+        this.hud.hideBlacksmithPanel();
+
+        if (buildingType === BuildingTypeId.Blacksmith && Building.complete[firstEid] === 1) {
+          // Show Blacksmith research panel instead of building commands
+          const cmdBuilding = document.getElementById('cmd-building');
+          if (cmdBuilding) cmdBuilding.hidden = true;
+          this.showBlacksmithResearchUI(firstEid);
+        } else {
+          // Show building command panel for production buildings
+          const cmdBuilding = document.getElementById('cmd-building');
+          if (cmdBuilding) cmdBuilding.hidden = false;
+        }
       } else if (hasComponent(world, firstEid, IsUnit)) {
         // Unit(s) selected
         const units: SelectedUnit[] = entityIds.map(eid => ({
@@ -1121,8 +1190,9 @@ export class Game {
       }
     } else if (this.hud) {
       this.hud.hideSelectionPanel();
+      this.hud.hideBlacksmithPanel();
       // Hide all command panels
-      const panels = ['cmd-unit', 'cmd-multi', 'cmd-building', 'cmd-worker', 'cmd-hero'];
+      const panels = ['cmd-unit', 'cmd-multi', 'cmd-building', 'cmd-worker', 'cmd-hero', 'cmd-blacksmith'];
       for (const id of panels) {
         const el = document.getElementById(id);
         if (el) el.hidden = true;
@@ -1260,6 +1330,83 @@ export class Game {
     }
   }
 
+  private getBuildingName(buildingType: number): string {
+    switch (buildingType) {
+      case BuildingTypeId.TownHall: return 'Boerderij';
+      case BuildingTypeId.Barracks: return 'Cafe';
+      case BuildingTypeId.LumberCamp: return 'Houtzagerij';
+      case BuildingTypeId.Blacksmith: return 'Smederij';
+      default: return 'Gebouw';
+    }
+  }
+
+  private getBuildingHudType(buildingType: number): 'townhall' | 'barracks' | 'lumbercamp' | 'blacksmith' {
+    switch (buildingType) {
+      case BuildingTypeId.TownHall: return 'townhall';
+      case BuildingTypeId.LumberCamp: return 'lumbercamp';
+      case BuildingTypeId.Blacksmith: return 'blacksmith';
+      default: return 'barracks';
+    }
+  }
+
+  /** Map BuildingTypeId to BuildingRenderer type name. Falls back to 'barracks' for unknown types. */
+  private getBuildingRendererType(buildingType: number): 'townhall' | 'barracks' | 'lumbercamp' | 'blacksmith' {
+    switch (buildingType) {
+      case BuildingTypeId.TownHall: return 'townhall';
+      case BuildingTypeId.LumberCamp: return 'lumbercamp';
+      case BuildingTypeId.Blacksmith: return 'blacksmith';
+      default: return 'barracks';
+    }
+  }
+
+  /**
+   * Show the Blacksmith research UI with upgrade buttons and progress.
+   */
+  private showBlacksmithResearchUI(blacksmithEid: number): void {
+    if (!this.hud) return;
+    const factionId = FactionId.Brabanders;
+
+    // Build upgrade button data
+    const upgrades = UPGRADE_DEFINITIONS.map(def => ({
+      id: def.id as number,
+      name: def.name,
+      description: def.description,
+      costGold: def.cost.gold,
+      canAfford: this.playerState.canAfford(factionId, def.cost.gold),
+      canResearch: techTreeSystem.canResearch(factionId, def.id),
+      isResearched: techTreeSystem.isResearched(factionId, def.id),
+    }));
+
+    // Get current research progress for this Blacksmith
+    const progress = techTreeSystem.getResearchProgress(blacksmithEid, factionId);
+    let researchProgress: { name: string; progress: number; remaining: number } | null = null;
+    if (progress) {
+      const def = getUpgradeDefinition(progress.upgradeId);
+      researchProgress = {
+        name: def.name,
+        progress: progress.progress,
+        remaining: progress.remaining,
+      };
+    }
+
+    this.hud.showBlacksmithPanel(
+      upgrades,
+      researchProgress,
+      (upgradeId: number) => {
+        const success = techTreeSystem.startResearch(factionId, blacksmithEid, upgradeId as UpgradeId);
+        if (success) {
+          const def = getUpgradeDefinition(upgradeId as UpgradeId);
+          this.hud?.showAlert(`Onderzoek gestart: ${def.name}`, 'info');
+          audioManager.playSound('click');
+          // Refresh the panel to show progress
+          this.showBlacksmithResearchUI(blacksmithEid);
+        } else {
+          this.hud?.showAlert('Kan onderzoek niet starten!', 'warning');
+        }
+      },
+    );
+  }
+
   update(dt: number): void {
     if (this.gameOver) return;
 
@@ -1283,6 +1430,9 @@ export class Game {
 
     // Run the system pipeline (movement, combat, gather, production, build, death, vision)
     this.pipeline.update(world, dt);
+
+    // Update music system (battle intensity detection, crossfades)
+    this.musicSystem.update(world, dt);
 
     // Detect newly spawned units (from ProductionSystem) that don't have meshes yet
     this.detectAndRenderNewEntities();
@@ -1409,6 +1559,9 @@ export class Game {
         this.entityMeshMap.set(eid, mesh);
       }
       this.knownUnitEntities.add(eid);
+
+      // Apply completed tech tree upgrades to this newly spawned unit
+      techTreeSystem.applyAllUpgradesToNewUnit(eid, Faction.id[eid]);
     }
   }
 
@@ -1560,6 +1713,7 @@ export class Game {
 
     this.hud.updateResources(
       this.playerState.getGold(0),
+      this.playerState.getWood(0),
       this.playerState.getPopulation(0),
       this.playerState.getPopulationMax(0)
     );
@@ -1590,6 +1744,12 @@ export class Game {
               this.getUnitNameByType(Production.unitType[firstEid]),
               remaining
             );
+          }
+          // Update Blacksmith research progress (refreshes every frame)
+          if (Building.typeId[firstEid] === BuildingTypeId.Blacksmith &&
+              Building.complete[firstEid] === 1 &&
+              Faction.id[firstEid] === FactionId.Brabanders) {
+            this.showBlacksmithResearchUI(firstEid);
           }
         }
       }
@@ -1693,15 +1853,16 @@ export class Game {
     const toMiniX = (wx: number) => ((wx + halfMap) / MAP_SIZE) * w;
     const toMiniY = (wz: number) => ((wz + halfMap) / MAP_SIZE) * h;
 
-    // Draw gold mines (bright yellow dots, only if explored)
+    // Draw resources (gold = yellow, wood = green, only if explored)
     for (const [eid] of this.entityMeshMap) {
       if (hasComponent(world, eid, IsResource)) {
         const wx = Position.x[eid];
         const wz = Position.z[eid];
         if (!this.fogOfWarRenderer.isExplored(wx, wz)) continue;
+        if (Resource.amount[eid] <= 0) continue;
         const mx = toMiniX(wx);
         const my = toMiniY(wz);
-        ctx.fillStyle = '#FFD700';
+        ctx.fillStyle = Resource.type[eid] === ResourceType.Wood ? '#228B22' : '#FFD700';
         ctx.fillRect(mx - 2, my - 2, 5, 5);
       }
     }
@@ -1777,6 +1938,12 @@ export class Game {
 
   private triggerGameOver(victory: boolean): void {
     this.gameOver = true;
+    // Play victory or defeat stinger
+    if (victory) {
+      this.musicSystem.playVictory();
+    } else {
+      this.musicSystem.playDefeat();
+    }
     if (this.hud) {
       this.hud.showGameOver(victory, {
         durationSeconds: world.meta.elapsed,
@@ -1977,6 +2144,12 @@ export class Game {
     // Reset ECS world (removes all entities and components)
     resetGameWorld();
 
+    // Reset tech tree research state
+    techTreeSystem.reset();
+
+    // Stop music system
+    this.musicSystem.stop(500);
+
     // Reset game state
     this.selectedEntities = [];
     this.lastHpMap.clear();
@@ -2001,7 +2174,17 @@ export class Game {
     const y = this.terrain.getHeightAt(x, z);
 
     addComponent(world, eid, Position); Position.x[eid] = x; Position.y[eid] = y; Position.z[eid] = z;
-    addComponent(world, eid, Resource); Resource.amount[eid] = amount;
+    addComponent(world, eid, Resource); Resource.type[eid] = ResourceType.Gold; Resource.amount[eid] = amount; Resource.maxAmount[eid] = amount;
+    addComponent(world, eid, IsResource);
+    return eid;
+  }
+
+  private createTreeResourceEntity(x: number, z: number, amount: number): number {
+    const eid = addEntity(world);
+    const y = this.terrain.getHeightAt(x, z);
+
+    addComponent(world, eid, Position); Position.x[eid] = x; Position.y[eid] = y; Position.z[eid] = z;
+    addComponent(world, eid, Resource); Resource.type[eid] = ResourceType.Wood; Resource.amount[eid] = amount; Resource.maxAmount[eid] = amount;
     addComponent(world, eid, IsResource);
     return eid;
   }

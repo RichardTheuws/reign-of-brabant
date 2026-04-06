@@ -20,6 +20,7 @@ import {
   type MapDefinition,
   type SpawnPoint,
   type GoldMineSpawn,
+  type TreeResourceSpawn,
 } from '../types/index';
 
 // ---------------------------------------------------------------------------
@@ -34,6 +35,22 @@ const MINE_NEAR_OFFSET = 12;
 
 /** Default gold per mine. */
 const DEFAULT_GOLD_AMOUNT = 2000;
+
+/** Default wood per tree resource node. */
+const DEFAULT_WOOD_AMOUNT = 300;
+
+/** Number of tree resource clusters (groves). */
+const TREE_GROVE_COUNT = 4;
+
+/** Trees per grove. */
+const TREES_PER_GROVE_MIN = 3;
+const TREES_PER_GROVE_MAX = 5;
+
+/** Spacing between trees in a grove. */
+const GROVE_SPREAD = 3.0;
+
+/** Tree grove distance from base (similar to mines). */
+const GROVE_NEAR_OFFSET = 18;
 
 /** Number of starting workers per player. */
 const STARTING_WORKERS = 3;
@@ -97,6 +114,7 @@ export interface GeneratedMap extends MapDefinition {
   readonly buildings: readonly BuildingSpawn[];
   readonly units: readonly UnitSpawn[];
   readonly decorations: readonly DecoSpawn[];
+  readonly treeResources: readonly TreeResourceSpawn[];
 }
 
 // ---------------------------------------------------------------------------
@@ -243,7 +261,37 @@ export function generateMap(
   }
 
   // -----------------------------------------------------------------------
-  // 5. Decoration props (trees and rocks)
+  // 5. Tree resource groves (harvestable wood)
+  // -----------------------------------------------------------------------
+
+  const treeResources: TreeResourceSpawn[] = [];
+
+  // Grove centers: 2 near player, 2 near AI
+  const groveCenters = [
+    // Near player
+    { x: playerSpawn.x + GROVE_NEAR_OFFSET, z: playerSpawn.z + GROVE_NEAR_OFFSET * 0.5 },
+    { x: playerSpawn.x + GROVE_NEAR_OFFSET * 0.5, z: playerSpawn.z + GROVE_NEAR_OFFSET },
+    // Near AI
+    { x: aiSpawn.x - GROVE_NEAR_OFFSET, z: aiSpawn.z - GROVE_NEAR_OFFSET * 0.5 },
+    { x: aiSpawn.x - GROVE_NEAR_OFFSET * 0.5, z: aiSpawn.z - GROVE_NEAR_OFFSET },
+  ];
+
+  for (let g = 0; g < TREE_GROVE_COUNT; g++) {
+    const center = groveCenters[g];
+    const treeCount = TREES_PER_GROVE_MIN + Math.floor(rng() * (TREES_PER_GROVE_MAX - TREES_PER_GROVE_MIN + 1));
+    for (let t = 0; t < treeCount; t++) {
+      const offsetX = (rng() - 0.5) * GROVE_SPREAD * 2;
+      const offsetZ = (rng() - 0.5) * GROVE_SPREAD * 2;
+      treeResources.push({
+        x: center.x + offsetX,
+        z: center.z + offsetZ,
+        amount: DEFAULT_WOOD_AMOUNT,
+      });
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // 6. Decoration props (trees and rocks)
   // -----------------------------------------------------------------------
 
   // Collect positions we want to avoid
@@ -251,6 +299,7 @@ export function generateMap(
     playerSpawn,
     aiSpawn,
     ...goldMines,
+    ...treeResources,
     ...buildings,
     ...units,
   ];
@@ -298,6 +347,7 @@ export function generateMap(
     heightScale: 10,
     spawns: [playerSpawn, aiSpawn],
     goldMines,
+    treeResources,
     buildings,
     units,
     decorations,

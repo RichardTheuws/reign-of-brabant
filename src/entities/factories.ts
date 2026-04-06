@@ -57,6 +57,7 @@ import {
   UNIT_ARCHETYPES,
   BUILDING_ARCHETYPES,
   GOLD_MINE,
+  TREE_RESOURCE,
 } from './archetypes';
 
 // ---------------------------------------------------------------------------
@@ -336,6 +337,23 @@ export function createBarracks(
   return eid;
 }
 
+/**
+ * Create a Blacksmith (Smederij) entity.
+ * Research building for unit upgrades.
+ * Starts under construction unless startComplete is specified.
+ */
+export function createBlacksmith(
+  world: World,
+  factionId: FactionId,
+  x: number,
+  z: number,
+  startComplete = false,
+): number {
+  const eid = initBuilding(world, BuildingTypeId.Blacksmith, factionId, x, z, startComplete);
+  // Blacksmith does not produce units -- no Production/RallyPoint components needed
+  return eid;
+}
+
 // ---------------------------------------------------------------------------
 // Resource Factories
 // ---------------------------------------------------------------------------
@@ -372,6 +390,58 @@ export function createGoldMine(
   // RenderRef
   RenderRef.meshId[eid] = eid;
 
+  return eid;
+}
+
+/**
+ * Create a Tree Resource (Hout) entity.
+ * Resource node that workers can gather wood from.
+ */
+export function createTreeResource(
+  world: World,
+  x: number,
+  z: number,
+  amount?: number,
+): number {
+  const eid = addEntity(world);
+  const treeAmount = amount ?? TREE_RESOURCE.defaultAmount;
+
+  // Register resource components
+  addComponent(world, eid, Position);
+  addComponent(world, eid, Resource);
+  addComponent(world, eid, RenderRef);
+  addComponent(world, eid, IsResource);
+
+  // Position
+  Position.x[eid] = x;
+  Position.y[eid] = 0; // Will be set by terrain height lookup
+  Position.z[eid] = z;
+
+  // Resource data
+  Resource.type[eid] = ResourceType.Wood;
+  Resource.amount[eid] = treeAmount;
+  Resource.maxAmount[eid] = treeAmount;
+
+  // RenderRef
+  RenderRef.meshId[eid] = eid;
+
+  return eid;
+}
+
+/**
+ * Create a Lumber Camp (Houtzagerij) entity.
+ * Drop-off point for wood. Does not produce units.
+ * Starts under construction unless startComplete is specified.
+ */
+export function createLumberCamp(
+  world: World,
+  factionId: FactionId,
+  x: number,
+  z: number,
+  startComplete = false,
+): number {
+  const eid = initBuilding(world, BuildingTypeId.LumberCamp, factionId, x, z, startComplete);
+  // Lumber Camp does not produce units -- no Production/RallyPoint components needed
   return eid;
 }
 

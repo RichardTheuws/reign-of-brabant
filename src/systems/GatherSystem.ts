@@ -22,6 +22,7 @@ import { IsWorker, IsBuilding, IsResource, IsDead, NeedsPathfinding } from '../e
 import { playerState } from '../core/PlayerState';
 import {
   UnitAIState,
+  ResourceType,
   HARVEST_RATE,
   CARRY_CAPACITY,
   GATHER_ARRIVAL_DISTANCE,
@@ -77,7 +78,7 @@ function processMovingToResource(world: GameWorld, eid: number): void {
     hasComponent(world, targetEid, IsDead) ||
     Resource.amount[targetEid] <= 0
   ) {
-    findNearestMineOrIdle(world, eid);
+    findNearestResourceOrIdle(world, eid, Gatherer.resourceType[eid]);
     return;
   }
 
@@ -106,7 +107,7 @@ function processGathering(world: GameWorld, eid: number, dt: number): void {
     if (Gatherer.carrying[eid] > 0) {
       startReturning(world, eid);
     } else {
-      findNearestMineOrIdle(world, eid);
+      findNearestResourceOrIdle(world, eid, Gatherer.resourceType[eid]);
     }
     return;
   }
@@ -127,36 +128,41 @@ function processGathering(world: GameWorld, eid: number, dt: number): void {
     return;
   }
 
-  // Mine depleted while gathering
+  // Resource depleted while gathering
   if (Resource.amount[targetEid] <= 0) {
     if (Gatherer.carrying[eid] > 0) {
       startReturning(world, eid);
     } else {
-      findNearestMineOrIdle(world, eid);
+      findNearestResourceOrIdle(world, eid, Gatherer.resourceType[eid]);
     }
   }
 }
 
 function processReturning(world: GameWorld, eid: number): void {
-  // Find nearest own town hall
+  // Find nearest deposit building for the carried resource type
   const factionId = Faction.id[eid];
-  const townHallEid = findNearestTownHall(world, eid, factionId);
+  const resType = Gatherer.resourceType[eid];
+  const depositEid = findNearestDepositBuilding(world, eid, factionId, resType);
 
-  if (townHallEid === NO_ENTITY) {
-    // No town hall -- go idle
+  if (depositEid === NO_ENTITY) {
+    // No deposit building -- go idle
     Gatherer.state[eid] = GATHER_NONE;
     return;
   }
 
-  // Check if arrived at town hall
-  const dx = Position.x[townHallEid] - Position.x[eid];
-  const dz = Position.z[townHallEid] - Position.z[eid];
+  // Check if arrived at deposit building
+  const dx = Position.x[depositEid] - Position.x[eid];
+  const dz = Position.z[depositEid] - Position.z[eid];
   const dist = Math.sqrt(dx * dx + dz * dz);
 
   if (dist < DEPOSIT_ARRIVAL_DISTANCE) {
-    // Deposit gold
+    // Deposit resources
     const amount = Math.floor(Gatherer.carrying[eid]);
-    playerState.addGold(factionId, amount);
+    if (resType === ResourceType.Wood) {
+      playerState.addWood(factionId, amount);
+    } else {
+      playerState.addGold(factionId, amount);
+    }
     Gatherer.carrying[eid] = 0;
 
     // Auto-return to same resource
@@ -172,8 +178,8 @@ function processReturning(world: GameWorld, eid: number): void {
       Movement.hasTarget[eid] = 1;
       addComponent(world, eid, NeedsPathfinding);
     } else {
-      // Mine depleted, find another
-      findNearestMineOrIdle(world, eid);
+      // Resource depleted, find another of the same type
+      findNearestResourceOrIdle(world, eid, resType);
     }
   }
 }
@@ -186,28 +192,40 @@ function startReturning(world: GameWorld, eid: number): void {
   Gatherer.state[eid] = GATHER_RETURNING;
 
   const factionId = Faction.id[eid];
-  const townHallEid = findNearestTownHall(world, eid, factionId);
+  const resType = Gatherer.resourceType[eid];
+  const depositEid = findNearestDepositBuilding(world, eid, factionId, resType);
 
-  if (townHallEid === NO_ENTITY) {
+  if (depositEid === NO_ENTITY) {
     Gatherer.state[eid] = GATHER_NONE;
     return;
   }
 
-  Movement.targetX[eid] = Position.x[townHallEid];
-  Movement.targetZ[eid] = Position.z[townHallEid];
+  Movement.targetX[eid] = Position.x[depositEid];
+  Movement.targetZ[eid] = Position.z[depositEid];
   Movement.hasTarget[eid] = 1;
   addComponent(world, eid, NeedsPathfinding);
 }
 
-function findNearestTownHall(world: GameWorld, eid: number, factionId: number): number {
+/**
+ * Find the nearest deposit building for the given resource type.
+ * For Gold: TownHall
+ * For Wood: LumberCamp preferred, TownHall as fallback
+ */
+function findNearestDepositBuilding(world: GameWorld, eid: number, factionId: number, resType: number): number {
   const buildings = query(world, [Position, Building, IsBuilding]);
   const px = Position.x[eid];
   const pz = Position.z[eid];
   let closestEid = NO_ENTITY;
   let closestDistSq = Infinity;
 
+  // For wood: first try LumberCamp, then fall back to TownHall
+  // For gold: only TownHall
+  const primaryType = resType === ResourceType.Wood ? BuildingTypeId.LumberCamp : BuildingTypeId.TownHall;
+  const fallbackType = BuildingTypeId.TownHall;
+
+  // First pass: look for primary deposit type
   for (const bEid of buildings) {
-    if (Building.typeId[bEid] !== BuildingTypeId.TownHall) continue;
+    if (Building.typeId[bEid] !== primaryType) continue;
     if (Faction.id[bEid] !== factionId) continue;
     if (Building.complete[bEid] !== 1) continue;
     if (hasComponent(world, bEid, IsDead)) continue;
@@ -222,10 +240,32 @@ function findNearestTownHall(world: GameWorld, eid: number, factionId: number): 
     }
   }
 
+  // If wood and no LumberCamp found, fall back to TownHall
+  if (closestEid === NO_ENTITY && resType === ResourceType.Wood) {
+    for (const bEid of buildings) {
+      if (Building.typeId[bEid] !== fallbackType) continue;
+      if (Faction.id[bEid] !== factionId) continue;
+      if (Building.complete[bEid] !== 1) continue;
+      if (hasComponent(world, bEid, IsDead)) continue;
+
+      const dx = Position.x[bEid] - px;
+      const dz = Position.z[bEid] - pz;
+      const distSq = dx * dx + dz * dz;
+
+      if (distSq < closestDistSq) {
+        closestDistSq = distSq;
+        closestEid = bEid;
+      }
+    }
+  }
+
   return closestEid;
 }
 
-function findNearestMineOrIdle(world: GameWorld, eid: number): void {
+/**
+ * Find the nearest resource of the given type, or go idle.
+ */
+function findNearestResourceOrIdle(world: GameWorld, eid: number, resType: number): void {
   const resources = query(world, [Position, Resource, IsResource]);
   const px = Position.x[eid];
   const pz = Position.z[eid];
@@ -235,6 +275,7 @@ function findNearestMineOrIdle(world: GameWorld, eid: number): void {
   for (const rEid of resources) {
     if (Resource.amount[rEid] <= 0) continue;
     if (hasComponent(world, rEid, IsDead)) continue;
+    if (Resource.type[rEid] !== resType) continue;
 
     const dx = Position.x[rEid] - px;
     const dz = Position.z[rEid] - pz;
@@ -247,15 +288,16 @@ function findNearestMineOrIdle(world: GameWorld, eid: number): void {
   }
 
   if (closestEid !== NO_ENTITY) {
-    // Found a mine -- go gather
+    // Found a resource -- go gather
     Gatherer.targetEid[eid] = closestEid;
+    Gatherer.resourceType[eid] = resType;
     Gatherer.state[eid] = GATHER_MOVING_TO_RESOURCE;
     Movement.targetX[eid] = Position.x[closestEid];
     Movement.targetZ[eid] = Position.z[closestEid];
     Movement.hasTarget[eid] = 1;
     addComponent(world, eid, NeedsPathfinding);
   } else {
-    // No mines left -- go idle
+    // No resources left -- go idle
     Gatherer.state[eid] = GATHER_NONE;
     Gatherer.targetEid[eid] = NO_ENTITY;
     Movement.hasTarget[eid] = 0;

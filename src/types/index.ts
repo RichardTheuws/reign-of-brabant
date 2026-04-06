@@ -38,11 +38,25 @@ export enum HeroTypeId {
 export enum BuildingTypeId {
   TownHall = 0,
   Barracks = 1,
+  LumberCamp = 2,
+  Blacksmith = 3,
 }
 
-/** Resource types. PoC only uses Gold (Worstenbroodjes). */
+/** Upgrade identifiers for the tech tree. */
+export enum UpgradeId {
+  MeleeAttack1 = 0,
+  MeleeAttack2 = 1,
+  RangedAttack1 = 2,
+  RangedAttack2 = 3,
+  ArmorUpgrade1 = 4,
+  ArmorUpgrade2 = 5,
+  MoveSpeed1 = 6,
+}
+
+/** Resource types. Gold (Worstenbroodjes) and Wood (Hout). */
 export enum ResourceType {
   Gold = 0,
+  Wood = 1,
 }
 
 /** Top-level game phase. */
@@ -259,6 +273,7 @@ export const FACTION_COLORS = {
 } as const;
 
 export const GOLD_MINE_COLOR = 0xffd700;
+export const TREE_RESOURCE_COLOR = 0x228b22;
 
 // ---------------------------------------------------------------------------
 // Interfaces -- Archetype Data
@@ -300,6 +315,13 @@ export interface BuildingArchetype {
 /** Gold mine definition. */
 export interface GoldMineDefinition {
   readonly hp: number; // not destructible in PoC, but tracked
+  readonly defaultAmount: number;
+  readonly sightRange: number;
+}
+
+/** Tree resource definition. */
+export interface TreeResourceDefinition {
+  readonly hp: number;
   readonly defaultAmount: number;
   readonly sightRange: number;
 }
@@ -346,6 +368,7 @@ export interface HeroAbilityDef {
 /** Per-player resource state (managed outside ECS in GameState). */
 export interface PlayerResources {
   gold: number;
+  wood: number;
 }
 
 /** Per-player population state. */
@@ -379,12 +402,20 @@ export interface GoldMineSpawn {
   readonly amount: number;
 }
 
+/** Tree resource placement on the map. */
+export interface TreeResourceSpawn {
+  readonly x: number;
+  readonly z: number;
+  readonly amount: number;
+}
+
 /** Complete map definition for game setup. */
 export interface MapDefinition {
   readonly size: number;
   readonly heightScale: number;
   readonly spawns: readonly SpawnPoint[];
   readonly goldMines: readonly GoldMineSpawn[];
+  readonly treeResources: readonly TreeResourceSpawn[];
 }
 
 // ---------------------------------------------------------------------------
@@ -476,6 +507,18 @@ export interface CarnavalsrageActivatedEvent {
   readonly factionId: FactionId;
 }
 
+export interface ResearchStartedEvent {
+  readonly factionId: FactionId;
+  readonly upgradeId: UpgradeId;
+  readonly upgradeName: string;
+}
+
+export interface ResearchCompletedEvent {
+  readonly factionId: FactionId;
+  readonly upgradeId: UpgradeId;
+  readonly upgradeName: string;
+}
+
 /** Union type of all event names for the typed EventBus. */
 export interface GameEvents {
   'unit-died': UnitDiedEvent;
@@ -491,6 +534,8 @@ export interface GameEvents {
   'hero-ability-used': HeroAbilityUsedEvent;
   'combat-hit': CombatHitEvent;
   'carnavalsrage-activated': CarnavalsrageActivatedEvent;
+  'research-started': ResearchStartedEvent;
+  'research-completed': ResearchCompletedEvent;
 }
 
 // ---------------------------------------------------------------------------

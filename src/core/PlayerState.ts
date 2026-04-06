@@ -18,6 +18,7 @@ import {
 // ---------------------------------------------------------------------------
 interface PlayerData {
   gold: number;
+  wood: number;
   populationCurrent: number;
   populationMax: number;
   gezelligheid: number;
@@ -44,8 +45,8 @@ class PlayerStateManager {
    */
   reset(): void {
     this.players = [
-      { gold: 100, populationCurrent: 0, populationMax: 10, gezelligheid: 0, efficiencyStacks: 0 },
-      { gold: 100, populationCurrent: 0, populationMax: 10, gezelligheid: 0, efficiencyStacks: 0 },
+      { gold: 100, wood: 0, populationCurrent: 0, populationMax: 10, gezelligheid: 0, efficiencyStacks: 0 },
+      { gold: 100, wood: 0, populationCurrent: 0, populationMax: 10, gezelligheid: 0, efficiencyStacks: 0 },
     ];
   }
 
@@ -73,6 +74,32 @@ class PlayerStateManager {
   /** Get current gold for a player. */
   getGold(factionId: number): number {
     return this.players[factionId].gold;
+  }
+
+  // -------------------------------------------------------------------------
+  // Wood
+  // -------------------------------------------------------------------------
+
+  /** Check if player can afford a wood cost. */
+  canAffordWood(factionId: number, cost: number): boolean {
+    return this.players[factionId].wood >= cost;
+  }
+
+  /** Deduct wood. Returns false if insufficient. */
+  spendWood(factionId: number, cost: number): boolean {
+    if (!this.canAffordWood(factionId, cost)) return false;
+    this.players[factionId].wood -= cost;
+    return true;
+  }
+
+  /** Add wood to a player. */
+  addWood(factionId: number, amount: number): void {
+    this.players[factionId].wood += amount;
+  }
+
+  /** Get current wood for a player. */
+  getWood(factionId: number): number {
+    return this.players[factionId].wood;
   }
 
   // -------------------------------------------------------------------------

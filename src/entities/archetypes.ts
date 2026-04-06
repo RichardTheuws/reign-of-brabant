@@ -14,6 +14,7 @@ import {
   type UnitArchetype,
   type BuildingArchetype,
   type GoldMineDefinition,
+  type TreeResourceDefinition,
 } from '../types/index';
 
 // ---------------------------------------------------------------------------
@@ -179,6 +180,32 @@ export const BUILDING_ARCHETYPES: readonly BuildingArchetype[] = [
     sightRange: 10,
     produces: [UnitTypeId.Infantry, UnitTypeId.Ranged],
   },
+
+  // BuildingTypeId.LumberCamp = 2 -- Houtzagerij
+  {
+    typeId: BuildingTypeId.LumberCamp,
+    name: 'LumberCamp',
+    brabantName: 'Houtzagerij',
+    hp: 600,
+    costGold: 100,
+    costSecondary: 0,
+    buildTime: 20,
+    sightRange: 8,
+    produces: [],
+  },
+
+  // BuildingTypeId.Blacksmith = 3 -- Smederij
+  {
+    typeId: BuildingTypeId.Blacksmith,
+    name: 'Blacksmith',
+    brabantName: 'Smederij',
+    hp: 300,
+    costGold: 200,
+    costSecondary: 0,
+    buildTime: 20,        // 20 seconds to construct
+    sightRange: 8,
+    produces: [],          // Does not produce units; researches upgrades instead
+  },
 ] as const;
 
 // ---------------------------------------------------------------------------
@@ -188,6 +215,16 @@ export const BUILDING_ARCHETYPES: readonly BuildingArchetype[] = [
 export const GOLD_MINE: GoldMineDefinition = {
   hp: 99999,            // effectively indestructible in PoC
   defaultAmount: 1500,  // total gold in a mine
+  sightRange: 0,        // resources don't reveal fog
+} as const;
+
+// ---------------------------------------------------------------------------
+// Tree Resource Definition
+// ---------------------------------------------------------------------------
+
+export const TREE_RESOURCE: TreeResourceDefinition = {
+  hp: 99999,            // effectively indestructible
+  defaultAmount: 300,   // wood per tree
   sightRange: 0,        // resources don't reveal fog
 } as const;
 

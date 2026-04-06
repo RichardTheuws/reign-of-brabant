@@ -6,6 +6,7 @@
  */
 
 import { audioManager } from '../audio/AudioManager';
+import { MUSIC_IDS } from '../systems/MusicSystem';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -154,10 +155,14 @@ export class MenuScreens {
     this.setScreen('loading-screen', false);
     // Show HUD-related elements hidden during menu
     this.setGameHUDVisible(false);
+    // Play menu music (AudioManager handles crossfade if music already playing)
+    audioManager.playMusic(MUSIC_IDS.MAIN_MENU, true, 2000);
   }
 
   hideMainMenu(): void {
     this.setScreen('main-menu', false);
+    // Stop menu music (game will start its own faction theme via MusicSystem)
+    audioManager.stopMusic(1500);
   }
 
   // -----------------------------------------------------------------------

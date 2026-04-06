@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.6.0] - 2026-04-06
+
+### Added
+- **Music Integration System**: Dynamic battle intensity music (3 levels), faction themes (Brabanders/Randstad/Limburgers/Belgen), menu music, victory/defeat stingers, boss battle theme, crossfade transitions
+- **Wood as 2nd resource**: Tree resource nodes on map, Lumber Camp building (Houtzagerij), workers gather wood from trees, HUD shows wood count
+- **Tech Tree & Upgrades**: Blacksmith building with 7 researches — Zwaardvechten I/II, Boogschieten I/II, Bepantsering I/II, Snelle Mars I. Prerequisites, progress bars, retroactive application to existing units
+- **Campaign missions 7-9**: "De Markt van Brabant" (economy+defense), "Het Beleg van Eindhansen" (siege warfare), "De Brabantse Nansen" (epic 2-front finale with CEO boss wave)
+- **10 Suno music tracks**: Main menu, 4 faction themes, battle low/high, victory, defeat, boss battle
+
+### Fixed
+- **HERO_ARCHETYPES null check**: hero-died/hero-revived events now guard against invalid heroTypeId preventing potential crash
+- **Defeat track trimmed**: 3:31 → 1:10 with fade-out (appropriate length for defeat stinger)
+
 ## [0.5.2] - 2026-04-05
 
 ### Fixed

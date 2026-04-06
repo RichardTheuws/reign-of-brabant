@@ -285,6 +285,7 @@
     .resource-icon { font-size: 1.1rem; }
     .resource-value { font-weight: 700; min-width: 32px; text-align: right; }
     #res-gold { color: #f0d060; }
+    #res-wood { color: #66bb6a; }
     #res-pop, #res-pop-max { color: #88ccff; }
     #res-gezelligheid { color: #ff9944; }
 
@@ -783,6 +784,10 @@
             <span class="resource-icon">&#x1FA99;</span>
             <span class="resource-value" id="res-gold">0</span>
           </div>
+          <div class="resource-item" data-resource="wood">
+            <span class="resource-icon">&#x1FAB5;</span>
+            <span class="resource-value" id="res-wood">0</span>
+          </div>
           <div class="resource-item" data-resource="population">
             <span class="resource-icon">&#x1F465;</span>
             <span><span class="resource-value" id="res-pop">0</span> / <span id="res-pop-max">10</span></span>
@@ -878,6 +883,8 @@
         </div>
         <div class="command-panel" id="cmd-worker" hidden>
           <button class="cmd-btn" data-action="build-barracks" data-hotkey="Q"><span class="btn-icon">&#x1F3D7;&#xFE0F;</span><span>Kazerne</span><span class="hotkey">Q</span></button>
+          <button class="cmd-btn" data-action="build-lumbercamp"><span class="btn-icon">&#x1FAB5;</span><span>Houtzagerij</span></button>
+          <button class="cmd-btn" data-action="build-blacksmith" data-hotkey="R"><span class="btn-icon">&#x2692;&#xFE0F;</span><span>Smederij</span><span class="hotkey">R</span></button>
           <button class="cmd-btn" data-action="move" data-hotkey="W"><span class="btn-icon">&#x1F4CD;</span><span class="hotkey">W</span></button>
           <button class="cmd-btn" data-action="stop" data-hotkey="E"><span class="btn-icon">&#x1F6D1;</span><span class="hotkey">E</span></button>
         </div>
@@ -888,6 +895,8 @@
           <button class="cmd-btn cmd-btn--hero" data-action="train-hero-prins" data-hotkey="T"><span class="btn-icon">&#x1F451;</span><span>Prins</span><span class="hotkey">T</span></button>
           <button class="cmd-btn cmd-btn--hero" data-action="train-hero-boer" data-hotkey="Y"><span class="btn-icon">&#x1F33E;</span><span>Boer Hero</span><span class="hotkey">Y</span></button>
         </div>
+        <!-- Blacksmith research panel (dynamically populated by HUD.showBlacksmithPanel) -->
+        <div class="command-panel command-panel--blacksmith" id="cmd-blacksmith" hidden></div>
         <!-- Hero ability panel (shown when a hero is selected) -->
         <div class="command-panel command-panel--hero" id="cmd-hero" hidden>
           <button class="cmd-btn cmd-btn--ability" data-action="hero-ability-q" data-slot="0" data-hotkey="1">

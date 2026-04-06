@@ -25,13 +25,14 @@ export interface MinimapData {
   cameraViewHeight: number;
 }
 export type UnitStatus = 'idle' | 'moving' | 'attacking' | 'gathering' | 'building' | 'fleeing';
-export type BuildingType = 'townhall' | 'barracks';
+export type BuildingType = 'townhall' | 'barracks' | 'lumbercamp' | 'blacksmith';
 export type CommandAction =
   | 'move' | 'attack' | 'stop' | 'hold'
   | 'train-worker' | 'train-infantry' | 'train-ranged' | 'rally-point'
-  | 'build-townhall' | 'build-barracks'
+  | 'build-townhall' | 'build-barracks' | 'build-lumbercamp' | 'build-blacksmith'
   | 'train-hero-prins' | 'train-hero-boer'
-  | 'hero-ability-q' | 'hero-ability-w' | 'hero-ability-e';
+  | 'hero-ability-q' | 'hero-ability-w' | 'hero-ability-e'
+  | 'research-upgrade';
 
 export interface SelectedUnit {
   id: number;
@@ -89,6 +90,8 @@ const UNIT_EMOJI: Record<string, string> = {
   ranged: '\u{1F3F9}',                     // bow
   townhall: '\u{1F3F0}',                  // castle
   barracks: '\u2694\uFE0F',               // fallback
+  blacksmith: '\u2692\uFE0F',             // hammer and pick
+  smederij: '\u2692\uFE0F',              // hammer and pick (Dutch)
   prins: '\u{1F451}',                      // crown
   boer: '\u{1F33E}',                       // ear of rice
   ceo: '\u{1F4BC}',                        // briefcase
@@ -103,6 +106,7 @@ const UNIT_EMOJI: Record<string, string> = {
 export class HUD {
   // DOM element cache
   private resGold!: HTMLElement;
+  private resWood!: HTMLElement;
   private resPop!: HTMLElement;
   private resPopMax!: HTMLElement;
   private resPopItem!: HTMLElement;
@@ -182,6 +186,7 @@ export class HUD {
 
     // Cache all DOM references
     this.resGold = this.el('res-gold');
+    this.resWood = this.el('res-wood');
     this.resPop = this.el('res-pop');
     this.resPopMax = this.el('res-pop-max');
     this.resPopItem = document.querySelector('.resource-item[data-resource="population"]') as HTMLElement;
@@ -256,8 +261,9 @@ export class HUD {
   // Resource bar
   // -----------------------------------------------------------------------
 
-  updateResources(gold: number, pop: number, maxPop: number): void {
+  updateResources(gold: number, wood: number, pop: number, maxPop: number): void {
     this.resGold.textContent = String(Math.floor(gold));
+    this.resWood.textContent = String(Math.floor(wood));
     this.resPop.textContent = String(pop);
     this.resPopMax.textContent = String(maxPop);
 
@@ -478,6 +484,89 @@ export class HUD {
     this.queueLabel.textContent = label;
     this.queueBar.style.width = `${Math.min(progress, 1) * 100}%`;
     this.queueTime.textContent = `${Math.ceil(remainingSeconds)}s`;
+  }
+
+  // -----------------------------------------------------------------------
+  // Blacksmith research panel
+  // -----------------------------------------------------------------------
+
+  /**
+   * Show upgrade buttons for a selected Blacksmith.
+   * @param upgrades - Array of upgrade data to show as buttons
+   * @param researchProgress - Current research in progress (or null)
+   * @param onResearch - Callback when player clicks an upgrade button
+   */
+  showBlacksmithPanel(
+    upgrades: Array<{
+      id: number;
+      name: string;
+      description: string;
+      costGold: number;
+      canAfford: boolean;
+      canResearch: boolean;
+      isResearched: boolean;
+    }>,
+    researchProgress: { name: string; progress: number; remaining: number } | null,
+    onResearch: (upgradeId: number) => void,
+  ): void {
+    const panel = document.getElementById('cmd-blacksmith');
+    if (!panel) return;
+
+    panel.hidden = false;
+    panel.innerHTML = '';
+
+    // If currently researching, show progress bar
+    if (researchProgress) {
+      const progressDiv = document.createElement('div');
+      progressDiv.className = 'blacksmith-research-progress';
+      progressDiv.innerHTML = `
+        <div class="research-label">\u2692\uFE0F ${this.escapeHtml(researchProgress.name)}</div>
+        <div class="research-bar-container">
+          <div class="research-bar" style="width:${Math.min(researchProgress.progress, 1) * 100}%"></div>
+        </div>
+        <div class="research-time">${Math.ceil(researchProgress.remaining)}s</div>
+      `;
+      panel.appendChild(progressDiv);
+    }
+
+    // Upgrade buttons
+    for (const upg of upgrades) {
+      const btn = document.createElement('button');
+      btn.className = 'cmd-btn cmd-btn--research';
+      btn.disabled = !upg.canResearch || !upg.canAfford || upg.isResearched || researchProgress !== null;
+
+      if (upg.isResearched) {
+        btn.classList.add('is-researched');
+      }
+      if (!upg.canResearch && !upg.isResearched) {
+        btn.classList.add('is-locked');
+      }
+
+      btn.innerHTML = `
+        <span class="btn-icon">\u2692\uFE0F</span>
+        <span class="research-name">${this.escapeHtml(upg.name)}</span>
+        <span class="research-cost">${upg.isResearched ? '\u2714' : upg.costGold + 'g'}</span>
+      `;
+      btn.title = `${upg.name}\n${upg.description}\nKosten: ${upg.costGold} goud`;
+
+      if (!upg.isResearched && upg.canResearch) {
+        btn.addEventListener('click', () => {
+          audioManager.playSound('click');
+          onResearch(upg.id);
+        });
+      }
+
+      panel.appendChild(btn);
+    }
+  }
+
+  /** Hide the Blacksmith research panel. */
+  hideBlacksmithPanel(): void {
+    const panel = document.getElementById('cmd-blacksmith');
+    if (panel) {
+      panel.hidden = true;
+      panel.innerHTML = '';
+    }
   }
 
   // -----------------------------------------------------------------------

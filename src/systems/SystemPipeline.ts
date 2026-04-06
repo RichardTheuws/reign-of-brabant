@@ -187,6 +187,7 @@ import { createCombatSystem } from './CombatSystem';
 import { createGatherSystem } from './GatherSystem';
 import { createProductionSystem } from './ProductionSystem';
 import { createBuildSystem } from './BuildSystem';
+import { createTechTreeSystem } from './TechTreeSystem';
 import { createBureaucracySystem } from './BureaucracySystem';
 import { createDeathSystem } from './DeathSystem';
 import { createVisionSystem } from './VisionSystem';
@@ -229,6 +230,7 @@ export function createGamePipeline(terrain: Terrain, devMode = false): SystemPip
   pipeline.add('GatherSystem', createGatherSystem(), 'economy');
   pipeline.add('ProductionSystem', createProductionSystem(), 'economy');
   pipeline.add('BuildSystem', createBuildSystem(), 'economy');
+  pipeline.add('TechTreeSystem', createTechTreeSystem(), 'economy');
 
   // Phase 6: Cleanup
   pipeline.add('DeathSystem', createDeathSystem(), 'cleanup');

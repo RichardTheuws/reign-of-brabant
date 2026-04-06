@@ -12,13 +12,19 @@ import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 // Types
 // ---------------------------------------------------------------------------
 
-export type BuildingTypeName = 'townhall' | 'barracks';
+export type BuildingTypeName = 'townhall' | 'barracks' | 'blacksmith' | 'lumbercamp';
 
 const BUILDING_MODEL_PATHS: Record<string, string> = {
   townhall_0: 'assets/models/v02/brabanders/townhall.glb',
   townhall_1: 'assets/models/v02/randstad/townhall.glb',
   barracks_0: 'assets/models/v02/brabanders/barracks.glb',
   barracks_1: 'assets/models/v02/randstad/barracks.glb',
+  // LumberCamp reuses barracks model until dedicated model is created
+  lumbercamp_0: 'assets/models/v02/brabanders/barracks.glb',
+  lumbercamp_1: 'assets/models/v02/randstad/barracks.glb',
+  // Blacksmith reuses barracks model until dedicated model is created
+  blacksmith_0: 'assets/models/v02/brabanders/barracks.glb',
+  blacksmith_1: 'assets/models/v02/randstad/barracks.glb',
 };
 
 const BUILDING_MODEL_FALLBACKS: Record<string, string> = {
@@ -26,6 +32,10 @@ const BUILDING_MODEL_FALLBACKS: Record<string, string> = {
   townhall_1: 'assets/models/v01/randstad/townhall.glb',
   barracks_0: 'assets/models/v01/brabanders/barracks.glb',
   barracks_1: 'assets/models/v01/randstad/barracks.glb',
+  lumbercamp_0: 'assets/models/v01/brabanders/barracks.glb',
+  lumbercamp_1: 'assets/models/v01/randstad/barracks.glb',
+  blacksmith_0: 'assets/models/v01/brabanders/barracks.glb',
+  blacksmith_1: 'assets/models/v01/randstad/barracks.glb',
 };
 
 type ModelCacheKey = `${BuildingTypeName}_${number}`;

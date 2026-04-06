@@ -11,7 +11,7 @@
  */
 
 import { FactionId, UnitTypeId, BuildingTypeId } from '../types/index';
-import type { GoldMineSpawn } from '../types/index';
+import type { GoldMineSpawn, TreeResourceSpawn } from '../types/index';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -84,6 +84,7 @@ export interface MissionDefinition {
   readonly buildings: readonly MissionBuildingSpawn[];
   readonly units: readonly MissionUnitSpawn[];
   readonly goldMines: readonly GoldMineSpawn[];
+  readonly treeResources?: readonly TreeResourceSpawn[];
   readonly objectives: readonly MissionObjective[];
   readonly triggers: readonly MissionTrigger[];
   readonly waves: readonly WaveDefinition[];
@@ -940,6 +941,570 @@ const MISSION_6_BOERENOPSTAND: MissionDefinition = {
 };
 
 // ---------------------------------------------------------------------------
+// Missie 7: "De Markt van Brabant" (Economy + defense)
+// ---------------------------------------------------------------------------
+
+const M7_RAID_NE_X = 30;
+const M7_RAID_NE_Z = 30;
+const M7_RAID_NW_X = -30;
+const M7_RAID_NW_Z = 30;
+const M7_RAID_SE_X = 30;
+const M7_RAID_SE_Z = -30;
+
+const MISSION_7_MARKT: MissionDefinition = {
+  id: 'brabant-7-de-markt',
+  campaignId: 'brabanders',
+  missionIndex: 6,
+  title: 'De Markt van Brabant',
+  briefingTitle: 'Missie 7: De Markt van Brabant',
+  briefingText:
+    'Na de Boerenopstand bloeit de handel weer in Brabant. Worstenbroodjes, bier, ' +
+    'en verdacht goede friet — de marktkooplui hebben hun kramen opgeslagen en het goud ' +
+    'stroomt als bier uit een vat.\n\n' +
+    'Maar de Randstad is niet blij. "Economische zelfstandigheid is in strijd met ' +
+    'het Centraal Beleid!" Ze sturen raiding parties om de handelsroutes te verstoren.\n\n' +
+    'Bescherm de markt, verzamel 500 goud, en laat zien dat Brabant z\'n eigen ' +
+    'boontjes kan doppen. Of z\'n eigen worstenbroodjes kan bakken. Hedde da!',
+
+  mapSize: 80,
+  startingGold: 150,
+  startingGoldAI: 0,
+
+  buildings: [
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: 0, z: 0, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: 8, z: 0, complete: true },
+  ],
+
+  units: [
+    // 4 workers
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -3, z: -2 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -2 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -2 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 3, z: -2 },
+    // 2 infantry
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 6, z: -2 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 6, z: 2 },
+  ],
+
+  goldMines: [
+    { x: -20, z: 15, amount: 2000 },
+    { x: 20, z: 15, amount: 2000 },
+    { x: 0, z: -25, amount: 2500 },
+  ],
+
+  objectives: [
+    { id: 'gather-500', type: 'gather-gold', description: 'Verzamel 500 goud voor de markteconomie', targetValue: 500, isBonus: false },
+    { id: 'survive-raids', type: 'survive-waves', description: 'Overleef alle 3 Randstad-raids', targetValue: 3, isBonus: true },
+    { id: 'no-building-loss', type: 'no-townhall-loss', description: 'Verlies geen enkel gebouw', targetValue: 0, isBonus: true },
+    { id: 'have-10-units', type: 'have-units-at-end', description: 'Heb 10+ eenheden aan het einde', targetValue: 10, isBonus: true },
+  ],
+
+  triggers: [
+    {
+      id: 'start-markt',
+      condition: { type: 'time', seconds: 3 },
+      actions: [{ type: 'message', text: 'De markt is open! De frituurmeester heeft de olie al heet staan. Stuur je Boeren naar de goudmijnen — we moeten Brabant\'s economie opbouwen.' }],
+      once: true,
+    },
+    {
+      id: 'tip-defense',
+      condition: { type: 'time', seconds: 30 },
+      actions: [{ type: 'message', text: 'Verkenners melden Randstad-activiteit in het noordoosten. Train extra eenheden en bereid je voor op raids.' }],
+      once: true,
+    },
+    {
+      id: 'raid-1-warning',
+      condition: { type: 'time', seconds: 90 },
+      actions: [{ type: 'message', text: 'Een Randstad-konvooi is gesignaleerd! Ze komen vanuit het noordoosten!' }],
+      once: true,
+    },
+    {
+      id: 'raid-1-spawn',
+      condition: { type: 'time', seconds: 105 },
+      actions: [
+        { type: 'message', text: 'RAID 1! "Wij komen uw marktvergunningen controleren!" — Randstad-inspecteur' },
+        { type: 'spawn-wave', waveIndex: 0 },
+      ],
+      once: true,
+    },
+    {
+      id: 'raid-2-warning',
+      condition: { type: 'time', seconds: 240 },
+      actions: [{ type: 'message', text: 'Meer vijanden naderen... dit keer vanuit het noordwesten! Ze proberen ons te omsingelen!' }],
+      once: true,
+    },
+    {
+      id: 'raid-2-spawn',
+      condition: { type: 'time', seconds: 255 },
+      actions: [
+        { type: 'message', text: 'RAID 2! Zwaardere eenheden! "Dit pand is in strijd met het bestemmingsplan!"' },
+        { type: 'spawn-wave', waveIndex: 1 },
+      ],
+      once: true,
+    },
+    {
+      id: 'raid-3-warning',
+      condition: { type: 'time', seconds: 390 },
+      actions: [{ type: 'message', text: 'GROTE AANVAL in aantocht vanuit het zuidoosten! Alles op alles — verdedig de markt!' }],
+      once: true,
+    },
+    {
+      id: 'raid-3-spawn',
+      condition: { type: 'time', seconds: 405 },
+      actions: [
+        { type: 'message', text: 'RAID 3! De CEO persoonlijk: "Als jullie niet stoppen met die worstenbroodjes, ga ik de NVWA bellen!"' },
+        { type: 'spawn-wave', waveIndex: 2 },
+      ],
+      once: true,
+    },
+    {
+      id: 'all-raids-survived',
+      condition: { type: 'all-waves-defeated' },
+      actions: [
+        { type: 'message', text: 'Alle raids afgeslagen! De Randstad druipt af. De frituurmeester: "En nu... feest! Gratis bitterballen voor iedereen!"' },
+      ],
+      once: true,
+    },
+    {
+      id: 'victory-gold',
+      condition: { type: 'gold-reached', amount: 500 },
+      actions: [
+        { type: 'message', text: 'De markteconomie bloeit! 500 goud verzameld! Brabant is niet te stoppen!' },
+        { type: 'victory' },
+      ],
+      once: true,
+    },
+  ],
+
+  waves: [
+    // Raid 1 (T=105s): Small — 4 Infantry from NE
+    {
+      index: 0,
+      spawnTime: 105,
+      units: createWaveUnits(4, UnitTypeId.Infantry, M7_RAID_NE_X, M7_RAID_NE_Z, 3),
+      message: 'Raid 1 van 3 — Noordoost',
+    },
+    // Raid 2 (T=255s): Medium — 5 Infantry + 2 Ranged from NW
+    {
+      index: 1,
+      spawnTime: 255,
+      units: [
+        ...createWaveUnits(5, UnitTypeId.Infantry, M7_RAID_NW_X, M7_RAID_NW_Z, 4),
+        ...createWaveUnits(2, UnitTypeId.Ranged, M7_RAID_NW_X + 3, M7_RAID_NW_Z + 3, 2),
+      ],
+      message: 'Raid 2 van 3 — Noordwest',
+    },
+    // Raid 3 (T=405s): Large — 6 Infantry + 4 Ranged from SE
+    {
+      index: 2,
+      spawnTime: 405,
+      units: [
+        ...createWaveUnits(6, UnitTypeId.Infantry, M7_RAID_SE_X, M7_RAID_SE_Z, 5),
+        ...createWaveUnits(4, UnitTypeId.Ranged, M7_RAID_SE_X + 4, M7_RAID_SE_Z + 4, 3),
+      ],
+      message: 'Raid 3 van 3 — Zuidoost (ZWAAR)',
+    },
+  ],
+
+  hasAIProduction: false,
+
+  starThresholds: {
+    threeStarTime: 480,   // 8 min
+    twoStarTime: 720,     // 12 min
+    allBonusesGrants3Stars: true,
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Missie 8: "Het Beleg van Eindhansen" (Full siege warfare)
+// ---------------------------------------------------------------------------
+
+const MISSION_8_BELEG: MissionDefinition = {
+  id: 'brabant-8-het-beleg-van-eindhansen',
+  campaignId: 'brabanders',
+  missionIndex: 7,
+  title: 'Het Beleg van Eindhansen',
+  briefingTitle: 'Missie 8: Het Beleg van Eindhansen',
+  briefingText:
+    'Eindhansen — ooit het technologisch hart van Brabant. Maar de Randstad heeft er een ' +
+    'vesting van gemaakt. Bewakingscamera\'s op elke hoek, vergaderzalen in elke straat, ' +
+    'en ergste van alles: de friettenten zijn vervangen door sushi-bars.\n\n' +
+    'De Prins van Brabansen leidt het offensief. "Mansen, dit is het moment. We gansen ' +
+    'die bureaucraten eruit jansen!" Twee aanvalsroutes zijn beschikbaar: frontaal via ' +
+    'de snelweg, of sluipend door het Stratumseind.\n\n' +
+    'Verover Eindhansen. Voor de friet. Voor Brabant.',
+
+  mapSize: 96,
+  startingGold: 350,
+  startingGoldAI: 800,
+
+  buildings: [
+    // Player: base in SW
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: -38, z: -38, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: -30, z: -38, complete: true },
+    // Enemy: fortified base in NE
+    { factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall, x: 38, z: 38, complete: true },
+    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: 30, z: 38, complete: true },
+    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: 38, z: 30, complete: true },
+  ],
+
+  units: [
+    // Player: 6 infantry, 4 ranged (the army), + 3 workers for economy
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -35, z: -36 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -33, z: -36 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -31, z: -36 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -28, z: -36 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -26, z: -36 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -24, z: -36 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -28, z: -34 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -26, z: -34 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -24, z: -34 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -28, z: -32 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -26, z: -32 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -24, z: -32 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -22, z: -32 },
+    // Enemy: heavy defense around TownHall
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 36, z: 36 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 40, z: 36 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 36, z: 40 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 40, z: 40 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 38, z: 34 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 34, z: 38 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 38, z: 42 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 42, z: 38 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 36, z: 42 },
+    // Barracks 1 guards
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 28, z: 36 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 32, z: 36 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 30, z: 40 },
+    // Barracks 2 guards
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 36, z: 28 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 40, z: 28 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 38, z: 32 },
+    // Forward patrol in center
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 10, z: 10 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 12, z: 8 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 8, z: 12 },
+  ],
+
+  goldMines: [
+    { x: -35, z: -25, amount: 3000 },
+    { x: -25, z: -38, amount: 2500 },
+    { x: 0, z: -10, amount: 2000 },
+    { x: 35, z: 25, amount: 2000 }, // Near enemy — risky
+  ],
+
+  objectives: [
+    { id: 'destroy-eindhansen-th', type: 'destroy-building', description: 'Vernietig het Randstad-hoofdkantoor in Eindhansen', targetValue: 1, isBonus: false },
+    { id: 'no-th-loss', type: 'no-townhall-loss', description: 'Houd de Prins in leven (verlies je Boerderij niet)', targetValue: 0, isBonus: true },
+    { id: 'train-15-units', type: 'train-units', description: 'Train 15 extra eenheden', targetValue: 15, isBonus: true },
+  ],
+
+  triggers: [
+    {
+      id: 'prins-speech',
+      condition: { type: 'time', seconds: 3 },
+      actions: [{ type: 'message', text: 'Prins van Brabansen: "Kansen! Carnavalvierders! Vandansen nansen wansen da\'t vansen Brabansen ansen!" *[vrij vertaald: vandaag bevrijden we onze stad]*' }],
+      once: true,
+    },
+    {
+      id: 'tip-routes',
+      condition: { type: 'time', seconds: 15 },
+      actions: [{ type: 'message', text: 'Twee routes naar de vesting: frontaal aanvallen via het centrum, of sluipen door het bos in het zuiden. Kies wijs.' }],
+      once: true,
+    },
+    {
+      id: 'forward-patrol',
+      condition: { type: 'time', seconds: 60 },
+      actions: [{ type: 'message', text: 'Vijandelijke patrouille gespot in het centrum. Ze bewaken de toegangsweg naar de vesting.' }],
+      once: true,
+    },
+    {
+      id: 'ai-reinforcements-1',
+      condition: { type: 'time', seconds: 300 },
+      actions: [
+        { type: 'message', text: 'Randstad-versterkingen arriveren vanuit het noorden! Ze geven Eindhansen niet zomaar op!' },
+        {
+          type: 'spawn-units',
+          units: [
+            ...createWaveUnits(4, UnitTypeId.Infantry, 38, 44, 3),
+            ...createWaveUnits(2, UnitTypeId.Ranged, 42, 44, 2),
+          ],
+        },
+      ],
+      once: true,
+    },
+    {
+      id: 'ai-reinforcements-2',
+      condition: { type: 'time', seconds: 540 },
+      actions: [
+        { type: 'message', text: 'Nog een golf Randstad-troepen! "We hebben een vergadering gehad en besloten jullie te stoppen!"' },
+        {
+          type: 'spawn-units',
+          units: [
+            ...createWaveUnits(5, UnitTypeId.Infantry, 44, 38, 4),
+            ...createWaveUnits(3, UnitTypeId.Ranged, 44, 42, 3),
+          ],
+        },
+      ],
+      once: true,
+    },
+    {
+      id: 'army-10',
+      condition: { type: 'army-count', count: 10 },
+      actions: [{ type: 'message', text: 'Het leger is sterk genoeg! Tijd om de aanval in te zetten op de vesting!' }],
+      once: true,
+    },
+    {
+      id: 'victory-eindhansen',
+      condition: { type: 'building-destroyed', factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall },
+      actions: [
+        { type: 'message', text: 'Eindhansen is bevrijd! De Prins plant de Brabantse vlag op het dak van het hoofdkantoor. "En als eerste maatregel: alle sushi-bars worden weer friettenten!"' },
+        { type: 'victory' },
+      ],
+      once: true,
+    },
+  ],
+
+  waves: [],
+  hasAIProduction: true,
+
+  starThresholds: {
+    threeStarTime: 600,   // 10 min
+    twoStarTime: 900,     // 15 min
+    allBonusesGrants3Stars: true,
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Missie 9: "De Brabantse Nansen" (Epic two-front finale)
+// ---------------------------------------------------------------------------
+
+const M9_NE_BASE_X = 42;
+const M9_NE_BASE_Z = 42;
+const M9_NW_BASE_X = -42;
+const M9_NW_BASE_Z = 42;
+
+const MISSION_9_NANSEN: MissionDefinition = {
+  id: 'brabant-9-de-brabantse-nansen',
+  campaignId: 'brabanders',
+  missionIndex: 8,
+  title: 'De Brabantse Nansen',
+  briefingTitle: 'Missie 9: De Brabantse Nansen',
+  briefingText:
+    'Dit is het. De CEO van de Randstad Ontwikkelingsmaatschappij heeft zijn laatste troef ' +
+    'gespeeld. Twee legers marcheren naar het hart van Brabant — een vanuit het noordoosten, ' +
+    'een vanuit het noordwesten. Pincerbeweging. Klassiek management-tactiek.\n\n' +
+    'Maar wij hebben iets wat zij niet hebben: de Prins van Brabansen EN de Boer van Brabansen. ' +
+    'Twee helden, een volk, en genoeg worstenbroodjes om een maand te overleven.\n\n' +
+    '"Jansen, mansen, het is tijd voor de Brabantse Nansen! Ze gansen allebei eransen!" ' +
+    '— Prins van Brabansen\n\n' +
+    'Vernietig beide vijandelijke basissen. Red Brabant. En moge de frituurolie met ons zijn.',
+
+  mapSize: 112,
+  startingGold: 500,
+  startingGoldAI: 1000,
+
+  buildings: [
+    // Player: full base in south-center
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: 0, z: -42, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: 8, z: -42, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: -8, z: -42, complete: true },
+    // Enemy base 1: NE
+    { factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall, x: M9_NE_BASE_X, z: M9_NE_BASE_Z, complete: true },
+    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: M9_NE_BASE_X - 8, z: M9_NE_BASE_Z, complete: true },
+    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: M9_NE_BASE_X, z: M9_NE_BASE_Z - 8, complete: true },
+    // Enemy base 2: NW
+    { factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall, x: M9_NW_BASE_X, z: M9_NW_BASE_Z, complete: true },
+    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: M9_NW_BASE_X + 8, z: M9_NW_BASE_Z, complete: true },
+    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: M9_NW_BASE_X, z: M9_NW_BASE_Z - 8, complete: true },
+  ],
+
+  units: [
+    // Player: 6 workers
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -3, z: -40 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -40 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -40 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 3, z: -40 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -3, z: -38 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -38 },
+    // Player army: 5 infantry + 3 ranged (Prins side)
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 6, z: -40 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 8, z: -40 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 10, z: -40 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 6, z: -38 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 8, z: -38 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 12, z: -40 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 12, z: -38 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 10, z: -38 },
+    // Player: 3 infantry + 2 ranged (Boer side)
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -6, z: -40 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -8, z: -40 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -10, z: -40 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -12, z: -40 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -12, z: -38 },
+    // NE base defenders
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 40, z: 40 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 44, z: 40 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 40, z: 44 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 44, z: 44 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 38, z: 42 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 42, z: 46 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 46, z: 42 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 42, z: 38 },
+    // NW base defenders
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -40, z: 40 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -44, z: 40 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -40, z: 44 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -44, z: 44 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -38, z: 42 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -42, z: 46 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -46, z: 42 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -42, z: 38 },
+    // Forward scouting parties (center map)
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 15, z: 10 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -15, z: 10 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 0, z: 15 },
+  ],
+
+  goldMines: [
+    { x: -15, z: -42, amount: 2500 },
+    { x: 15, z: -42, amount: 2500 },
+    { x: 0, z: -20, amount: 2000 }, // Center — contested
+  ],
+
+  objectives: [
+    { id: 'destroy-both-hq', type: 'destroy-building', description: 'Vernietig beide Randstad-hoofdkantoren', targetValue: 2, isBonus: false },
+    { id: 'no-th-loss', type: 'no-townhall-loss', description: 'Verlies je Boerderij niet', targetValue: 0, isBonus: true },
+    { id: 'train-25-units', type: 'train-units', description: 'Train 25 eenheden totaal', targetValue: 25, isBonus: true },
+  ],
+
+  triggers: [
+    {
+      id: 'start-epic',
+      condition: { type: 'time', seconds: 3 },
+      actions: [{ type: 'message', text: 'Prins: "Twee vijanden, twee basissen. We moeten ze allebei uitschakelen." Boer: "Ik hak ze om als mais in de oogst!"' }],
+      once: true,
+    },
+    {
+      id: 'tip-strategy',
+      condition: { type: 'time', seconds: 15 },
+      actions: [{ type: 'message', text: 'Resources zijn schaars! Verdeel je leger slim. Vernietig beide Randstad-hoofdkantoren om te winnen.' }],
+      once: true,
+    },
+    {
+      id: 'ne-attack-1',
+      condition: { type: 'time', seconds: 180 },
+      actions: [
+        { type: 'message', text: 'Het NE-leger marcheert! Randstad-troepen vanuit het noordoosten!' },
+        {
+          type: 'spawn-units',
+          units: [
+            ...createWaveUnits(4, UnitTypeId.Infantry, 30, 25, 3),
+            ...createWaveUnits(2, UnitTypeId.Ranged, 33, 25, 2),
+          ],
+        },
+      ],
+      once: true,
+    },
+    {
+      id: 'nw-attack-1',
+      condition: { type: 'time', seconds: 210 },
+      actions: [
+        { type: 'message', text: 'Nu ook vanuit het noordwesten! Twee fronten tegelijk!' },
+        {
+          type: 'spawn-units',
+          units: [
+            ...createWaveUnits(4, UnitTypeId.Infantry, -30, 25, 3),
+            ...createWaveUnits(2, UnitTypeId.Ranged, -33, 25, 2),
+          ],
+        },
+      ],
+      once: true,
+    },
+    {
+      id: 'ne-attack-2',
+      condition: { type: 'time', seconds: 420 },
+      actions: [
+        { type: 'message', text: 'Zwaardere NE-troepen! Ze sturen alles wat ze hebben!' },
+        {
+          type: 'spawn-units',
+          units: [
+            ...createWaveUnits(6, UnitTypeId.Infantry, 30, 20, 4),
+            ...createWaveUnits(3, UnitTypeId.Ranged, 34, 22, 3),
+          ],
+        },
+      ],
+      once: true,
+    },
+    {
+      id: 'nw-attack-2',
+      condition: { type: 'time', seconds: 450 },
+      actions: [
+        { type: 'message', text: 'Massale NW-aanval! De grond trilt!' },
+        {
+          type: 'spawn-units',
+          units: [
+            ...createWaveUnits(6, UnitTypeId.Infantry, -30, 20, 4),
+            ...createWaveUnits(3, UnitTypeId.Ranged, -34, 22, 3),
+          ],
+        },
+      ],
+      once: true,
+    },
+    {
+      id: 'ceo-appears',
+      condition: { type: 'time', seconds: 660 },
+      actions: [
+        { type: 'message', text: 'DE CEO VERSCHIJNT! "Genoeg geïnnoveerd in jullie dorpjes. Het is tijd voor een RESTRUCTURING!" Enorm leger vanuit het noorden!' },
+        {
+          type: 'spawn-units',
+          units: [
+            // CEO's personal army — massive wave from due north
+            ...createWaveUnits(8, UnitTypeId.Infantry, 0, 45, 6),
+            ...createWaveUnits(5, UnitTypeId.Ranged, 0, 50, 4),
+            // Flanking squads
+            ...createWaveUnits(3, UnitTypeId.Infantry, 20, 40, 3),
+            ...createWaveUnits(3, UnitTypeId.Infantry, -20, 40, 3),
+          ],
+        },
+      ],
+      once: true,
+    },
+    {
+      id: 'army-15',
+      condition: { type: 'army-count', count: 15 },
+      actions: [{ type: 'message', text: 'Het Brabantse leger groeit! Tijd om de aanval in te zetten!' }],
+      once: true,
+    },
+    {
+      id: 'army-25',
+      condition: { type: 'army-count', count: 25 },
+      actions: [{ type: 'message', text: 'Een machtig Brabants leger! De vijand siddert!' }],
+      once: true,
+    },
+    {
+      id: 'victory-both-destroyed',
+      condition: { type: 'building-destroyed', factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall },
+      actions: [
+        { type: 'message', text: 'BEIDE BASISSEN VERNIETIGD! De CEO vlucht in een Uber! "Ik ga naar een coworking space in Bali!" Brabant is gered! De Prins en de Boer omhelzen elkaar. Vandaag is een dag die nooit vergeten wordt.' },
+        { type: 'victory' },
+      ],
+      once: true,
+    },
+  ],
+
+  waves: [],
+  hasAIProduction: true,
+
+  starThresholds: {
+    threeStarTime: 900,    // 15 min
+    twoStarTime: 1200,     // 20 min
+    allBonusesGrants3Stars: true,
+  },
+};
+
+// ---------------------------------------------------------------------------
 // Exports
 // ---------------------------------------------------------------------------
 
@@ -950,6 +1515,9 @@ export const BRABANDERS_MISSIONS: readonly MissionDefinition[] = [
   MISSION_4_BINNENDIEZE,
   MISSION_5_HEUVELLAND,
   MISSION_6_BOERENOPSTAND,
+  MISSION_7_MARKT,
+  MISSION_8_BELEG,
+  MISSION_9_NANSEN,
 ];
 
 /** Get a mission by its id. */
