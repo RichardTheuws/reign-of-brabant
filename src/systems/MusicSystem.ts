@@ -38,6 +38,19 @@ export const MUSIC_IDS = {
 } as const;
 
 // ---------------------------------------------------------------------------
+// Track variants — multiple tracks per category, picked randomly
+// ---------------------------------------------------------------------------
+
+const FACTION_THEME_VARIANTS: Record<number, readonly string[]> = {
+  [FactionId.Brabanders]: ['music_brabanders', 'music_brabanders_2'],
+  [FactionId.Randstad]: ['music_randstad'],
+};
+
+function pickRandom<T>(arr: readonly T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// ---------------------------------------------------------------------------
 // Intensity levels
 // ---------------------------------------------------------------------------
 
@@ -249,7 +262,8 @@ export function createMusicSystem(playerFaction: FactionId = FactionId.Brabander
 
   function switchToIntensityTrack(intensity: BattleIntensity): void {
     const trackId = getTrackForIntensity(intensity);
-    if (trackId !== state.currentTrackId) {
+    // Always switch when returning to faction theme (random variant may differ)
+    if (trackId !== state.currentTrackId || intensity === BattleIntensity.None) {
       playTrack(trackId);
     }
   }
@@ -266,7 +280,8 @@ export function createMusicSystem(playerFaction: FactionId = FactionId.Brabander
   }
 
   function getFactionTheme(faction: FactionId): string {
-    return faction === FactionId.Randstad ? MUSIC_IDS.RANDSTAD : MUSIC_IDS.BRABANDERS;
+    const variants = FACTION_THEME_VARIANTS[faction];
+    return variants ? pickRandom(variants) : MUSIC_IDS.BRABANDERS;
   }
 
   function playTrack(trackId: string, loop = true, fadeMs = 2000): void {
