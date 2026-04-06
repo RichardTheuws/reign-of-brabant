@@ -9,7 +9,7 @@
 import * as THREE from 'three';
 import { addEntity, addComponent, hasComponent, query, entityExists } from 'bitecs';
 
-import { world, resetGameWorld, type GameWorld } from '../ecs/world';
+import { world, resetGameWorld } from '../ecs/world';
 import { Position, Faction, Health, Attack, Armor, Movement, UnitType, UnitAI, Gatherer, Visibility, Building, Resource, Selected, Production, Rotation, GezeligheidBonus, Hero, HeroAbilities } from '../ecs/components';
 import { IsUnit, IsBuilding, IsResource, IsWorker, IsDead, IsHero } from '../ecs/tags';
 import { FactionId, UnitTypeId, BuildingTypeId, HeroTypeId, UpgradeId, ResourceType, MAP_SIZE, UnitAIState, NO_PRODUCTION, HERO_POPULATION_COST } from '../types/index';
@@ -29,7 +29,7 @@ import { FogOfWarRenderer } from '../rendering/FogOfWarRenderer';
 import { visionData } from '../systems/VisionSystem';
 import { playerState } from '../core/PlayerState';
 import { eventBus } from '../core/EventBus';
-import { HUD, type SelectedUnit, type SelectedBuilding, type CommandAction } from '../ui/HUD';
+import { HUD, type SelectedUnit, type CommandAction } from '../ui/HUD';
 import { activateCarnavalsrage, getCarnavalsrageState, getCarnavalsrageConfig } from '../systems/AbilitySystem';
 import { activateHeroAbility } from '../systems/HeroSystem';
 import { audioManager } from '../audio/AudioManager';

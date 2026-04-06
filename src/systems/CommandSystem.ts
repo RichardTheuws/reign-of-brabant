@@ -22,7 +22,7 @@ import {
   Attack,
   Resource,
 } from '../ecs/components';
-import { IsUnit, IsWorker, IsBuilding, NeedsPathfinding, IsResource } from '../ecs/tags';
+import { IsUnit, IsWorker, IsBuilding, NeedsPathfinding } from '../ecs/tags';
 import { playerState } from '../core/PlayerState';
 import { UnitAIState, FactionId, NO_ENTITY, NO_PRODUCTION } from '../types/index';
 import type { GameWorld } from '../ecs/world';

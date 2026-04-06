@@ -1505,6 +1505,1154 @@ const MISSION_9_NANSEN: MissionDefinition = {
 };
 
 // ---------------------------------------------------------------------------
+// Missie 10: "De Raad van Brabant" (Alliance forge + sabotage defense)
+// ---------------------------------------------------------------------------
+
+const M10_SABOTAGE_NORTH_X = 0;
+const M10_SABOTAGE_NORTH_Z = 100;
+const M10_SABOTAGE_WEST_X = -80;
+const M10_SABOTAGE_WEST_Z = 60;
+const M10_SABOTAGE_EAST_X = 80;
+const M10_SABOTAGE_EAST_Z = 60;
+
+const MISSION_10_RAAD: MissionDefinition = {
+  id: 'brabant-10-de-raad-van-brabant',
+  campaignId: 'brabanders',
+  missionIndex: 9,
+  title: 'De Raad van Brabant',
+  briefingTitle: 'Missie 10: De Raad van Brabant',
+  briefingText:
+    'Na de Mijn van Waarheid is er geen weg meer terug. De Randstad weet dat we de Receptuur ' +
+    'hebben. Ze weten dat we komen. En ze bereiden zich voor.\n\n' +
+    'Maar wij ook. In Den Bosch — het kloppende hart van Brabant — roepen we de Raad van ' +
+    'Brabant bijeen. Brabanders, Limburgers en Belgen aan dezelfde tafel. Voor het eerst ' +
+    'in de geschiedenis.\n\n' +
+    'Bouw de grootste alliantie die het zuiden ooit heeft gezien. Maar wees gewaarschuwd: ' +
+    'de Randstad stuurt saboteurs om de boel te saboteren. Bescherm de kathedraal. ' +
+    'Bescherm de alliantie. En bereid je voor op oorlog.',
+
+  mapSize: 256,
+  startingGold: 600,
+  startingGoldAI: 0,
+
+  buildings: [
+    // Player: base south of the cathedral
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: 0, z: -20, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: 10, z: -20, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: -10, z: -20, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.LumberCamp, x: 0, z: -30, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Blacksmith, x: 10, z: -30, complete: true },
+    // Limburgse bondgenoot basis (oost) — represented by AI-friendly barracks
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: 80, z: 0, complete: true },
+    // Belgische bondgenoot basis (west)
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: -80, z: 0, complete: true },
+  ],
+
+  units: [
+    // Player: 8 workers, 6 infantry (Carnavalvierders), 4 ranged (Kansen), 2 ranged (Boerinnen equivalent)
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -3, z: -18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 3, z: -18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -3, z: -16 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -16 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -16 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 3, z: -16 },
+    // Infantry (Carnavalvierders)
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 8, z: -18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 10, z: -18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 12, z: -18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 8, z: -16 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 10, z: -16 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 12, z: -16 },
+    // Ranged (Kansen)
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -8, z: -18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -10, z: -18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -8, z: -16 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -10, z: -16 },
+    // Limburgse bondgenoot units (oost)
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 78, z: -2 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 80, z: -2 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 82, z: -2 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 78, z: 2 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 80, z: 2 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 82, z: 2 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 84, z: 0 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 76, z: 0 },
+    // Belgische bondgenoot units (west)
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -78, z: -2 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -80, z: -2 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -82, z: -2 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -78, z: 2 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -80, z: 2 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -82, z: 2 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -84, z: 0 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -76, z: 0 },
+  ],
+
+  goldMines: [
+    { x: -20, z: -30, amount: 3000 },
+    { x: 20, z: -30, amount: 3000 },
+    { x: -60, z: 40, amount: 2000 }, // Contested — past de Dieze
+    { x: 60, z: 40, amount: 2000 },  // Contested — past de Dieze
+  ],
+
+  treeResources: [
+    { x: -40, z: -40, amount: 800 },
+    { x: 40, z: -40, amount: 800 },
+    { x: -30, z: -10, amount: 600 },
+    { x: 30, z: -10, amount: 600 },
+  ],
+
+  objectives: [
+    { id: 'survive-sabotage', type: 'survive-waves', description: 'Bescherm de kathedraal — overleef 3 sabotage-golven', targetValue: 3, isBonus: false },
+    { id: 'train-army', type: 'train-units', description: 'Bouw een leger: train 30 militaire eenheden', targetValue: 30, isBonus: false },
+    { id: 'gather-alliance-gold', type: 'gather-gold', description: 'Verzamel 800 goud voor de oorlogskas', targetValue: 800, isBonus: false },
+    { id: 'no-th-loss', type: 'no-townhall-loss', description: 'Verlies je Boerderij niet', targetValue: 0, isBonus: false },
+    { id: 'fast-alliance', type: 'gather-gold', description: 'Voltooi de alliantie snel: verzamel 1000 Worstenbroodjes', targetValue: 1000, isBonus: true },
+    { id: 'have-50-units', type: 'have-units-at-end', description: 'Bereik 50 population aan het einde', targetValue: 50, isBonus: true },
+  ],
+
+  triggers: [
+    {
+      id: 'start-narrator',
+      condition: { type: 'time', seconds: 3 },
+      actions: [{
+        type: 'message',
+        text: 'Er zijn momenten die de geschiedenis veranderen. Niet door zwaarden of kanonnen — maar door handen die elkaar vinden. Dit is zo\'n moment.',
+      }],
+      once: true,
+    },
+    {
+      id: 'tip-alliance',
+      condition: { type: 'time', seconds: 15 },
+      actions: [{
+        type: 'message',
+        text: 'Bouw een leger en versterk je economie. De Limburgers in het oosten en de Belgen in het westen helpen met de verdediging. Samen zijn we sterk.',
+      }],
+      once: true,
+    },
+    {
+      id: 'alliance-forming',
+      condition: { type: 'time', seconds: 60 },
+      actions: [{
+        type: 'message',
+        text: 'Mijnbaas: "Brabander. We zijn begonnen als vreemden. In de Mijn van Waarheid werden we bondgenoten. Vandaag worden we broeders." Prins: "Sta op, vriend. In Brabant knielen we nie. We proosten."',
+      }],
+      once: true,
+    },
+    // Sabotage Wave 1 (minute 5 = 300s)
+    {
+      id: 'wave-1-warning',
+      condition: { type: 'time', seconds: 270 },
+      actions: [{
+        type: 'message',
+        text: 'Kansen-scout: "Beweging bij de bruggen! En... zijn dat Hipsters? Ze proberen de kathedraal te... ze zetten er een pop-up koffiebar IN!"',
+      }],
+      once: true,
+    },
+    {
+      id: 'wave-1-spawn',
+      condition: { type: 'time', seconds: 300 },
+      actions: [
+        { type: 'message', text: 'SABOTAGE GOLF 1! Hipsters en Managers vanuit het noorden over de westbrug!' },
+        { type: 'spawn-wave', waveIndex: 0 },
+      ],
+      once: true,
+    },
+    // Sabotage Wave 2 (minute 12 = 720s)
+    {
+      id: 'wave-2-warning',
+      condition: { type: 'time', seconds: 690 },
+      actions: [{
+        type: 'message',
+        text: '"Die Stagiaires op het plein — dat zijn GEEN Stagiaires! Ze hebben laptops met RANDSTAD-logo\'s!"',
+      }],
+      once: true,
+    },
+    {
+      id: 'wave-2-spawn',
+      condition: { type: 'time', seconds: 720 },
+      actions: [
+        { type: 'message', text: 'SABOTAGE GOLF 2! Influencers, Managers en Consultants vanuit alle richtingen!' },
+        { type: 'spawn-wave', waveIndex: 1 },
+      ],
+      once: true,
+    },
+    // Hidden saboteurs at wave 2
+    {
+      id: 'hidden-saboteurs',
+      condition: { type: 'time', seconds: 725 },
+      actions: [
+        { type: 'message', text: 'VERRAAD! Verborgen saboteurs op het marktplein worden vijandig!' },
+        {
+          type: 'spawn-units',
+          units: [
+            { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -5, z: 5 },
+            { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 5, z: 5 },
+          ],
+        },
+      ],
+      once: true,
+    },
+    // Sabotage Wave 3 (minute 20 = 1200s) — De Politicus + full assault
+    {
+      id: 'wave-3-warning',
+      condition: { type: 'time', seconds: 1170 },
+      actions: [{
+        type: 'message',
+        text: 'De Politicus zelf komt eraan met een elite-escorte! Dit is de zwaarste golf!',
+      }],
+      once: true,
+    },
+    {
+      id: 'wave-3-spawn',
+      condition: { type: 'time', seconds: 1200 },
+      actions: [
+        {
+          type: 'message',
+          text: 'SABOTAGE GOLF 3! Politicus: "Jullie \'alliantie\' is illegaal. Ik heb hier een wet... artikel 47b... lid 3..." Prins: "Artikel dit."',
+        },
+        { type: 'spawn-wave', waveIndex: 2 },
+      ],
+      once: true,
+    },
+    // Belgian alliance event
+    {
+      id: 'belgian-alliance',
+      condition: { type: 'gold-reached', amount: 200 },
+      actions: [{
+        type: 'message',
+        text: 'Frietkoning proeft een worstenbroodje. Stilte. Zijn ogen worden groot. "Sacrebleu... dit is... LEKKERDER DAN FRIETEN." Dramatische stilte. "Maar vertel dat aan niemand."',
+      }],
+      once: true,
+    },
+    // Victory trigger — all waves survived + enough gold + army
+    {
+      id: 'all-waves-victory',
+      condition: { type: 'all-waves-defeated' },
+      actions: [{
+        type: 'message',
+        text: 'De drie leiders staan samen op het bordes van de kathedraal. Prins: "Morgen marcheren we." Mijnbaas: "Limburg is gereed." Frietkoning: "De frieten zijn warm." De Raad van Brabant is gesmeed!',
+      }],
+      once: true,
+    },
+    // Victory: all objectives met (gold + waves + army)
+    {
+      id: 'victory-alliance',
+      condition: { type: 'gold-reached', amount: 800 },
+      actions: [
+        {
+          type: 'message',
+          text: 'De oorlogskas is gevuld! De alliantie is gesmeed in vuur en vertrouwen. En de Randstad... de Randstad had geen idee wat er op hen af kwam.',
+        },
+        { type: 'victory' },
+      ],
+      once: true,
+    },
+  ],
+
+  waves: [
+    // Sabotage Wave 1 (T=300s): 6 Infantry (Hipsters) + 4 Infantry (Managers) from north-west
+    {
+      index: 0,
+      spawnTime: 300,
+      units: [
+        ...createWaveUnits(6, UnitTypeId.Infantry, M10_SABOTAGE_WEST_X + 40, M10_SABOTAGE_NORTH_Z, 5),
+        ...createWaveUnits(4, UnitTypeId.Infantry, M10_SABOTAGE_NORTH_X, M10_SABOTAGE_NORTH_Z, 4),
+      ],
+      message: 'Sabotage Golf 1 van 3',
+    },
+    // Sabotage Wave 2 (T=720s): 3 Ranged (Influencers) + 8 Infantry (Managers) + 2 Infantry (Consultants) from all directions
+    {
+      index: 1,
+      spawnTime: 720,
+      units: [
+        ...createWaveUnits(3, UnitTypeId.Ranged, M10_SABOTAGE_NORTH_X, M10_SABOTAGE_NORTH_Z, 3),
+        ...createWaveUnits(4, UnitTypeId.Infantry, M10_SABOTAGE_WEST_X + 20, M10_SABOTAGE_WEST_Z, 4),
+        ...createWaveUnits(4, UnitTypeId.Infantry, M10_SABOTAGE_EAST_X - 20, M10_SABOTAGE_EAST_Z, 4),
+        ...createWaveUnits(2, UnitTypeId.Ranged, M10_SABOTAGE_EAST_X, M10_SABOTAGE_EAST_Z, 2),
+      ],
+      message: 'Sabotage Golf 2 van 3',
+    },
+    // Sabotage Wave 3 (T=1200s): De Politicus + 12 Infantry + 4 Ranged + 2 Infantry (Vastgoedmakelaars)
+    {
+      index: 2,
+      spawnTime: 1200,
+      units: [
+        // Politicus elite group — represented as strong infantry/ranged mix
+        ...createWaveUnits(12, UnitTypeId.Infantry, M10_SABOTAGE_NORTH_X, M10_SABOTAGE_NORTH_Z, 8),
+        ...createWaveUnits(4, UnitTypeId.Ranged, M10_SABOTAGE_NORTH_X - 10, M10_SABOTAGE_NORTH_Z, 4),
+        ...createWaveUnits(2, UnitTypeId.Infantry, M10_SABOTAGE_NORTH_X + 10, M10_SABOTAGE_NORTH_Z, 2),
+      ],
+      message: 'SABOTAGE GOLF 3 — De Politicus!',
+    },
+  ],
+
+  hasAIProduction: false,
+
+  starThresholds: {
+    threeStarTime: 1500,   // 25 min
+    twoStarTime: 2100,     // 35 min
+    allBonusesGrants3Stars: true,
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Missie 11: "De Slag om de A2" (Massive 6-wave multi-front battle)
+// ---------------------------------------------------------------------------
+
+const M11_A2_NORTH_X = 0;
+const M11_A2_NORTH_Z = 170;
+const M11_WEST_FLANK_X = -120;
+const M11_WEST_FLANK_Z = 100;
+const M11_EAST_FLANK_X = 120;
+const M11_EAST_FLANK_Z = 100;
+const M11_FORT_DENBOSCH_X = 0;
+const M11_FORT_DENBOSCH_Z = -60;
+const M11_FORT_VEGHEL_X = 80;
+const M11_FORT_VEGHEL_Z = 20;
+const M11_FORT_BEST_X = -80;
+const M11_FORT_BEST_Z = 20;
+
+const MISSION_11_A2: MissionDefinition = {
+  id: 'brabant-11-de-slag-om-de-a2',
+  campaignId: 'brabanders',
+  missionIndex: 10,
+  title: 'De Slag om de A2',
+  briefingTitle: 'Missie 11: De Slag om de A2',
+  briefingText:
+    'Ze kwamen bij het ochtendgloren. Langs de A2, in een eindeloze kolonne van pakken en ' +
+    'PowerPoints, marcheerde de Randstad naar het zuiden. Meer dan we ooit gezien hadden.\n\n' +
+    'Dit is het. De Randstad gooit ALLES in de strijd. De CEO leidt persoonlijk de aanval. ' +
+    'De Politicus stuurt de reserves. En achter hen... de hele bureaucratische machine.\n\n' +
+    'Maar wij staan niet alleen. Brabant, Limburg en Belgie — zij aan zij. Dit is de dag ' +
+    'waarop we laten zien dat het zuiden nie buigt.\n\n' +
+    'Win, en de weg naar de Randstad ligt open. Verlies... en er IS geen Brabant meer.',
+
+  mapSize: 384,
+  startingGold: 800,
+  startingGoldAI: 0,
+
+  buildings: [
+    // Fort Den Bosch (south-center) — player main base
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: M11_FORT_DENBOSCH_X, z: M11_FORT_DENBOSCH_Z, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M11_FORT_DENBOSCH_X + 10, z: M11_FORT_DENBOSCH_Z, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M11_FORT_DENBOSCH_X - 10, z: M11_FORT_DENBOSCH_Z, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.LumberCamp, x: M11_FORT_DENBOSCH_X, z: M11_FORT_DENBOSCH_Z - 10, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Blacksmith, x: M11_FORT_DENBOSCH_X + 10, z: M11_FORT_DENBOSCH_Z - 10, complete: true },
+    // Fort Veghel (center-east) — allied outpost
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: M11_FORT_VEGHEL_X, z: M11_FORT_VEGHEL_Z, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M11_FORT_VEGHEL_X + 8, z: M11_FORT_VEGHEL_Z, complete: true },
+    // Fort Best (center-west) — allied outpost
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: M11_FORT_BEST_X, z: M11_FORT_BEST_Z, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M11_FORT_BEST_X - 8, z: M11_FORT_BEST_Z, complete: true },
+    // Randstad Veldkwartier (mobile HQ — represented as a northern TownHall)
+    { factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall, x: M11_A2_NORTH_X, z: 140, complete: true },
+    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: M11_A2_NORTH_X + 10, z: 140, complete: true },
+    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: M11_A2_NORTH_X - 10, z: 140, complete: true },
+  ],
+
+  units: [
+    // Fort Den Bosch garrison — 10 infantry + 6 ranged + 6 workers
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -3, z: -58 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -58 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -58 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 3, z: -58 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -3, z: -56 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -56 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 8, z: -58 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 10, z: -58 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 12, z: -58 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 14, z: -58 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 8, z: -56 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 10, z: -56 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 12, z: -56 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 14, z: -56 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -8, z: -58 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -10, z: -58 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -8, z: -56 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -10, z: -56 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -12, z: -56 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -12, z: -58 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -14, z: -56 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -14, z: -58 },
+    // Fort Veghel garrison — 12 infantry + 4 ranged
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 78, z: 18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 80, z: 18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 82, z: 18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 84, z: 18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 78, z: 22 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 80, z: 22 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 82, z: 22 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 84, z: 22 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 76, z: 20 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 86, z: 20 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 78, z: 24 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 82, z: 24 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 80, z: 24 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 84, z: 24 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 76, z: 22 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 86, z: 22 },
+    // Fort Best garrison — 10 infantry + 4 ranged
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -78, z: 18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -80, z: 18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -82, z: 18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -84, z: 18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -78, z: 22 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -80, z: 22 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -82, z: 22 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -84, z: 22 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -76, z: 20 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -86, z: 20 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -80, z: 24 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -84, z: 24 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -76, z: 22 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -86, z: 22 },
+    // Veldkwartier guards
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -2, z: 138 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 2, z: 138 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -2, z: 142 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 2, z: 142 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -5, z: 140 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 5, z: 140 },
+  ],
+
+  goldMines: [
+    { x: -20, z: -70, amount: 4000 },
+    { x: 20, z: -70, amount: 4000 },
+    { x: M11_FORT_VEGHEL_X, z: M11_FORT_VEGHEL_Z - 15, amount: 3000 },
+    { x: M11_FORT_BEST_X, z: M11_FORT_BEST_Z - 15, amount: 3000 },
+    { x: 0, z: 50, amount: 2500 },  // Contested — in no-man's land
+  ],
+
+  treeResources: [
+    { x: -40, z: -50, amount: 1000 },
+    { x: 40, z: -50, amount: 1000 },
+    { x: -60, z: 10, amount: 800 },
+    { x: 60, z: 10, amount: 800 },
+  ],
+
+  objectives: [
+    { id: 'survive-6-waves', type: 'survive-waves', description: 'Overleef 6 aanvalsgolven', targetValue: 6, isBonus: false },
+    { id: 'destroy-veldkwartier', type: 'destroy-building', description: 'Vernietig het Randstad Veldkwartier', targetValue: 1, isBonus: false },
+    { id: 'no-th-loss', type: 'no-townhall-loss', description: 'Alle 3 forten moeten overleven', targetValue: 0, isBonus: false },
+    { id: 'forts-healthy', type: 'have-units-at-end', description: 'Alle forten boven 50% HP (heb 40+ eenheden over)', targetValue: 40, isBonus: true },
+    { id: 'low-losses', type: 'train-units', description: 'Train minder dan 20 vervangende eenheden (meester strateeg)', targetValue: 20, isBonus: true },
+  ],
+
+  triggers: [
+    {
+      id: 'start-epic',
+      condition: { type: 'time', seconds: 3 },
+      actions: [{
+        type: 'message',
+        text: 'De A2. Ooit de levensader van Nederland. Vandaag de frontlinie van een oorlog die niemand zag aankomen.',
+      }],
+      once: true,
+    },
+    {
+      id: 'tip-defense',
+      condition: { type: 'time', seconds: 15 },
+      actions: [{
+        type: 'message',
+        text: 'Verdedig de drie forten langs de A2: Den Bosch, Veghel en Best. Vernietig het Randstad Veldkwartier in het noorden om de vijandelijke productie te stoppen.',
+      }],
+      once: true,
+    },
+    // Wave 1: Voorhoede (minute 3 = 180s)
+    {
+      id: 'wave-1-warning',
+      condition: { type: 'time', seconds: 150 },
+      actions: [{
+        type: 'message',
+        text: 'Prins: "Daar zijn ze. Brabanders — ge weet waarvoor we vechten. Nie voor grond. Nie voor goud. Maar voor wie we ZIJN."',
+      }],
+      once: true,
+    },
+    {
+      id: 'wave-1-spawn',
+      condition: { type: 'time', seconds: 180 },
+      actions: [
+        { type: 'message', text: 'GOLF 1: VOORHOEDE! Verkenners langs de A2 vanuit het noorden!' },
+        { type: 'spawn-wave', waveIndex: 0 },
+      ],
+      once: true,
+    },
+    // Wave 2: Westvleugel (minute 8 = 480s)
+    {
+      id: 'wave-2-warning',
+      condition: { type: 'time', seconds: 450 },
+      actions: [{
+        type: 'message',
+        text: 'Verkenners: "Een kolonne vanuit het noordwesten! Ze marcheren op Fort Best!"',
+      }],
+      once: true,
+    },
+    {
+      id: 'wave-2-spawn',
+      condition: { type: 'time', seconds: 480 },
+      actions: [
+        { type: 'message', text: 'GOLF 2: WESTVLEUGEL! Managers, Consultants en Influencers richting Fort Best!' },
+        { type: 'spawn-wave', waveIndex: 1 },
+      ],
+      once: true,
+    },
+    // Wave 3: Oostvleugel + CEO (minute 13 = 780s)
+    {
+      id: 'wave-3-warning',
+      condition: { type: 'time', seconds: 750 },
+      actions: [{
+        type: 'message',
+        text: 'CEO op een zwarte tractor: "Ik heb de kwartaalcijfers bekeken. Brabant is een VERLIESPOST. En ik saneer verliesposten."',
+      }],
+      once: true,
+    },
+    {
+      id: 'wave-3-spawn',
+      condition: { type: 'time', seconds: 780 },
+      actions: [
+        { type: 'message', text: 'GOLF 3: OOSTVLEUGEL! De CEO leidt de aanval op Fort Veghel! Corporate Advocaten voorop!' },
+        { type: 'spawn-wave', waveIndex: 2 },
+      ],
+      once: true,
+    },
+    // Wave 4: Tang movement (minute 18 = 1080s)
+    {
+      id: 'wave-4-warning',
+      condition: { type: 'time', seconds: 1050 },
+      actions: [{
+        type: 'message',
+        text: 'TANGBEWEGING! De vijand valt tegelijkertijd vanuit het westen EN oosten aan! Verdeel je troepen!',
+      }],
+      once: true,
+    },
+    {
+      id: 'wave-4-spawn',
+      condition: { type: 'time', seconds: 1080 },
+      actions: [
+        { type: 'message', text: 'GOLF 4: TANGBEWEGING! Twee flankaanvallen tegelijk! Kies: welk fort red je eerst?' },
+        { type: 'spawn-wave', waveIndex: 3 },
+      ],
+      once: true,
+    },
+    // Wave 5: Hoofdmacht + De Politicus (minute 24 = 1440s)
+    {
+      id: 'wave-5-warning',
+      condition: { type: 'time', seconds: 1410 },
+      actions: [{
+        type: 'message',
+        text: 'Politicus: "In naam van de democratie eisen wij overgave!" Frietkoning: "In naam van de frieten eisen wij dat ge opflikkert!"',
+      }],
+      once: true,
+    },
+    {
+      id: 'wave-5-spawn',
+      condition: { type: 'time', seconds: 1440 },
+      actions: [
+        { type: 'message', text: 'GOLF 5: HOOFDMACHT! De Politicus met de zwaarste aanval tot nu toe! Alle fronten tegelijk!' },
+        { type: 'spawn-wave', waveIndex: 4 },
+      ],
+      once: true,
+    },
+    // Wave 6: Alles of niets (minute 30 = 1800s)
+    {
+      id: 'wave-6-warning',
+      condition: { type: 'time', seconds: 1770 },
+      actions: [{
+        type: 'message',
+        text: 'Dit is het. Hun laatste kaart. Als we dit overleven... Prins: "DAN GAAN WE NAAR DE RANDSTAD!" Alle bondgenoten schreeuwen oorlogskreten.',
+      }],
+      once: true,
+    },
+    {
+      id: 'wave-6-spawn',
+      condition: { type: 'time', seconds: 1800 },
+      actions: [
+        { type: 'message', text: 'GOLF 6: ALLES OF NIETS! CEO + Politicus + ALLES wat de Randstad heeft! HOUD STAND VOOR BRABANT!' },
+        { type: 'spawn-wave', waveIndex: 5 },
+      ],
+      once: true,
+    },
+    // Fort under pressure warnings
+    {
+      id: 'army-rally',
+      condition: { type: 'army-count', count: 30 },
+      actions: [{
+        type: 'message',
+        text: 'Het leger is sterk! Overweeg een aanval op het Randstad Veldkwartier terwijl het zwak bewaakt is!',
+      }],
+      once: true,
+    },
+    // Victory: all waves defeated + veldkwartier destroyed
+    {
+      id: 'all-waves-victory',
+      condition: { type: 'all-waves-defeated' },
+      actions: [{
+        type: 'message',
+        text: 'Alle golven verslagen! Val nu het Randstad Veldkwartier aan om de overwinning te voltooien!',
+      }],
+      once: true,
+    },
+    {
+      id: 'victory-a2',
+      condition: { type: 'building-destroyed', factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall },
+      actions: [
+        {
+          type: 'message',
+          text: 'Het Randstad-leger vlucht over de A2! Prins staat op een heuvel: "Rennen maar. Morgen komen WIJ naar de Randstad." Mijnbaas: "Ik hoop dat ze parking hebben." Frietkoning: "En ik neem de frietketel mee."',
+        },
+        { type: 'victory' },
+      ],
+      once: true,
+    },
+  ],
+
+  waves: [
+    // Wave 1 (T=180s): Voorhoede — 12 Infantry + 4 Ranged (scouts) + 2 Infantry (Hipsters) from north
+    {
+      index: 0,
+      spawnTime: 180,
+      units: [
+        ...createWaveUnits(12, UnitTypeId.Infantry, M11_A2_NORTH_X, M11_A2_NORTH_Z, 8),
+        ...createWaveUnits(4, UnitTypeId.Ranged, M11_A2_NORTH_X + 10, M11_A2_NORTH_Z, 4),
+        ...createWaveUnits(2, UnitTypeId.Infantry, M11_A2_NORTH_X - 10, M11_A2_NORTH_Z, 2),
+      ],
+      message: 'Golf 1 van 6 — Voorhoede',
+    },
+    // Wave 2 (T=480s): Westvleugel — 10 Infantry + 4 Ranged + 3 Ranged (Influencers) + 2 Infantry (HR) targeting Fort Best
+    {
+      index: 1,
+      spawnTime: 480,
+      units: [
+        ...createWaveUnits(10, UnitTypeId.Infantry, M11_WEST_FLANK_X, M11_WEST_FLANK_Z, 6),
+        ...createWaveUnits(4, UnitTypeId.Ranged, M11_WEST_FLANK_X + 10, M11_WEST_FLANK_Z, 4),
+        ...createWaveUnits(3, UnitTypeId.Ranged, M11_WEST_FLANK_X + 5, M11_WEST_FLANK_Z - 5, 3),
+        ...createWaveUnits(2, UnitTypeId.Infantry, M11_WEST_FLANK_X + 15, M11_WEST_FLANK_Z, 2),
+      ],
+      message: 'Golf 2 van 6 — Westvleugel naar Fort Best',
+    },
+    // Wave 3 (T=780s): Oostvleugel + CEO — 12 Infantry + 6 Ranged + 2 Infantry (Vastgoedmakelaars) targeting Fort Veghel
+    {
+      index: 2,
+      spawnTime: 780,
+      units: [
+        ...createWaveUnits(12, UnitTypeId.Infantry, M11_EAST_FLANK_X, M11_EAST_FLANK_Z, 7),
+        ...createWaveUnits(6, UnitTypeId.Ranged, M11_EAST_FLANK_X - 10, M11_EAST_FLANK_Z, 5),
+        ...createWaveUnits(2, UnitTypeId.Infantry, M11_EAST_FLANK_X - 5, M11_EAST_FLANK_Z + 5, 2),
+      ],
+      message: 'Golf 3 van 6 — Oostvleugel + De CEO',
+    },
+    // Wave 4 (T=1080s): Tang movement — split attack west AND east
+    {
+      index: 3,
+      spawnTime: 1080,
+      units: [
+        // West pincer
+        ...createWaveUnits(8, UnitTypeId.Infantry, M11_WEST_FLANK_X + 20, M11_WEST_FLANK_Z + 20, 5),
+        ...createWaveUnits(3, UnitTypeId.Ranged, M11_WEST_FLANK_X + 25, M11_WEST_FLANK_Z + 20, 3),
+        // East pincer
+        ...createWaveUnits(8, UnitTypeId.Infantry, M11_EAST_FLANK_X - 20, M11_EAST_FLANK_Z + 20, 5),
+        ...createWaveUnits(3, UnitTypeId.Ranged, M11_EAST_FLANK_X - 25, M11_EAST_FLANK_Z + 20, 3),
+      ],
+      message: 'Golf 4 van 6 — Tangbeweging!',
+    },
+    // Wave 5 (T=1440s): Hoofdmacht — 15 Infantry + 8 Ranged + 4 Infantry + 3 Ranged + 2 Infantry (HR)
+    {
+      index: 4,
+      spawnTime: 1440,
+      units: [
+        ...createWaveUnits(15, UnitTypeId.Infantry, M11_A2_NORTH_X, M11_A2_NORTH_Z, 10),
+        ...createWaveUnits(8, UnitTypeId.Ranged, M11_A2_NORTH_X, M11_A2_NORTH_Z + 10, 6),
+        ...createWaveUnits(4, UnitTypeId.Infantry, M11_WEST_FLANK_X + 40, M11_WEST_FLANK_Z + 10, 3),
+        ...createWaveUnits(3, UnitTypeId.Ranged, M11_EAST_FLANK_X - 40, M11_EAST_FLANK_Z + 10, 3),
+        ...createWaveUnits(2, UnitTypeId.Infantry, M11_A2_NORTH_X + 30, M11_A2_NORTH_Z, 2),
+      ],
+      message: 'Golf 5 van 6 — HOOFDMACHT!',
+    },
+    // Wave 6 (T=1800s): Alles of niets — CEO + Politicus + massive army from ALL directions
+    {
+      index: 5,
+      spawnTime: 1800,
+      units: [
+        // Main A2 push
+        ...createWaveUnits(20, UnitTypeId.Infantry, M11_A2_NORTH_X, M11_A2_NORTH_Z, 12),
+        ...createWaveUnits(10, UnitTypeId.Ranged, M11_A2_NORTH_X, M11_A2_NORTH_Z + 5, 8),
+        // West flank
+        ...createWaveUnits(4, UnitTypeId.Infantry, M11_WEST_FLANK_X + 30, M11_WEST_FLANK_Z + 30, 4),
+        ...createWaveUnits(2, UnitTypeId.Ranged, M11_WEST_FLANK_X + 35, M11_WEST_FLANK_Z + 30, 2),
+        // East flank
+        ...createWaveUnits(4, UnitTypeId.Infantry, M11_EAST_FLANK_X - 30, M11_EAST_FLANK_Z + 30, 4),
+        ...createWaveUnits(2, UnitTypeId.Ranged, M11_EAST_FLANK_X - 35, M11_EAST_FLANK_Z + 30, 2),
+      ],
+      message: 'GOLF 6 — ALLES OF NIETS!',
+    },
+  ],
+
+  hasAIProduction: true,
+
+  starThresholds: {
+    threeStarTime: 2400,   // 40 min
+    twoStarTime: 3300,     // 55 min
+    allBonusesGrants3Stars: true,
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Missie 12: "Het Gouden Worstenbroodje" (Finale — 3-ring assault + boss fight)
+// ---------------------------------------------------------------------------
+
+const M12_PLAYER_BASE_X = 0;
+const M12_PLAYER_BASE_Z = -130;
+const M12_RING1_Z = -40;
+const M12_RING2_Z = 30;
+const M12_RING3_Z = 100;
+const M12_TOWER_X = 0;
+const M12_TOWER_Z = 120;
+
+const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
+  id: 'brabant-12-het-gouden-worstenbroodje',
+  campaignId: 'brabanders',
+  missionIndex: 11,
+  title: 'Het Gouden Worstenbroodje',
+  briefingTitle: 'Missie 12: Het Gouden Worstenbroodje',
+  briefingText:
+    'Dit is het, Brabant.\n\n' +
+    'Achter ons liggen elf missies, drie allianties en een oorlog die begon met een gestolen ' +
+    'worstenbroodje. Voor ons ligt de Randstad. Een stad van glas en staal, waar de zon ' +
+    'nauwelijks doorheen komt.\n\n' +
+    'Ergens daarbinnen — in de kluis van het Corporate Tower, veertig verdiepingen hoog — ' +
+    'ligt het Gouden Worstenbroodje.\n\n' +
+    'Het wordt niet makkelijk. De Randstad heeft drie verdedigingsringen. Kantoor-torens op ' +
+    'elke hoek. En De CEO wacht op ons op het dak van zijn toren.\n\n' +
+    'Maar wij hebben gezelligheid. Wij hebben Limburgse tunnels en Belgische frieten. Wij ' +
+    'hebben een Prins die danst in de regen en een Boer die een tractor kan besturen door ' +
+    'een kantoorgebouw heen.\n\n' +
+    'Haal het Worstenbroodje terug. Beeindig Project Gentrificatie. En laat de Randstad weten: ' +
+    'Brabant buigt nie.\n\n' +
+    'VOOR HET WORSTENBROODJE!',
+
+  mapSize: 320,
+  startingGold: 700,
+  startingGoldAI: 2000,
+
+  buildings: [
+    // Player base (south — open polder)
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: M12_PLAYER_BASE_X, z: M12_PLAYER_BASE_Z, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M12_PLAYER_BASE_X + 10, z: M12_PLAYER_BASE_Z, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M12_PLAYER_BASE_X - 10, z: M12_PLAYER_BASE_Z, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.LumberCamp, x: M12_PLAYER_BASE_X + 10, z: M12_PLAYER_BASE_Z - 10, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Blacksmith, x: M12_PLAYER_BASE_X - 10, z: M12_PLAYER_BASE_Z - 10, complete: true },
+    // Ring 1 — Buitenwijken (2 Barracks as Kantoor-torens at city gates)
+    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: -40, z: M12_RING1_Z, complete: true },
+    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: 40, z: M12_RING1_Z, complete: true },
+    // Ring 2 — Bedrijventerrein (2 Barracks as Coworking Spaces + Politicus patrol zone)
+    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: -30, z: M12_RING2_Z, complete: true },
+    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: 30, z: M12_RING2_Z, complete: true },
+    // Ring 3 — Centrum (TownHall as Corporate Tower, surrounded by Barracks as Kantoor-torens)
+    { factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall, x: M12_TOWER_X, z: M12_TOWER_Z, complete: true },
+    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: M12_TOWER_X - 20, z: M12_RING3_Z, complete: true },
+    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: M12_TOWER_X + 20, z: M12_RING3_Z, complete: true },
+    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: M12_TOWER_X, z: M12_RING3_Z - 15, complete: true },
+  ],
+
+  units: [
+    // Player starting army: 8 workers + 10 infantry + 6 ranged
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -3, z: -128 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -128 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -128 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 3, z: -128 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -3, z: -126 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -126 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -126 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 3, z: -126 },
+    // Infantry
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 8, z: -128 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 10, z: -128 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 12, z: -128 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 14, z: -128 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 16, z: -128 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 8, z: -126 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 10, z: -126 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 12, z: -126 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 14, z: -126 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 16, z: -126 },
+    // Ranged
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -8, z: -128 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -10, z: -128 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -12, z: -128 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -8, z: -126 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -10, z: -126 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -12, z: -126 },
+    // Limburgse bondgenoten (east flank)
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 80, z: -110 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 82, z: -110 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 84, z: -110 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 80, z: -108 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 82, z: -108 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 84, z: -108 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 86, z: -110 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 86, z: -108 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 78, z: -110 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 78, z: -108 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 80, z: -106 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 82, z: -106 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 84, z: -106 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 86, z: -106 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 88, z: -110 },
+    // Belgische bondgenoten (west flank)
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -80, z: -110 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -82, z: -110 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -84, z: -110 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -80, z: -108 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -82, z: -108 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -84, z: -108 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -78, z: -110 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -78, z: -108 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -80, z: -106 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -82, z: -106 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -84, z: -106 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -86, z: -110 },
+
+    // --- ENEMY FORCES ---
+    // Ring 1 — Buitenwijken: 10 Infantry (Managers) + 4 Ranged (Consultants) + 4 Infantry (Hipsters)
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -30, z: -45 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -25, z: -45 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -20, z: -42 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 20, z: -42 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 25, z: -45 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 30, z: -45 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -10, z: -38 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 10, z: -38 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 0, z: -42 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 5, z: -42 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -35, z: -40 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 35, z: -40 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -15, z: -38 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 15, z: -38 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -45, z: -38 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 45, z: -38 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -50, z: -35 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 50, z: -35 },
+
+    // Ring 2 — Bedrijventerrein: 14 Infantry + 6 Ranged (Corporate Advocaten) + 4 Ranged (HR) + 3 Ranged (Influencers)
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -25, z: 25 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -20, z: 25 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -15, z: 28 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -10, z: 28 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -5, z: 30 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 0, z: 30 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 5, z: 30 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 10, z: 28 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 15, z: 28 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 20, z: 25 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 25, z: 25 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -35, z: 30 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 35, z: 30 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 0, z: 35 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -28, z: 32 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 28, z: 32 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -20, z: 32 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 20, z: 32 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -10, z: 34 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 10, z: 34 },
+    // Politicus elite escorte
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -5, z: 32 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 5, z: 32 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 0, z: 28 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -3, z: 33 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 3, z: 33 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -15, z: 35 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 15, z: 35 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 0, z: 37 },
+
+    // Ring 3 — Centrum: 12 Infantry + 8 Ranged + 4 Infantry (siege defense)
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -15, z: 95 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -10, z: 95 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -5, z: 98 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 0, z: 98 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 5, z: 98 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 10, z: 95 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 15, z: 95 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -20, z: 100 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 20, z: 100 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -15, z: 105 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 15, z: 105 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 0, z: 105 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -18, z: 102 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 18, z: 102 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -10, z: 102 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 10, z: 102 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -5, z: 108 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 5, z: 108 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -10, z: 110 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 10, z: 110 },
+    // Siege defenders (Vastgoedmakelaars)
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -22, z: 98 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 22, z: 98 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -22, z: 105 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 22, z: 105 },
+
+    // Corporate Tower guards (CEO bodyguards) — 4 elite Infantry
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -3, z: 118 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 3, z: 118 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -3, z: 122 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 3, z: 122 },
+    // CEO himself (represented as Ranged — uses ranged attacks from the tower)
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 0, z: 120 },
+  ],
+
+  goldMines: [
+    { x: M12_PLAYER_BASE_X - 30, z: M12_PLAYER_BASE_Z - 10, amount: 4000 },
+    { x: M12_PLAYER_BASE_X + 30, z: M12_PLAYER_BASE_Z - 10, amount: 4000 },
+    { x: M12_PLAYER_BASE_X, z: M12_PLAYER_BASE_Z + 20, amount: 3000 },
+    { x: 60, z: -80, amount: 2500 },   // Near east flank approach
+    { x: -60, z: -80, amount: 2500 },  // Near west flank approach
+  ],
+
+  treeResources: [
+    { x: -50, z: -130, amount: 1000 },
+    { x: 50, z: -130, amount: 1000 },
+    { x: -30, z: -110, amount: 800 },
+    { x: 30, z: -110, amount: 800 },
+  ],
+
+  objectives: [
+    { id: 'destroy-corporate-tower', type: 'destroy-building', description: 'Vernietig het Corporate Tower (Randstad HQ)', targetValue: 1, isBonus: false },
+    { id: 'destroy-ring-defenses', type: 'destroy-building', description: 'Doorbreek de verdedigingsringen (vernietig 5+ vijandelijke gebouwen)', targetValue: 5, isBonus: false },
+    { id: 'no-th-loss', type: 'no-townhall-loss', description: 'Verlies je eigen basis niet', targetValue: 0, isBonus: false },
+    { id: 'total-victory', type: 'destroy-building', description: 'Totale Overwinning: vernietig ALLE vijandelijke gebouwen', targetValue: 8, isBonus: true },
+    { id: 'have-30-units', type: 'have-units-at-end', description: 'Win met 30+ eenheden over (geen hero deaths)', targetValue: 30, isBonus: true },
+  ],
+
+  triggers: [
+    // Opening
+    {
+      id: 'start-march',
+      condition: { type: 'time', seconds: 3 },
+      actions: [{
+        type: 'message',
+        text: 'Prins: "BRABANT! LIMBURG! BELGIE! Vandaag halen we terug wat van ons is. VOOR HET WORSTENBROODJE!" Het hele leger: "VOOR HET WORSTENBROODJE!"',
+      }],
+      once: true,
+    },
+    {
+      id: 'tip-strategy',
+      condition: { type: 'time', seconds: 15 },
+      actions: [{
+        type: 'message',
+        text: 'Doorbreek de drie verdedigingsringen: Buitenwijken, Bedrijventerrein en Centrum. Vernietig het Corporate Tower om de CEO uit te lokken.',
+      }],
+      once: true,
+    },
+    // Ring 1 battle events
+    {
+      id: 'ring1-approach',
+      condition: { type: 'army-count', count: 15 },
+      actions: [{
+        type: 'message',
+        text: 'Het Brabantse leger nadert de buitenwijken van de Randstad. Staal en glas torenen boven het weiland uit. Dit is vijandelijk terrein.',
+      }],
+      once: true,
+    },
+    // Ring 1 reinforcements
+    {
+      id: 'ring1-reinforcements',
+      condition: { type: 'time', seconds: 300 },
+      actions: [
+        { type: 'message', text: 'Randstad patrouilles vanuit de buitenwijken! Ze verdedigen de stadspoorten!' },
+        {
+          type: 'spawn-units',
+          units: [
+            ...createWaveUnits(6, UnitTypeId.Infantry, -20, -50, 4),
+            ...createWaveUnits(3, UnitTypeId.Ranged, 20, -50, 3),
+          ],
+        },
+      ],
+      once: true,
+    },
+    // Ring 2 events
+    {
+      id: 'ring2-politicus',
+      condition: { type: 'time', seconds: 600 },
+      actions: [
+        {
+          type: 'message',
+          text: 'Politicus: "Dit is een SCHENDING van het bestuursrecht! Artikel 12! Lid 7! Sub-b!" Frietkoning: "Sub-DIT!" (gooit een friet)',
+        },
+        {
+          type: 'spawn-units',
+          units: [
+            ...createWaveUnits(8, UnitTypeId.Infantry, 0, 40, 5),
+            ...createWaveUnits(4, UnitTypeId.Ranged, 0, 45, 3),
+          ],
+        },
+      ],
+      once: true,
+    },
+    // Reinforcements from Ring 2
+    {
+      id: 'ring2-reinforcements',
+      condition: { type: 'time', seconds: 900 },
+      actions: [
+        { type: 'message', text: 'Meer vijandelijke eenheden stromen vanuit de coworking spaces! De Randstad geeft niet op!' },
+        {
+          type: 'spawn-units',
+          units: [
+            ...createWaveUnits(6, UnitTypeId.Infantry, -30, 35, 4),
+            ...createWaveUnits(6, UnitTypeId.Infantry, 30, 35, 4),
+            ...createWaveUnits(3, UnitTypeId.Ranged, 0, 38, 3),
+          ],
+        },
+      ],
+      once: true,
+    },
+    // Ring 3 approach
+    {
+      id: 'ring3-approach',
+      condition: { type: 'time', seconds: 1200 },
+      actions: [{
+        type: 'message',
+        text: 'Camera kijkt omhoog naar het Corporate Tower. CEO (megafoon): "Welkom in MIJN wereld, Brabanders. Maar ik moet jullie teleurstellen: het Worstenbroodje... dat heb ik OMGESMOLTEN." Prins, kalm: "Ge liegt. En dat weten we allebei."',
+      }],
+      once: true,
+    },
+    // Ring 3 elite reinforcements
+    {
+      id: 'ring3-elite',
+      condition: { type: 'time', seconds: 1500 },
+      actions: [
+        { type: 'message', text: 'Elite eenheden vanuit het centrum! De zwaarste troepen van de Randstad!' },
+        {
+          type: 'spawn-units',
+          units: [
+            ...createWaveUnits(8, UnitTypeId.Infantry, 0, 100, 6),
+            ...createWaveUnits(4, UnitTypeId.Ranged, -10, 105, 4),
+            ...createWaveUnits(4, UnitTypeId.Ranged, 10, 105, 4),
+          ],
+        },
+      ],
+      once: true,
+    },
+    // CEO boss spawns additional guards when tower is under attack
+    {
+      id: 'boss-phase-1',
+      condition: { type: 'time', seconds: 1800 },
+      actions: [
+        {
+          type: 'message',
+          text: 'CEO: "BESCHERM HET TOWER! Dat is mijn HYBRIDE WERKPLEK!" Boss fight begint! CEO: "Laat me jullie mijn EXIT-STRATEGIE tonen."',
+        },
+        {
+          type: 'spawn-units',
+          units: [
+            // Stagiaires shield
+            ...createWaveUnits(4, UnitTypeId.Infantry, 0, 115, 3),
+          ],
+        },
+      ],
+      once: true,
+    },
+    // Boss phase 2 — CEO uses desperate measures
+    {
+      id: 'boss-phase-2',
+      condition: { type: 'time', seconds: 2100 },
+      actions: [
+        {
+          type: 'message',
+          text: 'CEO: "De kwartaalcijfers spreken voor ZICH! Brabant is een KOSTENPOST!" Prins: "En gij zijt een VERLIESPOST!" De CEO wordt wanhopig!',
+        },
+        {
+          type: 'spawn-units',
+          units: [
+            // Desperate reinforcements
+            ...createWaveUnits(6, UnitTypeId.Infantry, -15, 120, 4),
+            ...createWaveUnits(6, UnitTypeId.Infantry, 15, 120, 4),
+            ...createWaveUnits(3, UnitTypeId.Ranged, 0, 125, 3),
+          ],
+        },
+      ],
+      once: true,
+    },
+    // Boss phase 3 — final stand
+    {
+      id: 'boss-phase-3',
+      condition: { type: 'time', seconds: 2400 },
+      actions: [
+        {
+          type: 'message',
+          text: 'CEO: "IK... BEN... DE... SYNERGIEEEEE!" Laatste wanhopige aanval! Alles op alles!',
+        },
+        {
+          type: 'spawn-units',
+          units: [
+            ...createWaveUnits(10, UnitTypeId.Infantry, 0, 130, 8),
+            ...createWaveUnits(5, UnitTypeId.Ranged, 0, 135, 5),
+          ],
+        },
+      ],
+      once: true,
+    },
+    // Counter-attacks from Ring 2 remnants
+    {
+      id: 'counterattack-west',
+      condition: { type: 'time', seconds: 1050 },
+      actions: [
+        { type: 'message', text: 'Vijandelijke tegenaanval vanuit het westen! Bescherm je flank!' },
+        {
+          type: 'spawn-units',
+          units: [
+            ...createWaveUnits(5, UnitTypeId.Infantry, -60, 0, 4),
+            ...createWaveUnits(2, UnitTypeId.Ranged, -55, 5, 2),
+          ],
+        },
+      ],
+      once: true,
+    },
+    {
+      id: 'counterattack-east',
+      condition: { type: 'time', seconds: 1350 },
+      actions: [
+        { type: 'message', text: 'Tegenaanval vanuit het oosten!' },
+        {
+          type: 'spawn-units',
+          units: [
+            ...createWaveUnits(5, UnitTypeId.Infantry, 60, 0, 4),
+            ...createWaveUnits(2, UnitTypeId.Ranged, 55, 5, 2),
+          ],
+        },
+      ],
+      once: true,
+    },
+    // Victory trigger — Corporate Tower (enemy TownHall) destroyed
+    {
+      id: 'victory-tower',
+      condition: { type: 'building-destroyed', factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall },
+      actions: [
+        {
+          type: 'message',
+          text: 'Het Corporate Tower scheurt open! Uit het puin verschijnt een gouden gloed — het Gouden Worstenbroodje! Intact. Stralend. ' +
+            'Prins: "HET WORSTENBROODJE IS THUIS!" ' +
+            'Dit was nooit het verhaal van een worstenbroodje. Het was het verhaal van een volk dat ontdekte dat het samen sterker was dan alleen. ' +
+            'Dat gezelligheid geen zwakte is, maar de grootste kracht die er bestaat.',
+        },
+        { type: 'victory' },
+      ],
+      once: true,
+    },
+  ],
+
+  waves: [],
+  hasAIProduction: true,
+
+  starThresholds: {
+    threeStarTime: 2400,   // 40 min
+    twoStarTime: 3300,     // 55 min
+    allBonusesGrants3Stars: true,
+  },
+};
+
+// ---------------------------------------------------------------------------
 // Exports
 // ---------------------------------------------------------------------------
 
@@ -1518,6 +2666,9 @@ export const BRABANDERS_MISSIONS: readonly MissionDefinition[] = [
   MISSION_7_MARKT,
   MISSION_8_BELEG,
   MISSION_9_NANSEN,
+  MISSION_10_RAAD,
+  MISSION_11_A2,
+  MISSION_12_GOUDEN_WORSTENBROODJE,
 ];
 
 /** Get a mission by its id. */

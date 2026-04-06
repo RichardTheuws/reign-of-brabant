@@ -16,8 +16,6 @@ import { query, addComponent, removeComponent, hasComponent, entityExists } from
 import {
   Position,
   Health,
-  Attack,
-  Armor,
   Faction,
   UnitAI,
   Movement,
@@ -30,7 +28,7 @@ import {
   GezeligheidBonus,
   Production,
 } from '../ecs/components';
-import { IsUnit, IsHero, IsReviving, IsDead, IsSummon, IsBuilding } from '../ecs/tags';
+import { IsUnit, IsHero, IsDead, IsSummon, IsBuilding } from '../ecs/tags';
 import { eventBus } from '../core/EventBus';
 import { playerState } from '../core/PlayerState';
 import {

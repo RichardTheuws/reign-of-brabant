@@ -27,7 +27,6 @@ import { eventBus } from '../core/EventBus';
 import {
   FactionId,
   UnitTypeId,
-  BuildingTypeId,
   UpgradeId,
 } from '../types/index';
 import type { GameWorld } from '../ecs/world';

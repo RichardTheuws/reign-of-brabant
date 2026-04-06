@@ -10,11 +10,11 @@
  */
 
 import type * as THREE from 'three';
+import type { Crowd, CrowdAgent, NavMesh, NavMeshQuery, TileCache, Obstacle } from 'recast-navigation';
 import { distance2D } from '../utils/math';
 
 // ---------------------------------------------------------------------------
-// Types re-declared here so the module stays importable even when
-// recast-navigation is not yet loaded (dynamic import).
+// Local Vector3 type for positions without importing Three.js Vector3.
 // ---------------------------------------------------------------------------
 
 /** Minimal Vector3-like used by recast-navigation. */
@@ -24,21 +24,15 @@ interface RcVec3 {
   z: number;
 }
 
-/** Obstacle reference returned by TileCache. */
-interface ObstacleRef {
-  raw?: unknown;
-}
-
 // ---------------------------------------------------------------------------
 // Internal state
 // ---------------------------------------------------------------------------
 
 /** Recast modules -- populated after `init()`. */
-let rcInit: (() => Promise<void>) | null = null;
-let rcCrowd: any = null; // Crowd instance
-let rcNavMesh: any = null; // NavMesh instance
-let rcNavMeshQuery: any = null; // NavMeshQuery instance
-let rcTileCache: any = null; // TileCache instance (nullable -- PoC may skip)
+let rcCrowd: Crowd | null = null;
+let rcNavMesh: NavMesh | null = null;
+let rcNavMeshQuery: NavMeshQuery | null = null;
+let rcTileCache: TileCache | null = null;
 
 /** Whether WASM init completed successfully. */
 let recastReady = false;
@@ -78,14 +72,14 @@ const CROWD_MAX_AGENT_RADIUS = 0.6;
 // ---------------------------------------------------------------------------
 
 interface AgentRecord {
-  crowdAgent: any; // CrowdAgent instance
+  crowdAgent: CrowdAgent;
   entityId: number;
   radius: number;
   speed: number;
 }
 
 const agentsByEntity = new Map<number, AgentRecord>();
-const obstacleRefs = new Map<number, any>(); // obstacleId -> obstacle ref
+const obstacleRefs = new Map<number, Obstacle>();
 let nextObstacleId = 1;
 
 // ---------------------------------------------------------------------------
@@ -458,10 +452,10 @@ export const NavMeshManager = {
   addObstacle(x: number, z: number, radius: number, height: number): number {
     const id = nextObstacleId++;
 
-    if (recastReady && rcTileCache) {
-      const ref = rcTileCache.addCylinderObstacle({ x, y: 0, z }, radius, height);
-      if (ref) {
-        obstacleRefs.set(id, ref);
+    if (recastReady && rcTileCache && rcNavMesh) {
+      const result = rcTileCache.addCylinderObstacle({ x, y: 0, z }, radius, height);
+      if (result.success && result.obstacle) {
+        obstacleRefs.set(id, result.obstacle);
         rcTileCache.update(rcNavMesh);
       }
     }
@@ -476,14 +470,14 @@ export const NavMeshManager = {
   addBoxObstacle(x: number, z: number, halfWidth: number, halfDepth: number, height: number): number {
     const id = nextObstacleId++;
 
-    if (recastReady && rcTileCache) {
-      const ref = rcTileCache.addBoxObstacle(
+    if (recastReady && rcTileCache && rcNavMesh) {
+      const result = rcTileCache.addBoxObstacle(
         { x, y: 0, z },
         { x: halfWidth, y: height / 2, z: halfDepth },
         0, // no rotation
       );
-      if (ref) {
-        obstacleRefs.set(id, ref);
+      if (result.success && result.obstacle) {
+        obstacleRefs.set(id, result.obstacle);
         rcTileCache.update(rcNavMesh);
       }
     }
@@ -495,10 +489,10 @@ export const NavMeshManager = {
    * Remove a previously added obstacle.
    */
   removeObstacle(obstacleId: number): void {
-    if (recastReady && rcTileCache) {
-      const ref = obstacleRefs.get(obstacleId);
-      if (ref) {
-        rcTileCache.removeObstacle(ref);
+    if (recastReady && rcTileCache && rcNavMesh) {
+      const obstacle = obstacleRefs.get(obstacleId);
+      if (obstacle) {
+        rcTileCache.removeObstacle(obstacle);
         rcTileCache.update(rcNavMesh);
         obstacleRefs.delete(obstacleId);
       }
@@ -533,12 +527,12 @@ export const NavMeshManager = {
   },
 
   /** Get the raw NavMesh for debug visualization. */
-  get navMesh(): any {
+  get navMesh(): NavMesh | null {
     return rcNavMesh;
   },
 
   /** Get the raw Crowd for debug visualization (CrowdHelper). */
-  get crowd(): any {
+  get crowd(): Crowd | null {
     return rcCrowd;
   },
 };

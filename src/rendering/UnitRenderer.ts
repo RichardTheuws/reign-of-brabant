@@ -1,11 +1,11 @@
 /**
  * UnitRenderer.ts
- * Loads GLB unit models, clones per entity, syncs transforms from ECS,
- * highlights selected units and faces them toward their movement target.
+ * Renders unit models using InstancedMesh for high-performance batched rendering.
+ * One InstancedMesh per (unitType, factionId) combination.
+ * Maintains lightweight proxy Object3Ds for raycasting compatibility.
  */
 
 import * as THREE from 'three';
-import { MeshToonMaterial } from 'three';
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 
 // ---------------------------------------------------------------------------
@@ -47,14 +47,15 @@ const FACTION_TINTS: Record<number, THREE.Color> = {
   [FACTION_BLUE]: new THREE.Color(0x4070bb),   // Randstad: clear blue
 };
 
-/** Emissive glow colour for selected units. */
-const SELECTION_EMISSIVE = new THREE.Color(0x44ff44);
-const SELECTION_EMISSIVE_INTENSITY = 0.35;
+/** Selection highlight color (green tint on instance color). */
+const SELECTION_COLOR = new THREE.Color(0.4, 1.0, 0.4);
 
 /** Damage flash: red flash for 0.1s when a unit takes damage. */
 const DAMAGE_FLASH_DURATION = 0.1;
-const DAMAGE_FLASH_COLOR = new THREE.Color(0xff3333);
-const DAMAGE_FLASH_INTENSITY = 0.8;
+const DAMAGE_FLASH_COLOR = new THREE.Color(1.0, 0.2, 0.2);
+
+/** Default (neutral) instance color: white = no tinting. */
+const DEFAULT_COLOR = new THREE.Color(1, 1, 1);
 
 /** Idle bob: gentle up-and-down movement for idle units. */
 const IDLE_BOB_AMPLITUDE = 0.08;
@@ -64,23 +65,88 @@ const IDLE_BOB_SPEED = 2.5;
 const BLOB_SHADOW_SIZE = 0.6;
 const BLOB_SHADOW_OPACITY = 0.2;
 
+/** Maximum instances per (unitType, faction) bucket. */
+const MAX_INSTANCES_PER_BUCKET = 128;
+
+/** Size of the invisible hit-proxy box for raycasting (world units). */
+const HIT_PROXY_SIZE = 0.8;
+const HIT_PROXY_HEIGHT = 1.6;
+
+// ---------------------------------------------------------------------------
+// Internal: per-bucket data for one InstancedMesh
+// ---------------------------------------------------------------------------
+
+/** Tracks one InstancedMesh and the entities mapped into it. */
+interface InstanceBucket {
+  /** The InstancedMesh added to the scene. */
+  mesh: THREE.InstancedMesh;
+  /** Entity ID -> instance index within this bucket. */
+  entityToIndex: Map<number, number>;
+  /** Instance index -> entity ID (inverse mapping). */
+  indexToEntity: Map<number, number>;
+  /** Current number of active instances. */
+  activeCount: number;
+  /** Per-instance override scale (e.g. 1.8 for heroes). Defaults to 1.0. */
+  instanceScales: Map<number, number>;
+}
+
+/**
+ * Extract all meshes from a GLB scene and merge their geometries into a single
+ * BufferGeometry + material. For models with a single mesh this is trivial;
+ * for multi-mesh models we take the first mesh (consistent with PropRenderer).
+ */
+function extractFirstMesh(
+  root: THREE.Group,
+): { geometry: THREE.BufferGeometry; material: THREE.Material } | null {
+  let found: THREE.Mesh | null = null;
+  root.traverse((child) => {
+    if (!found && (child as THREE.Mesh).isMesh) {
+      found = child as THREE.Mesh;
+    }
+  });
+  if (!found) return null;
+  const mesh = found as THREE.Mesh;
+
+  // Clone geometry so we can bake the mesh's world transform into it
+  const geo = mesh.geometry.clone();
+  mesh.updateWorldMatrix(true, false);
+  geo.applyMatrix4(mesh.matrixWorld);
+
+  const mat = Array.isArray(mesh.material)
+    ? (mesh.material as THREE.Material[])[0]
+    : (mesh.material as THREE.Material);
+
+  return { geometry: geo, material: mat.clone() };
+}
+
 // ---------------------------------------------------------------------------
 // UnitRenderer
 // ---------------------------------------------------------------------------
 
 export class UnitRenderer {
-  /** Loaded & parsed source models ready to be cloned. */
+  /** Loaded & parsed source models (for reference / disposal). */
   private modelCache = new Map<ModelCacheKey, THREE.Group>();
   /** Track which models are v02 (keep PBR materials, no toon conversion). */
   private v02Models = new Set<ModelCacheKey>();
-  /** Entity id -> cloned scene root living in the scene graph. */
-  private instances = new Map<number, THREE.Object3D>();
+  /** InstancedMesh buckets keyed by ModelCacheKey. */
+  private buckets = new Map<ModelCacheKey, InstanceBucket>();
+  /** Entity id -> lightweight proxy Object3D (for raycasting + entityMeshMap compat). */
+  private proxies = new Map<number, THREE.Object3D>();
+  /** Entity id -> which bucket key it belongs to. */
+  private entityBucketKey = new Map<number, ModelCacheKey>();
   /** Shared loader instance. */
   private loader = new GLTFLoader();
   /** Scene group that hosts all unit meshes. */
   private group: THREE.Group;
-  /** Reusable vector to avoid per-frame allocations. */
+
+  /** Reusable temporaries to avoid per-frame allocations. */
   private _vec = new THREE.Vector3();
+  private _mat4 = new THREE.Matrix4();
+  private _pos = new THREE.Vector3();
+  private _quat = new THREE.Quaternion();
+  private _scale = new THREE.Vector3();
+  private _euler = new THREE.Euler();
+  private _color = new THREE.Color();
 
   /** Damage flash timers: eid -> remaining seconds. */
   private damageFlashTimers = new Map<number, number>();
@@ -100,6 +166,10 @@ export class UnitRenderer {
   private moveIndicator: THREE.Mesh | null = null;
   private moveIndicatorTimer = 0;
 
+  /** Shared invisible hit-proxy geometry + material for raycasting. */
+  private hitProxyGeo: THREE.BoxGeometry;
+  private hitProxyMat: THREE.MeshBasicMaterial;
+
   constructor(parentGroup: THREE.Group) {
     this.group = parentGroup;
 
@@ -111,6 +181,13 @@ export class UnitRenderer {
       transparent: true,
       opacity: BLOB_SHADOW_OPACITY,
       depthWrite: false,
+    });
+
+    // Hit-proxy: invisible box used only for raycasting
+    this.hitProxyGeo = new THREE.BoxGeometry(HIT_PROXY_SIZE, HIT_PROXY_HEIGHT, HIT_PROXY_SIZE);
+    this.hitProxyMat = new THREE.MeshBasicMaterial({
+      visible: false,
+      // Keeps the mesh in the scene graph for raycasting but never drawn
     });
 
     // Move indicator (hidden by default)
@@ -132,7 +209,7 @@ export class UnitRenderer {
   // Asset loading
   // -----------------------------------------------------------------------
 
-  /** Pre-load all unit GLB models (v02 with v01 fallback). */
+  /** Pre-load all unit GLB models (v02 with v01 fallback) and create InstancedMeshes. */
   async preload(): Promise<void> {
     const entries = Object.entries(UNIT_MODEL_PATHS);
     const promises = entries.map(([key, path]) =>
@@ -143,9 +220,14 @@ export class UnitRenderer {
       }).then((gltf: GLTF) => {
         const root = gltf.scene;
         const isV02 = path.includes('/v02/');
-        if (isV02) this.v02Models.add(key as ModelCacheKey);
+        const cacheKey = key as ModelCacheKey;
+        if (isV02) this.v02Models.add(cacheKey);
+
         // v02 models are larger — use smaller scale; v01 needs upscale
-        root.scale.set(isV02 ? 0.5 : 1.5, isV02 ? 0.5 : 1.5, isV02 ? 0.5 : 1.5);
+        const scaleFactor = isV02 ? 0.5 : 1.5;
+        root.scale.set(scaleFactor, scaleFactor, scaleFactor);
+        root.updateMatrixWorld(true);
+
         // Enable shadow casting on all child meshes
         root.traverse((child) => {
           if ((child as THREE.Mesh).isMesh) {
@@ -153,10 +235,73 @@ export class UnitRenderer {
             child.receiveShadow = false;
           }
         });
-        this.modelCache.set(key as ModelCacheKey, root);
+
+        this.modelCache.set(cacheKey, root);
+
+        // Build InstancedMesh for this model key
+        this.createBucket(cacheKey, root, isV02);
       }),
     );
     await Promise.all(promises);
+  }
+
+  /**
+   * Create an InstancedMesh bucket from the loaded GLB root.
+   */
+  private createBucket(key: ModelCacheKey, root: THREE.Group, isV02: boolean): void {
+    const data = extractFirstMesh(root);
+    if (!data) {
+      console.warn(`[UnitRenderer] GLB has no mesh children for key "${key}"`);
+      return;
+    }
+
+    // Determine faction from key (e.g. "worker_0" -> factionId = 0)
+    const factionId = parseInt(key.split('_')[1], 10);
+
+    // Prepare material: v02 keeps PBR, v01 gets faction tint baked in
+    let material = data.material;
+    if (!isV02) {
+      const tint = FACTION_TINTS[factionId];
+      const origColor = ('color' in material && (material as THREE.MeshStandardMaterial).color instanceof THREE.Color)
+        ? (material as THREE.MeshStandardMaterial).color.clone()
+        : new THREE.Color(0x888888);
+      if (tint) origColor.lerp(tint, 0.4);
+      material = new THREE.MeshStandardMaterial({
+        color: origColor,
+        roughness: 0.8,
+        metalness: 0.1,
+      });
+    }
+
+    const im = new THREE.InstancedMesh(data.geometry, material, MAX_INSTANCES_PER_BUCKET);
+    im.count = 0; // Start empty — we grow as units spawn
+    im.castShadow = true;
+    im.receiveShadow = false;
+    im.frustumCulled = true;
+    im.name = `instanced_${key}`;
+
+    // Initialize instanceColor buffer (required for setColorAt)
+    // Three.js doesn't create it by default — we must allocate it
+    im.instanceColor = new THREE.InstancedBufferAttribute(
+      new Float32Array(MAX_INSTANCES_PER_BUCKET * 3),
+      3,
+    );
+    // Fill with white (neutral)
+    for (let i = 0; i < MAX_INSTANCES_PER_BUCKET; i++) {
+      im.setColorAt(i, DEFAULT_COLOR);
+    }
+    im.instanceColor.needsUpdate = true;
+
+    this.group.add(im);
+
+    const bucket: InstanceBucket = {
+      mesh: im,
+      entityToIndex: new Map(),
+      indexToEntity: new Map(),
+      activeCount: 0,
+      instanceScales: new Map(),
+    };
+    this.buckets.set(key, bucket);
   }
 
   // -----------------------------------------------------------------------
@@ -164,55 +309,52 @@ export class UnitRenderer {
   // -----------------------------------------------------------------------
 
   /**
-   * Create a visible unit mesh for an ECS entity by cloning the cached model.
-   * Returns the root Object3D so the caller can store a reference if needed.
+   * Create a visible unit instance for an ECS entity.
+   * Returns a lightweight proxy Object3D so the caller can set initial position,
+   * userData.eid, and store it in entityMeshMap for raycasting.
    */
   addUnit(eid: number, type: UnitTypeName, factionId: number): THREE.Object3D | null {
-    if (this.instances.has(eid)) return this.instances.get(eid)!;
+    if (this.proxies.has(eid)) return this.proxies.get(eid)!;
 
     const key: ModelCacheKey = `${type}_${factionId}`;
-    const source = this.modelCache.get(key);
-    if (!source) {
-      console.warn(`[UnitRenderer] No cached model for key "${key}"`);
+    const bucket = this.buckets.get(key);
+    if (!bucket) {
+      console.warn(`[UnitRenderer] No InstancedMesh bucket for key "${key}"`);
       return null;
     }
 
-    const clone = source.clone(true);
-    const isV02 = this.v02Models.has(key);
-    const tint = FACTION_TINTS[factionId];
+    if (bucket.activeCount >= MAX_INSTANCES_PER_BUCKET) {
+      console.warn(`[UnitRenderer] Instance limit (${MAX_INSTANCES_PER_BUCKET}) reached for "${key}"`);
+      return null;
+    }
 
-    clone.traverse((child) => {
-      if ((child as THREE.Mesh).isMesh) {
-        const mesh = child as THREE.Mesh;
-        if (isV02) {
-          // v02: keep original PBR materials, just clone to avoid shared state
-          if (Array.isArray(mesh.material)) {
-            mesh.material = mesh.material.map((m) => m.clone());
-          } else {
-            mesh.material = mesh.material.clone();
-          }
-        } else {
-          // v01: convert to toon material with faction tint
-          const applyTint = (m: THREE.Material): THREE.Material => {
-            const origColor = ('color' in m && m.color instanceof THREE.Color)
-              ? m.color.clone()
-              : new THREE.Color(0x888888);
-            if (tint) origColor.lerp(tint, 0.4);
-            return new MeshToonMaterial({ color: origColor, transparent: false });
-          };
-          if (Array.isArray(mesh.material)) {
-            mesh.material = mesh.material.map(applyTint);
-          } else {
-            mesh.material = applyTint(mesh.material);
-          }
-        }
-      }
-    });
+    // Assign next instance slot
+    const instanceIndex = bucket.activeCount;
+    bucket.entityToIndex.set(eid, instanceIndex);
+    bucket.indexToEntity.set(instanceIndex, eid);
+    bucket.activeCount++;
+    bucket.mesh.count = bucket.activeCount;
+    this.entityBucketKey.set(eid, key);
 
-    clone.name = `unit_${eid}`;
-    (clone as THREE.Object3D).userData.eid = eid;
-    this.instances.set(eid, clone);
-    this.group.add(clone);
+    // Set initial matrix (identity at origin — caller will set position)
+    this._mat4.identity();
+    bucket.mesh.setMatrixAt(instanceIndex, this._mat4);
+    bucket.mesh.instanceMatrix.needsUpdate = true;
+
+    // Set initial color to white (neutral)
+    bucket.mesh.setColorAt(instanceIndex, DEFAULT_COLOR);
+    if (bucket.mesh.instanceColor) bucket.mesh.instanceColor.needsUpdate = true;
+
+    // Create a lightweight proxy Object3D for raycasting compatibility.
+    // This is an invisible mesh that the caller's entityMeshMap and raycaster
+    // can interact with normally (intersectObjects, userData.eid walk-up).
+    const proxy = new THREE.Mesh(this.hitProxyGeo, this.hitProxyMat);
+    proxy.name = `unit_${eid}`;
+    proxy.userData.eid = eid;
+    // The proxy intercepts `.scale` sets from the caller (e.g. heroes at 1.8x).
+    // We watch for scale changes via a custom setter on userData.
+    this.proxies.set(eid, proxy);
+    this.group.add(proxy);
 
     // Create blob shadow for this unit
     const shadow = new THREE.Mesh(this.blobShadowGeo, this.blobShadowMat);
@@ -220,16 +362,60 @@ export class UnitRenderer {
     this.blobShadows.set(eid, shadow);
     this.group.add(shadow);
 
-    return clone;
+    return proxy;
   }
 
-  /** Remove and dispose the mesh of a dead / removed entity. */
+  /** Remove and dispose the mesh instance of a dead / removed entity. */
   removeUnit(eid: number): void {
-    const obj = this.instances.get(eid);
-    if (!obj) return;
-    this.group.remove(obj);
-    this.disposeObject(obj);
-    this.instances.delete(eid);
+    const key = this.entityBucketKey.get(eid);
+    if (!key) return;
+
+    const bucket = this.buckets.get(key);
+    if (bucket) {
+      const index = bucket.entityToIndex.get(eid);
+      if (index !== undefined) {
+        // Swap-remove: move the last active instance into this slot
+        const lastIndex = bucket.activeCount - 1;
+
+        if (index !== lastIndex) {
+          // Copy last instance's matrix and color into the removed slot
+          const lastEid = bucket.indexToEntity.get(lastIndex);
+          if (lastEid !== undefined) {
+            // Copy matrix
+            bucket.mesh.getMatrixAt(lastIndex, this._mat4);
+            bucket.mesh.setMatrixAt(index, this._mat4);
+
+            // Copy color
+            if (bucket.mesh.instanceColor) {
+              bucket.mesh.getColorAt(lastIndex, this._color);
+              bucket.mesh.setColorAt(index, this._color);
+            }
+
+            // Update mappings for the swapped entity
+            bucket.entityToIndex.set(lastEid, index);
+            bucket.indexToEntity.set(index, lastEid);
+          }
+        }
+
+        // Remove the now-vacated last slot
+        bucket.entityToIndex.delete(eid);
+        bucket.indexToEntity.delete(lastIndex);
+        bucket.instanceScales.delete(eid);
+        bucket.activeCount--;
+        bucket.mesh.count = bucket.activeCount;
+        bucket.mesh.instanceMatrix.needsUpdate = true;
+        if (bucket.mesh.instanceColor) bucket.mesh.instanceColor.needsUpdate = true;
+      }
+    }
+
+    this.entityBucketKey.delete(eid);
+
+    // Remove proxy
+    const proxy = this.proxies.get(eid);
+    if (proxy) {
+      this.group.remove(proxy);
+      this.proxies.delete(eid);
+    }
 
     // Remove blob shadow
     const shadow = this.blobShadows.get(eid);
@@ -237,15 +423,16 @@ export class UnitRenderer {
       this.group.remove(shadow);
       this.blobShadows.delete(eid);
     }
+
     // Clean up per-unit state
     this.damageFlashTimers.delete(eid);
     this.prevPositions.delete(eid);
     this.moveBlend.delete(eid);
   }
 
-  /** Get the Three.js object for an entity (used by RenderSyncSystem). */
+  /** Get the proxy Three.js object for an entity (used by RenderSyncSystem / entityMeshMap). */
   getObject(eid: number): THREE.Object3D | undefined {
-    return this.instances.get(eid);
+    return this.proxies.get(eid);
   }
 
   // -----------------------------------------------------------------------
@@ -253,7 +440,7 @@ export class UnitRenderer {
   // -----------------------------------------------------------------------
 
   /**
-   * Sync ECS Position/Rotation data into Three.js transforms.
+   * Sync ECS Position/Rotation data into InstancedMesh transforms.
    * Called once per frame by RenderSyncSystem.
    *
    * @param dt Delta time in seconds.
@@ -280,9 +467,6 @@ export class UnitRenderer {
       const newRemaining = remaining - dt;
       if (newRemaining <= 0) {
         this.damageFlashTimers.delete(eid);
-        // Clear flash emissive (will be re-set by highlight logic below)
-        const obj = this.instances.get(eid);
-        if (obj) this.clearDamageFlash(obj);
       } else {
         this.damageFlashTimers.set(eid, newRemaining);
       }
@@ -299,9 +483,17 @@ export class UnitRenderer {
       }
     }
 
+    // Track which buckets need matrix/color updates
+    const dirtyMatrixBuckets = new Set<ModelCacheKey>();
+    const dirtyColorBuckets = new Set<ModelCacheKey>();
+
     for (const data of positions) {
-      const obj = this.instances.get(data.eid);
-      if (!obj) continue;
+      const key = this.entityBucketKey.get(data.eid);
+      if (!key) continue;
+      const bucket = this.buckets.get(key);
+      if (!bucket) continue;
+      const instanceIndex = bucket.entityToIndex.get(data.eid);
+      if (instanceIndex === undefined) continue;
 
       // --- Movement detection ---
       const prev = this.prevPositions.get(data.eid);
@@ -332,46 +524,84 @@ export class UnitRenderer {
       // Blend between idle and walk bob
       const bob = idleBob * (1 - blend) + walkBob * blend;
 
-      // Idle breathing: subtle Y-axis scale pulse (0.98 - 1.02 at 1 Hz)
-      // Fades out when walking via (1 - blend)
-      const breathe = Math.sin(this.elapsedTime * Math.PI * 2 + data.eid * 0.5) * 0.02 * (1 - blend);
-      obj.scale.y = 1.0 + breathe;
-
-      // Apply Y position: terrain height + offset to clear terrain + procedural bob
-      obj.position.set(data.x, data.y + 0.5 + bob, data.z);
-
       // --- Facing direction ---
-      // Prefer movement target if supplied, else use ry
+      let facingY = data.ry;
       if (data.targetX !== undefined && data.targetZ !== undefined) {
         this._vec.set(data.targetX - data.x, 0, data.targetZ - data.z);
         if (this._vec.lengthSq() > 0.01) {
-          obj.rotation.y = Math.atan2(this._vec.x, this._vec.z);
+          facingY = Math.atan2(this._vec.x, this._vec.z);
         }
-      } else {
-        obj.rotation.y = data.ry;
       }
 
       // --- Walking sway & forward lean ---
-      // Side-to-side sway (half step frequency = 4 Hz)
       const swayPhase = (data.eid * 0.9) % (Math.PI * 2);
       const sway = Math.sin(this.elapsedTime * 4 + swayPhase) * 0.03 * blend;
-      obj.rotation.z = sway;
+      const forwardLean = blend * 0.05;
 
-      // Forward lean when moving (~3 degrees)
-      obj.rotation.x = blend * 0.05;
+      // --- Idle breathing: subtle Y-axis scale pulse ---
+      const breathe = Math.sin(this.elapsedTime * Math.PI * 2 + data.eid * 0.5) * 0.02 * (1 - blend);
 
-      // --- Selection highlight / damage flash ---
-      const isFlashing = this.damageFlashTimers.has(data.eid);
-      if (isFlashing) {
-        this.applyDamageFlash(obj);
-      } else {
-        this.setHighlight(obj, data.selected);
+      // --- Compose instance matrix ---
+      // Position: terrain height + offset to clear terrain + procedural bob
+      this._pos.set(data.x, data.y + 0.5 + bob, data.z);
+
+      // Rotation: facing Y + sway Z + forward lean X
+      this._euler.set(forwardLean, facingY, sway);
+      this._quat.setFromEuler(this._euler);
+
+      // Scale: check if caller set a custom scale on the proxy (e.g. heroes)
+      // Also apply idle breathing on Y axis
+      const proxy = this.proxies.get(data.eid);
+      const baseScale = proxy ? proxy.scale.x : 1.0;
+      // Store per-entity scale if it differs from 1 (for heroes etc.)
+      if (baseScale !== 1.0) {
+        bucket.instanceScales.set(data.eid, baseScale);
+      }
+      const entityScale = bucket.instanceScales.get(data.eid) ?? 1.0;
+      this._scale.set(entityScale, entityScale * (1.0 + breathe), entityScale);
+
+      this._mat4.compose(this._pos, this._quat, this._scale);
+      bucket.mesh.setMatrixAt(instanceIndex, this._mat4);
+      dirtyMatrixBuckets.add(key);
+
+      // --- Sync proxy position (for raycasting / entityMeshMap position queries) ---
+      if (proxy) {
+        proxy.position.set(data.x, data.y + 0.5 + bob, data.z);
+        proxy.rotation.y = facingY;
       }
 
-      // Sync blob shadow position (slightly above ground)
+      // --- Instance color: selection highlight / damage flash ---
+      const isFlashing = this.damageFlashTimers.has(data.eid);
+      if (isFlashing) {
+        bucket.mesh.setColorAt(instanceIndex, DAMAGE_FLASH_COLOR);
+        dirtyColorBuckets.add(key);
+      } else if (data.selected) {
+        bucket.mesh.setColorAt(instanceIndex, SELECTION_COLOR);
+        dirtyColorBuckets.add(key);
+      } else {
+        // Reset to neutral white
+        bucket.mesh.setColorAt(instanceIndex, DEFAULT_COLOR);
+        dirtyColorBuckets.add(key);
+      }
+
+      // --- Sync blob shadow position (slightly above ground) ---
       const shadow = this.blobShadows.get(data.eid);
       if (shadow) {
         shadow.position.set(data.x, data.y + 0.05, data.z);
+      }
+    }
+
+    // Flush dirty buffers once per bucket (not per entity)
+    for (const key of dirtyMatrixBuckets) {
+      const bucket = this.buckets.get(key);
+      if (bucket) {
+        bucket.mesh.instanceMatrix.needsUpdate = true;
+      }
+    }
+    for (const key of dirtyColorBuckets) {
+      const bucket = this.buckets.get(key);
+      if (bucket?.mesh.instanceColor) {
+        bucket.mesh.instanceColor.needsUpdate = true;
       }
     }
   }
@@ -381,8 +611,17 @@ export class UnitRenderer {
    */
   triggerDamageFlash(eid: number): void {
     this.damageFlashTimers.set(eid, DAMAGE_FLASH_DURATION);
-    const obj = this.instances.get(eid);
-    if (obj) this.applyDamageFlash(obj);
+
+    // Apply flash color immediately
+    const key = this.entityBucketKey.get(eid);
+    if (!key) return;
+    const bucket = this.buckets.get(key);
+    if (!bucket) return;
+    const index = bucket.entityToIndex.get(eid);
+    if (index === undefined) return;
+
+    bucket.mesh.setColorAt(index, DAMAGE_FLASH_COLOR);
+    if (bucket.mesh.instanceColor) bucket.mesh.instanceColor.needsUpdate = true;
   }
 
   /**
@@ -397,67 +636,32 @@ export class UnitRenderer {
   }
 
   // -----------------------------------------------------------------------
-  // Selection highlight
-  // -----------------------------------------------------------------------
-
-  private setHighlight(obj: THREE.Object3D, highlighted: boolean): void {
-    obj.traverse((child) => {
-      if (!(child as THREE.Mesh).isMesh) return;
-      const mesh = child as THREE.Mesh;
-      const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-      for (const mat of mats) {
-        if (mat instanceof MeshToonMaterial || mat instanceof THREE.MeshStandardMaterial || mat instanceof THREE.MeshPhysicalMaterial) {
-          if (highlighted) {
-            mat.emissive.copy(SELECTION_EMISSIVE);
-            mat.emissiveIntensity = SELECTION_EMISSIVE_INTENSITY;
-          } else {
-            mat.emissive.setScalar(0);
-            mat.emissiveIntensity = 0;
-          }
-        }
-      }
-    });
-  }
-
-  private applyDamageFlash(obj: THREE.Object3D): void {
-    obj.traverse((child) => {
-      if (!(child as THREE.Mesh).isMesh) return;
-      const mesh = child as THREE.Mesh;
-      const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-      for (const mat of mats) {
-        if (mat instanceof MeshToonMaterial || mat instanceof THREE.MeshStandardMaterial || mat instanceof THREE.MeshPhysicalMaterial) {
-          mat.emissive.copy(DAMAGE_FLASH_COLOR);
-          mat.emissiveIntensity = DAMAGE_FLASH_INTENSITY;
-        }
-      }
-    });
-  }
-
-  private clearDamageFlash(obj: THREE.Object3D): void {
-    obj.traverse((child) => {
-      if (!(child as THREE.Mesh).isMesh) return;
-      const mesh = child as THREE.Mesh;
-      const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-      for (const mat of mats) {
-        if (mat instanceof MeshToonMaterial || mat instanceof THREE.MeshStandardMaterial || mat instanceof THREE.MeshPhysicalMaterial) {
-          mat.emissive.setScalar(0);
-          mat.emissiveIntensity = 0;
-        }
-      }
-    });
-  }
-
-  // -----------------------------------------------------------------------
   // Cleanup
   // -----------------------------------------------------------------------
 
   /** Dispose all GPU resources held by this renderer. */
   destroy(): void {
-    for (const [, obj] of this.instances) {
-      this.group.remove(obj);
-      this.disposeObject(obj);
+    // Dispose all InstancedMesh buckets
+    for (const [, bucket] of this.buckets) {
+      this.group.remove(bucket.mesh);
+      bucket.mesh.geometry.dispose();
+      const mats = Array.isArray(bucket.mesh.material)
+        ? bucket.mesh.material
+        : [bucket.mesh.material];
+      for (const mat of mats) mat.dispose();
+      bucket.mesh.dispose();
+      bucket.entityToIndex.clear();
+      bucket.indexToEntity.clear();
+      bucket.instanceScales.clear();
     }
-    this.instances.clear();
+    this.buckets.clear();
+
+    // Dispose proxies
+    for (const [, proxy] of this.proxies) {
+      this.group.remove(proxy);
+    }
+    this.proxies.clear();
+    this.entityBucketKey.clear();
 
     // Dispose blob shadows
     for (const [, shadow] of this.blobShadows) {
@@ -469,6 +673,10 @@ export class UnitRenderer {
     this.damageFlashTimers.clear();
     this.prevPositions.clear();
     this.moveBlend.clear();
+
+    // Dispose hit-proxy shared resources
+    this.hitProxyGeo.dispose();
+    this.hitProxyMat.dispose();
 
     // Dispose move indicator
     if (this.moveIndicator) {
@@ -483,6 +691,7 @@ export class UnitRenderer {
       this.disposeObject(root);
     }
     this.modelCache.clear();
+    this.v02Models.clear();
   }
 
   private disposeObject(obj: THREE.Object3D): void {

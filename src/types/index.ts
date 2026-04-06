@@ -1,27 +1,54 @@
 /**
  * Reign of Brabant -- Type System
  *
- * All enums, interfaces, and type definitions for the PoC.
+ * All enums, interfaces, and type definitions for the game.
  * This is the single source of truth for game data types.
+ *
+ * Supports 4 factions: Brabanders, Randstad, Limburgers, Belgen.
+ * Each faction has unique resource names, tertiary resources, and upgrades.
  */
 
 // ---------------------------------------------------------------------------
 // Enums
 // ---------------------------------------------------------------------------
 
-/** Faction identifiers. PoC has 2: player (Brabanders) and AI (Randstad). */
+/**
+ * Faction identifiers.
+ * 4 playable factions, with AI as backwards-compatible alias for Randstad.
+ */
 export enum FactionId {
   Brabanders = 0,
-  AI = 1,
-  /** Alias for AI faction -- the Randstad bureaucrats. */
   Randstad = 1,
+  Limburgers = 2,
+  Belgen = 3,
+  /** @deprecated Use Randstad instead. Kept for backwards compatibility. */
+  AI = 1,
 }
 
-/** Unit type identifiers -- matches archetype data arrays. */
+/**
+ * Unit type identifiers -- matches archetype data arrays.
+ *
+ * Range 0-9: Universal types shared across all factions.
+ * Faction-specific unit flavours are resolved via FactionConfig lookup,
+ * not via separate enum values (keeps ECS u8 components compact).
+ */
 export enum UnitTypeId {
+  /** Resource gatherer / builder. */
   Worker = 0,
+  /** Melee combat unit. */
   Infantry = 1,
+  /** Ranged combat unit. */
   Ranged = 2,
+  /** Heavy melee unit (high HP, slow). */
+  Heavy = 3,
+  /** Siege unit (bonus vs buildings). */
+  Siege = 4,
+  /** Support / healer unit. */
+  Support = 5,
+  /** Faction-unique special unit. */
+  Special = 6,
+  /** Hero unit (spawned from TownHall, unique abilities). */
+  Hero = 7,
 }
 
 /** Hero type identifiers. */
@@ -32,18 +59,52 @@ export enum HeroTypeId {
   // Randstad heroes
   DeCEO = 2,
   DePoliticus = 3,
+  // Limburgers heroes
+  DeMijnwerker = 4,
+  DeVlaaibaas = 5,
+  // Belgen heroes
+  DeChocolatier = 6,
+  DeFrituur = 7,
 }
 
-/** Building type identifiers -- matches archetype data arrays. */
+/**
+ * Building type identifiers -- matches archetype data arrays.
+ *
+ * 0-3: Original buildings (backwards compatible).
+ * 4-8: New building types for full game.
+ */
 export enum BuildingTypeId {
+  /** Main base building. Deposits resources, produces workers/heroes. */
   TownHall = 0,
+  /** Military production building. */
   Barracks = 1,
+  /** Wood harvesting drop-off point. */
   LumberCamp = 2,
+  /** Research building for upgrades. */
   Blacksmith = 3,
+  /** Population capacity building. */
+  Housing = 4,
+  /** Tertiary resource generation building (faction-specific). */
+  TertiaryResourceBuilding = 5,
+  /** Advanced research / upgrade building. */
+  UpgradeBuilding = 6,
+  /** First faction-specific special building. */
+  FactionSpecial1 = 7,
+  /** Second faction-specific special building. */
+  FactionSpecial2 = 8,
 }
 
-/** Upgrade identifiers for the tech tree. */
+/**
+ * Upgrade identifiers for the tech tree.
+ *
+ * 0-6: Universal upgrades (backwards compatible).
+ * 10-19: Brabanders faction upgrades.
+ * 20-29: Randstad faction upgrades.
+ * 30-39: Limburgers faction upgrades.
+ * 40-49: Belgen faction upgrades.
+ */
 export enum UpgradeId {
+  // --- Universal upgrades (0-6, unchanged) ---
   MeleeAttack1 = 0,
   MeleeAttack2 = 1,
   RangedAttack1 = 2,
@@ -51,12 +112,67 @@ export enum UpgradeId {
   ArmorUpgrade1 = 4,
   ArmorUpgrade2 = 5,
   MoveSpeed1 = 6,
+
+  // --- Brabanders faction upgrades (10-19) ---
+  /** Increases Gezelligheid generation rate. */
+  GezelligheidsBoost = 10,
+  /** Unlocks the Carnavalsrage ability. */
+  Carnavalsrage = 11,
+  /** Workers carry more resources. */
+  BrabantseVlijt = 12,
+  /** Infantry gains bonus damage when grouped. */
+  SamenSterk = 13,
+
+  // --- Randstad faction upgrades (20-29) ---
+  /** Reduces Bureaucracy penalty. */
+  EfficiencyConsultant = 20,
+  /** Buildings produce units faster. */
+  Agile = 21,
+  /** Ranged units gain extra range. */
+  PowerPointMastery = 22,
+  /** Unlocks the Eindeloze Vergadering ability. */
+  VergaderingProtocol = 23,
+
+  // --- Limburgers faction upgrades (30-39) ---
+  /** Increases Kolen generation rate. */
+  DiepeSchacht = 30,
+  /** Heavy units gain extra armor. */
+  MergelPantsering = 31,
+  /** Workers mine gold faster. */
+  VlaaiMotivatie = 32,
+  /** Siege units deal bonus damage to buildings. */
+  Mijnbouwexplosief = 33,
+
+  // --- Belgen faction upgrades (40-49) ---
+  /** Increases Chocolade generation rate. */
+  PralineProductie = 40,
+  /** All units heal slowly over time. */
+  BelgischeVerzetskracht = 41,
+  /** Unlocks Trappist-powered unit buff. */
+  TrappistBrouwerij = 42,
+  /** Buildings cost less wood. */
+  FritenvetFundering = 43,
 }
 
-/** Resource types. Gold (Worstenbroodjes) and Wood (Hout). */
+/**
+ * Resource types.
+ *
+ * 0-1: Primary resources shared by all factions (with faction-flavoured names).
+ * 2-5: Tertiary resources, one per faction.
+ */
 export enum ResourceType {
+  /** Primary resource. Worstenbroodjes / PowerPoints / Vlaai / Frieten. */
   Gold = 0,
+  /** Secondary resource. Bier / LinkedIn / Mergel / Trappist. */
   Wood = 1,
+  /** Brabanders tertiary resource. */
+  Gezelligheid = 2,
+  /** Limburgers tertiary resource. */
+  Kolen = 3,
+  /** Belgen tertiary resource. */
+  Chocolade = 4,
+  /** Randstad tertiary resource. */
+  Havermoutmelk = 5,
 }
 
 /** Top-level game phase. */
@@ -263,14 +379,33 @@ export const FACTION_COLORS = {
     townHall: 0x8b4513,
     barracks: 0xa0522d,
   },
-  [FactionId.AI]: {
+  [FactionId.Randstad]: {
     worker: 0x3498db,
     infantry: 0x2980b9,
     ranged: 0x1f618d,
     townHall: 0x34495e,
     barracks: 0x2c3e50,
   },
+  [FactionId.Limburgers]: {
+    worker: 0xc0c0c0,
+    infantry: 0x808080,
+    ranged: 0x696969,
+    townHall: 0x4a4a4a,
+    barracks: 0x5c5c5c,
+  },
+  [FactionId.Belgen]: {
+    worker: 0xf0c040,
+    infantry: 0xd4a017,
+    ranged: 0xb8860b,
+    townHall: 0x8b6914,
+    barracks: 0x9b7d0a,
+  },
 } as const;
+
+/**
+ * Backwards-compatible alias: FACTION_COLORS[FactionId.AI] resolves to
+ * FACTION_COLORS[FactionId.Randstad] because AI = 1 = Randstad.
+ */
 
 export const GOLD_MINE_COLOR = 0xffd700;
 export const TREE_RESOURCE_COLOR = 0x228b22;
@@ -297,6 +432,16 @@ export interface UnitArchetype {
   readonly population: number;
   readonly sightRange: number;
   readonly carryCapacity: number; // 0 for non-workers
+  /** Optional wood cost (defaults to 0 if omitted). */
+  readonly costWood?: number;
+  /** Optional tertiary resource cost (defaults to 0 if omitted). */
+  readonly costTertiary?: number;
+  /** Bonus damage multiplier vs buildings (for Siege units). Defaults to 1.0. */
+  readonly siegeBonus?: number;
+  /** Heal rate per second (for Support units). 0 or omitted = no healing. */
+  readonly healRate?: number;
+  /** Which faction this archetype belongs to, if faction-specific. Omit for universal. */
+  readonly factionId?: FactionId;
 }
 
 /** Static stats for a building type. */
@@ -310,6 +455,18 @@ export interface BuildingArchetype {
   readonly buildTime: number; // seconds (0 = pre-placed, like TownHall)
   readonly sightRange: number;
   readonly produces: readonly UnitTypeId[];
+  /** Optional wood cost (defaults to 0 if omitted). */
+  readonly costWood?: number;
+  /** Optional tertiary resource cost (defaults to 0 if omitted). */
+  readonly costTertiary?: number;
+  /** Population capacity provided by this building (for Housing). Defaults to 0. */
+  readonly populationProvided?: number;
+  /** Tertiary resource generation rate per second (for TertiaryResourceBuilding). */
+  readonly tertiaryGenRate?: number;
+  /** Available upgrades that can be researched at this building. */
+  readonly researches?: readonly UpgradeId[];
+  /** Which faction this archetype belongs to, if faction-specific. Omit for universal. */
+  readonly factionId?: FactionId;
 }
 
 /** Gold mine definition. */
@@ -362,6 +519,127 @@ export interface HeroAbilityDef {
 }
 
 // ---------------------------------------------------------------------------
+// Interfaces -- Faction Configuration
+// ---------------------------------------------------------------------------
+
+/**
+ * Configuration for how a faction's tertiary resource works.
+ * Each faction has a unique tertiary resource with different generation mechanics.
+ */
+export interface TertiaryResourceConfig {
+  /** The ResourceType enum value for this faction's tertiary resource. */
+  readonly resourceType: ResourceType;
+  /** Display name of the tertiary resource. */
+  readonly name: string;
+  /** How the resource is generated (e.g. "proximity", "building", "combat", "passive"). */
+  readonly generationMethod: 'proximity' | 'building' | 'combat' | 'passive';
+  /** Base generation rate (units per second). */
+  readonly baseRate: number;
+  /** Short description of the mechanic for UI tooltips. */
+  readonly description: string;
+}
+
+/**
+ * Static configuration for a faction.
+ * Contains all metadata, resource names, colours, and tertiary resource config.
+ */
+export interface FactionConfig {
+  /** Faction enum value. */
+  readonly factionId: FactionId;
+  /** Display name of the faction. */
+  readonly name: string;
+  /** Short tagline / description. */
+  readonly tagline: string;
+  /** Primary colour (hex number for Three.js). */
+  readonly primaryColor: number;
+  /** Secondary colour (hex number for Three.js). */
+  readonly secondaryColor: number;
+  /** Faction-flavoured name for the Gold resource. */
+  readonly goldName: string;
+  /** Faction-flavoured name for the Wood resource. */
+  readonly woodName: string;
+  /** Tertiary resource configuration. */
+  readonly tertiaryResource: TertiaryResourceConfig;
+  /** Faction-specific passive description (e.g. Gezelligheid bonus, Bureaucracy). */
+  readonly passiveDescription: string;
+}
+
+/**
+ * Static faction configurations for all 4 factions.
+ * Keyed by FactionId for O(1) lookup.
+ */
+export const FACTION_CONFIGS: Record<FactionId, FactionConfig> = {
+  [FactionId.Brabanders]: {
+    factionId: FactionId.Brabanders,
+    name: 'Brabanders',
+    tagline: 'Gezelligheid is onze kracht',
+    primaryColor: 0xe67e22,
+    secondaryColor: 0xe8a839,
+    goldName: 'Worstenbroodjes',
+    woodName: 'Bier',
+    tertiaryResource: {
+      resourceType: ResourceType.Gezelligheid,
+      name: 'Gezelligheid',
+      generationMethod: 'proximity',
+      baseRate: 0.5,
+      description: 'Gegenereerd wanneer units dicht bij elkaar staan. Meer units = meer Gezelligheid.',
+    },
+    passiveDescription: 'Groepsbonus: units nabij elkaar krijgen attack/speed/armor buffs.',
+  },
+  [FactionId.Randstad]: {
+    factionId: FactionId.Randstad,
+    name: 'Randstad',
+    tagline: 'Efficiency through bureaucracy',
+    primaryColor: 0x2980b9,
+    secondaryColor: 0x3498db,
+    goldName: 'PowerPoints',
+    woodName: 'LinkedIn',
+    tertiaryResource: {
+      resourceType: ResourceType.Havermoutmelk,
+      name: 'Havermoutmelk',
+      generationMethod: 'passive',
+      baseRate: 0.3,
+      description: 'Passief gegenereerd over tijd. Versnelt naarmate efficiency stacks toenemen.',
+    },
+    passiveDescription: 'Bureaucratie: acties starten 20% trager maar versnellen met efficiency stacks.',
+  },
+  [FactionId.Limburgers]: {
+    factionId: FactionId.Limburgers,
+    name: 'Limburgers',
+    tagline: 'Diep in de aarde, sterk als mergel',
+    primaryColor: 0x808080,
+    secondaryColor: 0xc0c0c0,
+    goldName: 'Vlaai',
+    woodName: 'Mergel',
+    tertiaryResource: {
+      resourceType: ResourceType.Kolen,
+      name: 'Kolen',
+      generationMethod: 'building',
+      baseRate: 0.4,
+      description: 'Gegenereerd door Mijnschacht gebouwen. Meer schachten = meer Kolen.',
+    },
+    passiveDescription: 'Mijnbouw: heavy units zijn goedkoper en sterker. Gebouwen hebben extra HP.',
+  },
+  [FactionId.Belgen]: {
+    factionId: FactionId.Belgen,
+    name: 'Belgen',
+    tagline: 'Frieten, bier en compromissen',
+    primaryColor: 0xd4a017,
+    secondaryColor: 0xf0c040,
+    goldName: 'Frieten',
+    woodName: 'Trappist',
+    tertiaryResource: {
+      resourceType: ResourceType.Chocolade,
+      name: 'Chocolade',
+      generationMethod: 'combat',
+      baseRate: 0.2,
+      description: 'Gegenereerd door vijandelijke units te verslaan. Meer kills = meer Chocolade.',
+    },
+    passiveDescription: 'Veerkracht: alle units regenereren langzaam HP. Sterkere defence dan offence.',
+  },
+};
+
+// ---------------------------------------------------------------------------
 // Interfaces -- Runtime State
 // ---------------------------------------------------------------------------
 
@@ -369,6 +647,8 @@ export interface HeroAbilityDef {
 export interface PlayerResources {
   gold: number;
   wood: number;
+  /** Tertiary resource amount (Gezelligheid / Kolen / Chocolade / Havermoutmelk). */
+  tertiary: number;
 }
 
 /** Per-player population state. */
@@ -382,6 +662,31 @@ export interface PlayerState {
   readonly factionId: FactionId;
   resources: PlayerResources;
   population: PlayerPopulation;
+}
+
+// ---------------------------------------------------------------------------
+// Interfaces -- Upgrade Definition
+// ---------------------------------------------------------------------------
+
+/** Static definition of a tech tree upgrade. */
+export interface UpgradeDefinition {
+  readonly upgradeId: UpgradeId;
+  readonly name: string;
+  readonly description: string;
+  /** Gold cost to research. */
+  readonly costGold: number;
+  /** Wood cost to research. */
+  readonly costWood: number;
+  /** Tertiary resource cost to research (0 for universal upgrades). */
+  readonly costTertiary: number;
+  /** Research time in seconds. */
+  readonly researchTime: number;
+  /** Which building type this upgrade is researched at. */
+  readonly researchedAt: BuildingTypeId;
+  /** Required upgrade that must be completed first (undefined = no prerequisite). */
+  readonly prerequisite?: UpgradeId;
+  /** Which faction this upgrade belongs to (undefined = universal / all factions). */
+  readonly factionId?: FactionId;
 }
 
 // ---------------------------------------------------------------------------

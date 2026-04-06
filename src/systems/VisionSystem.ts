@@ -16,7 +16,7 @@ import {
   Visibility,
   Faction,
 } from '../ecs/components';
-import { IsUnit, IsBuilding, IsDead } from '../ecs/tags';
+import { IsDead } from '../ecs/tags';
 import { FactionId, FOW_UPDATE_RATE, MAP_SIZE } from '../types/index';
 import type { GameWorld } from '../ecs/world';
 

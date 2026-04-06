@@ -16,14 +16,12 @@ import {
   Faction,
   UnitType,
   Building,
-  Position,
-  Hero,
   PopulationCost,
 } from '../ecs/components';
-import { IsDead, IsUnit, IsBuilding, IsHero } from '../ecs/tags';
+import { IsDead, IsUnit, IsBuilding } from '../ecs/tags';
 import { eventBus } from '../core/EventBus';
 import { playerState } from '../core/PlayerState';
-import { DEATH_TIMER, HERO_POPULATION_COST } from '../types/index';
+import { FactionId, UnitTypeId, BuildingTypeId, DEATH_TIMER } from '../types/index';
 import type { GameWorld } from '../ecs/world';
 
 /**
@@ -63,8 +61,8 @@ export function createDeathSystem() {
 
           eventBus.emit('unit-died', {
             entityId: eid,
-            factionId: factionId as any,
-            unitTypeId: unitTypeId as any,
+            factionId: factionId as FactionId,
+            unitTypeId: unitTypeId as UnitTypeId,
             killerEntityId: null,
           });
         }
@@ -72,8 +70,8 @@ export function createDeathSystem() {
         if (hasComponent(world, eid, IsBuilding)) {
           eventBus.emit('building-destroyed', {
             entityId: eid,
-            factionId: factionId as any,
-            buildingTypeId: Building.typeId[eid],
+            factionId: factionId as FactionId,
+            buildingTypeId: Building.typeId[eid] as BuildingTypeId,
           });
         }
 

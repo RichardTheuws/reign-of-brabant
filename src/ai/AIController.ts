@@ -19,22 +19,13 @@
  */
 
 import {
-  FactionId,
   UnitTypeId,
-  BuildingTypeId,
   UnitAIState,
   StrategicAIPhase,
   MAP_SIZE,
-  type PlayerState,
   type EntityId,
 } from '../types/index';
 import { distance2D } from '../utils/math';
-import {
-  isVergaderingReady,
-  activateVergadering,
-  getRandstadEfficiencyStacks,
-  isWerkoverlegActive,
-} from '../systems/BureaucracySystem';
 
 // ---------------------------------------------------------------------------
 // Configuration

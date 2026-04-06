@@ -6,7 +6,7 @@
 
 import * as THREE from 'three';
 import { MeshToonMaterial } from 'three';
-import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 // ---------------------------------------------------------------------------
 // Constants

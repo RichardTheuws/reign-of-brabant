@@ -286,8 +286,8 @@ function spawnUnit(
   // Emit event
   eventBus.emit('unit-trained', {
     entityId: eid,
-    factionId: factionId as any,
-    unitTypeId: unitTypeId as any,
+    factionId: factionId as FactionId,
+    unitTypeId: unitTypeId as UnitTypeId,
     buildingEntityId: buildingEid,
   });
 }

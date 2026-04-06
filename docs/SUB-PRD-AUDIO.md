@@ -1,7 +1,7 @@
 # Reign of Brabant — Sub-PRD: Audio
 
-**Versie**: 1.0.0
-**Datum**: 2026-04-05
+**Versie**: 1.1.0
+**Datum**: 2026-04-06
 **Status**: Draft
 **Auteur**: Audio Director Agent
 **Parent**: PRD.md v1.0.0
@@ -40,10 +40,10 @@
 - **Idle** (2 varianten): unit doet 30+ seconden niets
 
 **Dialect richtlijnen:**
-- **Brabanders**: Zachte g, -ansen suffix, gezellig, warm. Kernwoorden: "hedde", "gansen", "pansen", "jansen"
+- **Brabanders**: Zachte g, echt Brabants dialect, warm en gezellig. Kernwoorden: "hedde", "ge", "nie", "moar", "laot", "dur", "houdoe"
 - **Randstad**: Strak ABN, corporate buzzwords, droog. Kernwoorden: "stakeholders", "synergy", "alignment", "escaleren"
-- **Limburgers**: Zachte klanken, kortere zinnen, mysterieuzer. Kernwoorden: "Gluck auf", "sjoen", "hej", "jao"
-- **Belgen**: Vlaams, mix Frans/Nederlands, chaotisch warm. Kernwoorden: "amai", "allez", "goesting", "ambetant"
+- **Limburgers**: Zachte klanken, kortere zinnen, mysterieuzer. Kernwoorden: "Gluck auf", "sjoen", "hej", "jao", "ich"
+- **Belgen**: Vlaams, mix Frans/Nederlands, chaotisch warm. Kernwoorden: "amai", "allez", "goesting", "ambetant", "ne keer"
 
 ---
 
@@ -54,59 +54,59 @@
 | Actie | Variant | Tekst | Emotie | Duur (s) |
 |-------|---------|-------|--------|----------|
 | Select | 1 | "Ja?" | Nuchter, kalm | 0.5 |
-| Select | 2 | "Zeg het maar" | Bereidwillig | 0.8 |
-| Select | 3 | "Ik luister, jansen" | Geduldig | 1.0 |
-| Move | 1 | "Ok!" | Kort, bevestigend | 0.3 |
-| Move | 2 | "Is goed" | Ontspannen | 0.6 |
-| Move | 3 | "Ik ga al, rustig aan" | Licht geergerd | 1.0 |
-| Attack | 1 | "Moet dat?!" | Onwillig | 0.6 |
-| Attack | 2 | "Vooruit dan maar..." | Zuchtend | 1.0 |
-| Attack | 3 | "Mansen, ge vraagt het erom!" | Opgehitst | 1.2 |
+| Select | 2 | "Zeg het mar" | Bereidwillig | 0.8 |
+| Select | 3 | "Ge hedde me nodig?" | Geduldig | 0.8 |
+| Move | 1 | "Is goed" | Kort, bevestigend | 0.4 |
+| Move | 2 | "Ik ga al, rustug an" | Ontspannen | 0.8 |
+| Move | 3 | "Jao jao, ik loop al" | Licht geergerd | 0.8 |
+| Attack | 1 | "Moet da nou?!" | Onwillig | 0.6 |
+| Attack | 2 | "Vooruit dan moar..." | Zuchtend | 0.8 |
+| Attack | 3 | "Ge vraagt erom, jong!" | Opgehitst | 0.8 |
 | Death | 1 | "Wie... melkt de koeien..." | Stervend, bezorgd | 1.5 |
 | Death | 2 | *kreun + zucht* | Stervend | 1.0 |
-| Ability | 1 | "Komaan, hooivork erin!" | Strijdlustig | 1.0 |
+| Ability | 1 | "Hooivork erin! Komaan!" | Strijdlustig | 1.0 |
 | Ability | 2 | "Dit is mijn land!" | Vastberaden | 0.8 |
 | Idle | 1 | *humming van een volksliedje* | Tevreden, verveeld | 2.0 |
-| Idle | 2 | "Die akker gaat zichzelf nie ploegen..." | Ongeduldig | 1.5 |
+| Idle | 2 | "Die akker gaat zichzelf nie ploegen, he..." | Ongeduldig | 1.5 |
 
 #### Carnavalvierder (Infantry)
 
 | Actie | Variant | Tekst | Emotie | Duur (s) |
 |-------|---------|-------|--------|----------|
-| Select | 1 | "ALAAF!" | Euforisch, luid | 0.8 |
+| Select | 1 | "ALAAF!" | Euforisch, luid | 0.5 |
 | Select | 2 | "Nog eentje dan!" | Aangeschoten vrolijk | 0.8 |
-| Select | 3 | "Waar is de bar?" | Verwonderd, zoekend | 0.8 |
+| Select | 3 | "Wa ist feest?!" | Verwonderd, euforisch | 0.6 |
 | Move | 1 | "Op naar het feest!" | Enthousiast | 0.8 |
 | Move | 2 | "Ik dans ernaartoe!" | Vrolijk | 0.8 |
-| Move | 3 | "Polonaise door de modder!" | Hysterisch blij | 1.0 |
-| Attack | 1 | "Pansen erop!" | Agressief feestend | 0.6 |
-| Attack | 2 | "Brabant vergeet niet!" | Strijdkreet | 1.0 |
-| Attack | 3 | "ALAAF op je muil!" | Dronken agressief | 0.8 |
-| Death | 1 | "...maar het was zo'n mooi feest..." | Dromerig stervend | 1.5 |
+| Move | 3 | "Polonaise dur de modder!" | Hysterisch blij | 1.0 |
+| Attack | 1 | "Alaaf op je muil!" | Dronken agressief | 0.8 |
+| Attack | 2 | "Brabant vergeet nie!" | Strijdkreet | 0.8 |
+| Attack | 3 | "Ge gaat eraan, jongen!" | Feestend agressief | 0.8 |
+| Death | 1 | "...moar het was zo'n mooi feest..." | Dromerig stervend | 1.5 |
 | Death | 2 | "Alaaa..." *stopt abrupt* | Cutoff | 0.8 |
-| Ability | 1 | "POLONAISE! Iedereen d'r bij!" | Commando, euforisch | 1.2 |
-| Ability | 2 | "Hansen vasthouden! GANSEN!" | Roepend | 1.0 |
-| Idle | 1 | *zingt* "Als de dransen kansen stromen..." | Neurieen | 2.5 |
-| Idle | 2 | "Is het al weer tijd voor carnaval?" | Hoopvol | 1.2 |
+| Ability | 1 | "POLONAISE! Allemaal d'r bij!" | Commando, euforisch | 1.2 |
+| Ability | 2 | "Vasthouden! Nie loslaoten!" | Roepend | 0.8 |
+| Idle | 1 | *zingt* "Brabant, mooi land achter de rivieren..." | Neurieen | 2.5 |
+| Idle | 2 | "Is 't al weer tied vur carnaval?" | Hoopvol | 1.2 |
 
-#### Kansen (Ranged / Stealth)
+#### Sluiper (Ranged / Stealth)
 
 | Actie | Variant | Tekst | Emotie | Duur (s) |
 |-------|---------|-------|--------|----------|
-| Select | 1 | "Ik ken iemansen die iemansen kent..." | Samenzweerderig | 1.5 |
+| Select | 1 | "Ik ken iemand die iemand kent..." | Samenzweerderig | 1.2 |
 | Select | 2 | "Niks gezien, niks gehoord" | Fluisterend | 1.0 |
-| Select | 3 | "Psst... hier, jansen" | Geheimzinnig | 0.8 |
-| Move | 1 | "Sssst, ik ga al" | Fluisterend | 0.8 |
+| Select | 3 | "Psst... hier, jong" | Geheimzinnig | 0.6 |
+| Move | 1 | "Sssst, ik ga al" | Fluisterend | 0.6 |
 | Move | 2 | "Via het sluipweggetje" | Sluw | 0.8 |
-| Move | 3 | "Ge hebt mij nooit gezien" | Samenzweerderig | 1.0 |
-| Attack | 1 | "Vansen de vrachtansen gevallen!" | Verrassingsluid | 1.2 |
-| Attack | 2 | "Surprise, klansen!" | Vals lachend | 0.8 |
-| Attack | 3 | "Niemansen die dit ziet!" | Fluisterend agressief | 1.0 |
-| Death | 1 | "Ze... hebben me gevonsen..." | Fluisterend stervend | 1.2 |
+| Move | 3 | "Ge hedde mij nooit gezien" | Samenzweerderig | 1.0 |
+| Attack | 1 | "Van achteren! Surprise!" | Verrassingsluid | 0.8 |
+| Attack | 2 | "Verrassing, slechterik!" | Vals lachend | 0.8 |
+| Attack | 3 | "Niemand die dit ziet!" | Fluisterend agressief | 0.8 |
+| Death | 1 | "Ze... hedde me gevonden..." | Fluisterend stervend | 1.2 |
 | Death | 2 | *korte kreun* | Verrast | 0.5 |
-| Ability | 1 | "Nu zie je me... nu niet meer" | Mysterieus | 1.2 |
-| Ability | 2 | "Weg ben ik, jansen" | Snel, fluisterend | 0.8 |
-| Idle | 1 | "Ik verveel me... zal ik iemansen bespioneren?" | Rusteloos | 1.5 |
+| Ability | 1 | "Nu zie ge me... nu nie meer" | Mysterieus | 1.0 |
+| Ability | 2 | "Weg ben ik, houdoe!" | Snel, fluisterend | 0.8 |
+| Idle | 1 | "Ik verveel me... zal ik iemand bespioneren?" | Rusteloos | 1.5 |
 | Idle | 2 | *stille voetstappen + zucht* | Ongeduldig | 1.0 |
 
 #### Boerinne (Support / Healer)
@@ -114,59 +114,59 @@
 | Actie | Variant | Tekst | Emotie | Duur (s) |
 |-------|---------|-------|--------|----------|
 | Select | 1 | "Hedde al gegeten?" | Zorgzaam, warm | 0.8 |
-| Select | 2 | "Kom hier, dan plak ik er een plansen op" | Moederlijk | 1.5 |
-| Select | 3 | "Wa kan ik dansen doen, sansen?" | Behulpzaam | 1.0 |
-| Move | 1 | "Ik kom eraan, jansen!" | Haastig, zorgzaam | 0.8 |
+| Select | 2 | "Kom hier, dan plak ik er een pleister op" | Moederlijk | 1.2 |
+| Select | 3 | "Wa kan ik voor oe doen, schat?" | Behulpzaam | 1.0 |
+| Move | 1 | "Ik kom eraan, wacht!" | Haastig, zorgzaam | 0.8 |
 | Move | 2 | "Wacht even, ik pak de koekenpan" | Dreigend liefdevol | 1.2 |
-| Move | 3 | "Goed, ik ga al!" | Moeder-toon | 0.7 |
-| Attack | 1 | "Ge had geluisterd moeten hebben!" | Koekenpan-woede | 1.2 |
-| Attack | 2 | "PAN EROP!" | Strijdkreet, koekenpan | 0.6 |
-| Attack | 3 | "Da's voor je eigen bestwil!" | Bestraffend | 1.0 |
+| Move | 3 | "Goed, ik ga al!" | Moeder-toon | 0.6 |
+| Attack | 1 | "Ge had moeten luisteren!" | Koekenpan-woede | 0.8 |
+| Attack | 2 | "PAN EROP!" | Strijdkreet, koekenpan | 0.5 |
+| Attack | 3 | "Da's voor uw eigen bestwil!" | Bestraffend | 0.8 |
 | Death | 1 | "Wie... maakt het eten klaar nu..." | Bezorgd stervend | 1.5 |
-| Death | 2 | "De koekenpan... erft aan de kleansen..." | Dramatisch | 1.8 |
+| Death | 2 | "De koekenpan... die erft de kleine..." | Dramatisch | 1.5 |
 | Ability | 1 | "Koffie en gebak! Komaan, aanschuiven!" | Warm, uitnodigend | 1.5 |
-| Ability | 2 | "Even bijkomen, dan gaat het weer" | Rustgevend | 1.2 |
-| Idle | 1 | "Als niemansen gewond is, dan ruim ik maar op" | Verantwoordelijk | 1.5 |
+| Ability | 2 | "Even bijkomen, dan gaat 't weer" | Rustgevend | 1.0 |
+| Idle | 1 | "Als niemand gewond is, dan ruim ik moar op" | Verantwoordelijk | 1.5 |
 | Idle | 2 | *humming + gerinkel van pannen* | Huiselijk | 2.0 |
 
-#### Muzikansen (Buffer / Debuffer)
+#### Muzikant (Buffer / Debuffer)
 
 | Actie | Variant | Tekst | Emotie | Duur (s) |
 |-------|---------|-------|--------|----------|
-| Select | 1 | "En dan nu... LIMBO!" | Showman, enthousiast | 1.0 |
-| Select | 2 | "Eansen, twee, drie, VIER!" | Aftellend, energiek | 1.0 |
+| Select | 1 | "En dan nu... LIMBO!" | Showman, enthousiast | 0.8 |
+| Select | 2 | "Een, twee, drie, VIER!" | Aftellend, energiek | 0.8 |
 | Select | 3 | "De fanfare is compleet!" | Trots | 0.8 |
-| Move | 1 | "Marsorders! Voorwaarts!" | Militair-komisch | 1.0 |
-| Move | 2 | "Ik speel onderweg wel door" | Nonchalant | 1.0 |
-| Move | 3 | "Eansen twee, eansen twee!" | Marcheerritme | 0.8 |
-| Attack | 1 | "Luister naar DANSEN!" | Agressief muzikaal | 0.8 |
+| Move | 1 | "Marsorders! Voorwaarts!" | Militair-komisch | 0.8 |
+| Move | 2 | "Ik speel onderweg wel dur" | Nonchalant | 1.0 |
+| Move | 3 | "Links, rechts, links, rechts!" | Marcheerritme | 0.8 |
+| Attack | 1 | "Luister hier naar, sukkel!" | Agressief muzikaal | 0.8 |
 | Attack | 2 | "Ik blaas je weg, letterlijk!" | Dreigend, speels | 1.0 |
 | Attack | 3 | "Tuba-aanval!" | Komisch strijdlustig | 0.6 |
 | Death | 1 | *trieste tuba-noot + kreun* | Dramatisch komisch | 1.5 |
 | Death | 2 | "De... muziek... stopt..." | Melancholisch | 1.2 |
-| Ability | 1 | "IEDEREEN MEEZINGEN! Nu!" | Commando, euforisch | 1.2 |
-| Ability | 2 | "Carnavalskraker drie, vier!" | Aftellend | 1.0 |
+| Ability | 1 | "IEDEREEN MEEZINGEN! Nu!" | Commando, euforisch | 1.0 |
+| Ability | 2 | "Carnavalskraker drie, vier!" | Aftellend | 0.8 |
 | Idle | 1 | *speelt een stukje carnavalsmuziek op tuba* | Verveeld | 2.5 |
-| Idle | 2 | "Ge kunt me toch nie laten staan zonder publiek?" | Teleurgesteld | 1.5 |
+| Idle | 2 | "Ge kunt me toch nie laote staan zonder publiek?" | Teleurgesteld | 1.5 |
 
 #### Tractorrijder (Heavy / Cavalry)
 
 | Actie | Variant | Tekst | Emotie | Duur (s) |
 |-------|---------|-------|--------|----------|
-| Select | 1 | "Meer pk's dan je kunt tansen!" | Trots, luid | 1.0 |
+| Select | 1 | "Meer pk's dan ge aankunt!" | Trots, luid | 0.8 |
 | Select | 2 | "Die akker ploegt zichzelf nie" | Nuchter boers | 1.0 |
 | Select | 3 | "Motor draait, baas!" | Klaar voor actie | 0.8 |
 | Move | 1 | "Volgas!" | Kort, krachtig | 0.4 |
-| Move | 2 | "Ik rijd d'r doorheen!" | Vastberaden | 0.8 |
-| Move | 3 | "Berm of weg, maakt mij niks uit!" | Nonchalant | 1.2 |
-| Attack | 1 | "BANSEN UIT DE WEG!" | Brullend | 0.8 |
+| Move | 2 | "Ik rijd d'r dwars doorheen!" | Vastberaden | 0.8 |
+| Move | 3 | "Berm of weg, maakt mij niks uit!" | Nonchalant | 1.0 |
+| Attack | 1 | "AAN DE KANT!" | Brullend | 0.6 |
 | Attack | 2 | "Ze gaan plat!" | Agressief | 0.5 |
 | Attack | 3 | "Die ziet mijn bumper nie aankomen!" | Dreigend | 1.2 |
 | Death | 1 | "De motor... slaat af... *cough*" | Stervend, mechanisch | 1.5 |
 | Death | 2 | *motorstotter + crash-geluid + kreun* | Dramatisch | 1.5 |
-| Ability | 1 | "VOLGAS! UIT DE WEG!" | Maximale intensiteit | 1.0 |
-| Ability | 2 | "Tractorcharge! BRRRR!" | Motor + schreeuw | 1.0 |
-| Idle | 1 | *motor stationair + "Ze laten me maar wachten..."* | Motor idle + mompelen | 2.0 |
+| Ability | 1 | "VOLGAS! UIT DE WEG!" | Maximale intensiteit | 0.8 |
+| Ability | 2 | "Tractorcharge! BRRRR!" | Motor + schreeuw | 0.8 |
+| Idle | 1 | *motor stationair + "Ze laoten me moar wachten..."* | Motor idle + mompelen | 2.0 |
 | Idle | 2 | "Zal ik een rondje rijden ofzo?" | Verveeld | 1.0 |
 
 #### Frituurmeester (Siege)
@@ -174,9 +174,9 @@
 | Actie | Variant | Tekst | Emotie | Duur (s) |
 |-------|---------|-------|--------|----------|
 | Select | 1 | "Een grote friet met!" | Enthousiast, professional | 0.8 |
-| Select | 2 | "Da wordt een kroketansen!" | Dreigend blij | 0.8 |
+| Select | 2 | "Da wordt een kroket, jongen!" | Dreigend blij | 0.8 |
 | Select | 3 | "Het vet is heet, baas!" | Klaar voor actie | 0.8 |
-| Move | 1 | "Niet morsen!" | Voorzichtig, geconcentreerd | 0.5 |
+| Move | 1 | "Nie morsen!" | Voorzichtig, geconcentreerd | 0.5 |
 | Move | 2 | "De frietkar rijdt!" | Trots | 0.6 |
 | Move | 3 | "Met frituurvet op pad" | Nuchter | 0.8 |
 | Attack | 1 | "Frituurvet in je gezicht!" | Agressief, koks-humor | 1.0 |
@@ -184,9 +184,9 @@
 | Attack | 3 | "Ik bak ze BRUIN!" | Dreigende kok | 0.6 |
 | Death | 1 | "De... frituur... gaat uit..." | Dramatisch stervend | 1.2 |
 | Death | 2 | *sissend vet-geluid + kreun* | Tragisch | 1.0 |
-| Ability | 1 | "Frikandel SPECIAAL! Brandansen!" | Maximaal enthousiast | 1.2 |
-| Ability | 2 | "Kokend vet! Pas op je bakkansen!" | Waarschuwend, dreigend | 1.2 |
-| Idle | 1 | "Fransen bakken zichzelf nie, mensen" | Ongeduldig | 1.2 |
+| Ability | 1 | "Frikandel SPECIAAL! Brand!" | Maximaal enthousiast | 1.0 |
+| Ability | 2 | "Kokend vet! Pas op je bakkes!" | Waarschuwend, dreigend | 1.0 |
+| Idle | 1 | "Frieten bakken zichzelf nie, mensen" | Ongeduldig | 1.2 |
 | Idle | 2 | *sissend vet + hummen* | Werkend, verveeld | 2.0 |
 
 #### Praalwagen (Super Siege)
@@ -194,10 +194,10 @@
 | Actie | Variant | Tekst | Emotie | Duur (s) |
 |-------|---------|-------|--------|----------|
 | Select | 1 | "De wagen is klaar!" | Trots, feestelijk | 0.8 |
-| Select | 2 | "Alaaf en vansen!" | Carnavalesk | 0.6 |
+| Select | 2 | "Alaaf en vooruit!" | Carnavalesk | 0.6 |
 | Select | 3 | "Confetti geladen, baas!" | Klaar voor actie | 0.8 |
 | Move | 1 | "De optocht gaat verder!" | Plechtig feestelijk | 0.8 |
-| Move | 2 | "Langzaam maar zeker!" | Geduldig | 0.8 |
+| Move | 2 | "Langzaam moar zeker!" | Geduldig | 0.8 |
 | Move | 3 | "Maak de weg vrij!" | Autoritair | 0.6 |
 | Attack | 1 | "CONFETTI-KANON! VUUR!" | Explosief enthousiast | 1.0 |
 | Attack | 2 | "Alaaf op je dak!" | Strijdlustig feestend | 0.8 |
@@ -206,10 +206,10 @@
 | Death | 2 | *confetti-explosie + instorten* | Episch tragisch | 1.5 |
 | Ability | 1 | "MEGA-CONFETTI-BOMBARDEMENT!" | Maximale intensiteit | 1.2 |
 | Ability | 2 | "Alles erop en eraan!" | Vol overgave | 0.8 |
-| Idle | 1 | "De wagen staat klaar maar niemansen kijkt..." | Teleurgesteld | 1.5 |
+| Idle | 1 | "De wagen staat klaar moar niemand kijkt..." | Teleurgesteld | 1.5 |
 | Idle | 2 | *carnavalsmuziekje vanuit de wagen* | Sfeergeluid | 2.0 |
 
-#### Prins van Brabansen (Hero - Tank/Buffer)
+#### Prins van Brabant (Hero - Tank/Buffer)
 
 | Actie | Variant | Tekst | Emotie | Duur (s) |
 |-------|---------|-------|--------|----------|
@@ -222,22 +222,22 @@
 | Attack | 1 | "In naam van het worstenbroodje!" | Epische strijdkreet | 1.2 |
 | Attack | 2 | "Brabant valt aan! ALAAF!" | Commando + kreet | 1.0 |
 | Attack | 3 | "Scepter op je kop!" | Dreigend komisch | 0.6 |
-| Death | 1 | "Het... carnaval... gaat door... zonder mij..." | Dramatisch stervend | 2.0 |
-| Death | 2 | "Lang... lansen... Brabant..." | Laatste woorden | 1.5 |
+| Death | 1 | "Het... carnaval... gaat dur... zonder mij..." | Dramatisch stervend | 2.0 |
+| Death | 2 | "Lang... leve... Brabant..." | Laatste woorden | 1.2 |
 | Ability (Toespraak) | 1 | "Luister, Brabanders! SAMEN zijn we STERK!" | Inspirerend, luid | 1.5 |
 | Ability (Sleutel) | 2 | "De sleutel van de stad... is van ONS!" | Autoritair | 1.2 |
 | Ability (Drie Dwaze Dansen) | 3 | "DRIE DWAZE DANSEN! Iedereen meedansen!" | Euforisch commando | 1.5 |
 | Ultimate (ALAAF!) | 1 | "ALAAAAAF! BRABANT IS ONOVERWINNELIJK!" | Maximaal episch | 2.0 |
-| Idle | 1 | "Een prins zonder volk... is maar een man met een hoed" | Filosofisch | 2.0 |
+| Idle | 1 | "Een prins zonder volk... is moar een man met een hoed" | Filosofisch | 2.0 |
 | Idle | 2 | *zingt zachtjes* "...want Brabant is het mooiste land..." | Sentimenteel | 2.5 |
 
-#### Boer van Brabansen (Hero - Tank/Summoner)
+#### Boer van Brabant (Hero - Tank/Summoner)
 
 | Actie | Variant | Tekst | Emotie | Duur (s) |
 |-------|---------|-------|--------|----------|
 | Select | 1 | "De akker wacht" | Kalm, diep | 0.6 |
 | Select | 2 | "Wat er ook komt, Brabant blijft staan" | Vastberaden | 1.2 |
-| Select | 3 | "De Boer van Brabansen, tot uw dienst" | Formeel warm | 1.2 |
+| Select | 3 | "De Boer van Brabant, tot uw dienst" | Formeel warm | 1.2 |
 | Move | 1 | "Ik ga waar de oogst me brengt" | Filosoof-boer | 1.0 |
 | Move | 2 | "Mestvork vooruit!" | Strijdlustig | 0.6 |
 | Move | 3 | "Daar gaat de boer" | Nuchter | 0.5 |
@@ -245,11 +245,11 @@
 | Attack | 2 | "Mestvork erin! Geen genade!" | Agressief | 1.0 |
 | Attack | 3 | "Dit is MIJN land!" | Territoriaal | 0.6 |
 | Death | 1 | "De grond... neemt me terug..." | Vredevol stervend | 1.5 |
-| Death | 2 | "Plant een boom... op mijn graf..." | Poëtisch | 1.5 |
+| Death | 2 | "Plant een boom... op mijn graf..." | Poetisch | 1.5 |
 | Ability (Mestverspreider) | 1 | "MEST! Overal MEST!" | Maniakaal blij | 1.0 |
 | Ability (Opstand) | 2 | "BOEREN, AAN MIJ! OPSTAND!" | Rebellenkreet | 1.2 |
 | Ultimate (Tractorcharge) | 1 | "TRACTOOOOR! UIT DE WEG OF ERONDER!" | Maximaal volume | 1.5 |
-| Idle | 1 | "De grond fluistert... ze zegt dat er onkruid staat" | Mystiek-boer | 2.0 |
+| Idle | 1 | "De grond fluistert... ze zegt da er onkruid staat" | Mystiek-boer | 2.0 |
 | Idle | 2 | "Ik mis mijn koeien" | Sentimenteel | 0.8 |
 
 ---
@@ -264,8 +264,8 @@
 | Select | 2 | "Kan ik dit op mijn LinkedIn zetten?" | Naief enthousiast | 1.2 |
 | Select | 3 | "Ja, euh, hoi! Wat kan ik doen?" | Nerveus | 1.0 |
 | Move | 1 | "Ik ga! ...waar moest ik heen?" | Verward | 1.0 |
-| Move | 2 | "Oké, dit is mijn moment!" | Over-enthousiast | 0.8 |
-| Move | 3 | "Loopt mijn contract nog? Oké, ik ga" | Onzeker | 1.2 |
+| Move | 2 | "Oke, dit is mijn moment!" | Over-enthousiast | 0.8 |
+| Move | 3 | "Loopt mijn contract nog? Oke, ik ga" | Onzeker | 1.2 |
 | Attack | 1 | "Dit stond echt niet in mijn functieprofiel!" | Paniek | 1.5 |
 | Attack | 2 | "Mijn manager gaat hier van horen!" | Dreigend maar zwak | 1.2 |
 | Attack | 3 | "Ik... ik vecht! Met... mijn stapler!" | Wanhopig | 1.2 |
@@ -492,12 +492,12 @@
 | Select | 2 | "De vaandel waait" | Plechtig | 0.6 |
 | Select | 3 | "Hej, Limburg steit" | Patriottisch | 0.6 |
 | Move | 1 | "Mars! Voorwaarts!" | Militair | 0.6 |
-| Move | 2 | "De sjutterij ruk op" | Formeel | 0.6 |
+| Move | 2 | "De sjutterij rukt op" | Formeel | 0.6 |
 | Move | 3 | "Achter de vaandel aan" | Plichtsgetrouw | 0.8 |
 | Attack | 1 | "VUUR!" | Kort, commando | 0.3 |
 | Attack | 2 | "Sjeet! Sjeet! Sjeet!" | Repetitief, urgent | 0.8 |
 | Attack | 3 | "Voor Limburg en eer!" | Strijdkreet | 0.8 |
-| Death | 1 | "De vaandel... laat 'm nie valle..." | Stervend, plichtsgetrouw | 1.5 |
+| Death | 1 | "De vaandel... laot 'm nie valle..." | Stervend, plichtsgetrouw | 1.5 |
 | Death | 2 | *musket valt + kreun* | Kort | 0.8 |
 | Ability (Vaandelzwaaien) | 1 | "VAANDEL OMHOOG! Limburg vreest niks!" | Inspirerend | 1.2 |
 | Ability (Vaandelzwaaien) | 2 | "Zwaaien! De sjutterij houdt stand!" | Commando | 1.0 |
@@ -512,7 +512,7 @@
 | Select | 2 | "De vlaai is gereed" | Kalm, professioneel | 0.6 |
 | Select | 3 | "Ich heb kersenvlaai en pruimevlaai" | Menu-achtig | 1.0 |
 | Move | 1 | "Ich bring de vlaai!" | Bezorger-toon | 0.6 |
-| Move | 2 | "Pas op, nie laten valle!" | Voorzichtig | 0.8 |
+| Move | 2 | "Pas op, nie laote valle!" | Voorzichtig | 0.8 |
 | Move | 3 | "Vlaai-express!" | Snelle bezorging | 0.5 |
 | Attack | 1 | "VLAAI IN JE GEZICHT!" | Agressief, komisch | 0.8 |
 | Attack | 2 | "Pruimevlaai! Extra kleffe!" | Dreigend blij | 0.8 |
@@ -544,13 +544,13 @@
 | Idle | 1 | *kraak-kraak van steen* "...wachte..." | Geduldig als een berg | 1.0 |
 | Idle | 2 | "Zelfs de berg verveelt zich" | Droog | 0.8 |
 
-#### Heuvelklansen (Scout)
+#### Heuvelrenner (Scout)
 
 | Actie | Variant | Tekst | Emotie | Duur (s) |
 |-------|---------|-------|--------|----------|
 | Select | 1 | "Boven op de heuvel!" | Energiek, jong | 0.6 |
-| Select | 2 | "Ich zie alles van hierboave!" | Trots, uitzicht | 0.8 |
-| Select | 3 | "Hej! Snelle voeten hier!" | Zelfverzekerd | 0.6 |
+| Select | 2 | "Ich zie alles van hierbove!" | Trots, uitzicht | 0.8 |
+| Select | 3 | "Hej! Sjnelle voeten hier!" | Zelfverzekerd | 0.6 |
 | Move | 1 | "Bergop of bergaf, ich ren!" | Atletisch | 0.8 |
 | Move | 2 | "Over de heuvels!" | Snel, enthousiast | 0.6 |
 | Move | 3 | "Ge ziet mich nie!" | Fluisterend snel | 0.5 |
@@ -562,7 +562,7 @@
 | Ability | 1 | "SPRINT! Niemand is sjneller!" | Maximum snelheid | 0.8 |
 | Ability | 2 | "Over de toppen en weg!" | Vluchtend snel | 0.8 |
 | Idle | 1 | "Van hier kan ich tot aan Duitsland kieke..." | Mijmerend | 1.5 |
-| Idle | 2 | "Ich ren een rondje... gewoon voor de fun" | Rusteloos | 1.0 |
+| Idle | 2 | "Ich ren een rondje... gewoon voor de lol" | Rusteloos | 1.0 |
 
 #### Mijnrat (Stealth / Sabotage)
 
@@ -582,7 +582,7 @@
 | Ability (Mine placement) | 1 | "Een cadeautje... in de grond" | Sinister blij | 1.0 |
 | Ability (Mine placement) | 2 | "BOEM... straks" | Fluisterend, dreigend | 0.8 |
 | Idle | 1 | *krabbend in de tunnel* "Wachte... wachte..." | Ongeduldig rondschuifelend | 1.2 |
-| Idle | 2 | "Ich hoor ze boave... ze weten niks" | Samenzweerderig | 1.2 |
+| Idle | 2 | "Ich hoor ze bove... ze weten niks" | Samenzweerderig | 1.2 |
 
 #### De Mijnbaas (Hero - Tank)
 
@@ -605,13 +605,13 @@
 | Idle | 1 | "De berg fluistert... als je luistert" | Mystiek | 1.2 |
 | Idle | 2 | *tikt met pikhouweel op de grond, ritmisch* | Meditatief | 2.0 |
 
-#### De Maasmansen (Hero - Caster)
+#### De Maasmeester (Hero - Caster)
 
 | Actie | Variant | Tekst | Emotie | Duur (s) |
 |-------|---------|-------|--------|----------|
 | Select | 1 | "De Maas stroomt door mijn aderen" | Mystiek, vloeiend | 1.2 |
 | Select | 2 | "Water wacht, water weet" | Enigmatisch | 0.8 |
-| Select | 3 | "De Maasmansen hoort je" | Kalm, diep | 0.8 |
+| Select | 3 | "De Maasmeester hoort je" | Kalm, diep | 0.8 |
 | Move | 1 | "Als water, ich stroom" | Vloeiend | 0.6 |
 | Move | 2 | "De Maas vindt altied een weg" | Filosofisch | 1.0 |
 | Move | 3 | "Stroomafwaarts" | Kort, mystiek | 0.4 |
@@ -675,7 +675,7 @@
 | Actie | Variant | Tekst | Emotie | Duur (s) |
 |-------|---------|-------|--------|----------|
 | Select | 1 | "Praline of truffel?" | Verfijnd, Belgisch | 0.6 |
-| Select | 2 | "De chocolade is tempereerd en dodelijk" | Dreigend elegant | 1.2 |
+| Select | 2 | "De chocolade is getemperd en dodelijk" | Dreigend elegant | 1.2 |
 | Select | 3 | "Amai, ik ben klaar met bonbons maken" | Klaar voor actie | 1.0 |
 | Move | 1 | "Met de gratie van gesmolten chocolade" | Elegant | 1.0 |
 | Move | 2 | "Ik glijd erheen" | Soepel | 0.4 |
@@ -686,7 +686,7 @@
 | Death | 1 | "De chocolade... smelt..." | Dramatisch stervend | 0.8 |
 | Death | 2 | "Mon dieu... les pralines..." | Stervend, Frans accent | 1.0 |
 | Ability (Praline Surprise) | 1 | "PRALINE SURPRISE! Vergiftigd en verslavend!" | Sinister blij | 1.2 |
-| Ability (Praline Surprise) | 2 | "Speciale bonbon! Je zult WENSEN dat je dood was!" | Extreem dreigend | 1.5 |
+| Ability (Praline Surprise) | 2 | "Speciale bonbon! Ge zult WENSEN dat ge dood waart!" | Extreem dreigend | 1.5 |
 | Idle | 1 | *chocolade roeren* "De perfecte temperatuur vergt geduld..." | Ambachtelijk | 1.5 |
 | Idle | 2 | "Ik maak alvast bonbons... met een verrassing" | Sinister rustgevend | 1.5 |
 
@@ -740,7 +740,7 @@
 | Move | 1 | "Ik infiltreer" | Kort, professioneel | 0.4 |
 | Move | 2 | "Niemand weet wie ik ben. Zelfs ik niet" | Existentieel | 1.2 |
 | Move | 3 | "Incognito, allez" | Nonchalant spion | 0.6 |
-| Attack | 1 | "Surprise! Ik ben NIET wie je denkt!" | Verrassing | 1.2 |
+| Attack | 1 | "Surprise! Ik ben NIET wie ge denkt!" | Verrassing | 1.2 |
 | Attack | 2 | "De Spion slaat toe! Vanuit de schaduwen!" | Dramatisch | 1.2 |
 | Attack | 3 | "Verraad! Met een glimlach!" | Sinister vrolijk | 1.0 |
 | Death | 1 | "Welke kant... was ik ook alweer..." | Verward stervend | 1.2 |
@@ -761,32 +761,32 @@
 | Move | 2 | "Op naar het slagveld! Met frieten!" | Absurd heroisch | 1.0 |
 | Move | 3 | "Allez, volg de Koning!" | Commando, warm | 0.6 |
 | Attack | 1 | "KONINKLIJKE PORTIE RAMMEL!" | Strijdkreet | 1.0 |
-| Attack | 2 | "Frieten regen op je neer!" | Episch | 0.8 |
+| Attack | 2 | "Frieten regenen op je neer!" | Episch | 0.8 |
 | Attack | 3 | "De Frietkoning kent geen genade! Alleen mayonaise!" | Dreigend absurd | 1.5 |
 | Death | 1 | "Het koninkrijk... van de friet... valt..." | Episch stervend | 1.2 |
-| Death | 2 | "Lang... lansen... de friet..." | Laatste woorden | 1.0 |
-| Ability (Koninklijke Portie) | 1 | "KONINKLIJKE PORTIE! Heel geheeld voor iedereen!" | Genereus, warm | 1.5 |
+| Death | 2 | "Lang... leve... de friet..." | Laatste woorden | 1.0 |
+| Ability (Koninklijke Portie) | 1 | "KONINKLIJKE PORTIE! Iedereen geheeld!" | Genereus, warm | 1.2 |
 | Ability (Koninklijke Portie) | 2 | "Frieten voor het hele leger! Eet en vecht!" | Inspirerend | 1.2 |
 | Ultimate | 1 | "DE FRIETKONING ONTKETENT DE GOUDEN FRITUUR! Onkwetsbaar!" | Maximaal episch | 2.0 |
 | Idle | 1 | "Een koning zonder volk is als frieten zonder zout" | Filosofisch | 1.5 |
 | Idle | 2 | "Ik bak alvast voor het overwinningsfeest" | Optimistisch | 1.2 |
 
-#### De Abdijbransen (Hero - Monk/Caster)
+#### De Abdijheer (Hero - Monk/Caster)
 
 | Actie | Variant | Tekst | Emotie | Duur (s) |
 |-------|---------|-------|--------|----------|
 | Select | 1 | "Stilte. De Abdij luistert" | Kalm, monastiek | 0.8 |
 | Select | 2 | "In nomine Belgii..." | Quasi-Latijns, plechtig | 0.8 |
-| Select | 3 | "De Abdijbransen kent het gebed EN het zwaard" | Dubbele natuur | 1.2 |
+| Select | 3 | "De Abdijheer kent het gebed EN het zwaard" | Dubbele natuur | 1.2 |
 | Move | 1 | "De pelgrimstocht gaat verder" | Vredig | 0.8 |
 | Move | 2 | "Ik wandel in stilte" | Monastiek | 0.6 |
 | Move | 3 | "Waar God mij leidt" | Devoot | 0.5 |
 | Attack | 1 | "De HEER vergeeft! Ik NIET!" | Strijdend monnik | 1.0 |
 | Attack | 2 | "Heilig vuur! Op de heidenen!" | Kruistochtachtig | 1.0 |
-| Attack | 3 | "Zwijg en ontvang je straf!" | Autoritair monastiek | 0.8 |
+| Attack | 3 | "Zwijg en ontvang uw straf!" | Autoritair monastiek | 0.8 |
 | Death | 1 | "De Abdij... bidt voor mij..." | Vredig stervend | 1.0 |
 | Death | 2 | "Pater noster..." | Latijns gebed, stervend | 1.0 |
-| Ability (Stiltegelofte) | 1 | "STILTE! Geen magie, geen woorden, geen heroes!" | Monastiek commando | 1.5 |
+| Ability (Stiltegelofte) | 1 | "STILTE! Geen magie, geen woorden, geen helden!" | Monastiek commando | 1.5 |
 | Ability (Stiltegelofte) | 2 | "De stilte is mijn wapen! ZWIJG!" | Paradoxaal luid | 1.2 |
 | Ultimate | 1 | "DE ABDIJ SPREEKT! ALLE ZONDEN VERGEVEN... NA STRAF!" | Maximaal monastiek | 2.0 |
 | Idle | 1 | *gregoriaansgezang, zacht* | Meditatief | 2.5 |
@@ -1001,7 +1001,7 @@ Naast unit voice lines, een set narrator-lijnen voor game events:
 |-----------|--------|
 | **Naam** | `music_randstad` |
 | **Titel** | "Corporate Conquest" |
-| **Stijl/Mood** | Strak, klinisch, corporate synth met onheilspellende ondertoon, stressvol maar efficiënt |
+| **Stijl/Mood** | Strak, klinisch, corporate synth met onheilspellende ondertoon, stressvol maar efficient |
 | **Instrumentatie** | Synthesizer pads, strak drumpatroon (electronic), strijkers (staccato), piano (minimal), klok-tikken als percussie, telefoonrinkel als accent |
 | **Tempo** | 100 BPM |
 | **Duur** | 3:00 (loop-friendly) |
@@ -1017,7 +1017,7 @@ Naast unit voice lines, een set narrator-lijnen voor game events:
 | **Naam** | `music_limburgers` |
 | **Titel** | "De Diepte" |
 | **Stijl/Mood** | Mysterieus, echoend, mijnwerkerslied, diep en aards, ondergronds gevoel |
-| **Instrumentatie** | Lage strijkers (cello, contrabas), mijnwerkershamers als percussie, echoënde hoorn, duduk/klarinet (donker), druppelwater ambient, mannenkoor (laag) |
+| **Instrumentatie** | Lage strijkers (cello, contrabas), mijnwerkershamers als percussie, echoende hoorn, duduk/klarinet (donker), druppelwater ambient, mannenkoor (laag) |
 | **Tempo** | 75 BPM |
 | **Duur** | 3:00 (loop-friendly) |
 | **Trigger** | Limburger-speler start match / Limburger-base zichtbaar |
@@ -1229,7 +1229,7 @@ class AudioManager {
     this.voiceVolume = 1.0;     // Voice lines altijd luid
     this.ambientVolume = 0.3;   // Ambient subtiel
 
-    // === Categorieën (aparte Howl instances) ===
+    // === Categorieen (aparte Howl instances) ===
     this.music = null;          // Huidige muziek track
     this.musicNext = null;      // Volgende track (voor crossfade)
     this.sfxPool = {};          // SFX pool per geluid
@@ -1259,7 +1259,7 @@ class AudioManager {
       }
     });
 
-    // Preload essentiële SFX
+    // Preload essentiele SFX
     this.preloadSFX();
     this.preloadAmbient();
   }
@@ -1639,9 +1639,9 @@ class VoiceLineManager {
               unit.includes('ceo') ||
               unit.includes('politicus') ||
               unit.includes('mijnbaas') ||
-              unit.includes('maasmansen') ||
+              unit.includes('maasmeester') ||
               unit.includes('frietkoning') ||
-              unit.includes('abdijbransen'),
+              unit.includes('abdijheer'),
     };
 
     this.lastPlayedTime[key] = now;
@@ -1785,25 +1785,28 @@ reign-of-brabant/
 | **Pitch** | Normaal tot iets lager, warm |
 | **Tempo** | Ontspannen, niet gehaast. Brabanders hebben geen stress |
 | **Emotie** | Warm, gezellig, nuchter. Zelfs in gevecht: "ach ja, vooruit dan" |
-| **Dialect** | Zachte g, -ansen suffix ("mansen" ipv "mannen"), "hedde", "ge" |
-| **Sleutelwoorden** | "jansen", "sansen", "pansen", "gansen", "Alaaf!" |
+| **Dialect** | Zachte g, echt Brabants. "hedde", "ge", "nie", "moar", "laot", "dur" |
+| **Sleutelwoorden** | "hedde", "ge", "nie", "moar", "houdoe", "Alaaf!" |
 | **Valkuil** | Niet te hard of te agressief. Brabanders zijn strijdlustig maar altijd warm |
 | **Referentie** | Denk aan een gezellige oom die toevallig ook kan vechten |
 
 **Dialect reminder:**
-- "mannen" -> "mansen"
-- "hebben" -> "hedde"
-- "jij" -> "ge" / "gansen"
+- "niet" -> "nie"
+- "maar" -> "moar"
+- "laat" -> "laot"
+- "door" -> "dur"
+- "hebben" -> "hedde" (2e persoon)
+- "jij" -> "ge"
 - Zachte g (geen keelschrapen)
-- "-en" aan het eind wordt "-ansen" bij grappige emphasis
+- Warme, ontspannen toon in alles
 
 #### Randstad Voice
 
 | Eigenschap | Richtlijn |
 |-----------|-----------|
 | **Pitch** | Normaal, iets hoger bij stress |
-| **Tempo** | Snel, efficiënt, geen woord te veel (behalve jargon, dat is eindeloos) |
-| **Emotie** | Droog, cynisch, gestrest. Altijd een beetje geïrriteerd |
+| **Tempo** | Snel, efficient, geen woord te veel (behalve jargon, dat is eindeloos) |
+| **Emotie** | Droog, cynisch, gestrest. Altijd een beetje geirriteerd |
 | **Dialect** | Zuiver ABN, GEEN accent. Corporate Nederlands |
 | **Sleutelwoorden** | "stakeholders", "alignment", "roadmap", "escaleren", "KPI" |
 | **Valkuil** | Niet te komisch - de humor zit in de DROOGHEID, niet in overdrijving |
@@ -1829,7 +1832,7 @@ reign-of-brabant/
 | **Tempo** | Onvoorspelbaar - soms snel, soms langzaam, altijd verrassend |
 | **Emotie** | Chaotisch warm, "amai!", expressief. Springt van emotie naar emotie |
 | **Dialect** | Vlaams: zachter dan Nederlands, "ge" ipv "je", Franstalige woorden |
-| **Sleutelwoorden** | "amai", "allez", "goesting", "ambetant", "zenne/zansen" |
+| **Sleutelwoorden** | "amai", "allez", "goesting", "ambetant", "ne keer" |
 | **Valkuil** | Niet te Frans - het is Vlaams met een sausje Frans, niet andersom |
 | **Referentie** | Denk aan een Vlaamse kroegbaas die tegelijk kookt en vertelt |
 
@@ -1885,7 +1888,7 @@ belgen-frietkoning-ultimate-1.wav
 - Dag 3: Limburgers + Narrator (kort, gefocust)
 - Dag 4: Belgen + retakes van alle facties
 
-**Tips voor efficiënte sessies:**
+**Tips voor efficiente sessies:**
 1. Neem per unit ALLE lijnen achter elkaar op (consistente stem)
 2. 3-5 seconden pauze tussen lijnen (makkelijker knippen)
 3. Neem elke lijn 2-3 keer op, kies de beste
@@ -1899,7 +1902,7 @@ belgen-frietkoning-ultimate-1.wav
 - Luister vooraf naar 10 minuten Brabants dialect op YouTube
 - Oefen de kernzinnen: "Hedde al gegeten?", "Ge kunt er niks aan doen"
 - De zachte g moet CONSISTENT zijn - gebruik hem in ELKE lijn
-- "-ansen" suffix: kies vooraf welke woorden dit krijgen en wees consistent
+- "nie" ipv "niet", "moar" ipv "maar", "ge" ipv "jij" — consequent!
 - Bij twijfel: spreek het zoals thuis, niet overdreven
 
 **Randstad (ABN):**

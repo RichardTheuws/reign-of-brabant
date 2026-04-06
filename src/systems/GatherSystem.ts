@@ -16,12 +16,10 @@ import {
   Movement,
   Faction,
   Building,
-  Health,
 } from '../ecs/components';
 import { IsWorker, IsBuilding, IsResource, IsDead, NeedsPathfinding } from '../ecs/tags';
 import { playerState } from '../core/PlayerState';
 import {
-  UnitAIState,
   ResourceType,
   HARVEST_RATE,
   CARRY_CAPACITY,

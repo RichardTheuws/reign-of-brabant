@@ -14,11 +14,9 @@ import {
   FactionId,
   UnitTypeId,
   BuildingTypeId,
-  HeroTypeId,
   UnitAIState,
   HERO_POPULATION_COST,
   type EntityId,
-  type PlayerState,
   MAP_SIZE,
 } from '../types/index';
 import {
@@ -28,7 +26,6 @@ import {
   type AIWorldSnapshot,
 } from './AIController';
 import { NavMeshManager } from '../pathfinding/NavMeshManager';
-import { distance2D } from '../utils/math';
 import {
   isVergaderingReady,
   activateVergadering,

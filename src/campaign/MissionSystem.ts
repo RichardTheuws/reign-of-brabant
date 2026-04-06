@@ -13,13 +13,12 @@
 import {
   type MissionDefinition,
   type MissionObjective,
-  type MissionTrigger,
   type TriggerCondition,
   type TriggerAction,
   type WaveDefinition,
   type MissionUnitSpawn,
 } from './MissionDefinitions';
-import { FactionId, UnitTypeId, BuildingTypeId } from '../types/index';
+import { FactionId, BuildingTypeId } from '../types/index';
 
 // ---------------------------------------------------------------------------
 // Callback interface -- the Game provides these

@@ -13,12 +13,11 @@ import {
   Position,
   Building,
   Faction,
-  UnitAI,
 } from '../ecs/components';
 import { IsBuilding, IsWorker, IsDead } from '../ecs/tags';
 import { playerState } from '../core/PlayerState';
 import { eventBus } from '../core/EventBus';
-import { UnitAIState } from '../types/index';
+import { FactionId, BuildingTypeId } from '../types/index';
 import { onRandstadActionCompleted } from './BureaucracySystem';
 import type { GameWorld } from '../ecs/world';
 
@@ -84,10 +83,10 @@ export function createBuildSystem() {
         onRandstadActionCompleted(factionId);
 
         // Emit building-complete event
-        eventBus.emit('building-placed' as any, {
+        eventBus.emit('building-placed', {
           entityId: bEid,
-          factionId: factionId as any,
-          buildingTypeId: Building.typeId[bEid],
+          factionId: factionId as FactionId,
+          buildingTypeId: Building.typeId[bEid] as BuildingTypeId,
           x: bx,
           z: bz,
         });
