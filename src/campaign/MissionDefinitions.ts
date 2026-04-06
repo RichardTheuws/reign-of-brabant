@@ -552,7 +552,7 @@ const MISSION_4_BINNENDIEZE: MissionDefinition = {
   objectives: [
     { id: 'destroy-archief', type: 'destroy-building', description: 'Vernietig het Randstad-archief', targetValue: 1, isBonus: false },
     { id: 'destroy-outposts', type: 'destroy-building', description: 'Vernietig de 2 bevoorradingsdepots', targetValue: 2, isBonus: true },
-    { id: 'no-worker-loss', type: 'no-worker-loss', description: 'Verlies geen Kansen', targetValue: 0, isBonus: true },
+    { id: 'keep-team-alive', type: 'have-units-at-end', description: 'Houd je hele commando-team in leven', targetValue: 6, isBonus: true },
   ],
 
   triggers: [

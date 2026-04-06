@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.6.1] - 2026-04-06
+
+### Fixed
+- **Mission 4 bonus objective**: "Verlies geen Kansen" was unloseable (tracked worker deaths but mission has no workers). Changed to "Houd je hele commando-team in leven" (have-units-at-end with targetValue 6)
+
 ## [0.6.0] - 2026-04-06
 
 ### Added
