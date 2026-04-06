@@ -200,7 +200,7 @@ export function activateCompromis(
 
   // Check Chocolade cost
   const cost = getCompromisCost(type);
-  if (!playerState.spendGezelligheid(FactionId.Belgen, cost)) return false;
+  if (!playerState.spendTertiary(FactionId.Belgen, cost)) return false;
 
   // Activate
   const compromis: ActiveCompromis = {
@@ -235,12 +235,12 @@ export function breakCompromis(targetFaction: number): boolean {
   activeCompromissen.splice(idx, 1);
 
   // Penalty: lose 20 Chocolade (spend, but don't fail if insufficient)
-  const currentChocolade = playerState.getGezelligheid(FactionId.Belgen);
+  const currentChocolade = playerState.getTertiary(FactionId.Belgen);
   if (currentChocolade >= 20) {
-    playerState.spendGezelligheid(FactionId.Belgen, 20);
+    playerState.spendTertiary(FactionId.Belgen, 20);
   } else {
     // Can't afford full penalty -- spend whatever is available
-    playerState.spendGezelligheid(FactionId.Belgen, currentChocolade);
+    playerState.spendTertiary(FactionId.Belgen, currentChocolade);
   }
 
   eventBus.emit('compromis-broken' as keyof import('../types/index').GameEvents, {
@@ -280,7 +280,7 @@ export function persuadeUnit(world: GameWorld, targetEid: number): boolean {
   if (persuadedUnits.some((p) => p.entityId === targetEid)) return false;
 
   // Check Chocolade cost
-  if (!playerState.spendGezelligheid(FactionId.Belgen, PERSUASION_COST)) return false;
+  if (!playerState.spendTertiary(FactionId.Belgen, PERSUASION_COST)) return false;
 
   // Switch faction
   const originalFaction = Faction.id[targetEid];
@@ -405,7 +405,7 @@ export function isCompromisReady(type: CompromisType, targetFaction: number): bo
   if (compromisCooldowns[type] > 0) return false;
   if (activeCompromissen.some((c) => c.targetFaction === targetFaction)) return false;
   const cost = getCompromisCost(type);
-  return playerState.getGezelligheid(FactionId.Belgen) >= cost;
+  return playerState.getTertiary(FactionId.Belgen) >= cost;
 }
 
 // ---------------------------------------------------------------------------

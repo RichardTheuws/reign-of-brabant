@@ -316,10 +316,10 @@ export function createUndergroundSystem(): SystemFn {
 
         const cost = grotCount * KOLEN_COST_PER_GROT;
         // Kolen is stored as tertiary resource (gezelligheid field in PlayerState)
-        const currentKolen = playerState.getGezelligheid(fid);
+        const currentKolen = playerState.getTertiary(fid);
 
         if (currentKolen >= cost) {
-          playerState.spendGezelligheid(fid, cost);
+          playerState.spendTertiary(fid, cost);
           if (!net.active) {
             net.active = true;
             (eventBus as EventBusAny).emit('tunnel-network-changed', {

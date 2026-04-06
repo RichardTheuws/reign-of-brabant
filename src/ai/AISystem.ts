@@ -386,8 +386,8 @@ function tryTrainAIHeroes(
   snapshot: AIWorldSnapshot,
 ): void {
   // Only check every 5 seconds
-  aiHeroTimer += 2; // Decision interval is 2s
-  if (aiHeroTimer < 10) return;
+  aiHeroTimer += 1;
+  if (aiHeroTimer < 150) return; // ~5 seconds at 30 calls/sec (AISystem runs every other frame)
   aiHeroTimer = 0;
 
   // Need 10+ army units before training heroes

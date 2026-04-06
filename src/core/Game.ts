@@ -504,6 +504,15 @@ export class Game {
         onRetry: () => window.location.reload(),
         onMenu: () => window.location.reload(),
       });
+      const factionNames = ['brabant', 'randstad', 'limburg', 'belgen'] as const;
+      this.hud.setFaction(factionNames[this.playerFactionId] ?? 'brabant');
+
+      // Hide gezelligheid bar for non-Brabanders, show tertiary for others
+      if (this.playerFactionId !== FactionId.Brabanders) {
+        const gezEl = document.querySelector('.gezelligheid-item') as HTMLElement | null;
+        if (gezEl) gezEl.style.display = 'none';
+      }
+
       this.hud.updateResources(
         this.playerState.getGold(this.playerFactionId),
         this.playerState.getWood(this.playerFactionId),

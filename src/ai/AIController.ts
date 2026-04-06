@@ -453,7 +453,6 @@ export class AIController {
 
     if (snapshot.army.length >= effectiveThreshold || snapshot.army.length > this.lastArmySize + 2) {
       this.issueAttackCommands(snapshot);
-      this.lastArmySize = 0; // Reset after sending wave
       this.attackWaveCount++;
     }
   }
