@@ -206,40 +206,47 @@ echo ""
 echo "[3/4] Syncing MP3 files..."
 echo ""
 
+# Download all remote MP3s to temp dir in one batch via rsync
+REMOTE_MP3_DIR="$REMOTE_DATA/mp3/"
+mkdir -p "$TMP_DIR/mp3"
+
+# Build list of filenames to download
+DOWNLOAD_LIST="$TMP_DIR/download-list.txt"
+echo "$MANIFEST" | while IFS='|' read -r LINE_ID REST; do
+  [[ -z "$LINE_ID" ]] && continue
+  echo "${LINE_ID}.mp3"
+done > "$DOWNLOAD_LIST"
+
+DOWNLOAD_COUNT=$(wc -l < "$DOWNLOAD_LIST" | tr -d ' ')
+echo "  Downloading $DOWNLOAD_COUNT MP3s from server..."
+rsync -az --files-from="$DOWNLOAD_LIST" "$REMOTE:$REMOTE_DATA/mp3/" "$TMP_DIR/mp3/" 2>/dev/null || true
+DOWNLOADED=$(ls "$TMP_DIR/mp3/" 2>/dev/null | wc -l | tr -d ' ')
+echo "  Downloaded: $DOWNLOADED files"
+echo ""
+
+# Place each file in the correct game directory
 while IFS='|' read -r LINE_ID FACTION UNIT ACTION VARIANT OUTPUT_PATH; do
+  [[ -z "$LINE_ID" ]] && continue
+
   # Determine target path
   if [[ -n "$OUTPUT_PATH" && "$OUTPUT_PATH" != "null" ]]; then
-    # Use the outputPath from voice-lines.json directly
     TARGET_FILE="$VOICES_DIR/$OUTPUT_PATH"
   else
-    # Fallback: construct from components
     TARGET_FILE="$VOICES_DIR/$FACTION/$UNIT/${ACTION}_${VARIANT}.mp3"
   fi
 
-  REMOTE_FILE="$REMOTE_DATA/mp3/${LINE_ID}.mp3"
+  SOURCE_FILE="$TMP_DIR/mp3/${LINE_ID}.mp3"
   STATUS=$(jq -r --arg id "$LINE_ID" '.[$id].status' "$TMP_DIR/recordings.json")
+  REL_TARGET=$(echo "$TARGET_FILE" | sed "s|$PROJECT_ROOT/||")
 
-  # Check if remote file exists (cache this check)
-  if ! ssh -q "$REMOTE" "test -f '$REMOTE_FILE'" 2>/dev/null; then
-    echo "  MISSING  $LINE_ID (MP3 not found on server)"
+  # Check if downloaded file exists
+  if [[ ! -f "$SOURCE_FILE" ]]; then
+    echo "  MISSING   $LINE_ID (MP3 not on server)"
     ((COUNT_MISSING++)) || true
     continue
   fi
 
-  # Get remote file modification time (epoch)
-  REMOTE_MTIME=$(ssh -q "$REMOTE" "stat -f '%m' '$REMOTE_FILE'" 2>/dev/null || echo "0")
-
-  # Check if local file exists and compare
   if [[ -f "$TARGET_FILE" ]]; then
-    LOCAL_MTIME=$(stat -f '%m' "$TARGET_FILE" 2>/dev/null || echo "0")
-
-    # Skip if local file is newer or same age
-    if [[ "$LOCAL_MTIME" -ge "$REMOTE_MTIME" ]]; then
-      echo "  SKIP     $LINE_ID → $(echo "$TARGET_FILE" | sed "s|$PROJECT_ROOT/||") (local is up to date)"
-      ((COUNT_SKIPPED++)) || true
-      continue
-    fi
-
     ACTION_LABEL="UPDATE"
     ((COUNT_UPDATED++)) || true
   else
@@ -248,15 +255,11 @@ while IFS='|' read -r LINE_ID FACTION UNIT ACTION VARIANT OUTPUT_PATH; do
   fi
 
   if [[ "$DRY_RUN" == "true" ]]; then
-    echo "  $ACTION_LABEL    $LINE_ID [$STATUS] → $(echo "$TARGET_FILE" | sed "s|$PROJECT_ROOT/||") (dry run)"
+    echo "  $ACTION_LABEL    $LINE_ID [$STATUS] → $REL_TARGET (dry run)"
   else
-    # Create target directory
-    TARGET_DIR=$(dirname "$TARGET_FILE")
-    mkdir -p "$TARGET_DIR"
-
-    # Download the file
-    scp -q "$REMOTE:$REMOTE_FILE" "$TARGET_FILE"
-    echo "  $ACTION_LABEL    $LINE_ID [$STATUS] → $(echo "$TARGET_FILE" | sed "s|$PROJECT_ROOT/||")"
+    mkdir -p "$(dirname "$TARGET_FILE")"
+    cp "$SOURCE_FILE" "$TARGET_FILE"
+    echo "  $ACTION_LABEL    $LINE_ID [$STATUS] → $REL_TARGET"
   fi
 
 done <<< "$MANIFEST"
