@@ -247,13 +247,13 @@ process_faction() {
         if [ -f "$v03_path" ]; then
             echo "--- Processing $faction/$unit_type (already rigged, adding anims) ---"
             add_category_anims "$category" "$v03_path" "$v03_path"
-            ((count++))
+            count=$((count + 1))
         else
             local v02_path="$V02_DIR/$faction/$unit_type.glb"
             if [ -f "$v02_path" ]; then
                 echo "--- Processing $faction/$unit_type (full rig + animate) ---"
                 process_single_rig_and_animate "$category" "$v02_path" "$v03_path"
-                ((count++))
+                count=$((count + 1))
             else
                 echo "SKIP: No model found for $faction/$unit_type"
             fi

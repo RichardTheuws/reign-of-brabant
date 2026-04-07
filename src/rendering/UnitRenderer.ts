@@ -89,6 +89,8 @@ const enum AnimUnitAIState {
   Gathering = 4,
   Returning = 5,
   Dead = 6,
+  Stunned = 7,
+  Reviving = 8,
 }
 
 /** UnitTypeId values (mirrored from types/index.ts to avoid circular imports). */
@@ -105,7 +107,7 @@ const enum AnimUnitTypeId {
 
 /** One-shot animation clip names that should not loop. */
 const ONE_SHOT_CLIPS = new Set([
-  'Attack', 'RangedAttack', 'HeavyAttack', 'SiegeAttack', 'Heal', 'Build', 'Death',
+  'Attack', 'RangedAttack', 'HeavyAttack', 'SiegeAttack', 'Heal', 'Death',
 ]);
 
 /**
@@ -138,8 +140,17 @@ function resolveAnimation(
     return 'Idle'; // fallback: no gather animation yet
   }
 
+  // Stunned / Reviving — hold current pose (no dedicated animation yet)
+  if (aiState === AnimUnitAIState.Stunned || aiState === AnimUnitAIState.Reviving) {
+    return 'Idle';
+  }
+
   // Attacking — unit type determines which attack animation
   if (aiState === AnimUnitAIState.Attacking) {
+    // Support units: Heal > Attack (healers "attack" by healing allies)
+    if (unitTypeId === AnimUnitTypeId.Support && availableClips.has('Heal')) {
+      return 'Heal';
+    }
     // Siege units: SiegeAttack > Attack
     if (unitTypeId === AnimUnitTypeId.Siege && availableClips.has('SiegeAttack')) {
       return 'SiegeAttack';
@@ -152,7 +163,6 @@ function resolveAnimation(
     if (unitTypeId === AnimUnitTypeId.Heavy && availableClips.has('HeavyAttack')) {
       return 'HeavyAttack';
     }
-    // Support units: Heal is used via separate logic; attack falls through
     return 'Attack'; // universal fallback
   }
 
