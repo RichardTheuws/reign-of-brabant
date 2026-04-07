@@ -4,7 +4,7 @@
  * Listens to player commands (from UI/input) and translates them into ECS
  * component writes on selected entities.
  *
- * Commands: move, attack, gather, build, train, stop.
+ * Commands: move, attack, attack-move, gather, build, train, stop.
  * This system does NOT read input directly -- it processes commands queued
  * via the public `queueCommand()` method.
  */
@@ -61,11 +61,17 @@ interface TrainCommand {
   cost: number;
 }
 
+interface AttackMoveCommand {
+  type: 'attack-move';
+  targetX: number;
+  targetZ: number;
+}
+
 interface StopCommand {
   type: 'stop';
 }
 
-type Command = MoveCommand | AttackCommand | GatherCommand | BuildCommand | TrainCommand | StopCommand;
+type Command = MoveCommand | AttackCommand | GatherCommand | BuildCommand | TrainCommand | AttackMoveCommand | StopCommand;
 
 // Internal command buffer -- flushed each frame
 const commandBuffer: Command[] = [];
@@ -132,6 +138,9 @@ export function createCommandSystem() {
         case 'train':
           handleTrain(world, cmd);
           break;
+        case 'attack-move':
+          handleAttackMove(world, selectedUnits, cmd);
+          break;
         case 'stop':
           handleStop(world, selectedUnits);
           break;
@@ -147,10 +156,50 @@ export function createCommandSystem() {
 // Command handlers
 // ---------------------------------------------------------------------------
 
+/**
+ * Compute formation offsets for a group of units moving to the same target.
+ * Places units in concentric rings around the target position.
+ * Returns an array of [offsetX, offsetZ] pairs.
+ */
+function computeFormationOffsets(count: number): Array<[number, number]> {
+  if (count <= 1) return [[0, 0]];
+
+  const offsets: Array<[number, number]> = [[0, 0]]; // First unit goes to exact target
+  const spacing = 1.8; // Space between units in the formation
+  let placed = 1;
+  let ring = 1;
+
+  while (placed < count) {
+    const radius = ring * spacing;
+    const circumference = 2 * Math.PI * radius;
+    const unitsInRing = Math.min(
+      count - placed,
+      Math.max(6, Math.floor(circumference / spacing)),
+    );
+
+    for (let i = 0; i < unitsInRing && placed < count; i++) {
+      const angle = (i / unitsInRing) * 2 * Math.PI;
+      offsets.push([
+        Math.cos(angle) * radius,
+        Math.sin(angle) * radius,
+      ]);
+      placed++;
+    }
+    ring++;
+  }
+
+  return offsets;
+}
+
 function handleMove(world: GameWorld, units: number[], cmd: MoveCommand): void {
-  for (const eid of units) {
-    Movement.targetX[eid] = cmd.targetX;
-    Movement.targetZ[eid] = cmd.targetZ;
+  const offsets = computeFormationOffsets(units.length);
+
+  for (let i = 0; i < units.length; i++) {
+    const eid = units[i];
+    const [ox, oz] = offsets[i];
+
+    Movement.targetX[eid] = cmd.targetX + ox;
+    Movement.targetZ[eid] = cmd.targetZ + oz;
     Movement.hasTarget[eid] = 1;
 
     UnitAI.state[eid] = UnitAIState.Moving;
@@ -294,6 +343,42 @@ function handleTrain(world: GameWorld, cmd: TrainCommand): void {
 
   // Queue full -- refund
   playerState.addGold(factionId, cost);
+}
+
+/**
+ * Attack-move: units move to a target position but engage any enemies encountered along the way.
+ * Implemented by setting UnitAI state to Moving with the aggro origin set to their current position,
+ * so the CombatSystem's auto-aggro will still fire while they move.
+ * Once they arrive, they go idle and auto-aggro takes over.
+ */
+function handleAttackMove(world: GameWorld, units: number[], cmd: AttackMoveCommand): void {
+  const offsets = computeFormationOffsets(units.length);
+
+  for (let i = 0; i < units.length; i++) {
+    const eid = units[i];
+    const [ox, oz] = offsets[i];
+
+    Movement.targetX[eid] = cmd.targetX + ox;
+    Movement.targetZ[eid] = cmd.targetZ + oz;
+    Movement.hasTarget[eid] = 1;
+
+    // Set to Idle so auto-aggro fires each frame while moving toward target.
+    // The Movement system still moves them because hasTarget=1, and
+    // CombatSystem's processAutoAggro checks idle units for enemies in range.
+    UnitAI.state[eid] = UnitAIState.Idle;
+    UnitAI.targetEid[eid] = NO_ENTITY;
+
+    // Store move destination as leash origin so units return after killing
+    UnitAI.originX[eid] = cmd.targetX + ox;
+    UnitAI.originZ[eid] = cmd.targetZ + oz;
+
+    // Reset gather state if worker
+    if (hasComponent(world, eid, IsWorker)) {
+      Gatherer.state[eid] = 0; // NONE
+    }
+
+    addComponent(world, eid, NeedsPathfinding);
+  }
 }
 
 function handleStop(world: GameWorld, units: number[]): void {

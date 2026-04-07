@@ -117,6 +117,7 @@ export const Gatherer = {
   carrying: f32(),      // current amount carried
   carryCapacity: f32(), // max carry (typically 10)
   resourceType: u8(),   // ResourceType enum
+  previousTarget: u32(), // entity id of resource node before combat interrupted (for auto-resume)
 };
 
 // ---------------------------------------------------------------------------

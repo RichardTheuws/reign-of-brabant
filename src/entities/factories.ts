@@ -321,6 +321,7 @@ export function createWorker(
   Gatherer.carrying[eid] = 0;
   Gatherer.carryCapacity[eid] = arch.carryCapacity || CARRY_CAPACITY;
   Gatherer.resourceType[eid] = ResourceType.Gold;
+  Gatherer.previousTarget[eid] = NO_ENTITY;
 
   return eid;
 }
@@ -717,6 +718,7 @@ export function createFactionUnit(
     Gatherer.carrying[eid] = 0;
     Gatherer.carryCapacity[eid] = arch.carryCapacity || CARRY_CAPACITY;
     Gatherer.resourceType[eid] = ResourceType.Gold;
+    Gatherer.previousTarget[eid] = NO_ENTITY;
   }
 
   return eid;
@@ -767,6 +769,7 @@ export function createFactionUnitByExtendedId(
     Gatherer.carrying[eid] = 0;
     Gatherer.carryCapacity[eid] = arch.carryCapacity || CARRY_CAPACITY;
     Gatherer.resourceType[eid] = ResourceType.Gold;
+    Gatherer.previousTarget[eid] = NO_ENTITY;
   }
 
   return eid;

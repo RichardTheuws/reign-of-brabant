@@ -12,7 +12,7 @@ import { addEntity, addComponent, hasComponent, query, entityExists } from 'bite
 import { world, resetGameWorld } from '../ecs/world';
 import { Position, Faction, Health, Attack, Armor, Movement, UnitType, UnitAI, Gatherer, Visibility, Building, Resource, Selected, Production, Rotation, GezeligheidBonus, Hero, HeroAbilities, RallyPoint } from '../ecs/components';
 import { IsUnit, IsBuilding, IsResource, IsWorker, IsDead, IsHero } from '../ecs/tags';
-import { FactionId, UnitTypeId, BuildingTypeId, HeroTypeId, UpgradeId, ResourceType, MAP_SIZE, UnitAIState, NO_PRODUCTION, HERO_POPULATION_COST } from '../types/index';
+import { FactionId, UnitTypeId, BuildingTypeId, HeroTypeId, UpgradeId, ResourceType, MAP_SIZE, UnitAIState, NO_PRODUCTION, NO_ENTITY, HERO_POPULATION_COST } from '../types/index';
 import { UNIT_ARCHETYPES, BUILDING_ARCHETYPES } from '../entities/archetypes';
 import { HERO_ARCHETYPES } from '../entities/heroArchetypes';
 import { createHero, isHeroActive } from '../entities/heroFactory';
@@ -94,6 +94,12 @@ export class Game {
   // Rally point placement mode
   private rallyPointMode = false;
   private rallyPointBuildingEid = -1;
+
+  // Attack-move mode: A key toggles, next click issues attack-move command
+  private attackMoveMode = false;
+
+  // Control groups: Ctrl+1..9 to assign, 1..9 to recall
+  private controlGroups = new Map<number, Set<number>>();
 
   // Drag-box selection
   private dragStartX = 0;
@@ -670,6 +676,144 @@ export class Game {
     if (canvas) canvas.style.cursor = 'default';
   }
 
+  // -----------------------------------------------------------------------
+  // Attack-move mode
+  // -----------------------------------------------------------------------
+
+  private enterAttackMoveMode(): void {
+    this.attackMoveMode = true;
+    const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
+    if (canvas) canvas.style.cursor = 'crosshair';
+    this.hud?.showAlert('Attack-move: klik op terrein of vijand', 'info');
+  }
+
+  private exitAttackMoveMode(): void {
+    this.attackMoveMode = false;
+    const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
+    if (canvas) canvas.style.cursor = 'default';
+  }
+
+  private handleAttackMoveClick(screenX: number, screenY: number): void {
+    const selected = this.selectedEntities;
+    if (selected.length === 0) {
+      this.exitAttackMoveMode();
+      return;
+    }
+
+    this.mouseVec.set(
+      (screenX / window.innerWidth) * 2 - 1,
+      -(screenY / window.innerHeight) * 2 + 1
+    );
+    this.raycaster.setFromCamera(this.mouseVec, this.camera.camera);
+    const hits = this.raycaster.intersectObject(this.terrain.mesh);
+
+    if (hits.length > 0) {
+      const point = hits[0].point;
+      const targetEid = this.findEntityAtPosition(point.x, point.z);
+
+      // If clicked on an enemy, issue a direct attack command
+      if (targetEid !== null && Faction.id[targetEid] !== this.playerFactionId &&
+          (hasComponent(world, targetEid, IsUnit) || hasComponent(world, targetEid, IsBuilding))) {
+        queueCommand({ type: 'attack', targetEid });
+      } else {
+        // Otherwise issue attack-move to position
+        queueCommand({ type: 'attack-move', targetX: point.x, targetZ: point.z });
+        this.unitRenderer.showMoveIndicator(point.x, point.y, point.z);
+      }
+
+      // Voice + audio feedback
+      const voiceEid = selected[0];
+      const voiceFaction = hasComponent(world, voiceEid, IsUnit) ? Faction.id[voiceEid] : this.playerFactionId;
+      const voiceUnitType = hasComponent(world, voiceEid, IsUnit) ? UnitType.id[voiceEid] : undefined;
+      playUnitVoice(voiceFaction, 'attack', voiceUnitType);
+    }
+
+    this.exitAttackMoveMode();
+  }
+
+  // -----------------------------------------------------------------------
+  // Ctrl+Click: select all same unit type
+  // -----------------------------------------------------------------------
+
+  /**
+   * Select all units of the same type and faction as the clicked unit.
+   * Returns array of entity IDs to select.
+   */
+  private selectAllSameType(clickedEid: number): number[] {
+    const clickedType = UnitType.id[clickedEid];
+    const clickedFaction = Faction.id[clickedEid];
+    const isClickedUnit = hasComponent(world, clickedEid, IsUnit);
+    const isClickedBuilding = hasComponent(world, clickedEid, IsBuilding);
+
+    // Only works for units, not buildings
+    if (!isClickedUnit) {
+      return [clickedEid];
+    }
+
+    const result: number[] = [];
+    for (const [eid] of this.entityMeshMap) {
+      if (!entityExists(world, eid)) continue;
+      if (!hasComponent(world, eid, IsUnit)) continue;
+      if (hasComponent(world, eid, IsDead)) continue;
+      if (Faction.id[eid] !== clickedFaction) continue;
+      if (UnitType.id[eid] !== clickedType) continue;
+      // Only select player faction units
+      if (Faction.id[eid] !== this.playerFactionId) continue;
+      result.push(eid);
+    }
+
+    return result.length > 0 ? result : [clickedEid];
+  }
+
+  // -----------------------------------------------------------------------
+  // Control groups
+  // -----------------------------------------------------------------------
+
+  /**
+   * Assign the current selection to a control group (1-9).
+   */
+  private assignControlGroup(groupNum: number): void {
+    if (this.selectedEntities.length === 0) return;
+    this.controlGroups.set(groupNum, new Set(this.selectedEntities));
+    this.hud?.showAlert(`Groep ${groupNum} toegewezen (${this.selectedEntities.length} units)`, 'info');
+  }
+
+  /**
+   * Recall a control group: select all living entities in the group.
+   * Centers the camera on the group's center position.
+   */
+  private recallControlGroup(groupNum: number): void {
+    const group = this.controlGroups.get(groupNum);
+    if (!group || group.size === 0) return;
+
+    // Filter out dead/removed entities
+    const alive: number[] = [];
+    for (const eid of group) {
+      if (entityExists(world, eid) && !hasComponent(world, eid, IsDead)) {
+        alive.push(eid);
+      } else {
+        group.delete(eid); // Clean up dead entities
+      }
+    }
+
+    if (alive.length === 0) {
+      this.controlGroups.delete(groupNum);
+      return;
+    }
+
+    // Select the group
+    this.selectedEntities = alive;
+    this.onSelectionChanged(this.selectedEntities);
+
+    // Center camera on the group's average position
+    let sumX = 0, sumZ = 0;
+    for (const eid of alive) {
+      sumX += Position.x[eid];
+      sumZ += Position.z[eid];
+    }
+    this.camera.setPosition(sumX / alive.length, sumZ / alive.length);
+  }
+
   private trainFromSelectedBuilding(unitType: UnitTypeId): void {
     // Find selected building that can train this unit type
     for (const eid of this.selectedEntities) {
@@ -798,7 +942,7 @@ export class Game {
     this.dragBoxDiv.style.cssText = 'position:fixed;border:1px solid #d4a853;background:rgba(212,168,83,0.15);pointer-events:none;z-index:50;display:none';
     document.body.appendChild(this.dragBoxDiv);
 
-    // Left mousedown: start drag or build placement or rally point placement
+    // Left mousedown: start drag or build placement or rally point placement or attack-move
     this.addTrackedListener(canvas, 'mousedown', ((e: MouseEvent) => {
       if (e.button !== 0) return;
 
@@ -811,6 +955,12 @@ export class Game {
       // Rally point mode: place rally point on click
       if (this.rallyPointMode && this.rallyPointBuildingEid >= 0) {
         this.handleRallyPointPlacement(e.clientX, e.clientY);
+        return;
+      }
+
+      // Attack-move mode: issue attack-move command at clicked position
+      if (this.attackMoveMode) {
+        this.handleAttackMoveClick(e.clientX, e.clientY);
         return;
       }
 
@@ -829,6 +979,11 @@ export class Game {
         }
         if (this.rallyPointMode) {
           this.exitRallyPointMode();
+          return;
+        }
+        // Right-click cancels attack-move mode
+        if (this.attackMoveMode) {
+          this.exitAttackMoveMode();
           return;
         }
         this.handleRightClick(e.clientX, e.clientY);
@@ -866,7 +1021,12 @@ export class Game {
           }
         }
         if (hit !== null && Faction.id[hit] === this.playerFactionId) {
-          this.selectedEntities = [hit];
+          // Ctrl+click: select ALL units of the same type and faction
+          if (e.ctrlKey || e.metaKey) {
+            this.selectedEntities = this.selectAllSameType(hit);
+          } else {
+            this.selectedEntities = [hit];
+          }
         } else {
           this.selectedEntities = [];
         }
@@ -897,12 +1057,43 @@ export class Game {
 
     // Keyboard shortcuts
     this.addTrackedListener(window, 'keydown', ((e: KeyboardEvent) => {
-      if (e.code === 'Escape' && this.rallyPointMode) {
-        this.exitRallyPointMode();
+      // Escape: cancel modes
+      if (e.code === 'Escape') {
+        if (this.attackMoveMode) { this.exitAttackMoveMode(); return; }
+        if (this.rallyPointMode) { this.exitRallyPointMode(); return; }
+        if (this.buildMode) { this.exitBuildMode(); return; }
       }
-      if (e.code === 'Escape' && this.buildMode) {
-        this.exitBuildMode();
+
+      // --- Control groups: Ctrl+1..9 assigns, 1..9 recalls ---
+      const digitMatch = e.code.match(/^(?:Digit|Numpad)([1-9])$/);
+      if (digitMatch) {
+        const groupNum = parseInt(digitMatch[1], 10);
+        const isCtrl = e.ctrlKey || e.metaKey;
+
+        if (isCtrl) {
+          // Ctrl+number: assign control group from current selection
+          this.assignControlGroup(groupNum);
+          e.preventDefault();
+          return;
+        }
+
+        // Number key without Ctrl: check if hero is selected first (for ability hotkeys)
+        const hasHeroSelected = this.selectedEntities.some(eid =>
+          hasComponent(world, eid, IsHero) && !hasComponent(world, eid, IsDead) &&
+          Faction.id[eid] === this.playerFactionId
+        );
+
+        if (hasHeroSelected && groupNum <= 3) {
+          // Hero ability hotkeys 1/2/3
+          this.useHeroAbility(groupNum - 1);
+          return;
+        }
+
+        // Recall control group
+        this.recallControlGroup(groupNum);
+        return;
       }
+
       // Check if a building is selected for production hotkeys
       const selectedBuilding = this.selectedEntities.length === 1 &&
         hasComponent(world, this.selectedEntities[0], IsBuilding) &&
@@ -917,6 +1108,17 @@ export class Game {
         if (e.code === 'KeyT') { this.trainHero(HeroTypeId.PrinsVanBrabant); return; }
         if (e.code === 'KeyR' && hasComponent(world, selectedBuilding, RallyPoint)) {
           this.enterRallyPointMode();
+          return;
+        }
+      }
+
+      // A key: enter attack-move mode (only if units are selected)
+      if (e.code === 'KeyA' && !this.buildMode && !this.rallyPointMode) {
+        if (this.selectedEntities.length > 0 &&
+            this.selectedEntities.some(eid =>
+              hasComponent(world, eid, IsUnit) && Faction.id[eid] === this.playerFactionId
+            )) {
+          this.enterAttackMoveMode();
           return;
         }
       }
@@ -947,17 +1149,6 @@ export class Game {
             this.hud?.showAlert(`Niet genoeg Gezelligheid! (${current}/${config.cost})`, 'warning');
           }
         }
-      }
-
-      // Hero ability hotkeys: 1/2/3 when hero is selected
-      if (e.code === 'Digit1' || e.code === 'Numpad1') {
-        this.useHeroAbility(0);
-      }
-      if (e.code === 'Digit2' || e.code === 'Numpad2') {
-        this.useHeroAbility(1);
-      }
-      if (e.code === 'Digit3' || e.code === 'Numpad3') {
-        this.useHeroAbility(2);
       }
     }) as EventListener);
   }
@@ -2358,6 +2549,7 @@ export class Game {
       addComponent(world, eid, IsWorker);
       addComponent(world, eid, Gatherer);
       Gatherer.carryCapacity[eid] = 10;
+      Gatherer.previousTarget[eid] = NO_ENTITY;
     }
 
     this.playerState.addPopulation(faction, 1);
@@ -2549,6 +2741,8 @@ export class Game {
     this.gameOver = false;
     this.buildMode = false;
     this.buildGhostType = null;
+    this.attackMoveMode = false;
+    this.controlGroups.clear();
     this.stats = { unitsProduced: 0, unitsLost: 0, enemiesKilled: 0, buildingsBuilt: 0, resourcesGathered: 0 };
     this.missionSystem = null;
     this.activeMission = null;

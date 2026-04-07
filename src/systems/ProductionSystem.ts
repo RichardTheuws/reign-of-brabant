@@ -210,12 +210,14 @@ function spawnUnit(
 
   const eid = addEntity(world);
 
-  // Position at rally point (offset from building), clamped to map bounds
+  // Position at rally point (offset from building) with random scatter, clamped to map bounds
   addComponent(world, eid, Position);
   const halfMap = MAP_SIZE / 2;
-  Position.x[eid] = Math.max(-halfMap + 1, Math.min(halfMap - 1, Position.x[buildingEid] + RALLY_OFFSET));
+  const scatterX = (Math.random() - 0.5) * 3.0; // +-1.5 units
+  const scatterZ = (Math.random() - 0.5) * 3.0; // +-1.5 units
+  Position.x[eid] = Math.max(-halfMap + 1, Math.min(halfMap - 1, Position.x[buildingEid] + RALLY_OFFSET + scatterX));
   Position.y[eid] = Position.y[buildingEid];
-  Position.z[eid] = Math.max(-halfMap + 1, Math.min(halfMap - 1, Position.z[buildingEid] + RALLY_OFFSET));
+  Position.z[eid] = Math.max(-halfMap + 1, Math.min(halfMap - 1, Position.z[buildingEid] + RALLY_OFFSET + scatterZ));
 
   // Health
   addComponent(world, eid, Health);
@@ -284,6 +286,7 @@ function spawnUnit(
     Gatherer.carryCapacity[eid] = template.carryCapacity;
     Gatherer.carrying[eid] = 0;
     Gatherer.targetEid[eid] = NO_ENTITY;
+    Gatherer.previousTarget[eid] = NO_ENTITY;
   }
 
   // Send unit to rally point if building has a custom rally point set

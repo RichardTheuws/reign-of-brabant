@@ -192,6 +192,7 @@ import { createBureaucracySystem } from './BureaucracySystem';
 import { createTertiaryResourceSystem } from './TertiaryResourceSystem';
 import { createUndergroundSystem } from './UndergroundSystem';
 import { createDiplomacySystem } from './DiplomacySystem';
+import { createSeparationSystem } from './SeparationSystem';
 import { createDeathSystem } from './DeathSystem';
 import { createVisionSystem } from './VisionSystem';
 import type { Terrain } from '../world/Terrain';
@@ -215,6 +216,9 @@ export function createGamePipeline(terrain: Terrain, devMode = false): SystemPip
 
   // Phase 4: Movement
   pipeline.add('MovementSystem', createMovementSystem(terrain), 'movement');
+
+  // Phase 4.1: Separation (after movement -- nudge overlapping idle units apart)
+  pipeline.add('SeparationSystem', createSeparationSystem(), 'movement');
 
   // Phase 4.5: Gezelligheid (after movement -- bonuses depend on final positions)
   pipeline.add('GezeligheidSystem', createGezeligheidSystem(), 'faction');

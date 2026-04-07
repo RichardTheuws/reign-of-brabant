@@ -19,11 +19,13 @@ import {
   Faction,
   UnitAI,
   Movement,
+  Gatherer,
+  Resource,
   GezeligheidBonus,
   Stunned,
   Invincible,
 } from '../ecs/components';
-import { IsUnit, IsBuilding, IsDead, NeedsPathfinding } from '../ecs/tags';
+import { IsUnit, IsBuilding, IsWorker, IsResource, IsDead, NeedsPathfinding } from '../ecs/tags';
 import {
   UnitAIState,
   MIN_DAMAGE,
@@ -148,6 +150,11 @@ function processAttacking(world: GameWorld, eid: number, dt: number): void {
   if (hasComponent(world, targetEid, UnitAI) && hasComponent(world, targetEid, IsUnit)) {
     const targetState = UnitAI.state[targetEid];
     if (targetState !== UnitAIState.Attacking && targetState !== UnitAIState.Dead) {
+      // Save gather target for workers so they can auto-resume after combat
+      if (hasComponent(world, targetEid, IsWorker) && Gatherer.targetEid[targetEid] !== NO_ENTITY) {
+        Gatherer.previousTarget[targetEid] = Gatherer.targetEid[targetEid];
+      }
+
       UnitAI.state[targetEid] = UnitAIState.Attacking;
       UnitAI.targetEid[targetEid] = eid;
       Movement.hasTarget[targetEid] = 0;
@@ -257,6 +264,11 @@ function processSelfDefense(world: GameWorld, eid: number, allUnits: { readonly 
   }
 
   if (closestEid !== NO_ENTITY) {
+    // Save gather target before switching to combat so we can resume after
+    if (hasComponent(world, eid, IsWorker) && Gatherer.targetEid[eid] !== NO_ENTITY) {
+      Gatherer.previousTarget[eid] = Gatherer.targetEid[eid];
+    }
+
     UnitAI.state[eid] = UnitAIState.Attacking;
     UnitAI.targetEid[eid] = closestEid;
     Movement.hasTarget[eid] = 0;
@@ -270,9 +282,44 @@ function processSelfDefense(world: GameWorld, eid: number, allUnits: { readonly 
 /**
  * Clear current attack target and attempt to find a new enemy
  * within sight range (AGGRO_RANGE). If none found, go idle.
+ * Workers auto-return to their previous gathering task if applicable.
  */
 function clearAttackAndSeekNew(world: GameWorld, eid: number): void {
   UnitAI.state[eid] = UnitAIState.Idle;
   UnitAI.targetEid[eid] = NO_ENTITY;
   Movement.hasTarget[eid] = 0;
+
+  // Workers: auto-resume gathering if they had a previous gather target
+  if (hasComponent(world, eid, IsWorker)) {
+    const prevTarget = Gatherer.previousTarget[eid];
+    if (
+      prevTarget !== NO_ENTITY &&
+      prevTarget !== 0 &&
+      entityExists(world, prevTarget) &&
+      !hasComponent(world, prevTarget, IsDead) &&
+      hasComponent(world, prevTarget, IsResource) &&
+      Resource.amount[prevTarget] > 0
+    ) {
+      // Resume gathering from the previous resource node
+      Gatherer.state[eid] = 1; // MOVING_TO_RESOURCE
+      Gatherer.targetEid[eid] = prevTarget;
+      Gatherer.resourceType[eid] = Resource.type[prevTarget];
+
+      Movement.targetX[eid] = Position.x[prevTarget];
+      Movement.targetZ[eid] = Position.z[prevTarget];
+      Movement.hasTarget[eid] = 1;
+
+      UnitAI.state[eid] = UnitAIState.MovingToResource;
+      UnitAI.targetEid[eid] = prevTarget;
+
+      addComponent(world, eid, NeedsPathfinding);
+
+      // Clear previous target so we don't re-trigger
+      Gatherer.previousTarget[eid] = NO_ENTITY;
+      return;
+    }
+
+    // Clear stale previous target
+    Gatherer.previousTarget[eid] = NO_ENTITY;
+  }
 }
