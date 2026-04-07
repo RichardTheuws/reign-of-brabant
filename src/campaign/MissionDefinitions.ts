@@ -510,78 +510,106 @@ const MISSION_4_BINNENDIEZE: MissionDefinition = {
     'een geheim Randstad-archief met de blauwdruk van "Project Gentrificatie".\n\n' +
     'De stad is zwaar bewaakt, maar Den Bosch heeft een geheim: de Binnendieze — een ' +
     'ondergrondse watergang die zich door de hele stad slingert.\n\n' +
-    'Stuur je Sluipers door de tunnels. Vind het archief. Vernietig de bewaking. ' +
-    'En kom levend terug.',
+    'Schakel de bewakingsposten een voor een uit. Neem het zuiden, dan het westen, ' +
+    'en werk je een weg naar het archief in het noordoosten. Verlies niemand.',
 
-  mapSize: 96,
+  mapSize: 144, // Grotere map zodat vijandgroepen ver uit elkaar staan
   startingGold: 0,
   startingGoldAI: 0,
 
   buildings: [
     // No player Town Hall — this is a commando mission
-    // Enemy: archief (TownHall as proxy) + 2 outposts (Barracks)
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall, x: 30, z: 30, complete: true },
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: 10, z: -15, complete: true },
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: -15, z: 20, complete: true },
+    // Archief (TownHall proxy) in NE corner, far from start
+    { factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall, x: 55, z: 55, complete: true },
+    // Outpost Zuid (eerste encounter, dichtbij start)
+    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: -10, z: -30, complete: true },
+    // Outpost West (tweede encounter)
+    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: -40, z: 25, complete: true },
+  ],
+
+  // Tree resources als natuurlijke barrières / "stadsmuren"
+  treeResources: [
+    // Bomenrij zuid (scheidt start van outpost zuid)
+    { x: -25, z: -20, amount: 300 },
+    { x: -20, z: -18, amount: 300 },
+    { x: -15, z: -20, amount: 300 },
+    // Bomenrij midden (scheidt zuid van west sector)
+    { x: -30, z: 0, amount: 300 },
+    { x: -25, z: 2, amount: 300 },
+    { x: -20, z: -2, amount: 300 },
+    { x: -15, z: 1, amount: 300 },
+    // Bomenrij noord (scheidt west van archief sector)
+    { x: 10, z: 30, amount: 300 },
+    { x: 15, z: 32, amount: 300 },
+    { x: 20, z: 28, amount: 300 },
+    { x: 25, z: 30, amount: 300 },
+    // Flankering archief
+    { x: 45, z: 40, amount: 300 },
+    { x: 40, z: 45, amount: 300 },
   ],
 
   units: [
-    // Player: 3 Sluipers (Ranged) + 2 Carnavalvierders (backup)
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -38, z: -38 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -36, z: -38 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -37, z: -36 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -40, z: -36 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -40, z: -38 },
-    // Enemy: patrols and defenders
-    // Outpost 1 guards
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 8, z: -13 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 12, z: -17 },
-    // Outpost 2 guards
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -17, z: 18 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -13, z: 22 },
-    // Archief heavy guard
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 28, z: 28 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 32, z: 28 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 30, z: 32 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 28, z: 32 },
-    // Roaming patrol
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 0, z: 0 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 2, z: 0 },
+    // Player: 5 Sluipers (all ranged, stealth squad)
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -55, z: -55 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -53, z: -55 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -55, z: -53 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -53, z: -53 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -54, z: -51 },
+
+    // === Encounter 1: Outpost Zuid (2 guards, easy) ===
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -12, z: -32 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -8, z: -28 },
+
+    // === Encounter 2: Outpost West (3 guards, medium) ===
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -42, z: 23 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -38, z: 27 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -40, z: 20 },
+
+    // === Encounter 3: Archief (4 heavy guards, hard) ===
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 53, z: 53 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 57, z: 53 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 55, z: 57 },
+    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 52, z: 57 },
   ],
 
   goldMines: [], // No economy in commando mission
 
   objectives: [
     { id: 'destroy-archief', type: 'destroy-building', description: 'Vernietig het Randstad-archief', targetValue: 1, isBonus: false },
-    { id: 'destroy-outposts', type: 'destroy-building', description: 'Vernietig de 2 bevoorradingsdepots', targetValue: 2, isBonus: true },
-    { id: 'keep-team-alive', type: 'have-units-at-end', description: 'Houd je hele commando-team in leven', targetValue: 6, isBonus: true },
+    { id: 'destroy-outposts', type: 'destroy-building', description: 'Vernietig de 2 bewakingsposten', targetValue: 2, isBonus: true },
+    { id: 'keep-team-alive', type: 'have-units-at-end', description: 'Houd alle 5 Sluipers in leven', targetValue: 5, isBonus: true },
   ],
 
   triggers: [
     {
       id: 'start-narrator',
       condition: { type: 'time', seconds: 3 },
-      actions: [{ type: 'message', text: 'De Sint-Janskathedraal torent boven je uit in het maanlicht. Ergens in deze stad liggen de antwoorden.' }],
+      actions: [{ type: 'message', text: 'De Sint-Janskathedraal torent boven je uit in het maanlicht. In de verte zie je de bewakingsposten van de Randstad.' }],
       once: true,
     },
     {
-      id: 'tip-stealth',
-      condition: { type: 'time', seconds: 15 },
-      actions: [{ type: 'message', text: 'Gebruik je Sluipers om vijanden uit te schakelen voordat ze alarm slaan. Neem de depots uit om de verdediging te verzwakken.' }],
+      id: 'tip-approach',
+      condition: { type: 'time', seconds: 12 },
+      actions: [{ type: 'message', text: 'Neem de bewakingsposten een voor een uit. Focus je vuur — vijf Sluipers samen verslaan elke patrouille voordat ze alarm kunnen slaan.' }],
+      once: true,
+    },
+    {
+      id: 'outpost-south-cleared',
+      condition: { type: 'building-destroyed', factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks },
+      actions: [{ type: 'message', text: 'Eerste post uitgeschakeld! De westelijke bewakingspost is je volgende doel. Beweeg je team door de bomenrij.' }],
       once: true,
     },
     {
       id: 'alarm-reinforcements',
-      condition: { type: 'time', seconds: 180 },
+      condition: { type: 'time', seconds: 300 },
       actions: [
-        { type: 'message', text: 'ALARM! De Randstad stuurt versterkingen! Haast je naar het archief!' },
+        { type: 'message', text: 'ALARM! De Randstad heeft jullie gedetecteerd! Extra bewaking onderweg naar het archief!' },
         {
           type: 'spawn-units',
           units: [
-            { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 40, z: 40 },
-            { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 42, z: 38 },
-            { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 38, z: 42 },
-            { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 40, z: 42 },
+            { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 60, z: 50 },
+            { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 50, z: 60 },
+            { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 58, z: 58 },
           ],
         },
       ],
@@ -604,8 +632,8 @@ const MISSION_4_BINNENDIEZE: MissionDefinition = {
   noPlayerTownHall: true,
 
   starThresholds: {
-    threeStarTime: 180,  // 3 min — stealth speed run
-    twoStarTime: 360,    // 6 min
+    threeStarTime: 240,  // 4 min — aggressive clear
+    twoStarTime: 420,    // 7 min
     allBonusesGrants3Stars: true,
   },
 };
