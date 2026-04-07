@@ -1029,8 +1029,8 @@ export class UnitRenderer {
     }
 
     // --- Set position and rotation directly on the model ---
-    // Animated models have feet at ground level; use smaller Y offset than InstancedMesh
-    animUnit.model.position.set(data.x, data.y + 0.1, data.z);
+    // Model origin is at center (feet at ~-1.0); after 1.5x scale, need +1.5 Y offset
+    animUnit.model.position.set(data.x, data.y + 1.5, data.z);
     animUnit.model.rotation.y = facingY;
 
     // --- Sync proxy position (for raycasting) ---
