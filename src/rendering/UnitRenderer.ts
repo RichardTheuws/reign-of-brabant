@@ -7,6 +7,7 @@
 
 import * as THREE from 'three';
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import { clone as skeletonClone } from 'three/addons/utils/SkeletonUtils.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -58,6 +59,56 @@ const UNIT_MODEL_FALLBACKS: Record<string, string> = {
   infantry_3: 'assets/models/v01/brabanders/infantry.glb',
   ranged_3: 'assets/models/v01/brabanders/ranged.glb',
 };
+
+/** Animated model paths — only for (unitType, faction) combos that have skeletal animation. */
+const ANIMATED_MODEL_PATHS: Record<string, string> = {
+  infantry_0: 'assets/models/test/infantry-animated.glb',
+  worker_0: 'assets/models/test/worker-animated.glb',
+};
+
+/** UnitAIState values (mirrored from types/index.ts to avoid circular imports). */
+const enum AnimUnitAIState {
+  Idle = 0,
+  Moving = 1,
+  Attacking = 2,
+  MovingToResource = 3,
+  Gathering = 4,
+  Returning = 5,
+  Dead = 6,
+}
+
+/** Map UnitAIState to animation clip name. */
+function aiStateToAnimName(state: number | undefined): string {
+  switch (state) {
+    case AnimUnitAIState.Moving:
+    case AnimUnitAIState.MovingToResource:
+    case AnimUnitAIState.Returning:
+      return 'Walk';
+    case AnimUnitAIState.Attacking:
+      return 'Attack';
+    case AnimUnitAIState.Dead:
+      return 'Death';
+    case AnimUnitAIState.Idle:
+    case AnimUnitAIState.Gathering:
+    default:
+      return 'Idle';
+  }
+}
+
+/** Template loaded once per (unitType, faction) that has animations. */
+interface AnimatedTemplate {
+  scene: THREE.Group;
+  clips: THREE.AnimationClip[];
+}
+
+/** Per animated unit instance. */
+interface AnimatedUnit {
+  model: THREE.Group;
+  mixer: THREE.AnimationMixer;
+  actions: Map<string, THREE.AnimationAction>;
+  currentAnim: string;
+  prevAnim: string;
+}
 
 /** Faction team colors: applied as a strong tint to unit materials. */
 const FACTION_TINTS: Record<number, THREE.Color> = {
@@ -190,6 +241,11 @@ export class UnitRenderer {
   private hitProxyGeo: THREE.BoxGeometry;
   private hitProxyMat: THREE.MeshBasicMaterial;
 
+  /** Animated model templates loaded once per (unitType, faction). */
+  private animatedTemplates = new Map<ModelCacheKey, AnimatedTemplate>();
+  /** Per-entity animated unit instances (eid -> AnimatedUnit). */
+  private animatedUnits = new Map<number, AnimatedUnit>();
+
   constructor(parentGroup: THREE.Group) {
     this.group = parentGroup;
 
@@ -273,6 +329,40 @@ export class UnitRenderer {
       }),
     );
     await Promise.all(promises);
+
+    // Load animated models (skeletal animation GLBs)
+    const animEntries = Object.entries(ANIMATED_MODEL_PATHS);
+    const animPromises = animEntries.map(([key, path]) =>
+      this.loader.loadAsync(path).then((gltf: GLTF) => {
+        const cacheKey = key as ModelCacheKey;
+        const root = gltf.scene;
+
+        // Scale animated models to match v02 static model size
+        const scaleFactor = 1.5;
+        root.scale.set(scaleFactor, scaleFactor, scaleFactor);
+        root.updateMatrixWorld(true);
+
+        root.traverse((child) => {
+          if ((child as THREE.Mesh).isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = false;
+          }
+        });
+
+        this.animatedTemplates.set(cacheKey, {
+          scene: root,
+          clips: gltf.animations,
+        });
+
+        console.log(
+          `[UnitRenderer] Loaded animated model "${key}" with ${gltf.animations.length} clips:`,
+          gltf.animations.map((c) => c.name),
+        );
+      }).catch((err) => {
+        console.warn(`[UnitRenderer] Failed to load animated model "${key}":`, err);
+      }),
+    );
+    await Promise.all(animPromises);
   }
 
   /** Create a simple colored box as fallback when GLB loading fails. */
@@ -367,6 +457,11 @@ export class UnitRenderer {
   // Instance management
   // -----------------------------------------------------------------------
 
+  /** Check if a given key has an animated template available. */
+  private hasAnimated(key: ModelCacheKey): boolean {
+    return this.animatedTemplates.has(key);
+  }
+
   /**
    * Create a visible unit instance for an ECS entity.
    * Returns a lightweight proxy Object3D so the caller can set initial position,
@@ -376,6 +471,13 @@ export class UnitRenderer {
     if (this.proxies.has(eid)) return this.proxies.get(eid)!;
 
     const key: ModelCacheKey = `${type}_${factionId}`;
+
+    // --- Animated path: individual SkinnedMesh per unit ---
+    if (this.hasAnimated(key)) {
+      return this.addAnimatedUnit(eid, key);
+    }
+
+    // --- Static path: InstancedMesh batching ---
     const bucket = this.buckets.get(key);
     if (!bucket) {
       console.warn(`[UnitRenderer] No InstancedMesh bucket for key "${key}"`);
@@ -424,46 +526,176 @@ export class UnitRenderer {
     return proxy;
   }
 
+  /**
+   * Add an animated unit: clone the template scene, set up AnimationMixer,
+   * create proxy and blob shadow.
+   */
+  private addAnimatedUnit(eid: number, key: ModelCacheKey): THREE.Object3D | null {
+    const template = this.animatedTemplates.get(key);
+    if (!template) return null;
+
+    // Deep clone the skinned mesh scene (preserves skeleton bindings)
+    const model = skeletonClone(template.scene) as THREE.Group;
+    model.name = `anim_unit_${eid}`;
+    model.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = false;
+        // Clone materials so damage flash doesn't affect all units
+        const mesh = child as THREE.Mesh;
+        if (Array.isArray(mesh.material)) {
+          mesh.material = mesh.material.map((m) => m.clone());
+        } else {
+          mesh.material = mesh.material.clone();
+        }
+      }
+    });
+
+    this.group.add(model);
+
+    // Create AnimationMixer and set up actions
+    const mixer = new THREE.AnimationMixer(model);
+    const actions = new Map<string, THREE.AnimationAction>();
+
+    for (const clip of template.clips) {
+      const action = mixer.clipAction(clip);
+
+      // Attack and Death play once, others loop
+      if (clip.name === 'Attack' || clip.name === 'Death') {
+        action.setLoop(THREE.LoopOnce, 1);
+        action.clampWhenFinished = true;
+      } else {
+        action.setLoop(THREE.LoopRepeat, Infinity);
+      }
+
+      actions.set(clip.name, action);
+    }
+
+    // Start with Idle
+    const idleAction = actions.get('Idle');
+    if (idleAction) {
+      idleAction.play();
+    }
+
+    const animUnit: AnimatedUnit = {
+      model,
+      mixer,
+      actions,
+      currentAnim: 'Idle',
+      prevAnim: 'Idle',
+    };
+    this.animatedUnits.set(eid, animUnit);
+
+    // Listen for Attack finished to return to Idle
+    mixer.addEventListener('finished', (e: THREE.Event & { action?: THREE.AnimationAction }) => {
+      const finishedAction = e.action;
+      if (!finishedAction) return;
+      const unit = this.animatedUnits.get(eid);
+      if (!unit) return;
+
+      // Find the clip name that finished
+      const clipName = finishedAction.getClip().name;
+      if (clipName === 'Attack') {
+        // Return to Idle after attack
+        this.crossfadeAnimation(unit, 'Idle');
+      }
+      // Death stays clamped (clampWhenFinished)
+    });
+
+    // Create proxy for raycasting
+    const proxy = new THREE.Mesh(this.hitProxyGeo, this.hitProxyMat);
+    proxy.name = `unit_${eid}`;
+    proxy.userData.eid = eid;
+    this.proxies.set(eid, proxy);
+    this.group.add(proxy);
+
+    // Create blob shadow
+    const shadow = new THREE.Mesh(this.blobShadowGeo, this.blobShadowMat);
+    shadow.renderOrder = 1;
+    this.blobShadows.set(eid, shadow);
+    this.group.add(shadow);
+
+    // Track the key for this entity (not in buckets, but we still track it)
+    this.entityBucketKey.set(eid, key);
+
+    return proxy;
+  }
+
+  /**
+   * Crossfade from the current animation to a new one.
+   */
+  private crossfadeAnimation(unit: AnimatedUnit, targetAnim: string): void {
+    if (unit.currentAnim === targetAnim) return;
+
+    const currentAction = unit.actions.get(unit.currentAnim);
+    const targetAction = unit.actions.get(targetAnim);
+    if (!targetAction) return;
+
+    unit.prevAnim = unit.currentAnim;
+    unit.currentAnim = targetAnim;
+
+    // Reset target action if it was a LoopOnce that already finished
+    targetAction.reset();
+    targetAction.play();
+    targetAction.fadeIn(0.2);
+
+    if (currentAction) {
+      currentAction.fadeOut(0.2);
+    }
+  }
+
   /** Remove and dispose the mesh instance of a dead / removed entity. */
   removeUnit(eid: number): void {
     const key = this.entityBucketKey.get(eid);
     if (!key) return;
 
-    const bucket = this.buckets.get(key);
-    if (bucket) {
-      const index = bucket.entityToIndex.get(eid);
-      if (index !== undefined) {
-        // Swap-remove: move the last active instance into this slot
-        const lastIndex = bucket.activeCount - 1;
+    // --- Animated path cleanup ---
+    const animUnit = this.animatedUnits.get(eid);
+    if (animUnit) {
+      animUnit.mixer.stopAllAction();
+      animUnit.mixer.uncacheRoot(animUnit.model);
+      this.group.remove(animUnit.model);
+      this.disposeObject(animUnit.model);
+      animUnit.actions.clear();
+      this.animatedUnits.delete(eid);
+    } else {
+      // --- Static (InstancedMesh) path cleanup ---
+      const bucket = this.buckets.get(key);
+      if (bucket) {
+        const index = bucket.entityToIndex.get(eid);
+        if (index !== undefined) {
+          // Swap-remove: move the last active instance into this slot
+          const lastIndex = bucket.activeCount - 1;
 
-        if (index !== lastIndex) {
-          // Copy last instance's matrix and color into the removed slot
-          const lastEid = bucket.indexToEntity.get(lastIndex);
-          if (lastEid !== undefined) {
-            // Copy matrix
-            bucket.mesh.getMatrixAt(lastIndex, this._mat4);
-            bucket.mesh.setMatrixAt(index, this._mat4);
+          if (index !== lastIndex) {
+            // Copy last instance's matrix and color into the removed slot
+            const lastEid = bucket.indexToEntity.get(lastIndex);
+            if (lastEid !== undefined) {
+              // Copy matrix
+              bucket.mesh.getMatrixAt(lastIndex, this._mat4);
+              bucket.mesh.setMatrixAt(index, this._mat4);
 
-            // Copy color
-            if (bucket.mesh.instanceColor) {
-              bucket.mesh.getColorAt(lastIndex, this._color);
-              bucket.mesh.setColorAt(index, this._color);
+              // Copy color
+              if (bucket.mesh.instanceColor) {
+                bucket.mesh.getColorAt(lastIndex, this._color);
+                bucket.mesh.setColorAt(index, this._color);
+              }
+
+              // Update mappings for the swapped entity
+              bucket.entityToIndex.set(lastEid, index);
+              bucket.indexToEntity.set(index, lastEid);
             }
-
-            // Update mappings for the swapped entity
-            bucket.entityToIndex.set(lastEid, index);
-            bucket.indexToEntity.set(index, lastEid);
           }
-        }
 
-        // Remove the now-vacated last slot
-        bucket.entityToIndex.delete(eid);
-        bucket.indexToEntity.delete(lastIndex);
-        bucket.instanceScales.delete(eid);
-        bucket.activeCount--;
-        bucket.mesh.count = bucket.activeCount;
-        bucket.mesh.instanceMatrix.needsUpdate = true;
-        if (bucket.mesh.instanceColor) bucket.mesh.instanceColor.needsUpdate = true;
+          // Remove the now-vacated last slot
+          bucket.entityToIndex.delete(eid);
+          bucket.indexToEntity.delete(lastIndex);
+          bucket.instanceScales.delete(eid);
+          bucket.activeCount--;
+          bucket.mesh.count = bucket.activeCount;
+          bucket.mesh.instanceMatrix.needsUpdate = true;
+          if (bucket.mesh.instanceColor) bucket.mesh.instanceColor.needsUpdate = true;
+        }
       }
     }
 
@@ -503,7 +735,7 @@ export class UnitRenderer {
    * Called once per frame by RenderSyncSystem.
    *
    * @param dt Delta time in seconds.
-   * @param positions - array of { eid, x, y, z, ry, selected, isIdle, targetX?, targetZ? }
+   * @param positions - array of { eid, x, y, z, ry, selected, isIdle, aiState?, targetX?, targetZ? }
    */
   update(
     dt: number,
@@ -515,6 +747,7 @@ export class UnitRenderer {
       ry: number;
       selected: boolean;
       isIdle?: boolean;
+      aiState?: number;
       targetX?: number;
       targetZ?: number;
     }>,
@@ -549,6 +782,15 @@ export class UnitRenderer {
     for (const data of positions) {
       const key = this.entityBucketKey.get(data.eid);
       if (!key) continue;
+
+      // --- Animated unit path ---
+      const animUnit = this.animatedUnits.get(data.eid);
+      if (animUnit) {
+        this.updateAnimatedUnit(dt, data, animUnit);
+        continue;
+      }
+
+      // --- Static (InstancedMesh) path ---
       const bucket = this.buckets.get(key);
       if (!bucket) continue;
       const instanceIndex = bucket.entityToIndex.get(data.eid);
@@ -666,12 +908,106 @@ export class UnitRenderer {
   }
 
   /**
+   * Update a single animated unit: advance mixer, select animation, set position/rotation.
+   */
+  private updateAnimatedUnit(
+    dt: number,
+    data: {
+      eid: number; x: number; y: number; z: number; ry: number;
+      selected: boolean; isIdle?: boolean; aiState?: number;
+      targetX?: number; targetZ?: number;
+    },
+    animUnit: AnimatedUnit,
+  ): void {
+    // Advance animation mixer
+    animUnit.mixer.update(dt);
+
+    // --- Select animation based on AI state ---
+    const targetAnim = aiStateToAnimName(data.aiState);
+    if (targetAnim !== animUnit.currentAnim) {
+      // Don't interrupt Death animation
+      if (animUnit.currentAnim !== 'Death') {
+        this.crossfadeAnimation(animUnit, targetAnim);
+      }
+    }
+
+    // --- Facing direction ---
+    let facingY = data.ry;
+    if (data.targetX !== undefined && data.targetZ !== undefined) {
+      this._vec.set(data.targetX - data.x, 0, data.targetZ - data.z);
+      if (this._vec.lengthSq() > 0.01) {
+        facingY = Math.atan2(this._vec.x, this._vec.z);
+      }
+    }
+
+    // --- Set position and rotation directly on the model ---
+    // Animated models have feet at ground level; use smaller Y offset than InstancedMesh
+    animUnit.model.position.set(data.x, data.y + 0.1, data.z);
+    animUnit.model.rotation.y = facingY;
+
+    // --- Sync proxy position (for raycasting) ---
+    const proxy = this.proxies.get(data.eid);
+    if (proxy) {
+      proxy.position.set(data.x, data.y + 1.0, data.z);
+      proxy.rotation.y = facingY;
+    }
+
+    // --- Sync blob shadow position ---
+    const shadow = this.blobShadows.get(data.eid);
+    if (shadow) {
+      shadow.position.set(data.x, data.y + 0.05, data.z);
+    }
+
+    // --- Damage flash / selection highlight for animated units ---
+    const isFlashing = this.damageFlashTimers.has(data.eid);
+    this.setAnimatedUnitEmissive(animUnit, isFlashing, data.selected);
+  }
+
+  /**
+   * Set emissive color on all materials of an animated unit model
+   * for damage flash and selection highlight effects.
+   */
+  private setAnimatedUnitEmissive(
+    animUnit: AnimatedUnit,
+    isFlashing: boolean,
+    isSelected: boolean,
+  ): void {
+    animUnit.model.traverse((child) => {
+      if (!(child as THREE.Mesh).isMesh) return;
+      const mesh = child as THREE.Mesh;
+      const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      for (const mat of mats) {
+        if ('emissive' in mat) {
+          const stdMat = mat as THREE.MeshStandardMaterial;
+          if (isFlashing) {
+            stdMat.emissive.copy(DAMAGE_FLASH_COLOR);
+            stdMat.emissiveIntensity = 0.8;
+          } else if (isSelected) {
+            stdMat.emissive.copy(SELECTION_COLOR);
+            stdMat.emissiveIntensity = 0.3;
+          } else {
+            stdMat.emissive.setScalar(0);
+            stdMat.emissiveIntensity = 0;
+          }
+        }
+      }
+    });
+  }
+
+  /**
    * Trigger a damage flash on a unit (called when HP decreases).
    */
   triggerDamageFlash(eid: number): void {
     this.damageFlashTimers.set(eid, DAMAGE_FLASH_DURATION);
 
-    // Apply flash color immediately
+    // Animated unit: apply emissive flash immediately
+    const animUnit = this.animatedUnits.get(eid);
+    if (animUnit) {
+      this.setAnimatedUnitEmissive(animUnit, true, false);
+      return;
+    }
+
+    // Static unit: apply flash color immediately
     const key = this.entityBucketKey.get(eid);
     if (!key) return;
     const bucket = this.buckets.get(key);
@@ -700,6 +1036,22 @@ export class UnitRenderer {
 
   /** Dispose all GPU resources held by this renderer. */
   destroy(): void {
+    // Dispose all animated unit instances
+    for (const [, animUnit] of this.animatedUnits) {
+      animUnit.mixer.stopAllAction();
+      animUnit.mixer.uncacheRoot(animUnit.model);
+      this.group.remove(animUnit.model);
+      this.disposeObject(animUnit.model);
+      animUnit.actions.clear();
+    }
+    this.animatedUnits.clear();
+
+    // Dispose animated templates
+    for (const [, template] of this.animatedTemplates) {
+      this.disposeObject(template.scene);
+    }
+    this.animatedTemplates.clear();
+
     // Dispose all InstancedMesh buckets
     for (const [, bucket] of this.buckets) {
       this.group.remove(bucket.mesh);

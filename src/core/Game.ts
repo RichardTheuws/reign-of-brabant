@@ -1930,7 +1930,8 @@ export class Game {
     // Build unit position data for UnitRenderer (includes idle bob, damage flash)
     const unitPositions: Array<{
       eid: number; x: number; y: number; z: number; ry: number;
-      selected: boolean; isIdle?: boolean; targetX?: number; targetZ?: number;
+      selected: boolean; isIdle?: boolean; aiState?: number;
+      targetX?: number; targetZ?: number;
     }> = [];
 
     for (const [eid, mesh] of this.entityMeshMap) {
@@ -1946,6 +1947,7 @@ export class Game {
             ry: Rotation.y[eid] || 0,
             selected: Selected.by[eid] === 0,
             isIdle,
+            aiState: UnitAI.state[eid],
             targetX: hasTarget ? Movement.targetX[eid] : undefined,
             targetZ: hasTarget ? Movement.targetZ[eid] : undefined,
           });
