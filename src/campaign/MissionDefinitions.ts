@@ -575,8 +575,8 @@ const MISSION_4_BINNENDIEZE: MissionDefinition = {
   goldMines: [], // No economy in commando mission
 
   objectives: [
-    { id: 'destroy-archief', type: 'destroy-building', description: 'Vernietig het Randstad-archief', targetValue: 1, isBonus: false },
-    { id: 'destroy-outposts', type: 'destroy-building', description: 'Vernietig de 2 bewakingsposten', targetValue: 2, isBonus: true },
+    // Primary: destroy ALL 3 buildings (2 outposts + archief). Victory fires via trigger when TownHall dies.
+    { id: 'destroy-all', type: 'destroy-building', description: 'Vernietig het archief en beide bewakingsposten', targetValue: 3, isBonus: false },
     { id: 'keep-team-alive', type: 'have-units-at-end', description: 'Houd alle 5 Sluipers in leven', targetValue: 5, isBonus: true },
   ],
 
