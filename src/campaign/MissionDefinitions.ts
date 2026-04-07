@@ -281,12 +281,12 @@ const MISSION_2_EERSTE_SCHERMUTSEL: MissionDefinition = {
 // Missie 3: "De Verdediging"
 // ---------------------------------------------------------------------------
 
-function createWaveUnits(count: number, type: UnitTypeId, baseX: number, baseZ: number, spread: number): MissionUnitSpawn[] {
+function createWaveUnits(count: number, type: UnitTypeId, baseX: number, baseZ: number, spread: number, faction: FactionId = FactionId.AI): MissionUnitSpawn[] {
   const units: MissionUnitSpawn[] = [];
   for (let i = 0; i < count; i++) {
     const angle = (i / count) * Math.PI * 2;
     units.push({
-      factionId: FactionId.AI,
+      factionId: faction,
       unitType: type,
       x: baseX + Math.cos(angle) * spread,
       z: baseZ + Math.sin(angle) * spread,
@@ -768,8 +768,8 @@ const MISSION_5_HEUVELLAND: MissionDefinition = {
       index: 0,
       spawnTime: 105,
       units: [
-        ...createWaveUnits(6, UnitTypeId.Infantry, LIMBURG_SPAWN_X, LIMBURG_SPAWN_Z, 4),
-        ...createWaveUnits(2, UnitTypeId.Ranged, LIMBURG_SPAWN_X + 3, LIMBURG_SPAWN_Z + 3, 2),
+        ...createWaveUnits(6, UnitTypeId.Infantry, LIMBURG_SPAWN_X, LIMBURG_SPAWN_Z, 4, FactionId.Limburgers),
+        ...createWaveUnits(2, UnitTypeId.Ranged, LIMBURG_SPAWN_X + 3, LIMBURG_SPAWN_Z + 3, 2, FactionId.Limburgers),
       ],
       message: 'Limburgse Test 1 van 3',
     },
@@ -778,10 +778,10 @@ const MISSION_5_HEUVELLAND: MissionDefinition = {
       index: 1,
       spawnTime: 270,
       units: [
-        ...createWaveUnits(6, UnitTypeId.Infantry, LIMBURG_SPAWN_X, LIMBURG_SPAWN_Z - 5, 4),
-        ...createWaveUnits(4, UnitTypeId.Ranged, LIMBURG_SPAWN_X, LIMBURG_SPAWN_Z + 5, 3),
+        ...createWaveUnits(6, UnitTypeId.Infantry, LIMBURG_SPAWN_X, LIMBURG_SPAWN_Z - 5, 4, FactionId.Limburgers),
+        ...createWaveUnits(4, UnitTypeId.Ranged, LIMBURG_SPAWN_X, LIMBURG_SPAWN_Z + 5, 3, FactionId.Limburgers),
         // Flank from south
-        ...createWaveUnits(2, UnitTypeId.Infantry, 0, LIMBURG_SPAWN_X, 2),
+        ...createWaveUnits(2, UnitTypeId.Infantry, 0, LIMBURG_SPAWN_X, 2, FactionId.Limburgers),
       ],
       message: 'Limburgse Test 2 van 3',
     },
@@ -790,8 +790,8 @@ const MISSION_5_HEUVELLAND: MissionDefinition = {
       index: 2,
       spawnTime: 450,
       units: [
-        ...createWaveUnits(10, UnitTypeId.Infantry, LIMBURG_SPAWN_X, LIMBURG_SPAWN_Z, 6),
-        ...createWaveUnits(5, UnitTypeId.Ranged, LIMBURG_SPAWN_X + 5, LIMBURG_SPAWN_Z, 4),
+        ...createWaveUnits(10, UnitTypeId.Infantry, LIMBURG_SPAWN_X, LIMBURG_SPAWN_Z, 6, FactionId.Limburgers),
+        ...createWaveUnits(5, UnitTypeId.Ranged, LIMBURG_SPAWN_X + 5, LIMBURG_SPAWN_Z, 4, FactionId.Limburgers),
       ],
       message: 'FINALE TEST — De Mijnbaas!',
     },
