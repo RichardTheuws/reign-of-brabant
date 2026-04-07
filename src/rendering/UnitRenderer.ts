@@ -62,8 +62,22 @@ const UNIT_MODEL_FALLBACKS: Record<string, string> = {
 
 /** Animated model paths — only for (unitType, faction) combos that have skeletal animation. */
 const ANIMATED_MODEL_PATHS: Record<string, string> = {
-  infantry_0: 'assets/models/test/infantry-animated.glb',
-  worker_0: 'assets/models/test/worker-animated.glb',
+  // Brabanders
+  worker_0: 'assets/models/v03/brabanders/worker.glb',
+  infantry_0: 'assets/models/v03/brabanders/infantry.glb',
+  ranged_0: 'assets/models/v03/brabanders/ranged.glb',
+  // Randstad
+  worker_1: 'assets/models/v03/randstad/worker.glb',
+  infantry_1: 'assets/models/v03/randstad/infantry.glb',
+  ranged_1: 'assets/models/v03/randstad/ranged.glb',
+  // Limburgers
+  worker_2: 'assets/models/v03/limburgers/worker.glb',
+  infantry_2: 'assets/models/v03/limburgers/infantry.glb',
+  ranged_2: 'assets/models/v03/limburgers/ranged.glb',
+  // Belgen
+  worker_3: 'assets/models/v03/belgen/worker.glb',
+  infantry_3: 'assets/models/v03/belgen/infantry.glb',
+  ranged_3: 'assets/models/v03/belgen/ranged.glb',
 };
 
 /** UnitAIState values (mirrored from types/index.ts to avoid circular imports). */
