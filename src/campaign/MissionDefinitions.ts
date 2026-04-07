@@ -97,6 +97,8 @@ export interface MissionDefinition {
     /** All bonuses completed also grants 3 stars regardless of time */
     readonly allBonusesGrants3Stars: boolean;
   };
+  /** If true, mission has no player TownHall (commando missions). Skips TownHall defeat check. */
+  readonly noPlayerTownHall?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -598,6 +600,8 @@ const MISSION_4_BINNENDIEZE: MissionDefinition = {
 
   waves: [],
   hasAIProduction: false,
+
+  noPlayerTownHall: true,
 
   starThresholds: {
     threeStarTime: 180,  // 3 min — stealth speed run
@@ -2856,6 +2860,7 @@ const MISSION_B1_EERSTE_FRITUUR: MissionDefinition = {
 // ---------------------------------------------------------------------------
 
 const MISSION_B2_CHOCOLADE_VERDRAG: MissionDefinition = {
+  // NOTE: hasAIProduction false — no AI barracks, reinforcements come via wave triggers
   id: 'belgen-2-het-chocolade-verdrag',
   campaignId: 'belgen',
   missionIndex: 1,
@@ -3030,7 +3035,7 @@ const MISSION_B2_CHOCOLADE_VERDRAG: MissionDefinition = {
     },
   ],
 
-  hasAIProduction: true,
+  hasAIProduction: false,
 
   starThresholds: {
     threeStarTime: 600,   // 10 min
@@ -3246,7 +3251,7 @@ const MISSION_B3_COMMISSIEVERGADERING: MissionDefinition = {
     },
   ],
 
-  hasAIProduction: true,
+  hasAIProduction: false,
 
   starThresholds: {
     threeStarTime: 720,    // 12 min
@@ -3879,7 +3884,7 @@ const LIMBURGERS_MISSION_4_VERRASSINGSAANVAL: MissionDefinition = {
   ],
 
   waves: [],
-  hasAIProduction: true,
+  hasAIProduction: false,
 
   starThresholds: {
     threeStarTime: 600,   // 10 min
@@ -4520,7 +4525,7 @@ const RANDSTAD_MISSION_3_VIJANDIGE_OVERNAME: MissionDefinition = {
   ],
 
   waves: [],
-  hasAIProduction: true,
+  hasAIProduction: false,
 
   starThresholds: {
     threeStarTime: 540,  // 9 min
@@ -4935,7 +4940,7 @@ const RANDSTAD_MISSION_5_BOARDROOM_BESLISSING: MissionDefinition = {
   ],
 
   waves: [],
-  hasAIProduction: true,
+  hasAIProduction: false,
 
   starThresholds: {
     threeStarTime: 720,   // 12 min

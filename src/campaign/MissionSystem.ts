@@ -399,8 +399,8 @@ export class MissionSystem {
     if (this.victoryTriggered || this.defeatTriggered) return;
     if (!this.callbacks) return;
 
-    // Never grant victory if TownHall is dead (defeat takes priority)
-    if (!this.callbacks.isPlayerTownHallAlive()) return;
+    // Never grant victory if TownHall is dead (defeat takes priority) — skip for commando missions
+    if (!this.mission?.noPlayerTownHall && !this.callbacks.isPlayerTownHallAlive()) return;
 
     const requiredObjectives = this.objectiveStates.filter(s => !s.objective.isBonus);
     const allRequiredComplete = requiredObjectives.length > 0 && requiredObjectives.every(s => s.completed);
@@ -448,8 +448,8 @@ export class MissionSystem {
     if (!this.callbacks || !this.mission) return;
     if (this.defeatTriggered || this.victoryTriggered) return;
 
-    // TownHall destroyed = defeat (missionIndex > 0 to skip tutorial mission)
-    if (this.mission.missionIndex > 0 && !this.callbacks.isPlayerTownHallAlive()) {
+    // TownHall destroyed = defeat (skip for tutorial and commando missions without TownHall)
+    if (this.mission.missionIndex > 0 && !this.mission.noPlayerTownHall && !this.callbacks.isPlayerTownHallAlive()) {
       this.defeatTriggered = true;
       this.victoryPendingSince = -1; // Cancel any pending victory
       this.callbacks.triggerDefeat();
