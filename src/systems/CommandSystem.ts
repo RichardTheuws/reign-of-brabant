@@ -9,7 +9,7 @@
  * via the public `queueCommand()` method.
  */
 
-import { query, addComponent, hasComponent } from 'bitecs';
+import { query, addComponent, hasComponent, entityExists } from 'bitecs';
 import {
   Position,
   Movement,
@@ -166,6 +166,9 @@ function handleMove(world: GameWorld, units: number[], cmd: MoveCommand): void {
 }
 
 function handleAttack(world: GameWorld, units: number[], cmd: AttackCommand): void {
+  // Validate target still exists (may have been destroyed between queue and execution)
+  if (!entityExists(world, cmd.targetEid)) return;
+
   for (const eid of units) {
     UnitAI.state[eid] = UnitAIState.Attacking;
     UnitAI.targetEid[eid] = cmd.targetEid;
@@ -194,6 +197,9 @@ function handleAttack(world: GameWorld, units: number[], cmd: AttackCommand): vo
 }
 
 function handleGather(world: GameWorld, units: number[], cmd: GatherCommand): void {
+  // Validate target resource still exists
+  if (!entityExists(world, cmd.targetEid)) return;
+
   for (const eid of units) {
     // Only workers can gather
     if (!hasComponent(world, eid, IsWorker)) continue;

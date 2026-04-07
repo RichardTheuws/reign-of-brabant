@@ -25,6 +25,7 @@ import {
   Rotation,
   Selected,
   GezeligheidBonus,
+  RallyPoint,
 } from '../ecs/components';
 import { IsBuilding, IsUnit, IsWorker, IsDead } from '../ecs/tags';
 import { playerState } from '../core/PlayerState';
@@ -36,6 +37,7 @@ import {
   NO_PRODUCTION,
   NO_ENTITY,
   CARRY_CAPACITY,
+  MAP_SIZE,
 } from '../types/index';
 import { onRandstadActionCompleted } from './BureaucracySystem';
 import { ceoProductionBuff } from './HeroSystem';
@@ -208,11 +210,12 @@ function spawnUnit(
 
   const eid = addEntity(world);
 
-  // Position at rally point (offset from building)
+  // Position at rally point (offset from building), clamped to map bounds
   addComponent(world, eid, Position);
-  Position.x[eid] = Position.x[buildingEid] + RALLY_OFFSET;
+  const halfMap = MAP_SIZE / 2;
+  Position.x[eid] = Math.max(-halfMap + 1, Math.min(halfMap - 1, Position.x[buildingEid] + RALLY_OFFSET));
   Position.y[eid] = Position.y[buildingEid];
-  Position.z[eid] = Position.z[buildingEid] + RALLY_OFFSET;
+  Position.z[eid] = Math.max(-halfMap + 1, Math.min(halfMap - 1, Position.z[buildingEid] + RALLY_OFFSET));
 
   // Health
   addComponent(world, eid, Health);
@@ -281,6 +284,22 @@ function spawnUnit(
     Gatherer.carryCapacity[eid] = template.carryCapacity;
     Gatherer.carrying[eid] = 0;
     Gatherer.targetEid[eid] = NO_ENTITY;
+  }
+
+  // Send unit to rally point if building has a custom rally point set
+  if (hasComponent(world, buildingEid, RallyPoint)) {
+    const rx = RallyPoint.x[buildingEid];
+    const rz = RallyPoint.z[buildingEid];
+    // Check if rally point differs from the default offset position
+    const defaultRallyX = Position.x[buildingEid] + 3;
+    const defaultRallyZ = Position.z[buildingEid];
+    const isCustomRally = Math.abs(rx - defaultRallyX) > 0.5 || Math.abs(rz - defaultRallyZ) > 0.5;
+    if (isCustomRally) {
+      Movement.targetX[eid] = rx;
+      Movement.targetZ[eid] = rz;
+      Movement.hasTarget[eid] = 1;
+      UnitAI.state[eid] = UnitAIState.Moving;
+    }
   }
 
   // Emit event

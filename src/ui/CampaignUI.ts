@@ -69,10 +69,9 @@ const FACTION_CAMPAIGN_TABS: FactionCampaignTab[] = [
     id: 'randstad',
     label: 'Randstad',
     icon: '\u{1F4BC}',
-    subtitle: 'De Grote Fusie',
-    available: false,
-    missionCount: 0,
-    comingSoonLabel: 'Binnenkort beschikbaar',
+    subtitle: 'De Grote Overname',
+    available: true,
+    missionCount: 5,
   },
 ];
 

@@ -218,7 +218,8 @@ class PlayerStateManager {
   getBureaucracyModifier(factionId: number): number {
     if (factionId !== FactionId.Randstad) return 1.0;
     const stacks = this.players[factionId].efficiencyStacks;
-    return BUREAUCRACY_BASE_MULTIPLIER - stacks * BUREAUCRACY_STACK_BONUS;
+    // Clamp to minimum 0.6x to prevent zero/negative production speed
+    return Math.max(0.6, BUREAUCRACY_BASE_MULTIPLIER - stacks * BUREAUCRACY_STACK_BONUS);
   }
 }
 

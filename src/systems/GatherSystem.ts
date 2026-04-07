@@ -118,7 +118,7 @@ function processGathering(world: GameWorld, eid: number, dt: number): void {
   const actual = Math.min(harvestAmount, remaining, available);
 
   Gatherer.carrying[eid] += actual;
-  Resource.amount[targetEid] -= actual;
+  Resource.amount[targetEid] = Math.max(0, Resource.amount[targetEid] - actual);
 
   // Full capacity -- head to town hall
   if (Gatherer.carrying[eid] >= capacity) {

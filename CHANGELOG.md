@@ -1,5 +1,56 @@
 # Changelog
 
+## [0.17.0] - 2026-04-07
+
+### Added
+- **Randstad Campaign — "De Grote Overname"**: 5 missions teaching Randstad mechanics progressively
+  - R1: "De Eerste Vergadering" — Tutorial: gather PowerPoints, recruit Stagiairs, survive Brabander protest
+  - R2: "Het Consultancy Rapport" — Build Vergaderzaal, train Managers/Consultants, destroy Brabander outpost
+  - R3: "De Vijandige Overname" — Two-front attack on Limburger mining operations, AI production enabled
+  - R4: "Gentrificatie" — Survive 4 waves of Belgen counter-attacks while building up the corporate district
+  - R5: "De Boardroom Beslissing" — Epic finale: defeat all 3 factions (Brabanders, Limburgers, Belgen) on a 256-size map
+- **Randstad campaign tab active**: Previously showed "SOON" badge, now fully playable with 5 missions
+
+## [0.16.3] - 2026-04-07
+
+### Added
+- **10 unique Meshy 3D models** for Limburgers and Belgen factions — faction-specific unit meshes replace Brabanders fallback models
+- **Auto-defend system**: Workers self-defend when enemies enter SELF_DEFENSE_RANGE (6 units). Idle units auto-aggro within AGGRO_RANGE (12 units). Damaged units retaliate against their attacker
+- **Camera intro**: Cinematic zoom arc at mission start (3.5s duration)
+- **Pause menu**: ESC hotkey with hotkey reference overlay
+- **Drag box multi-select**: Click-and-drag rectangle selection for units
+- **Dynamic production panel**: Per-building/faction production buttons and queue display with queued items count
+- **Fullscreen tip**: Shown on game start to encourage fullscreen mode
+- **Meshy parallel generation script**: `scripts/meshy_parallel_generate.py` for batch 3D model generation
+- **Victory confirmation delay**: 0.5s delay before victory triggers, prevents same-frame victory/objective-update race condition
+- **Multi-faction campaign support**: MissionSystem detects player faction, campaigns work for all 4 factions
+- **Faction music themes**: MusicSystem supports themes for all 4 factions
+
+### Changed
+- **Terrain overhaul**: 256 segments (was 128), height 2.0, slope-based color blending, spawn area flattening for building placement
+- **Water rendering**: Depth gradient coloring, increased metalness, 3-wave animation system
+- **-ansen purge**: 40+ occurrences of fake "-ansen" dialect suffix removed across 12 files — replaced with authentic Brabants dialect
+- **Faction-aware unit system**: Unit names, costs, and production options vary per faction in HUD and production panels
+- **Building/prop Y-offsets**: Fixed sinking into terrain — correct per-model vertical offsets applied
+- **Selection renderer**: Updated selection circles and health bars for new terrain heights
+- **Unit renderer**: Faction-specific model paths, improved instanced rendering for 4-faction support
+- **Design bible**: Updated to v0.16.3 with current game state
+
+### Fixed
+- **Victory/defeat race condition**: Guard on required objectives count (must be > 0) prevents instant victory on missions with no required objectives
+- **Victory on incomplete objectives**: handleVictory() now re-evaluates objectives and blocks if any required objective is incomplete
+- **Defeat on tutorial mission**: TownHall destruction defeat check skipped for missionIndex 0 (tutorial)
+- **Campaign faction detection**: CampaignUI and MissionSystem correctly identify player faction for non-Brabanders campaigns
+
+## [0.11.0] - 2026-04-07
+
+### Added
+- **Map template selector in skirmish menu**: Players choose from 4 battlefield layouts before starting — Klassiek (classic), Kruispunt (crossroads), Eilanden (islands), Arena. Selection flows from menu through to MapGenerator
+- **MapTemplateChoice type**: Exported from MenuScreens for type-safe map template selection
+
+### Changed
+- **Faction selection callback**: `onFactionSelected` now includes `mapTemplate` parameter, propagated through Game init and main entry point
+
 ## [0.10.0] - 2026-04-06
 
 ### Added

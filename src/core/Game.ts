@@ -10,7 +10,7 @@ import * as THREE from 'three';
 import { addEntity, addComponent, hasComponent, query, entityExists } from 'bitecs';
 
 import { world, resetGameWorld } from '../ecs/world';
-import { Position, Faction, Health, Attack, Armor, Movement, UnitType, UnitAI, Gatherer, Visibility, Building, Resource, Selected, Production, Rotation, GezeligheidBonus, Hero, HeroAbilities } from '../ecs/components';
+import { Position, Faction, Health, Attack, Armor, Movement, UnitType, UnitAI, Gatherer, Visibility, Building, Resource, Selected, Production, Rotation, GezeligheidBonus, Hero, HeroAbilities, RallyPoint } from '../ecs/components';
 import { IsUnit, IsBuilding, IsResource, IsWorker, IsDead, IsHero } from '../ecs/tags';
 import { FactionId, UnitTypeId, BuildingTypeId, HeroTypeId, UpgradeId, ResourceType, MAP_SIZE, UnitAIState, NO_PRODUCTION, HERO_POPULATION_COST } from '../types/index';
 import { UNIT_ARCHETYPES, BUILDING_ARCHETYPES } from '../entities/archetypes';
@@ -90,6 +90,10 @@ export class Game {
   // Building placement mode
   private buildMode = false;
   private buildGhostType: 'barracks' | 'blacksmith' | 'lumbercamp' | null = null;
+
+  // Rally point placement mode
+  private rallyPointMode = false;
+  private rallyPointBuildingEid = -1;
 
   // Drag-box selection
   private dragStartX = 0;
@@ -589,6 +593,9 @@ export class Game {
       case 'hero-ability-e':
         this.useHeroAbility(2);
         break;
+      case 'rally-point':
+        this.enterRallyPointMode();
+        break;
     }
   }
 
@@ -629,6 +636,36 @@ export class Game {
     this.buildMode = false;
     this.buildGhostType = null;
     this.buildingRenderer.hideGhost();
+    const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
+    if (canvas) canvas.style.cursor = 'default';
+  }
+
+  /**
+   * Enter rally point placement mode: next left-click on terrain sets
+   * the rally point for the currently selected production building.
+   */
+  private enterRallyPointMode(): void {
+    if (this.selectedEntities.length !== 1) {
+      this.hud?.showAlert('Selecteer een enkel gebouw', 'warning');
+      return;
+    }
+    const bEid = this.selectedEntities[0];
+    if (!hasComponent(world, bEid, IsBuilding) ||
+        Faction.id[bEid] !== this.playerFactionId ||
+        !hasComponent(world, bEid, RallyPoint)) {
+      this.hud?.showAlert('Dit gebouw kan geen rally point hebben', 'warning');
+      return;
+    }
+    this.rallyPointMode = true;
+    this.rallyPointBuildingEid = bEid;
+    const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
+    if (canvas) canvas.style.cursor = 'crosshair';
+    this.hud?.showAlert('Klik op het terrein om rally point te plaatsen', 'info');
+  }
+
+  private exitRallyPointMode(): void {
+    this.rallyPointMode = false;
+    this.rallyPointBuildingEid = -1;
     const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
     if (canvas) canvas.style.cursor = 'default';
   }
@@ -761,13 +798,19 @@ export class Game {
     this.dragBoxDiv.style.cssText = 'position:fixed;border:1px solid #d4a853;background:rgba(212,168,83,0.15);pointer-events:none;z-index:50;display:none';
     document.body.appendChild(this.dragBoxDiv);
 
-    // Left mousedown: start drag or build placement
+    // Left mousedown: start drag or build placement or rally point placement
     this.addTrackedListener(canvas, 'mousedown', ((e: MouseEvent) => {
       if (e.button !== 0) return;
 
       // Build mode: place building on click
       if (this.buildMode && this.buildGhostType) {
         this.handleBuildPlacement(e.clientX, e.clientY);
+        return;
+      }
+
+      // Rally point mode: place rally point on click
+      if (this.rallyPointMode && this.rallyPointBuildingEid >= 0) {
+        this.handleRallyPointPlacement(e.clientX, e.clientY);
         return;
       }
 
@@ -782,6 +825,10 @@ export class Game {
         // Right click: context command
         if (this.buildMode) {
           this.exitBuildMode();
+          return;
+        }
+        if (this.rallyPointMode) {
+          this.exitRallyPointMode();
           return;
         }
         this.handleRightClick(e.clientX, e.clientY);
@@ -850,6 +897,9 @@ export class Game {
 
     // Keyboard shortcuts
     this.addTrackedListener(window, 'keydown', ((e: KeyboardEvent) => {
+      if (e.code === 'Escape' && this.rallyPointMode) {
+        this.exitRallyPointMode();
+      }
       if (e.code === 'Escape' && this.buildMode) {
         this.exitBuildMode();
       }
@@ -859,12 +909,16 @@ export class Game {
         Faction.id[this.selectedEntities[0]] === this.playerFactionId
         ? this.selectedEntities[0] : null;
 
-      // Q/W/E/T: context-sensitive — building production OR unit commands
+      // Q/W/E/T/R: context-sensitive — building production OR unit commands
       if (selectedBuilding && Building.complete[selectedBuilding] === 1) {
         if (e.code === 'KeyQ') { this.trainFromSelectedBuilding(UnitTypeId.Worker); return; }
         if (e.code === 'KeyW') { this.trainFromSelectedBuilding(UnitTypeId.Infantry); return; }
         if (e.code === 'KeyE') { this.trainFromSelectedBuilding(UnitTypeId.Ranged); return; }
         if (e.code === 'KeyT') { this.trainHero(HeroTypeId.PrinsVanBrabant); return; }
+        if (e.code === 'KeyR' && hasComponent(world, selectedBuilding, RallyPoint)) {
+          this.enterRallyPointMode();
+          return;
+        }
       }
 
       // B key for build barracks (when worker selected)
@@ -1433,6 +1487,25 @@ export class Game {
       // Check if we clicked on an enemy or a resource
       const targetEid = this.findEntityAtPosition(point.x, point.z);
 
+      // Rally point: if a single own production building is selected,
+      // right-click sets the rally point instead of issuing a move command
+      if (selected.length === 1) {
+        const bEid = selected[0];
+        if (hasComponent(world, bEid, IsBuilding) &&
+            Faction.id[bEid] === this.playerFactionId &&
+            Building.complete[bEid] === 1 &&
+            hasComponent(world, bEid, RallyPoint)) {
+          // Right-click on the building itself clears the rally point
+          if (targetEid === bEid) {
+            this.clearRallyPoint(bEid);
+            return;
+          }
+          // Set rally point to clicked position
+          this.setRallyPoint(bEid, point.x, point.z);
+          return;
+        }
+      }
+
       // Determine unit type of first selected unit for voice lines
       const voiceEid = selected[0];
       const voiceFaction = hasComponent(world, voiceEid, IsUnit) ? Faction.id[voiceEid] : this.playerFactionId;
@@ -1455,6 +1528,53 @@ export class Game {
         playUnitVoice(voiceFaction, 'move', voiceUnitType);
       }
     }
+  }
+
+  // -----------------------------------------------------------------------
+  // Rally point management
+  // -----------------------------------------------------------------------
+
+  /**
+   * Set a rally point on a production building.
+   * Updates the ECS RallyPoint component and shows a visual flag marker.
+   */
+  private setRallyPoint(buildingEid: number, x: number, z: number): void {
+    RallyPoint.x[buildingEid] = x;
+    RallyPoint.z[buildingEid] = z;
+    const factionId = Faction.id[buildingEid];
+    this.buildingRenderer.setRallyPoint(buildingEid, x, z, factionId);
+    audioManager.playSound('click');
+  }
+
+  /**
+   * Clear the rally point on a production building (reset to default offset).
+   */
+  private clearRallyPoint(buildingEid: number): void {
+    // Reset to default position: offset from building
+    RallyPoint.x[buildingEid] = Position.x[buildingEid] + 3;
+    RallyPoint.z[buildingEid] = Position.z[buildingEid];
+    this.buildingRenderer.removeRallyPoint(buildingEid);
+    this.hud?.showAlert('Rally point gewist', 'info');
+  }
+
+  /**
+   * Handle left-click during rally point placement mode.
+   * Raycasts the terrain and sets the rally point at the clicked position.
+   */
+  private handleRallyPointPlacement(screenX: number, screenY: number): void {
+    this.mouseVec.set(
+      (screenX / window.innerWidth) * 2 - 1,
+      -(screenY / window.innerHeight) * 2 + 1
+    );
+    this.raycaster.setFromCamera(this.mouseVec, this.camera.camera);
+    const hits = this.raycaster.intersectObject(this.terrain.mesh);
+
+    if (hits.length > 0 && this.rallyPointBuildingEid >= 0) {
+      const point = hits[0].point;
+      this.setRallyPoint(this.rallyPointBuildingEid, point.x, point.z);
+    }
+
+    this.exitRallyPointMode();
   }
 
   private raycastEntities(screenX: number, screenY: number): number | null {
@@ -1923,6 +2043,8 @@ export class Game {
           this.buildingRenderer.removeBuilding(eid);
           this.entityMeshMap.delete(eid);
         }
+        // Remove rally point flag if building is destroyed
+        this.buildingRenderer.removeRallyPoint(eid);
         this.knownBuildingEntities.delete(eid);
       }
     }

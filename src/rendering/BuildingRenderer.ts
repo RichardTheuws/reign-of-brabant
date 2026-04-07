@@ -105,6 +105,12 @@ export class BuildingRenderer {
   /** Elapsed time for gear rotation. */
   private elapsedTime = 0;
 
+  /** Rally point flag markers: eid -> flag group. */
+  private rallyFlags = new Map<number, THREE.Group>();
+  /** Shared rally flag geometry. */
+  private rallyPoleGeo: THREE.CylinderGeometry;
+  private rallyFlagGeo: THREE.ConeGeometry;
+
   constructor(parentGroup: THREE.Group) {
     this.group = parentGroup;
 
@@ -117,6 +123,10 @@ export class BuildingRenderer {
       side: THREE.DoubleSide,
       depthWrite: false,
     });
+
+    // Create shared rally flag geometry
+    this.rallyPoleGeo = new THREE.CylinderGeometry(0.05, 0.05, 1.8, 6);
+    this.rallyFlagGeo = new THREE.ConeGeometry(0.35, 0.5, 4);
   }
 
   // -----------------------------------------------------------------------
@@ -424,6 +434,74 @@ export class BuildingRenderer {
   }
 
   // -----------------------------------------------------------------------
+  // Rally point flags
+  // -----------------------------------------------------------------------
+
+  /**
+   * Show or update a rally point flag marker for a building.
+   * Creates a small pole + cone flag in the faction's colour.
+   */
+  setRallyPoint(eid: number, x: number, z: number, factionId: number): void {
+    // Remove existing flag for this building
+    this.removeRallyPoint(eid);
+
+    const tint = FACTION_TINTS[factionId] ?? new THREE.Color(0xffffff);
+
+    // Pole (thin cylinder)
+    const poleMat = new THREE.MeshBasicMaterial({ color: 0x4a3a2a });
+    const pole = new THREE.Mesh(this.rallyPoleGeo, poleMat);
+    pole.position.set(0, 0.9, 0);
+
+    // Flag (cone rotated sideways at top of pole)
+    const flagMat = new THREE.MeshBasicMaterial({
+      color: tint,
+      transparent: true,
+      opacity: 0.85,
+    });
+    const flag = new THREE.Mesh(this.rallyFlagGeo, flagMat);
+    flag.position.set(0.2, 1.6, 0);
+    flag.rotation.z = -Math.PI / 2;
+
+    // Base ring (ground marker)
+    const ringGeo = new THREE.RingGeometry(0.2, 0.4, 12);
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: tint,
+      transparent: true,
+      opacity: 0.5,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.y = 0.05;
+
+    const flagGroup = new THREE.Group();
+    flagGroup.add(pole);
+    flagGroup.add(flag);
+    flagGroup.add(ring);
+    flagGroup.position.set(x, 0, z);
+    flagGroup.name = `rally_${eid}`;
+    flagGroup.renderOrder = 2;
+
+    this.rallyFlags.set(eid, flagGroup);
+    this.group.add(flagGroup);
+  }
+
+  /** Remove the rally point flag for a building. */
+  removeRallyPoint(eid: number): void {
+    const flag = this.rallyFlags.get(eid);
+    if (!flag) return;
+    this.group.remove(flag);
+    this.disposeObject(flag);
+    this.rallyFlags.delete(eid);
+  }
+
+  /** Check if a building has a visible rally point flag. */
+  hasRallyPoint(eid: number): boolean {
+    return this.rallyFlags.has(eid);
+  }
+
+  // -----------------------------------------------------------------------
   // Cleanup
   // -----------------------------------------------------------------------
 
@@ -443,6 +521,15 @@ export class BuildingRenderer {
     this.gearIndicators.clear();
     this.gearGeo.dispose();
     this.gearMat.dispose();
+
+    // Dispose rally flags
+    for (const [, flag] of this.rallyFlags) {
+      this.group.remove(flag);
+      this.disposeObject(flag);
+    }
+    this.rallyFlags.clear();
+    this.rallyPoleGeo.dispose();
+    this.rallyFlagGeo.dispose();
 
     for (const [, root] of this.modelCache) {
       this.disposeObject(root);
