@@ -169,7 +169,7 @@ function executeAbility(
   const hz = Position.z[heroEid];
 
   switch (abilityId) {
-    // ===== PRINS VAN BRABANSEN =====
+    // ===== PRINS VAN BRABANT =====
     case 'prins-toespraak': {
       // +30% all stats to allies in radius 12, 20s
       const radius = 12;
@@ -187,7 +187,7 @@ function executeAbility(
       break;
     }
 
-    case 'prins-dansen': {
+    case 'prins-dans': {
       // AoE stun radius 8, enemies dance 4s
       const radius = 8;
       const radiusSq = radius * radius;
@@ -215,7 +215,7 @@ function executeAbility(
       break;
     }
 
-    // ===== BOER VAN BRABANSEN =====
+    // ===== BOER VAN BRABANT =====
     case 'boer-mestverspreider': {
       // Cone AoE, 30 dmg + -40% speed 6s
       const coneRange = 10;

@@ -54,8 +54,8 @@ export enum UnitTypeId {
 /** Hero type identifiers. */
 export enum HeroTypeId {
   // Brabanders heroes
-  PrinsVanBrabansen = 0,
-  BoerVanBrabansen = 1,
+  PrinsVanBrabant = 0,
+  BoerVanBrabant = 1,
   // Randstad heroes
   DeCEO = 2,
   DePoliticus = 3,
@@ -293,7 +293,10 @@ export const MIN_DAMAGE = 1;
 export const ARMOR_FACTOR = 0.5;
 
 /** Auto-aggro radius: idle units detect enemies within this range. */
-export const AGGRO_RANGE = 8;
+export const AGGRO_RANGE = 12;
+
+/** Self-defense radius: gathering/working units react to enemies this close. */
+export const SELF_DEFENSE_RANGE = 6;
 
 /** Death animation duration in seconds before entity removal. */
 export const DEATH_TIMER = 2.0;

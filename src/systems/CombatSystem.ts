@@ -29,6 +29,7 @@ import {
   MIN_DAMAGE,
   ARMOR_FACTOR,
   AGGRO_RANGE,
+  SELF_DEFENSE_RANGE,
   NO_ENTITY,
 } from '../types/index';
 import { eventBus } from '../core/EventBus';
@@ -66,6 +67,13 @@ export function createCombatSystem() {
         processAttacking(world, eid, dt);
       } else if (UnitAI.state[eid] === UnitAIState.Idle) {
         processAutoAggro(world, eid, units);
+      } else if (
+        UnitAI.state[eid] === UnitAIState.Gathering ||
+        UnitAI.state[eid] === UnitAIState.MovingToResource ||
+        UnitAI.state[eid] === UnitAIState.Returning
+      ) {
+        // Workers self-defend when enemies are very close
+        processSelfDefense(world, eid, units);
       }
     }
   };
@@ -135,6 +143,16 @@ function processAttacking(world: GameWorld, eid: number, dt: number): void {
   }
 
   Health.current[targetEid] -= effectiveDamage;
+
+  // Damage triggers self-defense: non-attacking units retaliate against attacker
+  if (hasComponent(world, targetEid, UnitAI) && hasComponent(world, targetEid, IsUnit)) {
+    const targetState = UnitAI.state[targetEid];
+    if (targetState !== UnitAIState.Attacking && targetState !== UnitAIState.Dead) {
+      UnitAI.state[targetEid] = UnitAIState.Attacking;
+      UnitAI.targetEid[targetEid] = eid;
+      Movement.hasTarget[targetEid] = 0;
+    }
+  }
 
   // Emit combat-hit event for audio
   const isRanged = Attack.range[eid] > 1.5;
@@ -210,6 +228,38 @@ function processAutoAggro(
   if (closestEid !== NO_ENTITY) {
     UnitAI.state[eid] = UnitAIState.Attacking;
     UnitAI.targetEid[eid] = closestEid;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Self-defense: workers interrupt gathering when enemies are very close
+// ---------------------------------------------------------------------------
+
+function processSelfDefense(world: GameWorld, eid: number, allUnits: { readonly length: number; readonly [n: number]: number }): void {
+  const selfDefenseSq = SELF_DEFENSE_RANGE * SELF_DEFENSE_RANGE;
+  const myFaction = Faction.id[eid];
+  let closestEid = NO_ENTITY;
+  let closestDistSq = selfDefenseSq;
+
+  for (let i = 0; i < allUnits.length; i++) {
+    const other = allUnits[i];
+    if (other === eid) continue;
+    if (Faction.id[other] === myFaction) continue;
+    if (hasComponent(world, other, IsDead)) continue;
+
+    _dx = Position.x[other] - Position.x[eid];
+    _dz = Position.z[other] - Position.z[eid];
+    _distSq = _dx * _dx + _dz * _dz;
+    if (_distSq < closestDistSq) {
+      closestDistSq = _distSq;
+      closestEid = other;
+    }
+  }
+
+  if (closestEid !== NO_ENTITY) {
+    UnitAI.state[eid] = UnitAIState.Attacking;
+    UnitAI.targetEid[eid] = closestEid;
+    Movement.hasTarget[eid] = 0;
   }
 }
 

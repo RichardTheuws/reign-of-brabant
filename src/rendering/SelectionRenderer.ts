@@ -16,9 +16,9 @@ const MAX_SELECTION_CIRCLES = 50;
 const MAX_HEALTH_BARS = 64;
 
 const HEALTHBAR_WIDTH = 64;
-const HEALTHBAR_HEIGHT = 10;
+const HEALTHBAR_HEIGHT = 24;
 const HEALTHBAR_SPRITE_SCALE_X = 2.0;
-const HEALTHBAR_SPRITE_SCALE_Y = 0.3;
+const HEALTHBAR_SPRITE_SCALE_Y = 0.5;
 const HEALTHBAR_Y_OFFSET = 2.5;
 
 // HP colour thresholds (matching POC-UI.md: >50% green, >25% yellow, <25% red)
@@ -43,6 +43,7 @@ export interface SelectionData {
   isOwnFaction: boolean;
   hp: number;
   maxHp: number;
+  name?: string;
 }
 
 interface HealthBarEntry {
@@ -234,7 +235,7 @@ export class SelectionRenderer {
         if (entry) {
           entry.sprite.visible = true;
           entry.sprite.position.set(data.x, data.y + HEALTHBAR_Y_OFFSET, data.z);
-          this.drawHealthBar(entry, data.hp, data.maxHp);
+          this.drawHealthBar(entry, data.hp, data.maxHp, data.name);
         }
       }
     }
@@ -311,17 +312,22 @@ export class SelectionRenderer {
     entry.active = false;
   }
 
-  private drawHealthBar(entry: HealthBarEntry, hp: number, maxHp: number): void {
+  private drawHealthBar(entry: HealthBarEntry, hp: number, maxHp: number, name?: string): void {
     const { ctx, canvas, texture } = entry;
     const ratio = maxHp > 0 ? Math.max(0, Math.min(1, hp / maxHp)) : 0;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Background
-    ctx.fillStyle = HP_BG_COLOR;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Name text at top
+    ctx.font = 'bold 10px sans-serif';
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    if (name) ctx.fillText(name, canvas.width / 2, 0, canvas.width);
 
-    // HP bar
+    // HP bar below name
+    const barY = 14;
+    const barH = canvas.height - barY;
     let color: string;
     if (ratio > 0.5) {
       color = HP_COLOR_HIGH;
@@ -330,8 +336,10 @@ export class SelectionRenderer {
     } else {
       color = HP_COLOR_LOW;
     }
+    ctx.fillStyle = HP_BG_COLOR;
+    ctx.fillRect(0, barY, canvas.width, barH);
     ctx.fillStyle = color;
-    ctx.fillRect(0, 0, canvas.width * ratio, canvas.height);
+    ctx.fillRect(0, barY, canvas.width * ratio, barH);
 
     texture.needsUpdate = true;
   }

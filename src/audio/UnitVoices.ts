@@ -155,8 +155,6 @@ const UNIT_VOICE_LINES: Record<number, Record<string, Record<VoiceAction, string
   0: {
     boer: standardUnitVoices('brabanders', 'boer'),
     carnavalvierder: standardUnitVoices('brabanders', 'carnavalvierder'),
-    // Legacy alias: 'kansen' points to the same files on disk as the old setup
-    // but the canonical name is now 'sluiper'
     sluiper: standardUnitVoices('brabanders', 'sluiper'),
     tractorrijder: standardUnitVoices('brabanders', 'tractorrijder'),
     frituurmeester: standardUnitVoices('brabanders', 'frituurmeester'),

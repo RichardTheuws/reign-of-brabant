@@ -254,7 +254,7 @@ export class MenuScreens {
 
   setGameHUDVisible(visible: boolean): void {
     const hud = document.getElementById('game-hud');
-    if (hud) hud.style.display = visible ? '' : 'none';
+    if (hud) hud.style.display = visible ? 'block' : 'none';
   }
 
   // -----------------------------------------------------------------------

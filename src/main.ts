@@ -73,7 +73,12 @@ const postProcessing = new PostProcessing(renderer, scene, rtsCamera.camera);
 const keysDown = new Set<string>();
 let mouseX = -1, mouseY = -1, scrollDelta = 0;
 
-window.addEventListener('keydown', (e) => keysDown.add(e.code));
+window.addEventListener('keydown', (e) => {
+  keysDown.add(e.code);
+  if (e.code === 'Escape' && gameInitialized && stateMachine.currentId === GameStateId.PLAYING) {
+    togglePause();
+  }
+});
 window.addEventListener('keyup', (e) => keysDown.delete(e.code));
 window.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
 window.addEventListener('wheel', (e) => { e.preventDefault(); scrollDelta += e.deltaY > 0 ? 1 : -1; }, { passive: false });
@@ -135,6 +140,13 @@ let initialCameraZ = 0;
 // ---------------------------------------------------------------------------
 const stateMachine = new GameStateMachine();
 let gameInitialized = false;
+let gamePaused = false;
+
+function togglePause(): void {
+  gamePaused = !gamePaused;
+  const overlay = document.getElementById('pause-overlay');
+  if (overlay) overlay.hidden = !gamePaused;
+}
 
 // Menu camera rotation state
 let menuCameraAngle = 0;
@@ -142,8 +154,8 @@ let menuCameraAngle = 0;
 // Camera intro state
 let cameraIntroActive = false;
 let cameraIntroTimer = 0;
-const CAMERA_INTRO_DURATION = 2.0;
-let cameraIntroStartY = 80;
+const CAMERA_INTRO_DURATION = 3.5;
+let cameraIntroStartY = 55;
 let cameraIntroTargetX = 0;
 let cameraIntroTargetZ = 0;
 
@@ -204,6 +216,7 @@ setGameFlowDeps({
   },
 
   updateGame: (dt: number) => {
+    if (gamePaused) return;
     // Camera input (only when in-game, not during intro)
     if (!cameraIntroActive) {
       rtsCamera.update(dt, keysDown, mouseX, mouseY, window.innerWidth, window.innerHeight, scrollDelta);
@@ -255,7 +268,7 @@ setGameFlowDeps({
     const playerBase = game.getPlayerBasePosition();
     cameraIntroTargetX = playerBase.x;
     cameraIntroTargetZ = playerBase.z;
-    cameraIntroStartY = 80;
+    cameraIntroStartY = 55;
 
     // Show and fade the black overlay
     const overlay = document.getElementById('camera-intro-overlay');
@@ -267,6 +280,15 @@ setGameFlowDeps({
         overlay.classList.add('is-fading');
       });
     }
+
+    // Show fullscreen tip after a short delay
+    setTimeout(() => {
+      const tip = document.getElementById('fullscreen-tip');
+      if (tip) {
+        tip.hidden = false;
+        setTimeout(() => { if (tip) tip.hidden = true; }, 20000);
+      }
+    }, 2000);
 
     // Record initial camera position for tutorial tracking
     initialCameraX = cameraIntroTargetX;
@@ -341,6 +363,25 @@ campaignUI.init({
 });
 
 // ---------------------------------------------------------------------------
+// Pause menu buttons
+// ---------------------------------------------------------------------------
+document.getElementById('btn-resume')?.addEventListener('click', () => togglePause());
+document.getElementById('pause-btn')?.addEventListener('click', () => {
+  if (gameInitialized) togglePause();
+});
+document.getElementById('btn-pause-menu')?.addEventListener('click', () => {
+  gamePaused = false;
+  const overlay = document.getElementById('pause-overlay');
+  if (overlay) overlay.hidden = true;
+  gameInitialized = false;
+  stateMachine.requestTransition(GameStateId.MENU);
+});
+document.getElementById('btn-pause-settings')?.addEventListener('click', () => {
+  const panel = document.getElementById('settings-panel');
+  if (panel) panel.hidden = false;
+});
+
+// ---------------------------------------------------------------------------
 // Stats (dev only)
 // ---------------------------------------------------------------------------
 let devStats: { update: () => void; dom: HTMLElement } | null = null;
@@ -353,27 +394,32 @@ function fixedUpdate(dt: number): void {
   if (cameraIntroActive) {
     cameraIntroTimer += dt;
     const t = Math.min(cameraIntroTimer / CAMERA_INTRO_DURATION, 1);
-    // Smooth ease-out
-    const eased = 1 - Math.pow(1 - t, 3);
+    const eased = t < 0.5
+      ? 4 * t * t * t
+      : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
-    // Interpolate from high above to normal RTS view
     const startHeight = cameraIntroStartY;
-    const endHeight = 35;
+    const endHeight = 25;
     const currentHeight = startHeight + (endHeight - startHeight) * eased;
 
-    const offsetZ = 25 * Math.cos(Math.PI / 3); // ~60 degree angle offset
+    const arcOffsetX = (1 - eased) * 15;
+    const arcOffsetZ = (1 - eased) * 20;
+    const offsetZ = 18 * Math.cos(Math.PI / 3.5);
+
     rtsCamera.camera.position.set(
-      cameraIntroTargetX,
+      cameraIntroTargetX + arcOffsetX,
       currentHeight,
-      cameraIntroTargetZ + offsetZ + (1 - eased) * 20
+      cameraIntroTargetZ + offsetZ + arcOffsetZ
     );
-    rtsCamera.camera.lookAt(cameraIntroTargetX, 0, cameraIntroTargetZ);
+    rtsCamera.camera.lookAt(
+      cameraIntroTargetX + arcOffsetX * 0.3,
+      0,
+      cameraIntroTargetZ + arcOffsetZ * 0.15
+    );
 
     if (t >= 1) {
       cameraIntroActive = false;
-      // Snap camera to proper RTS position
       rtsCamera.setPosition(cameraIntroTargetX, cameraIntroTargetZ);
-      // Remove overlay
       const overlay = document.getElementById('camera-intro-overlay');
       if (overlay) {
         setTimeout(() => overlay.classList.add('is-hidden'), 1000);

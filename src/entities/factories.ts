@@ -339,7 +339,7 @@ export function createInfantry(
 }
 
 /**
- * Create a Ranged (Kansen) entity.
+ * Create a Ranged (Sluiper) entity.
  * Ranged combat unit that throws bierpullen.
  */
 export function createRanged(

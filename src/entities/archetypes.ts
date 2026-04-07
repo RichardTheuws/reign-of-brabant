@@ -62,11 +62,11 @@ export const UNIT_ARCHETYPES: readonly UnitArchetype[] = [
     carryCapacity: 0,     // cannot gather
   },
 
-  // UnitTypeId.Ranged = 2 -- Kansen
+  // UnitTypeId.Ranged = 2 -- Sluiper
   {
     typeId: UnitTypeId.Ranged,
     name: 'Ranged',
-    brabantName: 'Kansen',
+    brabantName: 'Sluiper',
     hp: 55,
     attack: 12,
     attackSpeed: 1.8,     // 1.8s between attacks

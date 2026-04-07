@@ -28,7 +28,7 @@ export enum ExtendedUnitTypeId {
   // --- Brabanders (0-9) ---
   Boer = 0,
   Carnavalvierder = 1,
-  Kansen = 2,               // "Sluiper" / Ranged stealth
+  Sluiper = 2,              // Ranged stealth
   Boerinne = 3,             // Support / Healer
   Muzikant = 4,             // Buffer / Debuffer [Tier 2]
   Tractorrijder = 5,        // Heavy / Cavalry [Tier 2]
@@ -57,7 +57,7 @@ export enum ExtendedUnitTypeId {
   Kolenbrander = 24,        // Siege [Tier 3]
   Sjpion = 25,              // Support / Healer
   Mijnrat = 26,             // Stealth / Sabotage [Tier 3]
-  Heuvelansen = 27,         // Scout [Tier 1]
+  Heuvelwacht = 27,         // Scout [Tier 1]
   DeMijnbaas = 28,          // Hero: Tank / Controller
   DeMaasridder = 29,        // Hero: Caster / Disruptor
 
@@ -200,11 +200,11 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       sightRange: 8,
       carryCapacity: 0,
     },
-    // Kansen (Ranged / Stealth) -- fast ranged, glass cannon
+    // Sluiper (Ranged / Stealth) -- fast ranged, glass cannon
     {
       typeId: UnitTypeId.Ranged,
-      name: 'Kansen',
-      brabantName: 'Kansen',
+      name: 'Sluiper',
+      brabantName: 'Sluiper',
       hp: 55,
       attack: 12,
       attackSpeed: 1.8,
@@ -620,11 +620,11 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       sightRange: 8,
       carryCapacity: 0,
     },
-    // Heuvelansen (Scout) [Tier 1] -- exception: fast scout, signature Limburgers unit
+    // Heuvelwacht (Scout) [Tier 1] -- exception: fast scout, signature Limburgers unit
     {
       typeId: UnitTypeId.Ranged,
-      name: 'Heuvelansen',
-      brabantName: 'Heuvelansen',
+      name: 'Heuvelwacht',
+      brabantName: 'Heuvelwacht',
       hp: 35,
       attack: 5,
       attackSpeed: 1.5,
@@ -1055,7 +1055,7 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       costSecondary: 0,
       buildTime: 34,
       sightRange: 10,
-      produces: [UnitTypeId.Ranged], // Schutterij, Vlaaienwerper, Heuvelansen
+      produces: [UnitTypeId.Ranged], // Schutterij, Vlaaienwerper, Heuvelwacht
     },
     // Vlaaibakkerij (Resource gen -- primary) -- sturdy resource building
     {

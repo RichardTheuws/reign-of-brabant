@@ -91,6 +91,12 @@ export class Game {
   private buildMode = false;
   private buildGhostType: 'barracks' | 'blacksmith' | 'lumbercamp' | null = null;
 
+  // Drag-box selection
+  private dragStartX = 0;
+  private dragStartY = 0;
+  private isDragging = false;
+  private dragBoxDiv: HTMLDivElement | null = null;
+
   // Player's chosen faction (0=Brabanders, 1=Randstad, 2=Limburgers, 3=Belgen)
   private playerFactionId: FactionId = FactionId.Brabanders;
 
@@ -246,11 +252,19 @@ export class Game {
     ]);
     try { await this.navMesh.init(this.terrain.mesh); } catch { /* fallback */ }
 
-    // Set starting resources
-    this.playerState.addGold(0, -this.playerState.getGold(0));
-    this.playerState.addGold(0, mission.startingGold);
-    this.playerState.addGold(1, -this.playerState.getGold(1));
-    this.playerState.addGold(1, mission.startingGoldAI);
+    // Detect player faction from mission (non-AI faction in buildings)
+    const missionPlayerFaction = mission.buildings.find(b => (b.factionId as number) !== 1)?.factionId
+      ?? mission.units.find(u => (u.factionId as number) !== 1)?.factionId
+      ?? FactionId.Brabanders;
+    this.playerFactionId = missionPlayerFaction;
+    gameConfig.setPlayerFaction(missionPlayerFaction);
+
+    // Set starting resources for correct factions
+    this.playerState.addGold(missionPlayerFaction, -this.playerState.getGold(missionPlayerFaction));
+    this.playerState.addGold(missionPlayerFaction, mission.startingGold);
+    const aiFaction = mission.buildings.find(b => b.factionId === FactionId.AI)?.factionId ?? FactionId.Randstad;
+    this.playerState.addGold(aiFaction, -this.playerState.getGold(aiFaction));
+    this.playerState.addGold(aiFaction, mission.startingGoldAI);
 
     this._spawnMissionEntities(mission);
     this.spawnProps();
@@ -262,11 +276,11 @@ export class Game {
     this.setupEventListeners();
     this._setupMissionEvents();
 
-    const pb = mission.buildings.find(b => b.factionId === FactionId.Brabanders);
+    const pb = mission.buildings.find(b => b.factionId === missionPlayerFaction);
     if (pb) this.camera.setPosition(pb.x, pb.z);
 
     this.missionSystem = new MissionSystem();
-    const wc = mission.units.filter(u => u.factionId === FactionId.Brabanders && u.unitType === UnitTypeId.Worker).length;
+    const wc = mission.units.filter(u => u.factionId === missionPlayerFaction && u.unitType === UnitTypeId.Worker).length;
     const cb: MissionCallbacks = {
       showMessage: (t) => this._showMsg(t),
       spawnUnits: (u) => this._spawnMissionUnits(u),
@@ -291,7 +305,7 @@ export class Game {
     audioManager.init();
     audioManager.startAmbient('ambient_birds');
     audioManager.startAmbient('ambient_wind');
-    this.musicSystem.start(FactionId.Brabanders);
+    this.musicSystem.start(missionPlayerFaction);
 
     console.log(`[Game] Mission "${mission.title}" initialized`);
   }
@@ -561,10 +575,10 @@ export class Game {
         this.trainFromSelectedBuilding(UnitTypeId.Ranged);
         break;
       case 'train-hero-prins':
-        this.trainHero(HeroTypeId.PrinsVanBrabansen);
+        this.trainHero(HeroTypeId.PrinsVanBrabant);
         break;
       case 'train-hero-boer':
-        this.trainHero(HeroTypeId.BoerVanBrabansen);
+        this.trainHero(HeroTypeId.BoerVanBrabant);
         break;
       case 'hero-ability-q':
         this.useHeroAbility(0);
@@ -742,40 +756,95 @@ export class Game {
     const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
     if (!canvas) return;
 
-    // Left click: select unit/building via raycasting, or place building
-    this.addTrackedListener(canvas, 'click', ((e: MouseEvent) => {
+    // Create drag-box overlay element
+    this.dragBoxDiv = document.createElement('div');
+    this.dragBoxDiv.style.cssText = 'position:fixed;border:1px solid #d4a853;background:rgba(212,168,83,0.15);pointer-events:none;z-index:50;display:none';
+    document.body.appendChild(this.dragBoxDiv);
+
+    // Left mousedown: start drag or build placement
+    this.addTrackedListener(canvas, 'mousedown', ((e: MouseEvent) => {
       if (e.button !== 0) return;
 
-      // Build mode: place building
+      // Build mode: place building on click
       if (this.buildMode && this.buildGhostType) {
         this.handleBuildPlacement(e.clientX, e.clientY);
         return;
       }
 
-      const hit = this.raycastEntities(e.clientX, e.clientY);
-      if (hit !== null && Faction.id[hit] === this.playerFactionId) {
-        this.selectedEntities = [hit];
-      } else {
-        this.selectedEntities = [];
-      }
-      this.onSelectionChanged(this.selectedEntities);
+      this.dragStartX = e.clientX;
+      this.dragStartY = e.clientY;
+      this.isDragging = true;
     }) as EventListener);
 
-    // Right click: context command
+    // Left mouseup: finish drag-box or single-click select
     this.addTrackedListener(canvas, 'mouseup', ((e: MouseEvent) => {
       if (e.button === 2) {
+        // Right click: context command
         if (this.buildMode) {
           this.exitBuildMode();
           return;
         }
         this.handleRightClick(e.clientX, e.clientY);
+        return;
       }
+
+      if (e.button !== 0 || !this.isDragging) return;
+      this.isDragging = false;
+
+      // Hide drag box
+      if (this.dragBoxDiv) this.dragBoxDiv.style.display = 'none';
+
+      const dx = e.clientX - this.dragStartX;
+      const dy = e.clientY - this.dragStartY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist > 5) {
+        // Drag-box select: find all player units inside the rectangle
+        const selected = this.boxSelectUnits(this.dragStartX, this.dragStartY, e.clientX, e.clientY);
+        this.selectedEntities = selected;
+      } else {
+        // Single click select
+        let hit = this.raycastEntities(e.clientX, e.clientY);
+        // Fallback: if raycasting misses, try position-based detection via terrain click
+        if (hit === null) {
+          this.mouseVec.set(
+            (e.clientX / window.innerWidth) * 2 - 1,
+            -(e.clientY / window.innerHeight) * 2 + 1
+          );
+          this.raycaster.setFromCamera(this.mouseVec, this.camera.camera);
+          const terrainHits = this.raycaster.intersectObject(this.terrain.mesh);
+          if (terrainHits.length > 0) {
+            const pt = terrainHits[0].point;
+            hit = this.findEntityAtPosition(pt.x, pt.z);
+          }
+        }
+        if (hit !== null && Faction.id[hit] === this.playerFactionId) {
+          this.selectedEntities = [hit];
+        } else {
+          this.selectedEntities = [];
+        }
+      }
+      this.onSelectionChanged(this.selectedEntities);
     }) as EventListener);
 
-    // Mouse move for build ghost
+    // Mouse move: build ghost + drag box update
     this.addTrackedListener(canvas, 'mousemove', ((e: MouseEvent) => {
       if (this.buildMode && this.buildGhostType) {
         this.updateBuildGhost(e.clientX, e.clientY);
+      }
+      // Update drag box overlay
+      if (this.isDragging && this.dragBoxDiv) {
+        const minX = Math.min(this.dragStartX, e.clientX);
+        const minY = Math.min(this.dragStartY, e.clientY);
+        const w = Math.abs(e.clientX - this.dragStartX);
+        const h = Math.abs(e.clientY - this.dragStartY);
+        if (w > 5 || h > 5) {
+          this.dragBoxDiv.style.display = 'block';
+          this.dragBoxDiv.style.left = `${minX}px`;
+          this.dragBoxDiv.style.top = `${minY}px`;
+          this.dragBoxDiv.style.width = `${w}px`;
+          this.dragBoxDiv.style.height = `${h}px`;
+        }
       }
     }) as EventListener);
 
@@ -784,6 +853,20 @@ export class Game {
       if (e.code === 'Escape' && this.buildMode) {
         this.exitBuildMode();
       }
+      // Check if a building is selected for production hotkeys
+      const selectedBuilding = this.selectedEntities.length === 1 &&
+        hasComponent(world, this.selectedEntities[0], IsBuilding) &&
+        Faction.id[this.selectedEntities[0]] === this.playerFactionId
+        ? this.selectedEntities[0] : null;
+
+      // Q/W/E/T: context-sensitive — building production OR unit commands
+      if (selectedBuilding && Building.complete[selectedBuilding] === 1) {
+        if (e.code === 'KeyQ') { this.trainFromSelectedBuilding(UnitTypeId.Worker); return; }
+        if (e.code === 'KeyW') { this.trainFromSelectedBuilding(UnitTypeId.Infantry); return; }
+        if (e.code === 'KeyE') { this.trainFromSelectedBuilding(UnitTypeId.Ranged); return; }
+        if (e.code === 'KeyT') { this.trainHero(HeroTypeId.PrinsVanBrabant); return; }
+      }
+
       // B key for build barracks (when worker selected)
       if (e.code === 'KeyB') {
         const hasWorker = this.selectedEntities.some(eid =>
@@ -1165,6 +1248,10 @@ export class Game {
           queue: queueItems,
         });
 
+        // Hide hero panel -- buildings don't have hero abilities
+        const heroPanel = document.getElementById('cmd-hero');
+        if (heroPanel) heroPanel.hidden = true;
+
         // Hide blacksmith panel by default (shown only for Blacksmith selection)
         this.hud.hideBlacksmithPanel();
 
@@ -1175,8 +1262,47 @@ export class Game {
           this.showBlacksmithResearchUI(firstEid);
         } else {
           // Show building command panel for production buildings
-          const cmdBuilding = document.getElementById('cmd-building');
-          if (cmdBuilding) cmdBuilding.hidden = false;
+          const cmdBuildingEl = document.getElementById('cmd-building');
+          if (cmdBuildingEl) cmdBuildingEl.hidden = false;
+
+          // Update production button labels for current faction
+          const unitNames: Record<number, Record<string, string>> = {
+            0: { worker: 'Boer', infantry: 'Carnavalvierder', ranged: 'Sluiper' },
+            1: { worker: 'Stagiair', infantry: 'Manager', ranged: 'Consultant' },
+            2: { worker: 'Mijnwerker', infantry: 'Schutterij', ranged: 'Vlaaienwerper' },
+            3: { worker: 'Frietkraamhouder', infantry: 'Bierbouwer', ranged: 'Chocolatier' },
+          };
+          const factionNames = unitNames[this.playerFactionId] ?? unitNames[0];
+          if (cmdBuildingEl) {
+            const buttons = cmdBuildingEl.querySelectorAll<HTMLButtonElement>('.cmd-btn');
+            for (const btn of buttons) {
+              const action = btn.dataset.action;
+              if (action === 'train-worker') {
+                const label = btn.querySelector('span:not(.hotkey):not(.btn-icon)');
+                if (label) label.textContent = factionNames.worker;
+              } else if (action === 'train-infantry') {
+                const label = btn.querySelector('span:not(.hotkey):not(.btn-icon)');
+                if (label) label.textContent = factionNames.infantry;
+              } else if (action === 'train-ranged') {
+                const label = btn.querySelector('span:not(.hotkey):not(.btn-icon)');
+                if (label) label.textContent = factionNames.ranged;
+              }
+            }
+          }
+
+          // Only show buttons for units this building can actually produce
+          const arch = BUILDING_ARCHETYPES[buildingType];
+          const canProduce = new Set(arch.produces);
+          if (cmdBuildingEl) {
+            const buttons = cmdBuildingEl.querySelectorAll<HTMLButtonElement>('.cmd-btn');
+            for (const btn of buttons) {
+              const action = btn.dataset.action;
+              if (action === 'train-worker') btn.hidden = !canProduce.has(UnitTypeId.Worker);
+              else if (action === 'train-infantry') btn.hidden = !canProduce.has(UnitTypeId.Infantry);
+              else if (action === 'train-ranged') btn.hidden = !canProduce.has(UnitTypeId.Ranged);
+              else if (action === 'train-hero-prins' || action === 'train-hero-boer') btn.hidden = true;
+            }
+          }
         }
       } else if (hasComponent(world, firstEid, IsUnit)) {
         // Unit(s) selected
@@ -1247,16 +1373,30 @@ export class Game {
   private getBuildingQueue(eid: number): Array<{ unitName: string; progress: number; remainingSeconds: number }> {
     const items: Array<{ unitName: string; progress: number; remainingSeconds: number }> = [];
     if (!hasComponent(world, eid, Production)) return items;
+    const fid = Faction.id[eid];
 
     if (Production.unitType[eid] !== NO_PRODUCTION) {
       const progress = Production.progress[eid];
       const duration = Production.duration[eid];
       const remaining = Math.max(0, duration * (1 - progress));
       items.push({
-        unitName: this.getUnitNameByType(Production.unitType[eid]),
+        unitName: this.getUnitNameByType(Production.unitType[eid], fid),
         progress,
         remainingSeconds: remaining,
       });
+    }
+
+    // Add queued items (queue0-queue4)
+    const queueSlots = [Production.queue0, Production.queue1, Production.queue2, Production.queue3, Production.queue4];
+    for (const slot of queueSlots) {
+      const unitType = slot[eid];
+      if (unitType !== NO_PRODUCTION) {
+        items.push({
+          unitName: this.getUnitNameByType(unitType, fid),
+          progress: 0,
+          remainingSeconds: 0,
+        });
+      }
     }
     return items;
   }
@@ -1339,7 +1479,7 @@ export class Game {
 
   private findEntityAtPosition(x: number, z: number): number | null {
     let closest: number | null = null;
-    let closestDist = 3.0; // 3 unit click radius
+    let closestDist = 5.0; // 5 unit click radius (generous for buildings)
 
     for (const [eid, mesh] of this.entityMeshMap) {
       const dx = mesh.position.x - x;
@@ -1354,6 +1494,21 @@ export class Game {
     return closest;
   }
 
+  private boxSelectUnits(x1: number, y1: number, x2: number, y2: number): number[] {
+    const minX = Math.min(x1, x2), maxX = Math.max(x1, x2);
+    const minY = Math.min(y1, y2), maxY = Math.max(y1, y2);
+    const selected: number[] = [];
+    for (const [eid, mesh] of this.entityMeshMap) {
+      if (!hasComponent(world, eid, IsUnit)) continue;
+      if (Faction.id[eid] !== this.playerFactionId) continue;
+      const screenPos = this.camera.worldToScreen(mesh.position);
+      if (screenPos.x >= minX && screenPos.x <= maxX && screenPos.y >= minY && screenPos.y <= maxY) {
+        selected.push(eid);
+      }
+    }
+    return selected;
+  }
+
   private getUnitName(eid: number): string {
     // Check if hero first
     if (hasComponent(world, eid, IsHero) && hasComponent(world, eid, Hero)) {
@@ -1362,26 +1517,41 @@ export class Game {
       if (arch) return arch.name;
     }
     const type = UnitType.id[eid];
-    return this.getUnitNameByType(type);
+    const factionId = Faction.id[eid];
+    return this.getUnitNameByType(type, factionId);
   }
 
-  private getUnitNameByType(type: number): string {
-    switch (type) {
-      case UnitTypeId.Worker: return 'Boer';
-      case UnitTypeId.Infantry: return 'Carnavalvierder';
-      case UnitTypeId.Ranged: return 'Kansen';
-      default: return 'Unit';
-    }
+  private getUnitNameByType(type: number, factionId?: number): string {
+    const fid = factionId ?? this.playerFactionId;
+    const names: Record<number, Record<number, string>> = {
+      [FactionId.Brabanders]: { [UnitTypeId.Worker]: 'Boer', [UnitTypeId.Infantry]: 'Carnavalvierder', [UnitTypeId.Ranged]: 'Sluiper' },
+      [FactionId.Randstad]: { [UnitTypeId.Worker]: 'Stagiair', [UnitTypeId.Infantry]: 'Manager', [UnitTypeId.Ranged]: 'Consultant' },
+      [FactionId.Limburgers]: { [UnitTypeId.Worker]: 'Mijnwerker', [UnitTypeId.Infantry]: 'Schutterij', [UnitTypeId.Ranged]: 'Vlaaienwerper' },
+      [FactionId.Belgen]: { [UnitTypeId.Worker]: 'Frietkraamhouder', [UnitTypeId.Infantry]: 'Bierbouwer', [UnitTypeId.Ranged]: 'Chocolatier' },
+    };
+    return names[fid]?.[type] ?? 'Unit';
   }
 
   private getBuildingName(buildingType: number): string {
-    switch (buildingType) {
-      case BuildingTypeId.TownHall: return 'Boerderij';
-      case BuildingTypeId.Barracks: return 'Cafe';
-      case BuildingTypeId.LumberCamp: return 'Houtzagerij';
-      case BuildingTypeId.Blacksmith: return 'Smederij';
-      default: return 'Gebouw';
-    }
+    const names: Record<number, Record<number, string>> = {
+      [BuildingTypeId.TownHall]: {
+        [FactionId.Brabanders]: 'Boerderij', [FactionId.Randstad]: 'Hoofdkantoor',
+        [FactionId.Limburgers]: 'Grottentempel', [FactionId.Belgen]: 'Wafelpaleis',
+      },
+      [BuildingTypeId.Barracks]: {
+        [FactionId.Brabanders]: 'Cafe', [FactionId.Randstad]: 'Vergaderzaal',
+        [FactionId.Limburgers]: 'Heuvelfort', [FactionId.Belgen]: 'Frituurfort',
+      },
+      [BuildingTypeId.LumberCamp]: {
+        [FactionId.Brabanders]: 'Houtzagerij', [FactionId.Randstad]: 'Logistiek Centrum',
+        [FactionId.Limburgers]: 'Mijnschacht', [FactionId.Belgen]: 'Chocolaterie',
+      },
+      [BuildingTypeId.Blacksmith]: {
+        [FactionId.Brabanders]: 'Smederij', [FactionId.Randstad]: 'R&D Lab',
+        [FactionId.Limburgers]: 'Mergeloven', [FactionId.Belgen]: 'Brouwerij',
+      },
+    };
+    return names[buildingType]?.[this.playerFactionId] ?? 'Gebouw';
   }
 
   private getBuildingHudType(buildingType: number): 'townhall' | 'barracks' | 'lumbercamp' | 'blacksmith' {
@@ -1713,6 +1883,12 @@ export class Game {
 
     for (const eid of this.selectedEntities) {
       if (!entityExists(world, eid)) continue;
+      let name: string | undefined;
+      if (hasComponent(world, eid, IsBuilding)) {
+        name = this.getBuildingName(Building.typeId[eid]);
+      } else if (hasComponent(world, eid, IsUnit)) {
+        name = this.getUnitName(eid);
+      }
       selectionData.push({
         eid,
         x: Position.x[eid],
@@ -1722,6 +1898,7 @@ export class Game {
         isOwnFaction: Faction.id[eid] === this.playerFactionId,
         hp: Health.current[eid],
         maxHp: Health.max[eid],
+        name,
       });
     }
 
@@ -1802,11 +1979,15 @@ export class Game {
             const progress = Production.progress[firstEid];
             const duration = Production.duration[firstEid];
             const remaining = Math.max(0, duration * (1 - progress));
-            this.hud.updateProductionQueue(
-              progress,
-              this.getUnitNameByType(Production.unitType[firstEid]),
-              remaining
-            );
+            const fid = Faction.id[firstEid];
+            const unitName = this.getUnitNameByType(Production.unitType[firstEid], fid);
+            // Count queued items
+            const queueSlots = [Production.queue0, Production.queue1, Production.queue2, Production.queue3, Production.queue4];
+            const queueCount = queueSlots.filter(s => s[firstEid] !== NO_PRODUCTION).length;
+            const label = queueCount > 0 ? `${unitName} (+${queueCount})` : unitName;
+            this.hud.updateProductionQueue(progress, label, remaining);
+          } else if (hasComponent(world, firstEid, Production)) {
+            this.hud.updateProductionQueue(0, '', 0);
           }
           // Update Blacksmith research progress (refreshes every frame)
           if (Building.typeId[firstEid] === BuildingTypeId.Blacksmith &&

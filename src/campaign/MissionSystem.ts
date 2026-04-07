@@ -89,6 +89,10 @@ export class MissionSystem {
   private victoryTriggered = false;
   private defeatTriggered = false;
 
+  // Victory confirmation delay: prevents victory firing in the same frame objectives update
+  private victoryPendingSince = -1;
+  private static readonly VICTORY_CONFIRM_DELAY = 0.5; // seconds
+
   // Runtime state
   private objectiveStates: ObjectiveState[] = [];
   private firedTriggers = new Set<string>();
@@ -113,6 +117,7 @@ export class MissionSystem {
     this.active = true;
     this.victoryTriggered = false;
     this.defeatTriggered = false;
+    this.victoryPendingSince = -1;
     this.firedTriggers.clear();
     this.initialWorkerCount = initialWorkerCount;
     this.workersLost = 0;
@@ -207,8 +212,11 @@ export class MissionSystem {
     // 3. Check wave states
     this.updateWaves();
 
-    // 4. Check defeat conditions
+    // 4. Check defeat conditions FIRST (defeat takes priority over victory)
     this.checkDefeat();
+
+    // 5. Auto-victory: all non-bonus objectives complete (with confirmation delay)
+    this.checkAutoVictory();
   }
 
   // -----------------------------------------------------------------------
@@ -387,12 +395,44 @@ export class MissionSystem {
   // Victory / Defeat
   // -----------------------------------------------------------------------
 
+  private checkAutoVictory(): void {
+    if (this.victoryTriggered || this.defeatTriggered) return;
+    if (!this.callbacks) return;
+
+    // Never grant victory if TownHall is dead (defeat takes priority)
+    if (!this.callbacks.isPlayerTownHallAlive()) return;
+
+    const requiredObjectives = this.objectiveStates.filter(s => !s.objective.isBonus);
+    const allRequiredComplete = requiredObjectives.length > 0 && requiredObjectives.every(s => s.completed);
+
+    if (allRequiredComplete) {
+      // Start confirmation delay to avoid same-frame victory
+      if (this.victoryPendingSince < 0) {
+        this.victoryPendingSince = this.elapsed;
+        return;
+      }
+      // Wait for the confirmation delay to pass
+      if (this.elapsed - this.victoryPendingSince >= MissionSystem.VICTORY_CONFIRM_DELAY) {
+        this.handleVictory();
+      }
+    } else {
+      // Objectives no longer all complete -- reset pending timer
+      this.victoryPendingSince = -1;
+    }
+  }
+
   private handleVictory(): void {
     if (this.victoryTriggered || !this.callbacks || !this.mission) return;
-    this.victoryTriggered = true;
 
-    // Final objective evaluation for end-of-mission objectives
+    // Guard: refuse victory if any required objective is incomplete
     this.updateObjectives();
+    const requiredIncomplete = this.objectiveStates.filter(s => !s.objective.isBonus && !s.completed);
+    if (requiredIncomplete.length > 0) {
+      console.log(`[MissionSystem] Victory blocked: ${requiredIncomplete.length} required objectives incomplete`);
+      return;
+    }
+
+    this.victoryTriggered = true;
 
     const stars = this.calculateStars();
     const bonusesCompleted = this.objectiveStates
@@ -406,14 +446,28 @@ export class MissionSystem {
 
   private checkDefeat(): void {
     if (!this.callbacks || !this.mission) return;
+    if (this.defeatTriggered || this.victoryTriggered) return;
 
-    // Mission 3: TownHall destroyed = defeat
-    // Mission 2: TownHall destroyed = defeat
-    // Mission 1: No defeat possible (tutorial, but wolves could kill everyone)
+    // TownHall destroyed = defeat (missionIndex > 0 to skip tutorial mission)
     if (this.mission.missionIndex > 0 && !this.callbacks.isPlayerTownHallAlive()) {
       this.defeatTriggered = true;
+      this.victoryPendingSince = -1; // Cancel any pending victory
       this.callbacks.triggerDefeat();
       this.active = false;
+      return;
+    }
+
+    // All units dead AND no gold to rebuild = defeat
+    // Only check after a grace period (10s) so early-game doesn't instantly defeat
+    if (this.elapsed > 10) {
+      const totalUnits = this.callbacks.getPlayerTotalUnits();
+      const gold = this.callbacks.getPlayerGold();
+      if (totalUnits === 0 && gold < 50) {
+        this.defeatTriggered = true;
+        this.victoryPendingSince = -1; // Cancel any pending victory
+        this.callbacks.triggerDefeat();
+        this.active = false;
+      }
     }
   }
 

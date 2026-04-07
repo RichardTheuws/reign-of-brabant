@@ -2,12 +2,12 @@ import * as THREE from 'three';
 import { createNoise2D } from 'simplex-noise';
 
 const MAP_SIZE = 128;
-const SEGMENTS = 128;
-const MAX_HEIGHT = 0.8;
+const SEGMENTS = 256;
+const MAX_HEIGHT = 2.0;
 const WATER_LEVEL = -1;
-const NOISE_SCALE = 0.006;
-const OCTAVES = 3;
-const PERSISTENCE = 0.35;
+const NOISE_SCALE = 0.012;
+const OCTAVES = 4;
+const PERSISTENCE = 0.45;
 const LACUNARITY = 2.2;
 
 // Clean, saturated Brabant meadow palette
@@ -173,10 +173,46 @@ export class Terrain {
         const height = 0.1 + raw * 0.9; // range: 0.1 .. MAX_HEIGHT
 
         this.heightData[idx] = height;
-        positions.setY(idx, height);
 
         // High-frequency detail noise for vertex color variation
         this.detailNoise[idx] = detailNoise2D(nx * 80, nz * 80);
+      }
+    }
+
+    // Flatten spawn areas so buildings don't end up on slopes
+    const spawnPositions = [
+      { x: 25, z: 25 }, { x: -25, z: -25 },
+      { x: 25, z: -25 }, { x: -25, z: 25 },
+    ];
+    const flattenRadiusInner = 8;
+    const flattenRadiusOuter = 15;
+    const halfSize = MAP_SIZE / 2;
+
+    for (let iz = 0; iz <= SEGMENTS; iz++) {
+      for (let ix = 0; ix <= SEGMENTS; ix++) {
+        const idx = iz * stride + ix;
+        const worldX = (ix / SEGMENTS) * MAP_SIZE - halfSize;
+        const worldZ = (iz / SEGMENTS) * MAP_SIZE - halfSize;
+
+        for (const sp of spawnPositions) {
+          const dx = worldX - sp.x;
+          const dz = worldZ - sp.z;
+          const dist = Math.sqrt(dx * dx + dz * dz);
+
+          if (dist < flattenRadiusOuter) {
+            const flatHeight = 0.15; // near-zero base height for spawn areas
+            if (dist <= flattenRadiusInner) {
+              this.heightData[idx] = flatHeight;
+            } else {
+              const t = (dist - flattenRadiusInner) / (flattenRadiusOuter - flattenRadiusInner);
+              // Smooth hermite interpolation
+              const smooth = t * t * (3 - 2 * t);
+              this.heightData[idx] = flatHeight + (this.heightData[idx] - flatHeight) * smooth;
+            }
+          }
+        }
+
+        positions.setY(idx, this.heightData[idx]);
       }
     }
 
@@ -191,6 +227,7 @@ export class Terrain {
 
   private applyVertexColors(): void {
     const positions = this.geometry.attributes.position;
+    const normals = this.geometry.attributes.normal;
     const count = positions.count;
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
@@ -205,46 +242,70 @@ export class Terrain {
       const ix = i % stride;
       const iz = Math.floor(i / stride);
 
-      // Simple, clean color zones — mostly green with subtle variation
-      const t = Math.min(1, height / MAX_HEIGHT); // 0..1 normalized height
+      // Compute slope from vertex normal (steeper = lower ny)
+      const ny = normals.getY(i);
+      const slope = 1 - ny; // 0 = flat, ~1 = very steep
 
-      if (t < 0.3) {
-        // Low areas: lush meadow green
-        color.lerpColors(COLOR_GRASS_LUSH, COLOR_GRASS, t / 0.3);
-      } else if (t < 0.6) {
-        // Mid areas: standard green with detail-based patches
-        const mt = (t - 0.3) / 0.3;
+      // Normalized height 0..1
+      const t = Math.min(1, height / MAX_HEIGHT);
+
+      if (t < 0.2) {
+        // Valley floors: deeper, richer green — slightly darkened
+        color.lerpColors(COLOR_DEEP_GRASS, COLOR_GRASS_LUSH, t / 0.2);
+        // Darken valleys for depth
+        color.multiplyScalar(0.88 + t * 0.6);
+      } else if (t < 0.45) {
+        // Low-mid: lush meadow
+        const mt = (t - 0.2) / 0.25;
+        color.lerpColors(COLOR_GRASS_LUSH, COLOR_GRASS, mt);
+      } else if (t < 0.65) {
+        // Mid areas: standard green with dirt path patches
+        const mt = (t - 0.45) / 0.2;
         color.lerpColors(COLOR_GRASS, COLOR_GRASS_LIGHT, mt);
-        // Subtle dirt patches based on noise
-        if (detail > 0.4) {
+        // Sandy dirt patches where noise is high
+        if (detail > 0.3) {
           tmpColor.copy(COLOR_PATH);
-          color.lerp(tmpColor, (detail - 0.4) * 0.3);
+          color.lerp(tmpColor, (detail - 0.3) * 0.45);
         }
       } else if (t < 0.85) {
-        // Higher areas: light grass to hill green
-        const ht = (t - 0.6) / 0.25;
+        // Higher areas: lighter grass transitioning to hill color
+        const ht = (t - 0.65) / 0.2;
         color.lerpColors(COLOR_GRASS_LIGHT, COLOR_HILL, ht);
       } else {
-        // Hill tops: sun-bleached
+        // Hill tops: sun-bleached warm green
         const pt = (t - 0.85) / 0.15;
         color.lerpColors(COLOR_HILL, COLOR_HILL_TOP, Math.min(1, pt));
+        // Brighten hilltops that catch sunlight
+        color.multiplyScalar(1.05 + pt * 0.08);
       }
 
-      // Micro-variation: seeded random per vertex for +-4% brightness/hue shift
+      // Slope-based blending: steep slopes get sandy/brown tones
+      if (slope > 0.15) {
+        tmpColor.copy(COLOR_SANDY);
+        const slopeFactor = Math.min(1, (slope - 0.15) * 3.0);
+        color.lerp(tmpColor, slopeFactor * 0.5);
+      }
+
+      // Micro-variation: seeded random per vertex for +-6% brightness/hue shift
       const rng = seededRandom(ix, iz); // 0..1
-      const brightnessShift = 0.96 + rng * 0.08; // 0.96 .. 1.04
+      const brightnessShift = 0.94 + rng * 0.12; // 0.94 .. 1.06
 
-      // Slight hue shift: nudge green channel differently from red/blue
-      const hueShift = (seededRandom(ix + 9999, iz + 7777) - 0.5) * 0.024; // -0.012..+0.012
+      // Slight hue shift: nudge green channel for organic feel
+      const hueShift = (seededRandom(ix + 9999, iz + 7777) - 0.5) * 0.035;
 
-      // Also layer in the detail noise for additional organic variation
-      const detailVariation = 0.988 + (detail * 0.5 + 0.5) * 0.024;
+      // Detail noise drives green-shade patches (clumps of different grass)
+      const detailFactor = detail * 0.5 + 0.5; // 0..1
+      const detailVariation = 0.96 + detailFactor * 0.08; // 0.96..1.04
+
+      // Extra green micro-patches: some vertices get slightly warmer/cooler green
+      const patchRng = seededRandom(ix + 3141, iz + 2718);
+      const patchShift = patchRng > 0.8 ? 0.04 : (patchRng < 0.2 ? -0.03 : 0);
 
       const finalVariation = brightnessShift * detailVariation;
 
-      colors[i * 3] = Math.min(1, color.r * finalVariation);
-      colors[i * 3 + 1] = Math.min(1, (color.g + hueShift) * finalVariation);
-      colors[i * 3 + 2] = Math.min(1, (color.b - hueShift * 0.5) * finalVariation);
+      colors[i * 3] = Math.min(1, Math.max(0, color.r * finalVariation));
+      colors[i * 3 + 1] = Math.min(1, Math.max(0, (color.g + hueShift + patchShift) * finalVariation));
+      colors[i * 3 + 2] = Math.min(1, Math.max(0, (color.b - hueShift * 0.5) * finalVariation));
     }
 
     this.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
@@ -282,21 +343,38 @@ export class Terrain {
   }
 
   private createWaterPlane(): THREE.Mesh {
-    const waterGeo = new THREE.PlaneGeometry(MAP_SIZE, MAP_SIZE, 64, 64);
+    const waterGeo = new THREE.PlaneGeometry(MAP_SIZE * 1.5, MAP_SIZE * 1.5, 80, 80);
     waterGeo.rotateX(-Math.PI / 2);
 
-    // Store reference at module level so updateWater() can animate vertices
     waterGeometry = waterGeo;
 
     const waterMat = new THREE.MeshStandardMaterial({
-      color: '#2a7aa0',
+      color: '#1a6b8a',
       transparent: true,
-      opacity: 0.7,
-      roughness: 0.15,
-      metalness: 0.4,
-      envMapIntensity: 0.8,
+      opacity: 0.82,
+      roughness: 0.08,
+      metalness: 0.6,
+      envMapIntensity: 1.2,
       side: THREE.DoubleSide,
     });
+
+    // Add vertex colors for depth gradient (darker in center, lighter at edges)
+    const colors = new Float32Array(waterGeo.attributes.position.count * 3);
+    const deepColor = new THREE.Color('#0d4a6a');
+    const shallowColor = new THREE.Color('#3a9ab8');
+    const halfSize = MAP_SIZE * 0.75;
+    for (let i = 0; i < waterGeo.attributes.position.count; i++) {
+      const x = waterGeo.attributes.position.getX(i);
+      const z = waterGeo.attributes.position.getZ(i);
+      const dist = Math.sqrt(x * x + z * z) / halfSize;
+      const t = Math.min(dist, 1);
+      const c = deepColor.clone().lerp(shallowColor, t);
+      colors[i * 3] = c.r;
+      colors[i * 3 + 1] = c.g;
+      colors[i * 3 + 2] = c.b;
+    }
+    waterGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    waterMat.vertexColors = true;
 
     const water = new THREE.Mesh(waterGeo, waterMat);
     water.position.y = WATER_LEVEL;
@@ -315,9 +393,10 @@ export function updateWater(elapsed: number): void {
   for (let i = 0; i < positions.count; i++) {
     const x = positions.getX(i);
     const z = positions.getZ(i);
-    // Two overlapping sine waves at different frequencies and directions
-    const y = Math.sin(x * 0.5 + elapsed * 0.8) * 0.04
-            + Math.sin(z * 0.3 + elapsed * 0.6) * 0.04;
+    // Three overlapping sine waves for realistic ocean-like movement
+    const y = Math.sin(x * 0.3 + elapsed * 0.7) * 0.12
+            + Math.sin(z * 0.2 + elapsed * 0.5) * 0.10
+            + Math.sin((x + z) * 0.15 + elapsed * 1.1) * 0.06;
     positions.setY(i, y);
   }
   positions.needsUpdate = true;

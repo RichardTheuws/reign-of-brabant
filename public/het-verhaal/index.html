@@ -839,7 +839,7 @@
             <span class="badge badge-randstad">Randstad</span>
             <span class="badge badge-limburg">Limburgers</span>
             <span class="badge badge-belgen">Belgen</span>
-            <span class="badge badge-gold">v0.8.0</span>
+            <span class="badge badge-gold">v0.16.3</span>
         </div>
     </div>
     <div class="scroll-hint">Scroll om te ontdekken</div>
@@ -958,6 +958,18 @@
             </div>
         </div>
         <div class="card">
+            <img src="../assets/factions/brabanders-sluiper.png" alt="Sluiper" class="card-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22><rect fill=%22%231a1a2e%22 width=%22400%22 height=%22400%22/><text x=%22200%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%23E67E22%22 font-size=%2260%22>🏹</text><text x=%22200%22 y=%22260%22 text-anchor=%22middle%22 fill=%22%238a8a9a%22 font-size=%2220%22>Sluiper</text></svg>'">
+            <div class="card-body">
+                <h4>Sluiper <span style="color: var(--text-muted); font-size: 0.8rem">— Ranged</span></h4>
+                <p>"Sssst, ik ga al" / "Ge hebt mij nie gezien" / "Stilletjes, h&egrave;"</p>
+                <div class="card-stats">
+                    <div class="stat"><div class="stat-value">55</div><div class="stat-label">HP</div></div>
+                    <div class="stat"><div class="stat-value">12</div><div class="stat-label">ATK</div></div>
+                    <div class="stat"><div class="stat-value">60/20</div><div class="stat-label">Cost</div></div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
             <img src="../assets/factions/brabanders-prins.png" alt="Prins van Brabant" class="card-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22><rect fill=%22%231a1a2e%22 width=%22400%22 height=%22400%22/><text x=%22200%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%23d4a847%22 font-size=%2260%22>👑</text><text x=%22200%22 y=%22260%22 text-anchor=%22middle%22 fill=%22%238a8a9a%22 font-size=%2220%22>De Prins</text></svg>'">
             <div class="card-body">
                 <h4>Prins van Brabant <span style="color: var(--gold); font-size: 0.8rem">— HERO</span></h4>
@@ -969,7 +981,21 @@
                 </div>
             </div>
         </div>
+        <div class="card">
+            <img src="../assets/factions/brabanders-boer-hero.png" alt="Boer van Brabant" class="card-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22><rect fill=%22%231a1a2e%22 width=%22400%22 height=%22400%22/><text x=%22200%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%23d4a847%22 font-size=%2260%22>🧑‍🌾</text><text x=%22200%22 y=%22260%22 text-anchor=%22middle%22 fill=%22%238a8a9a%22 font-size=%2220%22>Boer van Brabant</text></svg>'">
+            <div class="card-body">
+                <h4>Boer van Brabant <span style="color: var(--gold); font-size: 0.8rem">— HERO</span></h4>
+                <p>"Ge kunt den boer nie verstoppen!" / Ultimate: Oogstfeest — massive AoE heal + resource boost</p>
+                <div class="card-stats">
+                    <div class="stat"><div class="stat-value">400</div><div class="stat-label">HP</div></div>
+                    <div class="stat"><div class="stat-value">18</div><div class="stat-label">ATK</div></div>
+                    <div class="stat"><div class="stat-value">300/150</div><div class="stat-label">Cost</div></div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;"><strong>Buildings:</strong> Boerderij (TownHall), Caf&eacute; (Barracks), Houtzagerij, Smederij. <strong>Unieke mechanic:</strong> Gezelligheid — units krijgen +50% stats wanneer ze gegroepeerd zijn (20+ units).</p>
 
     <!-- RANDSTAD -->
     <div class="faction-header randstad" style="margin-top: 4rem;">
@@ -1002,12 +1028,24 @@
         <div class="card">
             <img src="../assets/factions/randstad-manager.png" alt="Manager" class="card-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22><rect fill=%22%231a1a2e%22 width=%22400%22 height=%22400%22/><text x=%22200%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%233498DB%22 font-size=%2260%22>📊</text><text x=%22200%22 y=%22260%22 text-anchor=%22middle%22 fill=%22%238a8a9a%22 font-size=%2220%22>Manager</text></svg>'">
             <div class="card-body">
-                <h4>Manager <span style="color: var(--text-muted); font-size: 0.8rem">— Ranged/Debuff</span></h4>
+                <h4>Manager <span style="color: var(--text-muted); font-size: 0.8rem">— Infantry</span></h4>
                 <p>"Even mijn agenda checken" / "Dit eskaleert!"</p>
                 <div class="card-stats">
                     <div class="stat"><div class="stat-value">70</div><div class="stat-label">HP</div></div>
                     <div class="stat"><div class="stat-value">9</div><div class="stat-label">ATK</div></div>
                     <div class="stat"><div class="stat-value">90/30</div><div class="stat-label">Cost</div></div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <img src="../assets/factions/randstad-consultant.png" alt="Consultant" class="card-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22><rect fill=%22%231a1a2e%22 width=%22400%22 height=%22400%22/><text x=%22200%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%233498DB%22 font-size=%2260%22>📋</text><text x=%22200%22 y=%22260%22 text-anchor=%22middle%22 fill=%22%238a8a9a%22 font-size=%2220%22>Consultant</text></svg>'">
+            <div class="card-body">
+                <h4>Consultant <span style="color: var(--text-muted); font-size: 0.8rem">— Ranged</span></h4>
+                <p>"Vanuit mijn optiek..." / "Dat staat in mijn rapport"</p>
+                <div class="card-stats">
+                    <div class="stat"><div class="stat-value">60</div><div class="stat-label">HP</div></div>
+                    <div class="stat"><div class="stat-value">11</div><div class="stat-label">ATK</div></div>
+                    <div class="stat"><div class="stat-value">80/25</div><div class="stat-label">Cost</div></div>
                 </div>
             </div>
         </div>
@@ -1025,12 +1063,14 @@
         </div>
     </div>
 
+    <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;"><strong>Buildings:</strong> Hoofdkantoor (TownHall), Vergaderzaal (Barracks), Logistiek Centrum, R&amp;D Lab. <strong>Unieke mechanic:</strong> Bureaucratie/Effici&euml;ntie stacks — meer vergaderingen = sterkere buffs.</p>
+
     <!-- LIMBURGERS -->
     <div class="faction-header limburg" style="margin-top: 4rem;">
         <div class="faction-icon">⛏️</div>
         <div class="faction-info">
             <h3 style="color: var(--limburg-primary)">De Limburgers</h3>
-            <p class="faction-tagline">"Gluck auf" — De Mijnwerkers</p>
+            <p class="faction-tagline">"Gluck auf" — Meesters van de Ondergrond</p>
             <div class="faction-traits">
                 <span class="trait">Hit-and-run</span>
                 <span class="trait">Underground tunnels</span>
@@ -1121,12 +1161,14 @@
         </div>
     </div>
 
+    <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;"><strong>Buildings:</strong> Grottentempel (TownHall), Heuvelfort (Barracks), Mijnschacht, Mergeloven. <strong>Unieke mechanic:</strong> Tunnelnetwerk + Kolen-economie. <strong style="color: var(--gold);">5 unieke Meshy 3D modellen</strong> gegenereerd via Meshy Studio. <strong>5 campaign missies</strong> speelbaar.</p>
+
     <!-- BELGEN -->
     <div class="faction-header belgen" style="margin-top: 4rem;">
         <div class="faction-icon">🍟</div>
         <div class="faction-info">
             <h3 style="color: var(--belgen-primary)">De Belgen</h3>
-            <p class="faction-tagline">"Ceci n'est pas une army" — De Diplomaten</p>
+            <p class="faction-tagline">"Ceci n'est pas une army" — Diplomaten en Compromismeesters</p>
             <div class="faction-traits">
                 <span class="trait">Diplomatie/Compromis</span>
                 <span class="trait">Sterke economie</span>
@@ -1210,6 +1252,8 @@
             </div>
         </div>
     </div>
+
+    <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;"><strong>Buildings:</strong> Wafelpaleis (TownHall), Frituurfort (Barracks), Chocolaterie, Brouwerij. <strong>Unieke mechanic:</strong> Diplomatie + Chocolade-overtuiging. <strong style="color: var(--gold);">5 unieke Meshy 3D modellen</strong> gegenereerd via Meshy Studio. <strong>3 campaign missies</strong> speelbaar.</p>
 </section>
 
 <!-- ===== 03: MECHANICS ===== -->
@@ -1315,19 +1359,19 @@
 <!-- ===== 04: PIPELINE ===== -->
 <section id="pipeline">
     <h2><span class="section-number">04</span>Asset Pipeline</h2>
-    <p class="section-intro">Een hybride AI-pipeline die 82% van alle 3D assets gratis genereert via Blender, aangevuld met Meshy/Tripo3D voor complexe modellen.</p>
+    <p class="section-intro">Een hybride AI-pipeline die 82% van alle 3D assets gratis genereert via Blender, aangevuld met Meshy Studio v6 voor faction-specifieke modellen en fal.ai Flux voor concept art.</p>
 
     <div class="pipeline">
         <div class="pipeline-step">
             <div class="step-icon">💡</div>
             <div class="step-title">Concept</div>
-            <div class="step-tool">Flux Pro / Nano Banana</div>
+            <div class="step-tool">fal.ai Flux / Nano Banana</div>
             <div class="step-cost">~$0.03/image</div>
         </div>
         <div class="pipeline-step">
             <div class="step-icon">🧊</div>
             <div class="step-title">3D Model</div>
-            <div class="step-tool">Blender (82%) / Meshy (18%)</div>
+            <div class="step-tool">Blender (82%) / Meshy Studio v6 (18%)</div>
             <div class="step-cost">$0 / ~$0.48</div>
         </div>
         <div class="pipeline-step">
@@ -1354,6 +1398,12 @@
             <div class="step-tool">ElevenLabs / Suno</div>
             <div class="step-cost">Bestaand abo</div>
         </div>
+        <div class="pipeline-step">
+            <div class="step-icon">🎙️</div>
+            <div class="step-title">Voice Studio</div>
+            <div class="step-tool">tools.theuws.com/voice-studio/</div>
+            <div class="step-cost">551 lines, 45 synced</div>
+        </div>
     </div>
 
     <div class="code-block">
@@ -1363,6 +1413,28 @@
   <span class="flag">--output</span> <span class="string">assets/models/brabanders/</span>
 
 <span class="comment"># 8 gebouwen in 57ms. 127 modellen totaal in &lt;60 seconden.</span>
+    </div>
+
+    <h3 style="margin-top: 2rem;">Meshy Studio v6 — Faction 3D Modellen</h3>
+    <div class="mechanic-box" style="border-color: var(--gold);">
+        <h4>10 Unieke Faction Modellen (v0.14)</h4>
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Meshy Studio v6 direct API met parallelle generatie: 10 modellen in 5 minuten. Concept art via fal.ai Flux, dan image-to-3D pipeline via Meshy.</p>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Factie</th><th>Modellen</th><th>Methode</th></tr></thead>
+                <tbody>
+                    <tr><td style="color: var(--limburg-primary);">Limburgers</td><td>5 modellen (Mijnwerker, Schutterij, Vlaaienwerper, Mijnbaas, Maasridder)</td><td>Flux concept art &rarr; Meshy image-to-3D</td></tr>
+                    <tr><td style="color: var(--belgen-primary);">Belgen</td><td>5 modellen (Frietkraamhouder, Bierbouwer, Chocolatier, Frietkoning, Abdijbrouwer)</td><td>Flux concept art &rarr; Meshy image-to-3D</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.75rem;">Faction color tints worden automatisch toegepast in-game voor visuele herkenning.</p>
+    </div>
+
+    <h3 style="margin-top: 2rem;">Voice Studio</h3>
+    <div class="mechanic-box" style="border-color: var(--brabant-primary);">
+        <h4>Voice Studio v1.1.0 — tools.theuws.com/voice-studio/</h4>
+        <p style="color: var(--text-secondary);">Dedicated web app voor voice line management. 551 voice lines totaal, 45 gesynced naar de game. Auto-sync script draait voor elke deploy.</p>
     </div>
 </section>
 
@@ -1440,7 +1512,7 @@
         <div class="timeline-item completed">
             <div class="timeline-date">5 april — v0.5 Sprint</div>
             <div class="timeline-title">Voices, Campaign 4-6, Bugfixes</div>
-            <div class="timeline-desc">51 ElevenLabs voice lines met per-unit-type persoonlijkheid (Boer/Carnavalvierder/Kansen + Randstad). Campaign missies 4-6: stealth, diplomatie, boerenopstand. Building Y-offset fix, destroy-building objective fix.</div>
+            <div class="timeline-desc">51 ElevenLabs voice lines met per-unit-type persoonlijkheid (Boer/Carnavalvierder/Sluiper + Randstad). Campaign missies 4-6: stealth, diplomatie, boerenopstand. Building Y-offset fix, destroy-building objective fix.</div>
         </div>
         <div class="timeline-item completed">
             <div class="timeline-date">6 april — v0.6.0 Sprint</div>
@@ -1457,10 +1529,25 @@
             <div class="timeline-title">Underground System, Diplomacy System, Entity Factory</div>
             <div class="timeline-desc">Entity factory met 4-faction support. Limburgers Underground tunnelnetwerk (max 4 endpoints, 3s transit, 12 unit capacity). Belgen Diplomacy systeem (4 Compromis types, Chocolade-Overtuiging, Commissie Oprichten, Damage Split). Tertiair Resource systeem. 36 any-types vervangen, dead imports opgeruimd.</div>
         </div>
+        <div class="timeline-item completed">
+            <div class="timeline-date">6 april — v0.10-v0.12</div>
+            <div class="timeline-title">4-Faction Playable, UX Polish, Terrain Overhaul</div>
+            <div class="timeline-desc">Alle 4 facties speelbaar, 20 campaign missies, 53 vitest tests, 4 map templates. Fullscreen tip, pause menu, camera intro. Terrain: 256 segments, height 2.0, slope-based kleuren, water verbetering.</div>
+        </div>
+        <div class="timeline-item completed">
+            <div class="timeline-date">6 april — v0.13-v0.14</div>
+            <div class="timeline-title">Faction Music, Meshy 3D Modellen</div>
+            <div class="timeline-desc">Multi-faction campaign fix (player faction detection). Faction-specifieke muziekthema's. 10 unieke Meshy Studio modellen (5 Limburgers + 5 Belgen) met faction color tints.</div>
+        </div>
+        <div class="timeline-item completed">
+            <div class="timeline-date">6 april — v0.15-v0.16</div>
+            <div class="timeline-title">Multi-Select, Production &amp; MEGA FIX</div>
+            <div class="timeline-desc">Drag box multi-select, dynamisch production panel, hero panel fix. MEGA FIX: -ansen purge (40+ occurrences), faction-aware unit systeem, victory/defeat fix, auto-defend combat, production queue display.</div>
+        </div>
         <div class="timeline-item active">
             <div class="timeline-date">Volgende</div>
-            <div class="timeline-title">v0.9: Skeletal Animation, Multiplayer Prep</div>
-            <div class="timeline-desc">Mixamo skeletal animaties voor units. Snowboard Rush UAT. Wolfenstein balancing. Multiplayer voorbereidingen.</div>
+            <div class="timeline-title">v0.17+: Voice Acting, Randstad Campaign, Skeletal Animation</div>
+            <div class="timeline-desc">Voice Studio: 45/551 lines synced. Randstad campaign missies. Skeletal animaties voor units. Multiplayer voorbereidingen.</div>
         </div>
     </div>
 </section>
@@ -1554,10 +1641,10 @@
             <div class="card-body">
                 <h4 style="color: var(--gold)">Cheat Codes</h4>
                 <p><strong>WANSEN:</strong> +10.000 resources</p>
-                <p><strong>GUUANSEN MANSEN:</strong> Alle muziek = Guus Meeuwis</p>
-                <p><strong>VERGANSEN DERING:</strong> Vijanden stoppen permanent</p>
+                <p><strong>GUUS MANSEN:</strong> Alle muziek = Guus Meeuwis</p>
+                <p><strong>VERGADERING:</strong> Vijanden stoppen permanent</p>
                 <p><strong>VLAAI STORM:</strong> Random vlaaien uit de lucht</p>
-                <p><strong>SPROOKANSEN BOS:</strong> Unlock Efteling-factie</p>
+                <p><strong>SPROOKJESBOS:</strong> Unlock Efteling-factie</p>
             </div>
         </div>
     </div>
@@ -1566,7 +1653,7 @@
 <!-- ===== 08: VOICES ===== -->
 <section id="voices">
     <h2><span class="section-number">08</span>Stemmen & Audio</h2>
-    <p class="section-intro">216 voice lines met echt dialect. Geen AI-Engels met een Nederlands sausje — dit wordt samen geschreven en door Richard zelf ingesproken.</p>
+    <p class="section-intro">551 voice lines in het Voice Studio, 45 gesynced naar de game. Faction-specifieke muziekthema's voor alle 4 facties. Auto-sync script draait voor elke deploy.</p>
 
     <div class="voice-grid">
         <div class="voice-sample">
@@ -1613,16 +1700,20 @@
         </div>
     </div>
 
-    <div class="mechanic-box" style="border-color: var(--text-muted); margin-top: 1.5rem;">
-        <h4>📋 Voice Lines — Aparte Sessie</h4>
-        <p style="color: var(--text-secondary);">De voice lines worden in een dedicated sessie samen uitgewerkt:</p>
-        <ol style="color: var(--text-secondary); margin-top: 0.75rem; padding-left: 1.5rem; font-size: 0.9rem; line-height: 2;">
-            <li><strong>Teksten samen schrijven</strong> — Per factie het juiste dialect, humor en karakter bepalen</li>
-            <li><strong>Richard spreekt in</strong> — Basis-opnames met echt Brabants gevoel als referentie</li>
-            <li><strong>ElevenLabs voice cloning</strong> — 4 unieke factiestemmen op basis van Richards opnames</li>
-            <li><strong>Genereren + curating</strong> — 216 lines genereren, beste varianten selecteren</li>
-        </ol>
-        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.75rem;">Play-knoppen worden actief zodra de echte samples klaar zijn.</p>
+    <div class="mechanic-box" style="border-color: var(--gold); margin-top: 1.5rem;">
+        <h4>🎙️ Voice Studio v1.1.0 — Status</h4>
+        <p style="color: var(--text-secondary);">Voice lines worden beheerd via Voice Studio (tools.theuws.com/voice-studio/):</p>
+        <div class="table-wrap" style="margin-top: 0.75rem;">
+            <table>
+                <thead><tr><th>Unit</th><th>Status</th><th>Lines</th></tr></thead>
+                <tbody>
+                    <tr><td style="color: var(--brabant-primary);">Boer</td><td style="color: var(--limburg-primary);">15 approved</td><td>Select, Move, Attack, Death</td></tr>
+                    <tr><td style="color: var(--brabant-primary);">Carnavalvierder</td><td style="color: var(--limburg-primary);">12 synced</td><td>Select, Move, Attack, Death</td></tr>
+                    <tr><td style="color: var(--brabant-primary);">Sluiper</td><td style="color: var(--brabant-primary);">18 recorded</td><td>Select, Move, Attack, Death</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.75rem;">45 van 551 voice lines gesynced. Auto-sync script draait voor elke deploy. Play-knoppen worden actief zodra de echte samples klaar zijn.</p>
     </div>
 
     <h3 style="margin-top: 2rem;">Voice Pipeline</h3>
@@ -1647,13 +1738,30 @@
             </div>
             <div class="pipeline-step">
                 <div class="step-icon">🎮</div>
-                <div class="step-title">216 Voice Lines</div>
+                <div class="step-title">551 Voice Lines</div>
                 <div class="step-tool">Select / Move / Attack / Death</div>
             </div>
         </div>
         <p style="color: var(--text-muted); font-size: 0.85rem;">Waarom zelf inspreken? Omdat geen AI de warmte van echt Brabants dialect kan vangen. "Hedde al gegeten?" klinkt alleen goed als het ECHT is.</p>
     </div>
     <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 1rem;">Klik op de play-knoppen hierboven voor een Web Speech API preview. Echte samples met Richards stem volgen in Phase 6.</p>
+
+    <h3 style="margin-top: 2rem;">Faction Muziekthema's (v0.13)</h3>
+    <div class="mechanic-box" style="border-color: var(--gold);">
+        <h4>4 Faction-Specifieke Muziekthema's</h4>
+        <p style="color: var(--text-secondary); margin-bottom: 0.75rem;">Elke factie heeft een uniek muziekthema dat automatisch wisselt op basis van de geselecteerde factie. Dynamic battle intensity systeem past muziek aan op gevechtsintensiteit.</p>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Factie</th><th>Stijl</th><th>Intensiteit</th></tr></thead>
+                <tbody>
+                    <tr><td style="color: var(--brabant-primary);">Brabanders</td><td>Folklorisch, warm, carnavalesk</td><td>Gezellig &rarr; Feestelijk &rarr; Episch</td></tr>
+                    <tr><td style="color: var(--randstad-primary);">Randstad</td><td>Corporate, strak, elektronisch</td><td>Ambient &rarr; Druk &rarr; Chaotisch</td></tr>
+                    <tr><td style="color: var(--limburg-primary);">Limburgers</td><td>Mysterieus, diep, aards</td><td>Stil &rarr; Dreigend &rarr; Aardbeving</td></tr>
+                    <tr><td style="color: var(--belgen-primary);">Belgen</td><td>Surrealistisch, vrolijk, Frans accent</td><td>Caf&eacute; &rarr; March &rarr; Chaos</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
     <h3 style="margin-top: 2rem;">Dialect Update (v0.7.0)</h3>
     <div class="mechanic-box" style="border-color: var(--brabant-primary);">
@@ -1849,8 +1957,8 @@
 
 <!-- ===== 10: TECHNICAL ===== -->
 <section id="tech">
-    <h2><span class="section-number">10</span>Technische Updates (v0.7-0.8)</h2>
-    <p class="section-intro">Onder de motorkap: instanced rendering, 4-faction architectuur, tertiaire resources, en een entity factory die 31 unit archetypes en 41 building archetypes aanstuurt.</p>
+    <h2><span class="section-number">10</span>Technische Updates (v0.7-0.16)</h2>
+    <p class="section-intro">Onder de motorkap: instanced rendering, 4-faction architectuur, tertiaire resources, en een entity factory die 31 unit archetypes en 41 building archetypes aanstuurt. Plus 9 grote versie-updates met terrain overhaul, multi-select, en de MEGA FIX.</p>
 
     <div class="card-grid">
         <div class="card">
@@ -1933,16 +2041,60 @@
             </tbody>
         </table>
     </div>
+
+    <h3 style="margin-top: 2rem;">Versie Updates (v0.10 - v0.16)</h3>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Versie</th><th>Titel</th><th>Highlights</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td style="color: var(--gold);">v0.10</td>
+                    <td>4-Faction Playable</td>
+                    <td>Alle 4 facties speelbaar, 20 campaign missies (Brabanders 12, Limburgers 5, Belgen 3), 4 map templates (kempen, crossroads, islands, arena), 53 vitest tests, balance pass voor asymmetrische facties</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--gold);">v0.11</td>
+                    <td>UX Polish</td>
+                    <td>Fullscreen tip bij game start, pause menu (ESC), camera intro animatie, unit visibility fixes, campaign tabs per factie</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--gold);">v0.12</td>
+                    <td>Terrain Overhaul</td>
+                    <td>256 terrain segmenten, height 2.0, slope-based kleuren, water verbetering, building/prop Y-offsets correct</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--gold);">v0.13</td>
+                    <td>Multi-Faction Campaign</td>
+                    <td>Player faction detection fix (campaign speelbaar als elke factie), faction-specifieke muziekthema's voor alle 4 facties</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--gold);">v0.14</td>
+                    <td>Meshy 3D Modellen</td>
+                    <td>10 unieke Meshy Studio modellen (5 Limburgers + 5 Belgen), faction color tints voor visuele herkenning</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--gold);">v0.15</td>
+                    <td>Multi-Select &amp; Production</td>
+                    <td>Drag box multi-select, dynamisch production panel, hero panel fix</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--gold);">v0.16</td>
+                    <td>MEGA FIX</td>
+                    <td>-ansen purge (40+ occurrences verwijderd), faction-aware unit systeem, victory/defeat condition fix, auto-defend combat, production queue display, unit namen correct per factie</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </section>
 
 <section id="roadmap">
     <h2><span class="section-number">11</span>Development Roadmap</h2>
-    <p class="section-intro">7 phases van gekleurde dozen tot een volledige RTS met 4 facties, campaign en multiplayer.</p>
+    <p class="section-intro">Van gekleurde dozen tot een volledige RTS met 4 facties, 20 campaign missies, 10 unieke 3D modellen en 551 voice lines.</p>
 
     <div class="cost-highlight" style="margin-bottom: 2rem;">
-        <div class="big-number">v0.8.0</div>
-        <div class="cost-label">4 facties | 31 unit archetypes | 41 building archetypes | 12 campaign missies</div>
-        <div style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">12 campaign missies · 3 resources per factie · instanced rendering 768 units · 507 voice lines</div>
+        <div class="big-number">v0.16.3</div>
+        <div class="cost-label">4 facties | 31 unit archetypes | 41 building archetypes | 20 campaign missies</div>
+        <div style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">20 campaign missies · 10 Meshy 3D modellen · 53 vitest tests · 551 voice lines (45 synced)</div>
     </div>
 
     <div class="table-wrap">
@@ -1955,22 +2107,30 @@
                 <tr><td style="color: var(--gold);">3. Combat</td><td>Damage, projectiles, auto-aggro, death system</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
                 <tr><td style="color: var(--gold);">4. AI</td><td>Scripted build order, gather, army, attack waves</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
                 <tr><td style="color: var(--gold);">5. Factions</td><td>Gezelligheid + Carnavalsrage, Bureaucratie + Werkoverleg</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
-                <tr><td style="color: var(--gold);">6. Assets</td><td>12 Meshy modellen, 15 ElevenLabs SFX, 16 concept art</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
+                <tr><td style="color: var(--gold);">6. Assets</td><td>22 Meshy modellen (incl. 10 faction-specifiek), 15 ElevenLabs SFX, 16 concept art</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
                 <tr><td style="color: var(--gold);">7. Heroes</td><td>4 heroes, 12 abilities, hero revival, AI hero training</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
-                <tr><td style="color: var(--gold);">8. Campaign</td><td>3 missies, campaign select, star rating, wave spawner</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
+                <tr><td style="color: var(--gold);">8. Campaign</td><td>20 missies (Brabanders 12, Limburgers 5, Belgen 3), campaign select, star rating, wave spawner</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
                 <tr><td style="color: var(--gold);">9. UI/Flow</td><td>Main menu, faction select, tutorial, loading, game over</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
                 <tr><td style="color: var(--gold);">10. Visuals</td><td>Fog of war, damage flash, idle bob, shadows, minimap</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
                 <tr><td style="color: var(--gold);">11. Muziek</td><td>12 Suno tracks, dynamic battle intensity, faction themes, random varianten</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
-                <tr><td style="color: var(--gold);">12. Voices</td><td>51 ElevenLabs voice lines, per-unit-type persoonlijkheid</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
+                <tr><td style="color: var(--gold);">12. Voices</td><td>551 voice lines in Voice Studio, 45 synced, per-unit-type persoonlijkheid</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
                 <tr><td style="color: var(--gold);">13. Campaign 4-9</td><td>6 extra missies: stealth, diplomatie, opstand, markt, beleg, finale</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
                 <tr><td style="color: var(--gold);">14. Hout &amp; Tech</td><td>2e resource (hout), Lumber Camp, Blacksmith, 7 upgrades</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
                 <tr><td style="color: var(--gold);">15. Campaign 10-12</td><td>Afsluiting Brabanders campaign (3 finale missies: Raad, A2, Worstenbroodje)</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
                 <tr><td style="color: var(--gold);">16. 4-Faction System</td><td>Limburgers &amp; Belgen specs, factionData.ts (1461 LOC), tertiaire resources</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
                 <tr><td style="color: var(--gold);">17. Instanced Rendering</td><td>InstancedMesh, 6 draw calls, 768 units@60 FPS</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
                 <tr><td style="color: var(--gold);">18. Underground &amp; Diplomacy</td><td>Tunnel-netwerk (Limburgers), Compromis-systeem (Belgen), Entity Factory</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
-                <tr><td>19. Skeletal Animation</td><td>Mixamo skeletal animaties voor units</td><td style="color: var(--brabant-primary);">Volgende</td></tr>
-                <tr><td>20. Multiplayer</td><td>Colyseus, invite links, ELO, leaderboard</td><td style="color: var(--text-muted);">Planned</td></tr>
-                <tr><td>21. Klapper</td><td>Epic Replay, Brabants weer, AI commentator</td><td style="color: var(--text-muted);">Planned</td></tr>
+                <tr><td style="color: var(--gold);">19. 4-Faction Playable</td><td>Alle 4 facties speelbaar, 20 campaign missies, 53 vitest tests, 4 map templates</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
+                <tr><td style="color: var(--gold);">20. UX &amp; Terrain</td><td>Fullscreen tip, pause menu, terrain overhaul (256 segments, slope colors), water improvement</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
+                <tr><td style="color: var(--gold);">21. Faction Music &amp; Campaign Fix</td><td>Player faction detection fix, faction-specifieke muziekthema's voor alle 4 facties</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
+                <tr><td style="color: var(--gold);">22. Meshy 3D Modellen</td><td>10 unieke Meshy Studio modellen (5 Limburgers + 5 Belgen), faction color tints</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
+                <tr><td style="color: var(--gold);">23. Multi-Select &amp; Production</td><td>Drag box multi-select, dynamisch production panel, hero panel fix</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
+                <tr><td style="color: var(--gold);">24. MEGA FIX</td><td>-ansen purge (40+), faction-aware unit system, victory/defeat fix, auto-defend, production queue</td><td style="color: var(--limburg-primary);">&#10003; Klaar</td></tr>
+                <tr><td style="color: var(--gold);">25. Voice Acting</td><td>Voice Studio v1.1.0, 45/551 lines synced (15 Boer, 12 Carnavalvierder, 18 Sluiper)</td><td style="color: var(--brabant-primary);">In Progress</td></tr>
+                <tr><td>26. Randstad Campaign</td><td>Randstad campaign missies</td><td style="color: var(--text-muted);">Planned</td></tr>
+                <tr><td>27. Skeletal Animation</td><td>Skeletal animaties voor units</td><td style="color: var(--text-muted);">Planned</td></tr>
+                <tr><td>28. Multiplayer</td><td>Colyseus, invite links, ELO, leaderboard</td><td style="color: var(--text-muted);">Planned</td></tr>
+                <tr><td>29. Klapper</td><td>Epic Replay, Brabants weer, AI commentator</td><td style="color: var(--text-muted);">Planned</td></tr>
             </tbody>
         </table>
     </div>
@@ -2111,7 +2271,7 @@
 <!-- ===== FOOTER ===== -->
 <footer>
     <div class="footer-logo">Reign of Brabant</div>
-    <p>Development Bible v0.8.0 — 6 april 2026</p>
+    <p>Development Bible v0.16.3 — 6 april 2026</p>
     <p style="margin-top: 0.5rem;">Gebouwd met Claude Code + fal.ai + Meshy + Blender + ElevenLabs + Suno</p>
     <p style="margin-top: 0.5rem; color: var(--text-muted);">Game Master &times; Richard Theuws</p>
     <p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.8rem;">Van een typo ("Zu") tot een speelbare RTS — in 1 sessie.</p>

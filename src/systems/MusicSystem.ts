@@ -26,6 +26,8 @@ export const MUSIC_IDS = {
   MAIN_MENU: 'music_main_menu',
   BRABANDERS: 'music_brabanders',
   RANDSTAD: 'music_randstad',
+  LIMBURGERS: 'music_limburgers',
+  BELGEN: 'music_belgen',
   BATTLE_LOW: 'music_battle_low',
   BATTLE_MEDIUM: 'music_battle_medium',
   BATTLE_HIGH: 'music_battle_high',
@@ -44,6 +46,8 @@ export const MUSIC_IDS = {
 const FACTION_THEME_VARIANTS: Record<number, readonly string[]> = {
   [FactionId.Brabanders]: ['music_brabanders', 'music_brabanders_2'],
   [FactionId.Randstad]: ['music_randstad'],
+  [FactionId.Limburgers]: ['music_limburgers'],
+  [FactionId.Belgen]: ['music_belgen'],
 };
 
 function pickRandom<T>(arr: readonly T[]): T {

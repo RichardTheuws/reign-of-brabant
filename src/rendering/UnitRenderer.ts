@@ -32,14 +32,14 @@ const UNIT_MODEL_PATHS: Record<string, string> = {
   infantry_1: 'assets/models/v02/randstad/infantry.glb',
   ranged_0: 'assets/models/v02/brabanders/ranged.glb',
   ranged_1: 'assets/models/v02/randstad/ranged.glb',
-  // Limburgers (reuse Brabanders models, distinguished by green tint)
-  worker_2: 'assets/models/v02/brabanders/worker.glb',
-  infantry_2: 'assets/models/v02/brabanders/infantry.glb',
-  ranged_2: 'assets/models/v02/brabanders/ranged.glb',
-  // Belgen (reuse Brabanders models, distinguished by burgundy tint)
-  worker_3: 'assets/models/v02/brabanders/worker.glb',
-  infantry_3: 'assets/models/v02/brabanders/infantry.glb',
-  ranged_3: 'assets/models/v02/brabanders/ranged.glb',
+  // Limburgers
+  worker_2: 'assets/models/v02/limburgers/worker.glb',
+  infantry_2: 'assets/models/v02/limburgers/infantry.glb',
+  ranged_2: 'assets/models/v02/limburgers/ranged.glb',
+  // Belgen
+  worker_3: 'assets/models/v02/belgen/worker.glb',
+  infantry_3: 'assets/models/v02/belgen/infantry.glb',
+  ranged_3: 'assets/models/v02/belgen/ranged.glb',
 };
 
 const UNIT_MODEL_FALLBACKS: Record<string, string> = {
@@ -49,11 +49,11 @@ const UNIT_MODEL_FALLBACKS: Record<string, string> = {
   infantry_1: 'assets/models/v01/randstad/infantry.glb',
   ranged_0: 'assets/models/v01/brabanders/ranged.glb',
   ranged_1: 'assets/models/v01/randstad/ranged.glb',
-  // Limburgers (reuse Brabanders v01 models as fallback)
+  // Limburgers (fallback to Brabanders v01)
   worker_2: 'assets/models/v01/brabanders/worker.glb',
   infantry_2: 'assets/models/v01/brabanders/infantry.glb',
   ranged_2: 'assets/models/v01/brabanders/ranged.glb',
-  // Belgen (reuse Brabanders v01 models as fallback)
+  // Belgen (fallback to Brabanders v01)
   worker_3: 'assets/models/v01/brabanders/worker.glb',
   infantry_3: 'assets/models/v01/brabanders/infantry.glb',
   ranged_3: 'assets/models/v01/brabanders/ranged.glb',
@@ -63,8 +63,8 @@ const UNIT_MODEL_FALLBACKS: Record<string, string> = {
 const FACTION_TINTS: Record<number, THREE.Color> = {
   [FACTION_ORANGE]: new THREE.Color(0xff8830), // Brabanders: bright warm orange
   [FACTION_BLUE]: new THREE.Color(0x4070bb),   // Randstad: clear blue
-  [FACTION_GREEN]: new THREE.Color(0x3a7d32),  // Limburgers: dark mining green
-  [FACTION_RED]: new THREE.Color(0xa01030),    // Belgen: burgundy red
+  [FACTION_GREEN]: new THREE.Color(0x44dd44),  // Limburgers: bright emerald green
+  [FACTION_RED]: new THREE.Color(0xdd3344),    // Belgen: bright crimson red
 };
 
 /** Selection highlight color (green tint on instance color). */
@@ -82,15 +82,15 @@ const IDLE_BOB_AMPLITUDE = 0.08;
 const IDLE_BOB_SPEED = 2.5;
 
 /** Blob shadow parameters. */
-const BLOB_SHADOW_SIZE = 0.6;
+const BLOB_SHADOW_SIZE = 1.0;
 const BLOB_SHADOW_OPACITY = 0.2;
 
 /** Maximum instances per (unitType, faction) bucket. */
 const MAX_INSTANCES_PER_BUCKET = 128;
 
 /** Size of the invisible hit-proxy box for raycasting (world units). */
-const HIT_PROXY_SIZE = 0.8;
-const HIT_PROXY_HEIGHT = 1.6;
+const HIT_PROXY_SIZE = 1.2;
+const HIT_PROXY_HEIGHT = 2.0;
 
 // ---------------------------------------------------------------------------
 // Internal: per-bucket data for one InstancedMesh
@@ -236,19 +236,25 @@ export class UnitRenderer {
       this.loader.loadAsync(path).catch(() => {
         const fallback = UNIT_MODEL_FALLBACKS[key];
         if (fallback) return this.loader.loadAsync(fallback);
-        throw new Error(`No model found for ${key}`);
-      }).then((gltf: GLTF) => {
+        return null;
+      }).then((gltf: GLTF | null) => {
+        const cacheKey = key as ModelCacheKey;
+        const factionId = parseInt(key.split('_')[1], 10);
+
+        if (!gltf) {
+          console.warn(`[UnitRenderer] Model load failed for "${key}", using fallback box`);
+          this.createFallbackBucket(cacheKey, factionId);
+          return;
+        }
+
         const root = gltf.scene;
         const isV02 = path.includes('/v02/');
-        const cacheKey = key as ModelCacheKey;
         if (isV02) this.v02Models.add(cacheKey);
 
-        // v02 models are larger — use smaller scale; v01 needs upscale
-        const scaleFactor = isV02 ? 0.5 : 1.5;
+        const scaleFactor = isV02 ? 1.5 : 1.8;
         root.scale.set(scaleFactor, scaleFactor, scaleFactor);
         root.updateMatrixWorld(true);
 
-        // Enable shadow casting on all child meshes
         root.traverse((child) => {
           if ((child as THREE.Mesh).isMesh) {
             child.castShadow = true;
@@ -257,12 +263,45 @@ export class UnitRenderer {
         });
 
         this.modelCache.set(cacheKey, root);
-
-        // Build InstancedMesh for this model key
         this.createBucket(cacheKey, root, isV02);
+
+        // Verify bucket was created, fallback if extractFirstMesh failed
+        if (!this.buckets.has(cacheKey)) {
+          console.warn(`[UnitRenderer] No mesh extracted for "${key}", using fallback box`);
+          this.createFallbackBucket(cacheKey, factionId);
+        }
       }),
     );
     await Promise.all(promises);
+  }
+
+  /** Create a simple colored box as fallback when GLB loading fails. */
+  private createFallbackBucket(key: ModelCacheKey, factionId: number): void {
+    const geo = new THREE.BoxGeometry(0.8, 1.4, 0.8);
+    geo.translate(0, 0.7, 0);
+    const tint = FACTION_TINTS[factionId] ?? new THREE.Color(0xcccccc);
+    const mat = new THREE.MeshStandardMaterial({ color: tint, roughness: 0.6, metalness: 0.1 });
+
+    const im = new THREE.InstancedMesh(geo, mat, MAX_INSTANCES_PER_BUCKET);
+    im.count = 0;
+    im.castShadow = true;
+    im.receiveShadow = false;
+    im.frustumCulled = false;
+    im.name = `fallback_${key}`;
+
+    im.instanceColor = new THREE.InstancedBufferAttribute(
+      new Float32Array(MAX_INSTANCES_PER_BUCKET * 3), 3,
+    );
+    for (let i = 0; i < MAX_INSTANCES_PER_BUCKET; i++) {
+      im.setColorAt(i, DEFAULT_COLOR);
+    }
+    im.instanceColor.needsUpdate = true;
+
+    this.group.add(im);
+    this.buckets.set(key, {
+      mesh: im, entityToIndex: new Map(), indexToEntity: new Map(),
+      activeCount: 0, instanceScales: new Map(),
+    });
   }
 
   /**
@@ -297,7 +336,7 @@ export class UnitRenderer {
     im.count = 0; // Start empty — we grow as units spawn
     im.castShadow = true;
     im.receiveShadow = false;
-    im.frustumCulled = true;
+    im.frustumCulled = false;
     im.name = `instanced_${key}`;
 
     // Initialize instanceColor buffer (required for setColorAt)
@@ -563,7 +602,7 @@ export class UnitRenderer {
 
       // --- Compose instance matrix ---
       // Position: terrain height + offset to clear terrain + procedural bob
-      this._pos.set(data.x, data.y + 0.5 + bob, data.z);
+      this._pos.set(data.x, data.y + 1.5 + bob, data.z);
 
       // Rotation: facing Y + sway Z + forward lean X
       this._euler.set(forwardLean, facingY, sway);
@@ -586,7 +625,7 @@ export class UnitRenderer {
 
       // --- Sync proxy position (for raycasting / entityMeshMap position queries) ---
       if (proxy) {
-        proxy.position.set(data.x, data.y + 0.5 + bob, data.z);
+        proxy.position.set(data.x, data.y + 1.5 + bob, data.z);
         proxy.rotation.y = facingY;
       }
 

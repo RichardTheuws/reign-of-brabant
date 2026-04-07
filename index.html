@@ -87,6 +87,10 @@
       align-items: center;
       justify-content: center;
       background: linear-gradient(135deg, rgba(10,8,6,0.92) 0%, rgba(20,15,10,0.85) 100%);
+      overflow-y: auto;
+      padding: 24px;
+      max-height: 100vh;
+      max-height: 100dvh;
     }
     .menu-logo { margin-bottom: 8px; }
     .menu-logo img {
@@ -219,6 +223,14 @@
       .faction-preview-image { width: 140px; height: 170px; }
       .faction-card { width: 120px; padding: 12px; }
     }
+    @media (max-height: 600px) {
+      #main-menu { padding: 12px; gap: 8px; }
+      .menu-logo img { max-width: 200px; }
+      .menu-title { font-size: 1.5rem; margin-bottom: 2px; }
+      .menu-subtitle { margin-bottom: 16px; font-size: 0.7rem; }
+      .menu-buttons { gap: 8px; min-width: 240px; }
+      .menu-btn { padding: 10px 16px; font-size: 0.9rem; }
+    }
 
     /* ================================================================ LOADING SCREEN */
     #loading-screen {
@@ -266,7 +278,7 @@
     }
 
     /* ================================================================ GAME HUD */
-    #game-hud { display: none; }
+    /* game-hud visibility controlled by inline style via MenuScreens.setGameHUDVisible() */
 
     .resource-bar {
       position: absolute; top: 0; left: 50%; transform: translateX(-50%);
@@ -358,10 +370,11 @@
       background: rgba(20, 15, 10, 0.92);
       border: 1px solid rgba(212, 168, 83, 0.3);
       border-radius: 8px;
-      z-index: 15;
+      z-index: 16;
       color: #e8e6e3; font-size: 0.85rem;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     }
+    #selection-panel[hidden] { display: none !important; }
     .unit-info { display: flex; align-items: center; gap: 10px; }
     .unit-portrait {
       width: 44px; height: 44px; border: 2px solid rgba(212, 168, 83, 0.4);
@@ -423,6 +436,7 @@
       border-radius: 8px; z-index: 15;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     }
+    .command-panel[hidden] { display: none !important; }
     .cmd-btn {
       width: 44px; height: 44px;
       background: rgba(40, 35, 25, 0.9);
@@ -576,6 +590,28 @@
     #camera-intro-overlay.is-fading { opacity: 0; }
     #camera-intro-overlay.is-hidden { display: none; }
 
+    /* ================================================================ PAUSE OVERLAY */
+    #pause-overlay {
+      position: absolute; inset: 0; display: flex;
+      align-items: center; justify-content: center;
+      background: rgba(0, 0, 0, 0.75); z-index: 45;
+      backdrop-filter: blur(4px);
+    }
+    #pause-overlay[hidden] { display: none; }
+    .pause-content {
+      text-align: center; padding: 40px 60px;
+      background: rgba(20, 15, 10, 0.95);
+      border: 2px solid rgba(212, 168, 83, 0.5);
+      border-radius: 12px;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+    }
+    .pause-title {
+      font-family: var(--font-heading); font-size: 2rem;
+      color: var(--color-gold); margin-bottom: 24px;
+    }
+    .pause-buttons { display: flex; flex-direction: column; gap: 12px; }
+    .pause-buttons .go-btn { min-width: 200px; }
+
     /* ================================================================ SETTINGS PANEL */
     #settings-panel {
       position: fixed;
@@ -637,6 +673,31 @@
       margin-top: 24px;
       width: 100%;
     }
+    .fullscreen-tip {
+      position: absolute; top: 50px; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 20px; z-index: 25;
+      background: rgba(20, 15, 10, 0.95);
+      border: 1px solid rgba(212, 168, 83, 0.5);
+      border-radius: 8px; font-size: 0.85rem;
+      color: var(--color-parchment);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+      animation: slideDown 0.4s ease-out;
+    }
+    .fullscreen-tip[hidden] { display: none; }
+    .fullscreen-tip-btn {
+      padding: 5px 14px; border: 1px solid var(--color-gold);
+      border-radius: 6px; background: rgba(212, 168, 83, 0.15);
+      color: var(--color-gold); font-family: var(--font-heading);
+      font-size: 0.75rem; cursor: pointer; white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .fullscreen-tip-btn:hover { background: rgba(212, 168, 83, 0.3); }
+    .fullscreen-tip-close {
+      background: none; border: none; color: var(--color-text-dim);
+      font-size: 1.2rem; cursor: pointer; padding: 0 4px; line-height: 1;
+    }
+    .fullscreen-tip-close:hover { color: var(--color-text); }
   </style>
 </head>
 <body>
@@ -644,6 +705,13 @@
     <canvas id="game-canvas"></canvas>
 
     <div id="ui-overlay">
+
+      <!-- ============ FULLSCREEN TIP (outside game-hud so always accessible) ============ -->
+      <div id="fullscreen-tip" class="fullscreen-tip" hidden>
+        <span>&#x26A1; Speel in volledig scherm voor de beste ervaring</span>
+        <button id="fullscreen-tip-btn" class="fullscreen-tip-btn">Volledig Scherm</button>
+        <button id="fullscreen-tip-close" class="fullscreen-tip-close">&times;</button>
+      </div>
 
       <!-- ============ MAIN MENU ============ -->
       <div id="main-menu">
@@ -677,7 +745,7 @@
           </button>
         </nav>
 
-        <span class="menu-version">v0.2.0</span>
+        <span class="menu-version">v0.16.3</span>
       </div>
 
       <!-- ============ SETTINGS PANEL ============ -->
@@ -815,13 +883,16 @@
           </div>
         </div>
 
-        <!-- FPS Counter -->
+        <!-- FPS Counter + Version -->
         <div id="fps-counter">
-          FPS: <span id="fps-value">0</span>
+          FPS: <span id="fps-value">0</span> | v0.16.3
         </div>
 
         <!-- Audio Mute Button -->
         <button id="audio-mute-btn" title="Geluid aan/uit (M)">&#x1F50A;</button>
+
+        <!-- Pause Button -->
+        <button id="pause-btn" title="Pauzeren (Esc)" style="position: absolute; top: 8px; right: 140px; font-size: 1rem; cursor: pointer; background: rgba(20,15,10,0.85); border: 1px solid rgba(212,168,83,0.25); color: var(--color-text); padding: 3px 10px; border-radius: 6px; z-index: 20; line-height: 1; transition: background 0.15s, border-color 0.15s;">&#x23F8;&#xFE0F;</button>
 
         <!-- Alert Container -->
         <div id="alert-container"></div>
@@ -902,7 +973,7 @@
         <div class="command-panel" id="cmd-building" hidden>
           <button class="cmd-btn" data-action="train-worker" data-hotkey="Q"><span class="btn-icon">&#x1F9D1;&#x200D;&#x1F33E;</span><span>Boer</span><span class="hotkey">Q</span></button>
           <button class="cmd-btn" data-action="train-infantry" data-hotkey="W"><span class="btn-icon">&#x2694;&#xFE0F;</span><span>Infanterie</span><span class="hotkey">W</span></button>
-          <button class="cmd-btn" data-action="train-ranged" data-hotkey="E"><span class="btn-icon">&#x1F3F9;</span><span>Kansen</span><span class="hotkey">E</span></button>
+          <button class="cmd-btn" data-action="train-ranged" data-hotkey="E"><span class="btn-icon">&#x1F3F9;</span><span>Sluiper</span><span class="hotkey">E</span></button>
           <button class="cmd-btn cmd-btn--hero" data-action="train-hero-prins" data-hotkey="T"><span class="btn-icon">&#x1F451;</span><span>Prins</span><span class="hotkey">T</span></button>
           <button class="cmd-btn cmd-btn--hero" data-action="train-hero-boer" data-hotkey="Y"><span class="btn-icon">&#x1F33E;</span><span>Boer Hero</span><span class="hotkey">Y</span></button>
         </div>
@@ -931,6 +1002,35 @@
           <button class="cmd-btn" data-action="move"><span class="btn-icon">&#x1F4CD;</span><span class="hotkey">M</span></button>
           <button class="cmd-btn" data-action="attack"><span class="btn-icon">&#x2694;&#xFE0F;</span><span class="hotkey">A</span></button>
           <button class="cmd-btn" data-action="stop"><span class="btn-icon">&#x1F6D1;</span><span class="hotkey">S</span></button>
+        </div>
+
+        <!-- Pause Menu -->
+        <div id="pause-overlay" hidden>
+          <div class="pause-content">
+            <h2 class="pause-title">Gepauzeerd</h2>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;margin-bottom:20px;font-size:0.8rem;padding:12px 16px;background:rgba(0,0,0,0.3);border-radius:8px;border:1px solid rgba(212,168,83,0.2)">
+              <div style="grid-column:1/-1;font-family:Cinzel,serif;color:#d4a853;font-size:0.85rem;margin-bottom:4px">Sneltoetsen</div>
+              <span style="color:#a0a0a0">Links klik</span><span>Selecteer</span>
+              <span style="color:#a0a0a0">Rechts klik</span><span>Commando</span>
+              <span style="color:#a0a0a0">WASD / Pijltjes</span><span>Camera bewegen</span>
+              <span style="color:#a0a0a0">Scroll</span><span>Zoom in/uit</span>
+              <span style="color:#a0a0a0">Q</span><span>Verplaats</span>
+              <span style="color:#a0a0a0">W</span><span>Aanval / Train Infanterie</span>
+              <span style="color:#a0a0a0">E</span><span>Stop / Train Sluiper</span>
+              <span style="color:#a0a0a0">B</span><span>Bouw Kazerne</span>
+              <span style="color:#a0a0a0">R</span><span>Carnavalsrage</span>
+              <span style="color:#a0a0a0">T</span><span>Train Held (Prins)</span>
+              <span style="color:#a0a0a0">1 / 2 / 3</span><span>Held abilities</span>
+              <span style="color:#a0a0a0">G</span><span>Raster aan/uit</span>
+              <span style="color:#a0a0a0">M</span><span>Geluid aan/uit</span>
+              <span style="color:#a0a0a0">Esc</span><span>Pauze</span>
+            </div>
+            <div class="pause-buttons">
+              <button class="go-btn" id="btn-resume">Hervatten</button>
+              <button class="go-btn" id="btn-pause-settings">Instellingen</button>
+              <button class="go-btn" id="btn-pause-menu">Naar Menu</button>
+            </div>
+          </div>
         </div>
 
         <div id="game-over" hidden>
@@ -967,15 +1067,29 @@
         </div>
       </div>
       <div class="loading-meta">
-        <span id="loading-label">Even gansen wansen...</span>
+        <span id="loading-label">Even geduld...</span>
         <span id="loading-percentage">0%</span>
       </div>
       <div class="loading-tip-container">
         <p class="loading-tip" id="loading-tip">Wist je dat? Gebouwen blokkeren het pad van je eenheden. Plan je basis-layout!</p>
       </div>
-      <span class="loading-version">v0.2.0</span>
+      <span class="loading-version">v0.16.3</span>
     </div>
   </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const tip = document.getElementById('fullscreen-tip');
+      const btn = document.getElementById('fullscreen-tip-btn');
+      const close = document.getElementById('fullscreen-tip-close');
+      if (tip && btn && close) {
+        btn.addEventListener('click', () => {
+          document.documentElement.requestFullscreen?.() || document.documentElement.webkitRequestFullscreen?.();
+          tip.hidden = true;
+        });
+        close.addEventListener('click', () => { tip.hidden = true; });
+      }
+    });
+  </script>
   <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

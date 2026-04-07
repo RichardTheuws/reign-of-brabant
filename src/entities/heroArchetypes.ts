@@ -20,9 +20,9 @@ import {
 // Brabanders Heroes
 // ---------------------------------------------------------------------------
 
-const PRINS_VAN_BRABANSEN: HeroArchetype = {
-  heroTypeId: HeroTypeId.PrinsVanBrabansen,
-  name: 'Prins van Brabansen',
+const PRINS_VAN_BRABANT: HeroArchetype = {
+  heroTypeId: HeroTypeId.PrinsVanBrabant,
+  name: 'Prins van Brabant',
   factionId: FactionId.Brabanders,
   hp: 500,
   attack: 25,
@@ -49,7 +49,7 @@ const PRINS_VAN_BRABANSEN: HeroArchetype = {
       description: 'Allies in radius 12 krijgen +30% alle stats, 20s',
     },
     {
-      id: 'prins-dansen',
+      id: 'prins-dans',
       name: 'Drie Dwaze Dansen',
       slot: AbilitySlot.W,
       cooldown: 45,
@@ -57,7 +57,7 @@ const PRINS_VAN_BRABANSEN: HeroArchetype = {
       radius: 8,
       range: 0,
       duration: 4,
-      description: 'AoE stun radius 8, vijanden dansen 4s',
+      description: 'AoE stun radius 8, vijanden dansen 4s (stun)',
     },
     {
       id: 'prins-alaaf',
@@ -74,9 +74,9 @@ const PRINS_VAN_BRABANSEN: HeroArchetype = {
   ],
 };
 
-const BOER_VAN_BRABANSEN: HeroArchetype = {
-  heroTypeId: HeroTypeId.BoerVanBrabansen,
-  name: 'Boer van Brabansen',
+const BOER_VAN_BRABANT: HeroArchetype = {
+  heroTypeId: HeroTypeId.BoerVanBrabant,
+  name: 'Boer van Brabant',
   factionId: FactionId.Brabanders,
   hp: 600,
   attack: 20,
@@ -242,8 +242,8 @@ const DE_POLITICUS: HeroArchetype = {
 // ---------------------------------------------------------------------------
 
 export const HERO_ARCHETYPES: readonly HeroArchetype[] = [
-  PRINS_VAN_BRABANSEN,    // HeroTypeId.PrinsVanBrabansen = 0
-  BOER_VAN_BRABANSEN,     // HeroTypeId.BoerVanBrabansen = 1
+  PRINS_VAN_BRABANT,    // HeroTypeId.PrinsVanBrabant = 0
+  BOER_VAN_BRABANT,     // HeroTypeId.BoerVanBrabant = 1
   DE_CEO,                 // HeroTypeId.DeCEO = 2
   DE_POLITICUS,           // HeroTypeId.DePoliticus = 3
 ] as const;

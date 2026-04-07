@@ -303,7 +303,7 @@ export class PropRenderer {
       }
     });
 
-    clone.position.set(x, y, z);
+    clone.position.set(x, y + 1.8, z);
     clone.name = `goldmine_${eid}`;
     clone.userData.eid = eid;
     this.goldMines.set(eid, clone);
@@ -352,7 +352,7 @@ export class PropRenderer {
 
     // Tree resources are slightly larger than decoration trees
     clone.scale.setScalar(TREE_SCALE_MULTIPLIER * 1.3);
-    clone.position.set(x, y, z);
+    clone.position.set(x, y + 1.0, z);
     clone.name = `tree_resource_${eid}`;
     clone.userData.eid = eid;
     this.treeResourceNodes.set(eid, clone);

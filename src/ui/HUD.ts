@@ -117,7 +117,7 @@ const UNIT_EMOJI: Record<string, string> = {
 // ---------------------------------------------------------------------------
 
 const FACTION_UNIT_NAMES: Record<Faction, { worker: string; infantry: string; ranged: string }> = {
-  brabant:  { worker: 'Boer',               infantry: 'Carnavalvierder', ranged: 'Kansen' },
+  brabant:  { worker: 'Boer',               infantry: 'Carnavalvierder', ranged: 'Sluiper' },
   randstad: { worker: 'Stagiair',           infantry: 'Manager',         ranged: 'Consultant' },
   limburg:  { worker: 'Mijnwerker',         infantry: 'Schutterij',      ranged: 'Vlaaienwerper' },
   belgen:   { worker: 'Frietkraamhouder',   infantry: 'Bierbouwer',      ranged: 'Chocolatier' },
@@ -166,7 +166,7 @@ const FACTION_WORKER_BUILDS: Record<Faction, WorkerBuildCmd[]> = {
 
 // Faction-specific building command labels (train panel)
 const FACTION_BUILDING_LABELS: Record<Faction, { worker: string; infantry: string; ranged: string }> = {
-  brabant:  { worker: 'Boer',               infantry: 'Infanterie', ranged: 'Kansen' },
+  brabant:  { worker: 'Boer',               infantry: 'Infanterie', ranged: 'Sluiper' },
   randstad: { worker: 'Stagiair',           infantry: 'Manager',    ranged: 'Consultant' },
   limburg:  { worker: 'Mijnwerker',         infantry: 'Schutterij', ranged: 'Vlaaienwerper' },
   belgen:   { worker: 'Frietkraamhouder',   infantry: 'Bierbouwer', ranged: 'Chocolatier' },
@@ -406,13 +406,35 @@ export class HUD {
   }
 
   // -----------------------------------------------------------------------
+  // Central command panel visibility
+  // -----------------------------------------------------------------------
+
+  /**
+   * Hide ALL command panels at once. Called at the start of showUnitPanel()
+   * and showBuildingPanel() to ensure stale panels (e.g. cmd-hero) never
+   * linger when the selection changes.
+   */
+  private hideAllCommandPanels(): void {
+    this.cmdUnit.hidden = true;
+    this.cmdMulti.hidden = true;
+    this.cmdWorker.hidden = true;
+    this.cmdBuilding.hidden = true;
+
+    const heroPanel = document.getElementById('cmd-hero');
+    if (heroPanel) heroPanel.hidden = true;
+
+    const blacksmithPanel = document.getElementById('cmd-blacksmith');
+    if (blacksmithPanel) blacksmithPanel.hidden = true;
+  }
+
+  // -----------------------------------------------------------------------
   // Unit panel
   // -----------------------------------------------------------------------
 
   showUnitPanel(units: SelectedUnit[]): void {
+    this.hideAllCommandPanels();
     this.selectionPanel.hidden = false;
     this.buildingPanel.hidden = true;
-    this.cmdWorker.hidden = true;
 
     if (units.length === 0) {
       this.hideSelectionPanel();
@@ -525,13 +547,11 @@ export class HUD {
   // -----------------------------------------------------------------------
 
   showBuildingPanel(building: SelectedBuilding): void {
+    this.hideAllCommandPanels();
     this.selectionPanel.hidden = false;
     this.unitSingle.hidden = true;
     this.unitMulti.hidden = true;
     this.buildingPanel.hidden = false;
-    this.cmdUnit.hidden = true;
-    this.cmdMulti.hidden = true;
-    this.cmdWorker.hidden = true;
     this.cmdBuilding.hidden = false;
 
     this.buildingName.textContent = building.name;
@@ -545,8 +565,11 @@ export class HUD {
     // Production queue
     if (building.queue.length > 0) {
       const current = building.queue[0];
+      const queueCount = building.queue.length - 1;
       this.queueProgress.hidden = false;
-      this.queueLabel.textContent = current.unitName;
+      this.queueLabel.textContent = queueCount > 0
+        ? `${current.unitName} (+${queueCount} in wachtrij)`
+        : current.unitName;
       this.queueBar.style.width = `${current.progress * 100}%`;
       this.queueTime.textContent = `${Math.ceil(current.remainingSeconds)}s`;
     } else {
@@ -556,6 +579,13 @@ export class HUD {
 
   updateProductionQueue(progress: number, label: string, remainingSeconds: number): void {
     if (!this.queueProgress) return;
+
+    // Hide the queue bar when there is no active production
+    if (!label || remainingSeconds <= 0) {
+      this.queueProgress.hidden = true;
+      return;
+    }
+
     this.queueProgress.hidden = false;
     this.queueLabel.textContent = label;
     this.queueBar.style.width = `${Math.min(progress, 1) * 100}%`;
@@ -654,6 +684,7 @@ export class HUD {
     this.unitSingle.hidden = true;
     this.unitMulti.hidden = true;
     this.buildingPanel.hidden = true;
+    this.hideAllCommandPanels();
   }
 
   // -----------------------------------------------------------------------
@@ -1105,7 +1136,7 @@ export class HUD {
     // Map Brabanders base names to faction equivalents
     if (lower === 'boer' || lower === 'worker') return names.worker;
     if (lower === 'carnavalvierder' || lower === 'infantry') return names.infantry;
-    if (lower === 'kansen' || lower === 'ranged') return names.ranged;
+    if (lower === 'sluiper' || lower === 'ranged') return names.ranged;
     // Pass through hero names and any others unchanged
     return baseName;
   }

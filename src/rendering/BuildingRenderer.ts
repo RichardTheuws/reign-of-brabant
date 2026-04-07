@@ -25,16 +25,16 @@ const BUILDING_MODEL_PATHS: Record<string, string> = {
   // Blacksmith reuses barracks model until dedicated model is created
   blacksmith_0: 'assets/models/v02/brabanders/barracks.glb',
   blacksmith_1: 'assets/models/v02/randstad/barracks.glb',
-  // Limburgers (reuse Brabanders models, distinguished by green tint)
-  townhall_2: 'assets/models/v02/brabanders/townhall.glb',
-  barracks_2: 'assets/models/v02/brabanders/barracks.glb',
-  lumbercamp_2: 'assets/models/v02/brabanders/barracks.glb',
-  blacksmith_2: 'assets/models/v02/brabanders/barracks.glb',
-  // Belgen (reuse Brabanders models, distinguished by burgundy tint)
-  townhall_3: 'assets/models/v02/brabanders/townhall.glb',
-  barracks_3: 'assets/models/v02/brabanders/barracks.glb',
-  lumbercamp_3: 'assets/models/v02/brabanders/barracks.glb',
-  blacksmith_3: 'assets/models/v02/brabanders/barracks.glb',
+  // Limburgers
+  townhall_2: 'assets/models/v02/limburgers/townhall.glb',
+  barracks_2: 'assets/models/v02/limburgers/barracks.glb',
+  lumbercamp_2: 'assets/models/v02/limburgers/barracks.glb',
+  blacksmith_2: 'assets/models/v02/limburgers/barracks.glb',
+  // Belgen
+  townhall_3: 'assets/models/v02/belgen/townhall.glb',
+  barracks_3: 'assets/models/v02/belgen/barracks.glb',
+  lumbercamp_3: 'assets/models/v02/belgen/barracks.glb',
+  blacksmith_3: 'assets/models/v02/belgen/barracks.glb',
 };
 
 const BUILDING_MODEL_FALLBACKS: Record<string, string> = {
@@ -64,8 +64,8 @@ type ModelCacheKey = `${BuildingTypeName}_${number}`;
 const FACTION_TINTS: Record<number, THREE.Color> = {
   0: new THREE.Color(0xff8830), // Brabanders: bright warm orange
   1: new THREE.Color(0x4070bb), // Randstad: clear blue
-  2: new THREE.Color(0x3a7d32), // Limburgers: dark mining green
-  3: new THREE.Color(0xa01030), // Belgen: burgundy red
+  2: new THREE.Color(0x44dd44), // Limburgers: bright emerald green
+  3: new THREE.Color(0xdd3344), // Belgen: bright crimson red
 };
 
 /** Ghost colours for placement preview. */
@@ -208,7 +208,7 @@ export class BuildingRenderer {
     });
 
     // Lift buildings above terrain to prevent sinking (v02 models have center pivots)
-    const yOffset = isV02 ? 0.6 : 0.3;
+    const yOffset = isV02 ? 2.5 : 1.2;
     clone.position.set(x, y + yOffset, z);
     clone.name = `building_${eid}`;
     clone.userData.eid = eid;

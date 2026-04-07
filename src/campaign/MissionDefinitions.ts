@@ -239,19 +239,19 @@ const MISSION_2_EERSTE_SCHERMUTSEL: MissionDefinition = {
     {
       id: 'tip-start',
       condition: { type: 'time', seconds: 5 },
-      actions: [{ type: 'message', text: 'Bouw een Kazerne om soldaten te trainen. Selecteer een Boer en druk B.' }],
+      actions: [{ type: 'message', text: 'Bouw een Kazerne om soldaten te trainen. Selecteer een Boer → klik op het hamer-icoon (Kazerne) → klik op een open plek.' }],
       once: true,
     },
     {
       id: 'barracks-built',
       condition: { type: 'building-built', buildingType: BuildingTypeId.Barracks },
-      actions: [{ type: 'message', text: 'Goed! De Kazerne staat. Train nu Carnavalvierders om de vijand aan te vallen.' }],
+      actions: [{ type: 'message', text: 'Goed bezig! Klik nu op de Kazerne en train Carnavalvierders (W) of Sluipers (E). Je hebt minstens 3 soldaten nodig om aan te vallen!' }],
       once: true,
     },
     {
       id: 'army-3',
       condition: { type: 'army-count', count: 3 },
-      actions: [{ type: 'message', text: 'Je leger groeit! Tijd om de vijand aan te vallen. Klik rechts op het vijandelijke gebouw.' }],
+      actions: [{ type: 'message', text: 'Je leger groeit! Selecteer je soldaten (klik of sleep een kader) en klik met rechts op het vijandelijke gebouw in het noordoosten om aan te vallen!' }],
       once: true,
     },
     {
@@ -508,7 +508,7 @@ const MISSION_4_BINNENDIEZE: MissionDefinition = {
     'een geheim Randstad-archief met de blauwdruk van "Project Gentrificatie".\n\n' +
     'De stad is zwaar bewaakt, maar Den Bosch heeft een geheim: de Binnendieze — een ' +
     'ondergrondse watergang die zich door de hele stad slingert.\n\n' +
-    'Stuur je Kansen-spionnen door de tunnels. Vind het archief. Vernietig de bewaking. ' +
+    'Stuur je Sluipers door de tunnels. Vind het archief. Vernietig de bewaking. ' +
     'En kom levend terug.',
 
   mapSize: 96,
@@ -524,7 +524,7 @@ const MISSION_4_BINNENDIEZE: MissionDefinition = {
   ],
 
   units: [
-    // Player: 3 Kansen (Ranged) + 2 Carnavalvierders (backup)
+    // Player: 3 Sluipers (Ranged) + 2 Carnavalvierders (backup)
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -38, z: -38 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -36, z: -38 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -37, z: -36 },
@@ -565,7 +565,7 @@ const MISSION_4_BINNENDIEZE: MissionDefinition = {
     {
       id: 'tip-stealth',
       condition: { type: 'time', seconds: 15 },
-      actions: [{ type: 'message', text: 'Gebruik je Kansen om vijanden uit te schakelen voordat ze alarm slaan. Neem de depots uit om de verdediging te verzwakken.' }],
+      actions: [{ type: 'message', text: 'Gebruik je Sluipers om vijanden uit te schakelen voordat ze alarm slaan. Neem de depots uit om de verdediging te verzwakken.' }],
       once: true,
     },
     {
@@ -1116,23 +1116,23 @@ const MISSION_7_MARKT: MissionDefinition = {
 };
 
 // ---------------------------------------------------------------------------
-// Missie 8: "Het Beleg van Eindhansen" (Full siege warfare)
+// Missie 8: "Het Beleg van Eindhoven" (Full siege warfare)
 // ---------------------------------------------------------------------------
 
 const MISSION_8_BELEG: MissionDefinition = {
-  id: 'brabant-8-het-beleg-van-eindhansen',
+  id: 'brabant-8-het-beleg-van-eindhoven',
   campaignId: 'brabanders',
   missionIndex: 7,
-  title: 'Het Beleg van Eindhansen',
-  briefingTitle: 'Missie 8: Het Beleg van Eindhansen',
+  title: 'Het Beleg van Eindhoven',
+  briefingTitle: 'Missie 8: Het Beleg van Eindhoven',
   briefingText:
-    'Eindhansen — ooit het technologisch hart van Brabant. Maar de Randstad heeft er een ' +
+    'Eindhoven — ooit het technologisch hart van Brabant. Maar de Randstad heeft er een ' +
     'vesting van gemaakt. Bewakingscamera\'s op elke hoek, vergaderzalen in elke straat, ' +
-    'en ergste van alles: de friettenten zijn vervangen door sushi-bars.\n\n' +
-    'De Prins van Brabansen leidt het offensief. "Mansen, dit is het moment. We gansen ' +
-    'die bureaucraten eruit jansen!" Twee aanvalsroutes zijn beschikbaar: frontaal via ' +
+    'en het ergste van alles: de friettenten zijn vervangen door sushi-bars.\n\n' +
+    'De Prins van Brabant leidt het offensief. "Jongens, dit is het moment. We jagen ' +
+    'die bureaucraten eruit!" Twee aanvalsroutes zijn beschikbaar: frontaal via ' +
     'de snelweg, of sluipend door het Stratumseind.\n\n' +
-    'Verover Eindhansen. Voor de friet. Voor Brabant.',
+    'Verover Eindhoven. Voor de friet. Voor Brabant.',
 
   mapSize: 96,
   startingGold: 350,
@@ -1195,7 +1195,7 @@ const MISSION_8_BELEG: MissionDefinition = {
   ],
 
   objectives: [
-    { id: 'destroy-eindhansen-th', type: 'destroy-building', description: 'Vernietig het Randstad-hoofdkantoor in Eindhansen', targetValue: 1, isBonus: false },
+    { id: 'destroy-eindhoven-th', type: 'destroy-building', description: 'Vernietig het Randstad-hoofdkantoor in Eindhoven', targetValue: 1, isBonus: false },
     { id: 'no-th-loss', type: 'no-townhall-loss', description: 'Houd de Prins in leven (verlies je Boerderij niet)', targetValue: 0, isBonus: true },
     { id: 'train-15-units', type: 'train-units', description: 'Train 15 extra eenheden', targetValue: 15, isBonus: true },
   ],
@@ -1204,7 +1204,7 @@ const MISSION_8_BELEG: MissionDefinition = {
     {
       id: 'prins-speech',
       condition: { type: 'time', seconds: 3 },
-      actions: [{ type: 'message', text: 'Prins van Brabansen: "Kansen! Carnavalvierders! Vandansen nansen wansen da\'t vansen Brabansen ansen!" *[vrij vertaald: vandaag bevrijden we onze stad]*' }],
+      actions: [{ type: 'message', text: 'Prins van Brabant: "Sluipers! Carnavalvierders! Vandaag bevrijden we onze stad! ALAAF!"' }],
       once: true,
     },
     {
@@ -1223,7 +1223,7 @@ const MISSION_8_BELEG: MissionDefinition = {
       id: 'ai-reinforcements-1',
       condition: { type: 'time', seconds: 300 },
       actions: [
-        { type: 'message', text: 'Randstad-versterkingen arriveren vanuit het noorden! Ze geven Eindhansen niet zomaar op!' },
+        { type: 'message', text: 'Randstad-versterkingen arriveren vanuit het noorden! Ze geven Eindhoven niet zomaar op!' },
         {
           type: 'spawn-units',
           units: [
@@ -1256,10 +1256,10 @@ const MISSION_8_BELEG: MissionDefinition = {
       once: true,
     },
     {
-      id: 'victory-eindhansen',
+      id: 'victory-eindhoven',
       condition: { type: 'building-destroyed', factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall },
       actions: [
-        { type: 'message', text: 'Eindhansen is bevrijd! De Prins plant de Brabantse vlag op het dak van het hoofdkantoor. "En als eerste maatregel: alle sushi-bars worden weer friettenten!"' },
+        { type: 'message', text: 'Eindhoven is bevrijd! De Prins plant de Brabantse vlag op het dak van het hoofdkantoor. "En als eerste maatregel: alle sushi-bars worden weer friettenten!"' },
         { type: 'victory' },
       ],
       once: true,
@@ -1277,7 +1277,7 @@ const MISSION_8_BELEG: MissionDefinition = {
 };
 
 // ---------------------------------------------------------------------------
-// Missie 9: "De Brabantse Nansen" (Epic two-front finale)
+// Missie 9: "De Brabantse Raad" (Epic two-front finale)
 // ---------------------------------------------------------------------------
 
 const M9_NE_BASE_X = 42;
@@ -1285,20 +1285,20 @@ const M9_NE_BASE_Z = 42;
 const M9_NW_BASE_X = -42;
 const M9_NW_BASE_Z = 42;
 
-const MISSION_9_NANSEN: MissionDefinition = {
-  id: 'brabant-9-de-brabantse-nansen',
+const MISSION_9_RAAD: MissionDefinition = {
+  id: 'brabant-9-de-brabantse-raad',
   campaignId: 'brabanders',
   missionIndex: 8,
-  title: 'De Brabantse Nansen',
-  briefingTitle: 'Missie 9: De Brabantse Nansen',
+  title: 'De Brabantse Raad',
+  briefingTitle: 'Missie 9: De Brabantse Raad',
   briefingText:
     'Dit is het. De CEO van de Randstad Ontwikkelingsmaatschappij heeft zijn laatste troef ' +
     'gespeeld. Twee legers marcheren naar het hart van Brabant — een vanuit het noordoosten, ' +
     'een vanuit het noordwesten. Pincerbeweging. Klassiek management-tactiek.\n\n' +
-    'Maar wij hebben iets wat zij niet hebben: de Prins van Brabansen EN de Boer van Brabansen. ' +
+    'Maar wij hebben iets wat zij niet hebben: de Prins van Brabant EN de Boer van Brabant. ' +
     'Twee helden, een volk, en genoeg worstenbroodjes om een maand te overleven.\n\n' +
-    '"Jansen, mansen, het is tijd voor de Brabantse Nansen! Ze gansen allebei eransen!" ' +
-    '— Prins van Brabansen\n\n' +
+    '"Jongens, het is tijd voor de Brabantse Raad! We pakken ze aan op twee fronten!" ' +
+    '— Prins van Brabant\n\n' +
     'Vernietig beide vijandelijke basissen. Red Brabant. En moge de frituurolie met ons zijn.',
 
   mapSize: 112,
@@ -1549,7 +1549,7 @@ const MISSION_10_RAAD: MissionDefinition = {
   ],
 
   units: [
-    // Player: 8 workers, 6 infantry (Carnavalvierders), 4 ranged (Kansen), 2 ranged (Boerinnen equivalent)
+    // Player: 8 workers, 6 infantry (Carnavalvierders), 4 ranged (Sluipers), 2 ranged (Boerinnen equivalent)
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -3, z: -18 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -18 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -18 },
@@ -1565,7 +1565,7 @@ const MISSION_10_RAAD: MissionDefinition = {
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 8, z: -16 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 10, z: -16 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 12, z: -16 },
-    // Ranged (Kansen)
+    // Ranged (Sluipers)
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -8, z: -18 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -10, z: -18 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -8, z: -16 },
@@ -1647,7 +1647,7 @@ const MISSION_10_RAAD: MissionDefinition = {
       condition: { type: 'time', seconds: 270 },
       actions: [{
         type: 'message',
-        text: 'Kansen-scout: "Beweging bij de bruggen! En... zijn dat Hipsters? Ze proberen de kathedraal te... ze zetten er een pop-up koffiebar IN!"',
+        text: 'Sluiper-scout: "Beweging bij de bruggen! En... zijn dat Hipsters? Ze proberen de kathedraal te... ze zetten er een pop-up koffiebar IN!"',
       }],
       once: true,
     },
@@ -3383,11 +3383,10 @@ const LIMBURGERS_MISSION_1_EERSTE_SCHACHT: MissionDefinition = {
       once: true,
     },
     {
-      id: 'victory-gather',
+      id: 'gold-milestone',
       condition: { type: 'gold-reached', amount: 400 },
       actions: [
-        { type: 'message', text: 'De Mijnbaas knikt goedkeurend. "Goed werk. Maar dit was nog maar het begin. Ik hoor boorgeluiden onder de Maas..."' },
-        { type: 'victory' },
+        { type: 'message', text: 'Genoeg Vlaai verzameld! Bouw nu een Heuvelfort en train Schutterij-soldaten om je missie te voltooien.' },
       ],
       once: true,
     },
@@ -4158,7 +4157,7 @@ export const BRABANDERS_MISSIONS: readonly MissionDefinition[] = [
   MISSION_6_BOERENOPSTAND,
   MISSION_7_MARKT,
   MISSION_8_BELEG,
-  MISSION_9_NANSEN,
+  MISSION_9_RAAD,
   MISSION_10_RAAD,
   MISSION_11_A2,
   MISSION_12_GOUDEN_WORSTENBROODJE,

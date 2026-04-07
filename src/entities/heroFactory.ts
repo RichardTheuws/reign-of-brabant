@@ -225,7 +225,7 @@ export function createHero(
 }
 
 /**
- * Create a temporary militia unit (for Boer van Brabansen's Opstand ability).
+ * Create a temporary militia unit (for Boer van Brabant's Opstand ability).
  * Militia have short lifespan and auto-die.
  */
 export function createMilitia(
