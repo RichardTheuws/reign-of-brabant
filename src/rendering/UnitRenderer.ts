@@ -91,22 +91,77 @@ const enum AnimUnitAIState {
   Dead = 6,
 }
 
-/** Map UnitAIState to animation clip name. */
-function aiStateToAnimName(state: number | undefined): string {
-  switch (state) {
-    case AnimUnitAIState.Moving:
-    case AnimUnitAIState.MovingToResource:
-    case AnimUnitAIState.Returning:
-      return 'Walk';
-    case AnimUnitAIState.Attacking:
-      return 'Attack';
-    case AnimUnitAIState.Dead:
-      return 'Death';
-    case AnimUnitAIState.Idle:
-    case AnimUnitAIState.Gathering:
-    default:
-      return 'Idle';
+/** UnitTypeId values (mirrored from types/index.ts to avoid circular imports). */
+const enum AnimUnitTypeId {
+  Worker = 0,
+  Infantry = 1,
+  Ranged = 2,
+  Heavy = 3,
+  Siege = 4,
+  Support = 5,
+  Special = 6,
+  Hero = 7,
+}
+
+/** One-shot animation clip names that should not loop. */
+const ONE_SHOT_CLIPS = new Set([
+  'Attack', 'RangedAttack', 'HeavyAttack', 'SiegeAttack', 'Heal', 'Build', 'Death',
+]);
+
+/**
+ * Resolve the best animation clip for a unit based on its AI state,
+ * unit type, and which clips are actually available on the model.
+ *
+ * Falls back gracefully: if the ideal clip doesn't exist, picks
+ * a universal fallback (Attack, Idle, Walk).
+ */
+function resolveAnimation(
+  aiState: number | undefined,
+  unitTypeId: number | undefined,
+  availableClips: Set<string>,
+): string {
+  // Dead always wins
+  if (aiState === AnimUnitAIState.Dead) return 'Death';
+
+  // Movement states
+  if (
+    aiState === AnimUnitAIState.Moving ||
+    aiState === AnimUnitAIState.MovingToResource ||
+    aiState === AnimUnitAIState.Returning
+  ) {
+    return 'Walk';
   }
+
+  // Gathering — workers get Gather clip if available
+  if (aiState === AnimUnitAIState.Gathering) {
+    if (availableClips.has('Gather')) return 'Gather';
+    return 'Idle'; // fallback: no gather animation yet
+  }
+
+  // Attacking — unit type determines which attack animation
+  if (aiState === AnimUnitAIState.Attacking) {
+    // Siege units: SiegeAttack > Attack
+    if (unitTypeId === AnimUnitTypeId.Siege && availableClips.has('SiegeAttack')) {
+      return 'SiegeAttack';
+    }
+    // Ranged units: RangedAttack > Attack
+    if (unitTypeId === AnimUnitTypeId.Ranged && availableClips.has('RangedAttack')) {
+      return 'RangedAttack';
+    }
+    // Heavy units: HeavyAttack > Attack
+    if (unitTypeId === AnimUnitTypeId.Heavy && availableClips.has('HeavyAttack')) {
+      return 'HeavyAttack';
+    }
+    // Support units: Heal is used via separate logic; attack falls through
+    return 'Attack'; // universal fallback
+  }
+
+  // Idle — siege units get SiegeIdle if available
+  if (unitTypeId === AnimUnitTypeId.Siege && availableClips.has('SiegeIdle')) {
+    return 'SiegeIdle';
+  }
+
+  return 'Idle';
 }
 
 /** Template loaded once per (unitType, faction) that has animations. */
@@ -120,6 +175,8 @@ interface AnimatedUnit {
   model: THREE.Group;
   mixer: THREE.AnimationMixer;
   actions: Map<string, THREE.AnimationAction>;
+  /** Which animation clip names are available on this unit's model. */
+  clipNames: Set<string>;
   currentAnim: string;
   prevAnim: string;
 }
@@ -570,15 +627,20 @@ export class UnitRenderer {
     // Create AnimationMixer and set up actions
     const mixer = new THREE.AnimationMixer(model);
     const actions = new Map<string, THREE.AnimationAction>();
+    const clipNames = new Set<string>();
 
     for (const clip of template.clips) {
       const action = mixer.clipAction(clip);
+      clipNames.add(clip.name);
 
-      // Attack and Death play once, others loop
-      if (clip.name === 'Attack' || clip.name === 'Death') {
+      // One-shot clips play once; Death also clamps at final pose
+      if (ONE_SHOT_CLIPS.has(clip.name)) {
         action.setLoop(THREE.LoopOnce, 1);
-        action.clampWhenFinished = true;
+        if (clip.name === 'Death') {
+          action.clampWhenFinished = true;
+        }
       } else {
+        // Idle, Walk, Gather, SiegeIdle, etc. loop continuously
         action.setLoop(THREE.LoopRepeat, Infinity);
       }
 
@@ -595,25 +657,25 @@ export class UnitRenderer {
       model,
       mixer,
       actions,
+      clipNames,
       currentAnim: 'Idle',
       prevAnim: 'Idle',
     };
     this.animatedUnits.set(eid, animUnit);
 
-    // Listen for Attack finished to return to Idle
+    // Listen for one-shot clips finishing to return to Idle
     mixer.addEventListener('finished', (e: THREE.Event & { action?: THREE.AnimationAction }) => {
       const finishedAction = e.action;
       if (!finishedAction) return;
       const unit = this.animatedUnits.get(eid);
       if (!unit) return;
 
-      // Find the clip name that finished
       const clipName = finishedAction.getClip().name;
-      if (clipName === 'Attack') {
-        // Return to Idle after attack
+      // All one-shot attack/ability clips return to Idle when done
+      // Death stays clamped (clampWhenFinished)
+      if (clipName !== 'Death' && ONE_SHOT_CLIPS.has(clipName)) {
         this.crossfadeAnimation(unit, 'Idle');
       }
-      // Death stays clamped (clampWhenFinished)
     });
 
     // Create proxy for raycasting
@@ -749,7 +811,7 @@ export class UnitRenderer {
    * Called once per frame by RenderSyncSystem.
    *
    * @param dt Delta time in seconds.
-   * @param positions - array of { eid, x, y, z, ry, selected, isIdle, aiState?, targetX?, targetZ? }
+   * @param positions - array of { eid, x, y, z, ry, selected, isIdle, aiState?, unitTypeId?, targetX?, targetZ? }
    */
   update(
     dt: number,
@@ -762,6 +824,7 @@ export class UnitRenderer {
       selected: boolean;
       isIdle?: boolean;
       aiState?: number;
+      unitTypeId?: number;
       targetX?: number;
       targetZ?: number;
     }>,
@@ -929,6 +992,7 @@ export class UnitRenderer {
     data: {
       eid: number; x: number; y: number; z: number; ry: number;
       selected: boolean; isIdle?: boolean; aiState?: number;
+      unitTypeId?: number;
       targetX?: number; targetZ?: number;
     },
     animUnit: AnimatedUnit,
@@ -936,8 +1000,8 @@ export class UnitRenderer {
     // Advance animation mixer
     animUnit.mixer.update(dt);
 
-    // --- Select animation based on AI state ---
-    const targetAnim = aiStateToAnimName(data.aiState);
+    // --- Select animation based on AI state + unit type + available clips ---
+    const targetAnim = resolveAnimation(data.aiState, data.unitTypeId, animUnit.clipNames);
     if (targetAnim !== animUnit.currentAnim) {
       // Don't interrupt Death animation
       if (animUnit.currentAnim !== 'Death') {

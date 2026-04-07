@@ -1931,6 +1931,7 @@ export class Game {
     const unitPositions: Array<{
       eid: number; x: number; y: number; z: number; ry: number;
       selected: boolean; isIdle?: boolean; aiState?: number;
+      unitTypeId?: number;
       targetX?: number; targetZ?: number;
     }> = [];
 
@@ -1948,6 +1949,7 @@ export class Game {
             selected: Selected.by[eid] === 0,
             isIdle,
             aiState: UnitAI.state[eid],
+            unitTypeId: UnitType.id[eid],
             targetX: hasTarget ? Movement.targetX[eid] : undefined,
             targetZ: hasTarget ? Movement.targetZ[eid] : undefined,
           });
