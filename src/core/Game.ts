@@ -89,7 +89,7 @@ export class Game {
 
   // Building placement mode
   private buildMode = false;
-  private buildGhostType: 'barracks' | 'blacksmith' | 'lumbercamp' | null = null;
+  private buildGhostType: 'barracks' | 'blacksmith' | 'lumbercamp' | 'mijnschacht' | 'chocolaterie' | null = null;
 
   // Rally point placement mode
   private rallyPointMode = false;
@@ -262,22 +262,28 @@ export class Game {
     ]);
     try { await this.navMesh.init(this.terrain.mesh); } catch { /* fallback */ }
 
-    // Detect player faction from mission (non-AI faction in buildings)
-    const missionPlayerFaction = mission.buildings.find(b => (b.factionId as number) !== 1)?.factionId
-      ?? mission.units.find(u => (u.factionId as number) !== 1)?.factionId
-      ?? FactionId.Brabanders;
+    // Use explicit faction fields from mission definition
+    const missionPlayerFaction = mission.playerFactionId;
     this.playerFactionId = missionPlayerFaction;
     gameConfig.setPlayerFaction(missionPlayerFaction);
 
     // Set starting resources for correct factions
     this.playerState.addGold(missionPlayerFaction, -this.playerState.getGold(missionPlayerFaction));
     this.playerState.addGold(missionPlayerFaction, mission.startingGold);
-    const aiFaction = mission.buildings.find(b => b.factionId === FactionId.AI)?.factionId ?? FactionId.Randstad;
-    this.playerState.addGold(aiFaction, -this.playerState.getGold(aiFaction));
-    this.playerState.addGold(aiFaction, mission.startingGoldAI);
+    // Give starting gold to each AI faction
+    for (const aiFaction of mission.aiFactionIds) {
+      this.playerState.addGold(aiFaction, -this.playerState.getGold(aiFaction));
+      this.playerState.addGold(aiFaction, mission.startingGoldAI);
+    }
 
     this._spawnMissionEntities(mission);
     this.spawnProps();
+
+    // Configure AI system: set the primary AI faction and start production if enabled
+    if (mission.aiFactionIds.length > 0) {
+      const primaryAiFaction = mission.aiFactionIds[0];
+      AISystem.setFaction(primaryAiFaction);
+    }
     if (mission.hasAIProduction) this.configureAI();
 
     // Setup input, event listeners, HUD, and mission events (cleanup cleared all flags)
@@ -362,7 +368,7 @@ export class Game {
       const mesh = this.unitRenderer.addUnit(eid, tn, fi);
       if (mesh) { mesh.position.set(u.x, this.terrain.getHeightAt(u.x, u.z), u.z); mesh.userData.eid = eid; this.entityMeshMap.set(eid, mesh); }
       this.knownUnitEntities.add(eid);
-      if (u.factionId === FactionId.AI) {
+      if (u.factionId !== this.playerFactionId) {
         const base = this.getPlayerBasePosition();
         Movement.targetX[eid] = base.x + (Math.random() - 0.5) * 8; Movement.targetZ[eid] = base.z + (Math.random() - 0.5) * 8;
         Movement.hasTarget[eid] = 1; UnitAI.state[eid] = UnitAIState.Moving;
@@ -379,11 +385,11 @@ export class Game {
   private _hasPlayerBldg(bt: BuildingTypeId): boolean { for (const eid of this.knownBuildingEntities) { if (!entityExists(world, eid)) continue; if (Faction.id[eid] === this.playerFactionId && Building.typeId[eid] === bt && Building.complete[eid] === 1) return true; } return false; }
   private _armyCount(): number { let c = 0; for (const eid of this.knownUnitEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead) || Faction.id[eid] !== this.playerFactionId) continue; const ut = UnitType.id[eid]; if (ut === UnitTypeId.Infantry || ut === UnitTypeId.Ranged) c++; } return c; }
   private _enemyBldgDestroyed(fid: FactionId, bt: BuildingTypeId): boolean { for (const eid of this.knownBuildingEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead) || Health.current[eid] <= 0) continue; if (Faction.id[eid] === fid && Building.typeId[eid] === bt) return false; } return this.activeMission?.buildings.some(b => b.factionId === fid && b.buildingType === bt) ?? false; }
-  private _destroyedEnemyBldgCount(): number { let count = 0; if (!this.activeMission) return 0; for (const b of this.activeMission.buildings) { if (b.factionId === FactionId.AI) { let alive = false; for (const eid of this.knownBuildingEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead) || Health.current[eid] <= 0) continue; if (Faction.id[eid] === FactionId.AI && Building.typeId[eid] === b.buildingType && Math.abs(Position.x[eid] - b.x) < 2 && Math.abs(Position.z[eid] - b.z) < 2) { alive = true; break; } } if (!alive) count++; } } return count; }
+  private _destroyedEnemyBldgCount(): number { let count = 0; if (!this.activeMission) return 0; for (const b of this.activeMission.buildings) { if (b.factionId !== this.playerFactionId) { let alive = false; for (const eid of this.knownBuildingEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead) || Health.current[eid] <= 0) continue; if (Faction.id[eid] === b.factionId && Building.typeId[eid] === b.buildingType && Math.abs(Position.x[eid] - b.x) < 2 && Math.abs(Position.z[eid] - b.z) < 2) { alive = true; break; } } if (!alive) count++; } } return count; }
   private _workerCount(): number { let c = 0; for (const eid of this.knownUnitEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead)) continue; if (Faction.id[eid] === this.playerFactionId && hasComponent(world, eid, IsWorker)) c++; } return c; }
   private _thAlive(): boolean { for (const eid of this.knownBuildingEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead) || Health.current[eid] <= 0) continue; if (Faction.id[eid] === this.playerFactionId && Building.typeId[eid] === BuildingTypeId.TownHall) return true; } return false; }
   private _playerUnits(): number { let c = 0; for (const eid of this.knownUnitEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead)) continue; if (Faction.id[eid] === this.playerFactionId) c++; } return c; }
-  private _aiUnits(): number { let c = 0; for (const eid of this.knownUnitEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead)) continue; if (Faction.id[eid] === FactionId.AI) c++; } return c; }
+  private _aiUnits(): number { let c = 0; for (const eid of this.knownUnitEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead)) continue; if (Faction.id[eid] !== this.playerFactionId) c++; } return c; }
   private _createMsgOverlay(): void {
     if (document.getElementById('mission-message')) return;
     const ov = document.getElementById('ui-overlay'); if (!ov) return;
@@ -415,11 +421,45 @@ export class Game {
     const states = this.missionSystem.getObjectiveStates();
     let h = '<div style="font-family:Cinzel,serif;font-weight:700;font-size:0.75rem;color:#d4a853;margin-bottom:8px;letter-spacing:0.05em">DOELSTELLINGEN</div>';
     for (const s of states) {
-      const ic = s.completed ? '\u2705' : s.failed ? '\u274C' : '\u25CB';
-      const cl = s.completed ? '#4CAF50' : s.failed ? '#F44336' : s.objective.isBonus ? '#d4a853' : '#e8e6e3';
-      const lb = s.objective.isBonus ? '\u2B50 ' + s.objective.description : s.objective.description;
-      let pr = ''; if (!s.completed && !s.failed && s.objective.targetValue > 1) pr = ' (' + Math.floor(s.currentValue) + '/' + s.objective.targetValue + ')';
-      h += '<div style="display:flex;gap:6px;margin-bottom:4px;color:' + cl + ';opacity:' + (s.completed || s.failed ? '.7' : '1') + (s.completed ? ';text-decoration:line-through' : '') + '"><span>' + ic + '</span><span>' + lb + pr + '</span></div>';
+      // Negative objectives (no-worker-loss, no-townhall-loss) that haven't failed yet
+      // should show as "active/protected" rather than "completed" -- they are only truly
+      // completed when the mission ends. Showing them as completed mid-mission is confusing.
+      const isNegativeType = s.objective.type === 'no-worker-loss' || s.objective.type === 'no-townhall-loss';
+      const isNegativeActive = isNegativeType && s.completed && !s.failed;
+
+      let ic: string;
+      let cl: string;
+      let opacity: string;
+      let strikethrough = false;
+
+      if (isNegativeActive) {
+        // Show as "protected/intact" -- not yet completed, just maintained
+        ic = '[OK]';
+        cl = '#7ecfcf'; // teal color to distinguish from completed green
+        opacity = '1';
+      } else if (s.failed) {
+        ic = '[X]';
+        cl = '#F44336';
+        opacity = '.7';
+      } else if (s.completed) {
+        ic = '[V]';
+        cl = '#4CAF50';
+        opacity = '.7';
+        strikethrough = true;
+      } else {
+        ic = '[ ]';
+        cl = s.objective.isBonus ? '#d4a853' : '#e8e6e3';
+        opacity = '1';
+      }
+
+      const lb = s.objective.isBonus ? '* ' + s.objective.description : s.objective.description;
+      let pr = '';
+      if (isNegativeActive) {
+        pr = ' \u2014 Beschermd';
+      } else if (!s.completed && !s.failed && s.objective.targetValue > 1) {
+        pr = ' (' + Math.floor(s.currentValue) + '/' + s.objective.targetValue + ')';
+      }
+      h += '<div style="display:flex;gap:6px;margin-bottom:4px;color:' + cl + ';opacity:' + opacity + (strikethrough ? ';text-decoration:line-through' : '') + '"><span>' + ic + '</span><span>' + lb + pr + '</span></div>';
     }
     const wp = this.missionSystem.getWaveProgress();
     if (wp.total > 0) h += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(212,168,83,.15);color:#d4a853;font-size:.75rem">Golven: ' + wp.defeated + '/' + wp.total + '</div>';
@@ -575,6 +615,14 @@ export class Game {
       case 'build-blacksmith':
         this.enterBuildMode('blacksmith');
         break;
+      case 'build-mijnschacht':
+        // Limburgers faction-specific building -- maps to TertiaryResourceBuilding
+        this.enterBuildMode('mijnschacht');
+        break;
+      case 'build-chocolaterie':
+        // Belgen faction-specific building -- maps to TertiaryResourceBuilding
+        this.enterBuildMode('chocolaterie');
+        break;
       case 'train-worker':
         this.trainFromSelectedBuilding(UnitTypeId.Worker);
         break;
@@ -613,7 +661,7 @@ export class Game {
     this.camera.setPosition(worldX, worldZ);
   }
 
-  private enterBuildMode(type: 'barracks' | 'lumbercamp' | 'blacksmith'): void {
+  private enterBuildMode(type: 'barracks' | 'lumbercamp' | 'blacksmith' | 'mijnschacht' | 'chocolaterie'): void {
     // Check if we have a worker selected
     const hasWorker = this.selectedEntities.some(eid =>
       hasComponent(world, eid, IsWorker) && Faction.id[eid] === this.playerFactionId
@@ -623,11 +671,10 @@ export class Game {
       return;
     }
     // Map ghost type to BuildingTypeId
-    const buildingTypeId = type === 'blacksmith' ? BuildingTypeId.Blacksmith
-      : type === 'lumbercamp' ? BuildingTypeId.LumberCamp
-      : BuildingTypeId.Barracks;
-    // Check cost
-    const cost = BUILDING_ARCHETYPES[buildingTypeId].costGold;
+    const buildingTypeId = this.getBuildingTypeIdForGhost(type);
+    // Check cost -- use archetype if available, otherwise default 150g
+    const arch = buildingTypeId < BUILDING_ARCHETYPES.length ? BUILDING_ARCHETYPES[buildingTypeId] : null;
+    const cost = arch?.costGold ?? 150;
     if (!this.playerState.canAfford(this.playerFactionId, cost)) {
       this.hud?.showAlert('Niet genoeg goud!', 'warning');
       return;
@@ -636,6 +683,29 @@ export class Game {
     this.buildGhostType = type;
     const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
     if (canvas) canvas.style.cursor = 'crosshair';
+  }
+
+  /** Map a build ghost type string to a BuildingTypeId enum. */
+  private getBuildingTypeIdForGhost(type: string): BuildingTypeId {
+    switch (type) {
+      case 'blacksmith': return BuildingTypeId.Blacksmith;
+      case 'lumbercamp': return BuildingTypeId.LumberCamp;
+      case 'mijnschacht': return BuildingTypeId.TertiaryResourceBuilding;
+      case 'chocolaterie': return BuildingTypeId.TertiaryResourceBuilding;
+      default: return BuildingTypeId.Barracks;
+    }
+  }
+
+  /** Get a faction-aware display label for a building ghost type. */
+  private getBuildingLabel(ghostType: string): string {
+    const factionLabels: Record<number, Record<string, string>> = {
+      [FactionId.Brabanders]: { barracks: 'Kazerne', lumbercamp: 'Houtzagerij', blacksmith: 'Smederij' },
+      [FactionId.Randstad]:   { barracks: 'Vergaderzaal', lumbercamp: 'Starbucks', blacksmith: 'CoworkingSpace' },
+      [FactionId.Limburgers]: { barracks: 'Schuttershal', lumbercamp: 'Vlaaibakkerij', blacksmith: 'Klooster', mijnschacht: 'Mijnschacht' },
+      [FactionId.Belgen]:     { barracks: 'Frituur', lumbercamp: 'Frietfabriek', blacksmith: 'EU-Parlement', chocolaterie: 'Chocolaterie' },
+    };
+    return factionLabels[this.playerFactionId]?.[ghostType]
+      ?? ghostType.charAt(0).toUpperCase() + ghostType.slice(1);
   }
 
   private exitBuildMode(): void {
@@ -1292,21 +1362,24 @@ export class Game {
 
     if (hits.length > 0) {
       const point = hits[0].point;
-      const buildingTypeId = this.buildGhostType === 'blacksmith' ? BuildingTypeId.Blacksmith
-        : this.buildGhostType === 'lumbercamp' ? BuildingTypeId.LumberCamp
-        : BuildingTypeId.Barracks;
-      const cost = BUILDING_ARCHETYPES[buildingTypeId].costGold;
-      const buildingLabel = this.buildGhostType === 'blacksmith' ? 'Smederij'
-        : this.buildGhostType === 'lumbercamp' ? 'Houtzagerij'
-        : 'Barracks';
+      const buildingTypeId = this.getBuildingTypeIdForGhost(this.buildGhostType);
+      const arch = buildingTypeId < BUILDING_ARCHETYPES.length ? BUILDING_ARCHETYPES[buildingTypeId] : null;
+      const goldCost = arch?.costGold ?? 150;
+      const woodCost = arch?.costWood ?? 0;
+      const buildingLabel = this.getBuildingLabel(this.buildGhostType);
 
-      if (!this.playerState.canAfford(this.playerFactionId, cost)) {
-        this.hud?.showAlert('Niet genoeg goud!', 'warning');
+      if (!this.playerState.canAfford(this.playerFactionId, goldCost)) {
+        this.hud?.showAlert(`Niet genoeg goud! (${goldCost} nodig)`, 'warning');
+        return;
+      }
+      if (woodCost > 0 && !this.playerState.canAffordWood(this.playerFactionId, woodCost)) {
+        this.hud?.showAlert(`Niet genoeg hout! (${woodCost} nodig)`, 'warning');
         return;
       }
 
-      // Deduct gold
-      this.playerState.spend(this.playerFactionId, cost);
+      // Deduct resources
+      this.playerState.spend(this.playerFactionId, goldCost);
+      if (woodCost > 0) this.playerState.spendWood(this.playerFactionId, woodCost);
 
       // Spawn building
       const eid = this.spawnBuildingAtRuntime(buildingTypeId, this.playerFactionId, point.x, point.z);
@@ -2048,10 +2121,10 @@ export class Game {
         return this.startTrainingUnit(buildingEid, unitType);
       },
       deductGold: (amount: number, factionId?: number) => {
-        return this.playerState.spend(factionId ?? this.getAIFactionId(), amount);
+        return this.playerState.spend(factionId ?? AISystem.factionId, amount);
       },
       getGold: (factionId?: number) => {
-        return this.playerState.getGold(factionId ?? this.getAIFactionId());
+        return this.playerState.getGold(factionId ?? AISystem.factionId);
       },
       getAllEntityIds: () => {
         return this.getAllLivingEntityIds();
@@ -2264,8 +2337,9 @@ export class Game {
         tertiaryEl.style.display = 'flex';
         tertiaryVal.textContent = String(Math.floor(this.playerState.getTertiary(this.playerFactionId)));
         if (tertiaryIcon) {
-          const icons: Record<number, string> = { 1: '\u2615', 2: '\u26CF\uFE0F', 3: '\u{1F36B}' };
-          tertiaryIcon.textContent = icons[this.playerFactionId] ?? '\u26CF\uFE0F';
+          // Tertiary icon uses CSS class on the resource-icon span -- no text content needed
+          tertiaryIcon.textContent = '';
+          tertiaryIcon.className = 'resource-icon resource-icon--gold';
         }
       }
     }
@@ -2558,7 +2632,9 @@ export class Game {
 
   private createBuildingEntity(type: BuildingTypeId, faction: FactionId, x: number, z: number): number {
     const eid = addEntity(world);
-    const arch = BUILDING_ARCHETYPES[type];
+    // Fallback archetype for building types not in the base array (e.g. TertiaryResourceBuilding)
+    const defaultArch = { hp: 500, costGold: 150, costSecondary: 0, buildTime: 25, sightRange: 8, produces: [] as number[] };
+    const arch = type < BUILDING_ARCHETYPES.length ? BUILDING_ARCHETYPES[type] : defaultArch;
     const y = this.terrain.getHeightAt(x, z);
 
     addComponent(world, eid, Position); Position.x[eid] = x; Position.y[eid] = y; Position.z[eid] = z;

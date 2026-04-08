@@ -82,6 +82,12 @@ const GEAR_SIZE = 0.7;
 const DAMAGE_TINT_COLOR = new THREE.Color(0xff2200);
 const MAX_DAMAGE_EMISSIVE_INTENSITY = 0.5;
 
+/** Status bar dimensions and positioning. */
+const BAR_WIDTH = 2.4;
+const BAR_HEIGHT = 0.25;
+const BAR_Y_OFFSET = 4.2;
+const BAR_HEALTH_Y_OFFSET = 3.85; // slightly below construction bar
+
 // ---------------------------------------------------------------------------
 // BuildingRenderer
 // ---------------------------------------------------------------------------
@@ -111,6 +117,19 @@ export class BuildingRenderer {
   private rallyPoleGeo: THREE.CylinderGeometry;
   private rallyFlagGeo: THREE.ConeGeometry;
 
+  /** Construction progress bars: eid -> { bg, fill } group. */
+  private progressBars = new Map<number, THREE.Group>();
+  /** Health bars: eid -> { bg, fill } group. */
+  private healthBars = new Map<number, THREE.Group>();
+  /** Shared bar geometries. */
+  private barBgGeo: THREE.PlaneGeometry;
+  private barFillGeo: THREE.PlaneGeometry;
+  /** Shared bar materials. */
+  private progressBgMat: THREE.MeshBasicMaterial;
+  private progressFillMat: THREE.MeshBasicMaterial;
+  private healthBgMat: THREE.MeshBasicMaterial;
+  private healthFillMat: THREE.MeshBasicMaterial;
+
   constructor(parentGroup: THREE.Group) {
     this.group = parentGroup;
 
@@ -127,6 +146,39 @@ export class BuildingRenderer {
     // Create shared rally flag geometry
     this.rallyPoleGeo = new THREE.CylinderGeometry(0.05, 0.05, 1.8, 6);
     this.rallyFlagGeo = new THREE.ConeGeometry(0.35, 0.5, 4);
+
+    // Create shared status bar resources
+    this.barBgGeo = new THREE.PlaneGeometry(BAR_WIDTH, BAR_HEIGHT);
+    this.barFillGeo = new THREE.PlaneGeometry(1.0, BAR_HEIGHT); // width scaled per-instance
+
+    this.progressBgMat = new THREE.MeshBasicMaterial({
+      color: 0x222222,
+      transparent: true,
+      opacity: 0.6,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    });
+    this.progressFillMat = new THREE.MeshBasicMaterial({
+      color: 0x44bb44,
+      transparent: true,
+      opacity: 0.85,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    });
+    this.healthBgMat = new THREE.MeshBasicMaterial({
+      color: 0x222222,
+      transparent: true,
+      opacity: 0.6,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    });
+    this.healthFillMat = new THREE.MeshBasicMaterial({
+      color: 0xcc2222,
+      transparent: true,
+      opacity: 0.85,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    });
   }
 
   // -----------------------------------------------------------------------
@@ -238,6 +290,12 @@ export class BuildingRenderer {
     this.group.remove(obj);
     this.disposeObject(obj);
     this.instances.delete(eid);
+
+    // Clean up associated status bars
+    const pBar = this.progressBars.get(eid);
+    if (pBar) { this.group.remove(pBar); this.progressBars.delete(eid); }
+    const hBar = this.healthBars.get(eid);
+    if (hBar) { this.group.remove(hBar); this.healthBars.delete(eid); }
   }
 
   getObject(eid: number): THREE.Object3D | undefined {
@@ -409,6 +467,99 @@ export class BuildingRenderer {
         gear.visible = false;
       }
     }
+
+    // Update construction progress bars and health bars
+    const activeProgressEids = new Set<number>();
+    const activeHealthEids = new Set<number>();
+
+    for (const data of buildings) {
+      const isUnderConstruction = data.progress < 1.0;
+      const isDamaged = data.hpRatio !== undefined && data.hpRatio < 1.0 && !isUnderConstruction;
+
+      // -- Construction progress bar --
+      if (isUnderConstruction) {
+        activeProgressEids.add(data.eid);
+        let barGroup = this.progressBars.get(data.eid);
+        if (!barGroup) {
+          barGroup = this.createBarGroup(this.progressBgMat, this.progressFillMat);
+          barGroup.name = `progress_bar_${data.eid}`;
+          this.progressBars.set(data.eid, barGroup);
+          this.group.add(barGroup);
+        }
+        barGroup.visible = true;
+        barGroup.position.set(data.x, data.y + BAR_Y_OFFSET, data.z);
+        // Billboard: face the camera by rotating on X axis
+        barGroup.rotation.x = -Math.PI / 4;
+        this.updateBarFill(barGroup, data.progress);
+      }
+
+      // -- Health bar --
+      if (isDamaged) {
+        activeHealthEids.add(data.eid);
+        let barGroup = this.healthBars.get(data.eid);
+        if (!barGroup) {
+          barGroup = this.createBarGroup(this.healthBgMat, this.healthFillMat);
+          barGroup.name = `health_bar_${data.eid}`;
+          this.healthBars.set(data.eid, barGroup);
+          this.group.add(barGroup);
+        }
+        barGroup.visible = true;
+        barGroup.position.set(data.x, data.y + BAR_HEALTH_Y_OFFSET, data.z);
+        barGroup.rotation.x = -Math.PI / 4;
+        this.updateBarFill(barGroup, data.hpRatio!);
+      }
+    }
+
+    // Hide bars for buildings no longer needing them
+    for (const [eid, bar] of this.progressBars) {
+      if (!activeProgressEids.has(eid)) {
+        bar.visible = false;
+      }
+    }
+    for (const [eid, bar] of this.healthBars) {
+      if (!activeHealthEids.has(eid)) {
+        bar.visible = false;
+      }
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // Status bars (construction progress + health)
+  // -----------------------------------------------------------------------
+
+  /**
+   * Create a bar group containing a background plane and a fill plane.
+   * The fill plane is the first child (index 0), the background is second (index 1).
+   */
+  private createBarGroup(bgMat: THREE.MeshBasicMaterial, fillMat: THREE.MeshBasicMaterial): THREE.Group {
+    const grp = new THREE.Group();
+    grp.renderOrder = 5;
+
+    // Background bar (full width)
+    const bg = new THREE.Mesh(this.barBgGeo, bgMat);
+    bg.renderOrder = 5;
+
+    // Fill bar (scaled by ratio)
+    const fill = new THREE.Mesh(this.barFillGeo, fillMat);
+    fill.renderOrder = 6;
+    fill.scale.set(BAR_WIDTH, 1, 1); // will be rescaled in updateBarFill
+    fill.position.set(0, 0, 0.01); // slight Z offset to prevent z-fighting
+
+    grp.add(fill); // index 0
+    grp.add(bg);   // index 1
+    return grp;
+  }
+
+  /**
+   * Update the fill width and position of a bar group based on ratio (0..1).
+   */
+  private updateBarFill(barGroup: THREE.Group, ratio: number): void {
+    const fill = barGroup.children[0] as THREE.Mesh;
+    const clamped = Math.max(0, Math.min(ratio, 1));
+    const fillWidth = BAR_WIDTH * clamped;
+    fill.scale.set(fillWidth, 1, 1);
+    // Anchor the fill bar to the left edge: offset so its left edge aligns with bg left edge
+    fill.position.x = -BAR_WIDTH / 2 + fillWidth / 2;
   }
 
   /**
@@ -530,6 +681,22 @@ export class BuildingRenderer {
     this.rallyFlags.clear();
     this.rallyPoleGeo.dispose();
     this.rallyFlagGeo.dispose();
+
+    // Dispose status bars
+    for (const [, bar] of this.progressBars) {
+      this.group.remove(bar);
+    }
+    this.progressBars.clear();
+    for (const [, bar] of this.healthBars) {
+      this.group.remove(bar);
+    }
+    this.healthBars.clear();
+    this.barBgGeo.dispose();
+    this.barFillGeo.dispose();
+    this.progressBgMat.dispose();
+    this.progressFillMat.dispose();
+    this.healthBgMat.dispose();
+    this.healthFillMat.dispose();
 
     for (const [, root] of this.modelCache) {
       this.disposeObject(root);

@@ -81,6 +81,14 @@ export interface MissionDefinition {
   readonly mapSize: number;
   readonly startingGold: number;
   readonly startingGoldAI: number;
+  /** The faction the player controls in this mission. */
+  readonly playerFactionId: FactionId;
+  /**
+   * The faction(s) controlled by the AI in this mission.
+   * Supports multiple AI factions for multi-front battles (e.g. Boardroom Beslissing).
+   * The first entry is the "primary" AI faction used for AI production when hasAIProduction is true.
+   */
+  readonly aiFactionIds: readonly FactionId[];
   readonly buildings: readonly MissionBuildingSpawn[];
   readonly units: readonly MissionUnitSpawn[];
   readonly goldMines: readonly GoldMineSpawn[];
@@ -110,6 +118,8 @@ const MISSION_1_DE_OOGST: MissionDefinition = {
   campaignId: 'brabanders',
   missionIndex: 0,
   title: 'De Oogst',
+  playerFactionId: FactionId.Brabanders,
+  aiFactionIds: [FactionId.Randstad],
   briefingTitle: 'Missie 1: De Oogst',
   briefingText:
     'Welkom in Reusel, het hart van Brabant. Het is een rustige ochtend — de vogels zingen, ' +
@@ -159,9 +169,9 @@ const MISSION_1_DE_OOGST: MissionDefinition = {
         {
           type: 'spawn-units',
           units: [
-            { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 25, z: 25 },
-            { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 27, z: 23 },
-            { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 23, z: 27 },
+            { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 25, z: 25 },
+            { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 27, z: 23 },
+            { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 23, z: 27 },
           ],
         },
       ],
@@ -197,6 +207,8 @@ const MISSION_2_EERSTE_SCHERMUTSEL: MissionDefinition = {
   campaignId: 'brabanders',
   missionIndex: 1,
   title: 'De Eerste Schermutsel',
+  playerFactionId: FactionId.Brabanders,
+  aiFactionIds: [FactionId.Randstad],
   briefingTitle: 'Missie 2: De Eerste Schermutsel',
   briefingText:
     'Onbekende indringers zijn gesignaleerd aan de rand van het dorp. Ze dragen pakken en ' +
@@ -211,7 +223,7 @@ const MISSION_2_EERSTE_SCHERMUTSEL: MissionDefinition = {
 
   buildings: [
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: -35, z: -35, complete: true },
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall, x: 35, z: 35, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: 35, z: 35, complete: true },
   ],
 
   units: [
@@ -220,9 +232,9 @@ const MISSION_2_EERSTE_SCHERMUTSEL: MissionDefinition = {
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -30, z: -33 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -28, z: -33 },
     // Enemy: 3 infantry (static defenders, no AI production)
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 33, z: 33 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 35, z: 37 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 37, z: 35 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 33, z: 33 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 35, z: 37 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 37, z: 35 },
   ],
 
   goldMines: [
@@ -258,7 +270,7 @@ const MISSION_2_EERSTE_SCHERMUTSEL: MissionDefinition = {
     },
     {
       id: 'victory-destroy',
-      condition: { type: 'building-destroyed', factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall },
+      condition: { type: 'building-destroyed', factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall },
       actions: [
         { type: 'message', text: 'Het vijandelijke Hoofdkantoor is vernietigd! De indringers vluchten!' },
         { type: 'victory' },
@@ -281,7 +293,7 @@ const MISSION_2_EERSTE_SCHERMUTSEL: MissionDefinition = {
 // Missie 3: "De Verdediging"
 // ---------------------------------------------------------------------------
 
-function createWaveUnits(count: number, type: UnitTypeId, baseX: number, baseZ: number, spread: number, faction: FactionId = FactionId.AI): MissionUnitSpawn[] {
+function createWaveUnits(count: number, type: UnitTypeId, baseX: number, baseZ: number, spread: number, faction: FactionId = FactionId.Randstad): MissionUnitSpawn[] {
   const units: MissionUnitSpawn[] = [];
   for (let i = 0; i < count; i++) {
     const angle = (i / count) * Math.PI * 2;
@@ -303,6 +315,8 @@ const MISSION_3_VERDEDIGING: MissionDefinition = {
   campaignId: 'brabanders',
   missionIndex: 2,
   title: 'De Verdediging',
+  playerFactionId: FactionId.Brabanders,
+  aiFactionIds: [FactionId.Randstad],
   briefingTitle: 'Missie 3: De Verdediging',
   briefingText:
     'De Randstad heeft ons gevonden. Verkenners melden dat er meerdere golven aanvallers ' +
@@ -504,6 +518,8 @@ const MISSION_4_BINNENDIEZE: MissionDefinition = {
   campaignId: 'brabanders',
   missionIndex: 3,
   title: 'De Binnendieze',
+  playerFactionId: FactionId.Brabanders,
+  aiFactionIds: [FactionId.Randstad],
   briefingTitle: 'Missie 4: De Binnendieze',
   briefingText:
     'Den Bosch. Het hart van Brabant. Volgens onze Belgische vrienden ligt hier ergens ' +
@@ -520,11 +536,11 @@ const MISSION_4_BINNENDIEZE: MissionDefinition = {
   buildings: [
     // No player Town Hall — this is a commando mission
     // Archief (TownHall proxy) in NE corner, far from start
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall, x: 55, z: 55, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: 55, z: 55, complete: true },
     // Outpost Zuid (eerste encounter, dichtbij start)
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: -10, z: -30, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: -10, z: -30, complete: true },
     // Outpost West (tweede encounter)
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: -40, z: 25, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: -40, z: 25, complete: true },
   ],
 
   // Tree resources als natuurlijke barrières / "stadsmuren"
@@ -557,19 +573,19 @@ const MISSION_4_BINNENDIEZE: MissionDefinition = {
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -54, z: -51 },
 
     // === Encounter 1: Outpost Zuid (2 guards, easy) ===
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -12, z: -32 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -8, z: -28 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -12, z: -32 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -8, z: -28 },
 
     // === Encounter 2: Outpost West (3 guards, medium) ===
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -42, z: 23 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -38, z: 27 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -40, z: 20 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -42, z: 23 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -38, z: 27 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -40, z: 20 },
 
     // === Encounter 3: Archief (4 heavy guards, hard) ===
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 53, z: 53 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 57, z: 53 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 55, z: 57 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 52, z: 57 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 53, z: 53 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 57, z: 53 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 55, z: 57 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 52, z: 57 },
   ],
 
   goldMines: [], // No economy in commando mission
@@ -595,7 +611,7 @@ const MISSION_4_BINNENDIEZE: MissionDefinition = {
     },
     {
       id: 'outpost-south-cleared',
-      condition: { type: 'building-destroyed', factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks },
+      condition: { type: 'building-destroyed', factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks },
       actions: [{ type: 'message', text: 'Eerste post uitgeschakeld! De westelijke bewakingspost is je volgende doel. Beweeg je team door de bomenrij.' }],
       once: true,
     },
@@ -607,9 +623,9 @@ const MISSION_4_BINNENDIEZE: MissionDefinition = {
         {
           type: 'spawn-units',
           units: [
-            { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 60, z: 50 },
-            { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 50, z: 60 },
-            { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 58, z: 58 },
+            { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 60, z: 50 },
+            { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 50, z: 60 },
+            { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 58, z: 58 },
           ],
         },
       ],
@@ -617,7 +633,7 @@ const MISSION_4_BINNENDIEZE: MissionDefinition = {
     },
     {
       id: 'victory-archief',
-      condition: { type: 'building-destroyed', factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall },
+      condition: { type: 'building-destroyed', factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall },
       actions: [
         { type: 'message', text: 'Documenten gevonden! "Project Gentrificatie — Elke stad een Vinex-wijk, elke kroeg een Starbucks." Dit is veel groter dan een Worstenbroodje...' },
         { type: 'victory' },
@@ -650,6 +666,8 @@ const MISSION_5_HEUVELLAND: MissionDefinition = {
   campaignId: 'brabanders',
   missionIndex: 4,
   title: 'Heuvelland Diplomatie',
+  playerFactionId: FactionId.Brabanders,
+  aiFactionIds: [FactionId.Limburgers],
   briefingTitle: 'Missie 5: Heuvelland Diplomatie',
   briefingText:
     'De Limburgers. Mysterieus, nors, en beroemd om hun vlaai. Ze leven in de heuvels ' +
@@ -815,6 +833,8 @@ const MISSION_6_BOERENOPSTAND: MissionDefinition = {
   campaignId: 'brabanders',
   missionIndex: 5,
   title: 'De Boerenopstand',
+  playerFactionId: FactionId.Brabanders,
+  aiFactionIds: [FactionId.Randstad],
   briefingTitle: 'Missie 6: De Boerenopstand',
   briefingText:
     'De boeren van het Groene Woud zijn woedend. De Randstad heeft hun landbouwgrond ' +
@@ -834,12 +854,12 @@ const MISSION_6_BOERENOPSTAND: MissionDefinition = {
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: -50, z: -50, complete: true },
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: -42, z: -50, complete: true },
     // Enemy garrison (north)
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall, x: 45, z: 45, complete: true },
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: 37, z: 45, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: 45, z: 45, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 37, z: 45, complete: true },
     // 3 "tractor" outposts (Barracks as proxy for confiscated tractors)
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: 0, z: -20, complete: true },
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: -20, z: 15, complete: true },
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: 20, z: 5, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 0, z: -20, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: -20, z: 15, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 20, z: 5, complete: true },
   ],
 
   units: [
@@ -857,29 +877,29 @@ const MISSION_6_BOERENOPSTAND: MissionDefinition = {
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -36, z: -48 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -36, z: -46 },
     // Tractor outpost 1 guards (center-south)
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -2, z: -22 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 2, z: -22 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 0, z: -18 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 0, z: -24 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -2, z: -22 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 2, z: -22 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 0, z: -18 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 0, z: -24 },
     // Tractor outpost 2 guards (west)
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -22, z: 13 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -18, z: 13 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -20, z: 17 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -20, z: 11 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -22, z: 13 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -18, z: 13 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -20, z: 17 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -20, z: 11 },
     // Tractor outpost 3 guards (east)
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 18, z: 3 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 22, z: 3 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 20, z: 7 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 20, z: 1 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 18, z: 3 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 22, z: 3 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 20, z: 7 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 20, z: 1 },
     // Main garrison defenders
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 43, z: 43 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 47, z: 43 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 43, z: 47 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 47, z: 47 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 45, z: 43 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 45, z: 47 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 40, z: 45 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 50, z: 45 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 43, z: 43 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 47, z: 43 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 43, z: 47 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 47, z: 47 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 45, z: 43 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 45, z: 47 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 40, z: 45 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 50, z: 45 },
   ],
 
   goldMines: [
@@ -953,7 +973,7 @@ const MISSION_6_BOERENOPSTAND: MissionDefinition = {
     },
     {
       id: 'victory-garrison',
-      condition: { type: 'building-destroyed', factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall },
+      condition: { type: 'building-destroyed', factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall },
       actions: [
         { type: 'message', text: 'Het garnizoen is gevallen! Het Groene Woud is bevrijd! De boeren vieren feest — de frituurmeester bakt de eerste friet van de overwinning!' },
         { type: 'victory' },
@@ -987,6 +1007,8 @@ const MISSION_7_MARKT: MissionDefinition = {
   id: 'brabant-7-de-markt',
   campaignId: 'brabanders',
   missionIndex: 6,
+  playerFactionId: FactionId.Brabanders,
+  aiFactionIds: [FactionId.Randstad],
   title: 'De Markt van Brabant',
   briefingTitle: 'Missie 7: De Markt van Brabant',
   briefingText:
@@ -1156,6 +1178,8 @@ const MISSION_8_BELEG: MissionDefinition = {
   campaignId: 'brabanders',
   missionIndex: 7,
   title: 'Het Beleg van Eindhoven',
+  playerFactionId: FactionId.Brabanders,
+  aiFactionIds: [FactionId.Randstad],
   briefingTitle: 'Missie 8: Het Beleg van Eindhoven',
   briefingText:
     'Eindhoven — ooit het technologisch hart van Brabant. Maar de Randstad heeft er een ' +
@@ -1175,9 +1199,9 @@ const MISSION_8_BELEG: MissionDefinition = {
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: -38, z: -38, complete: true },
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: -30, z: -38, complete: true },
     // Enemy: fortified base in NE
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall, x: 38, z: 38, complete: true },
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: 30, z: 38, complete: true },
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: 38, z: 30, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: 38, z: 38, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 30, z: 38, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 38, z: 30, complete: true },
   ],
 
   units: [
@@ -1196,27 +1220,27 @@ const MISSION_8_BELEG: MissionDefinition = {
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -24, z: -32 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -22, z: -32 },
     // Enemy: heavy defense around TownHall
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 36, z: 36 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 40, z: 36 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 36, z: 40 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 40, z: 40 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 38, z: 34 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 34, z: 38 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 38, z: 42 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 42, z: 38 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 36, z: 42 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 36, z: 36 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 40, z: 36 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 36, z: 40 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 40, z: 40 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 38, z: 34 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 34, z: 38 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 38, z: 42 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 42, z: 38 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 36, z: 42 },
     // Barracks 1 guards
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 28, z: 36 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 32, z: 36 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 30, z: 40 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 28, z: 36 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 32, z: 36 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 30, z: 40 },
     // Barracks 2 guards
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 36, z: 28 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 40, z: 28 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 38, z: 32 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 36, z: 28 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 40, z: 28 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 38, z: 32 },
     // Forward patrol in center
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 10, z: 10 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 12, z: 8 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 8, z: 12 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 10, z: 10 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 12, z: 8 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 8, z: 12 },
   ],
 
   goldMines: [
@@ -1289,7 +1313,7 @@ const MISSION_8_BELEG: MissionDefinition = {
     },
     {
       id: 'victory-eindhoven',
-      condition: { type: 'building-destroyed', factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall },
+      condition: { type: 'building-destroyed', factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall },
       actions: [
         { type: 'message', text: 'Eindhoven is bevrijd! De Prins plant de Brabantse vlag op het dak van het hoofdkantoor. "En als eerste maatregel: alle sushi-bars worden weer friettenten!"' },
         { type: 'victory' },
@@ -1321,6 +1345,8 @@ const MISSION_9_RAAD: MissionDefinition = {
   id: 'brabant-9-de-brabantse-raad',
   campaignId: 'brabanders',
   missionIndex: 8,
+  playerFactionId: FactionId.Brabanders,
+  aiFactionIds: [FactionId.Randstad],
   title: 'De Brabantse Raad',
   briefingTitle: 'Missie 9: De Brabantse Raad',
   briefingText:
@@ -1343,13 +1369,13 @@ const MISSION_9_RAAD: MissionDefinition = {
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: 8, z: -42, complete: true },
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: -8, z: -42, complete: true },
     // Enemy base 1: NE
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall, x: M9_NE_BASE_X, z: M9_NE_BASE_Z, complete: true },
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: M9_NE_BASE_X - 8, z: M9_NE_BASE_Z, complete: true },
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: M9_NE_BASE_X, z: M9_NE_BASE_Z - 8, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: M9_NE_BASE_X, z: M9_NE_BASE_Z, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: M9_NE_BASE_X - 8, z: M9_NE_BASE_Z, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: M9_NE_BASE_X, z: M9_NE_BASE_Z - 8, complete: true },
     // Enemy base 2: NW
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall, x: M9_NW_BASE_X, z: M9_NW_BASE_Z, complete: true },
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: M9_NW_BASE_X + 8, z: M9_NW_BASE_Z, complete: true },
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: M9_NW_BASE_X, z: M9_NW_BASE_Z - 8, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: M9_NW_BASE_X, z: M9_NW_BASE_Z, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: M9_NW_BASE_X + 8, z: M9_NW_BASE_Z, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: M9_NW_BASE_X, z: M9_NW_BASE_Z - 8, complete: true },
   ],
 
   units: [
@@ -1376,27 +1402,27 @@ const MISSION_9_RAAD: MissionDefinition = {
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -12, z: -40 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -12, z: -38 },
     // NE base defenders
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 40, z: 40 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 44, z: 40 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 40, z: 44 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 44, z: 44 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 38, z: 42 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 42, z: 46 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 46, z: 42 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 42, z: 38 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 40, z: 40 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 44, z: 40 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 40, z: 44 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 44, z: 44 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 38, z: 42 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 42, z: 46 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 46, z: 42 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 42, z: 38 },
     // NW base defenders
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -40, z: 40 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -44, z: 40 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -40, z: 44 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -44, z: 44 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -38, z: 42 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -42, z: 46 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -46, z: 42 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -42, z: 38 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -40, z: 40 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -44, z: 40 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -40, z: 44 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -44, z: 44 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -38, z: 42 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -42, z: 46 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -46, z: 42 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -42, z: 38 },
     // Forward scouting parties (center map)
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 15, z: 10 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -15, z: 10 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 0, z: 15 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 15, z: 10 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -15, z: 10 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 0, z: 15 },
   ],
 
   goldMines: [
@@ -1517,7 +1543,7 @@ const MISSION_9_RAAD: MissionDefinition = {
     },
     {
       id: 'victory-both-destroyed',
-      condition: { type: 'building-destroyed', factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall },
+      condition: { type: 'building-destroyed', factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall },
       actions: [
         { type: 'message', text: 'BEIDE BASISSEN VERNIETIGD! De CEO vlucht in een Uber! "Ik ga naar een coworking space in Bali!" Brabant is gered! De Prins en de Boer omhelzen elkaar. Vandaag is een dag die nooit vergeten wordt.' },
         { type: 'victory' },
@@ -1552,6 +1578,8 @@ const MISSION_10_RAAD: MissionDefinition = {
   campaignId: 'brabanders',
   missionIndex: 9,
   title: 'De Raad van Brabant',
+  playerFactionId: FactionId.Brabanders,
+  aiFactionIds: [FactionId.Randstad],
   briefingTitle: 'Missie 10: De Raad van Brabant',
   briefingText:
     'Na de Mijn van Waarheid is er geen weg meer terug. De Randstad weet dat we de Receptuur ' +
@@ -1720,8 +1748,8 @@ const MISSION_10_RAAD: MissionDefinition = {
         {
           type: 'spawn-units',
           units: [
-            { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -5, z: 5 },
-            { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 5, z: 5 },
+            { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -5, z: 5 },
+            { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 5, z: 5 },
           ],
         },
       ],
@@ -1851,6 +1879,8 @@ const MISSION_11_A2: MissionDefinition = {
   id: 'brabant-11-de-slag-om-de-a2',
   campaignId: 'brabanders',
   missionIndex: 10,
+  playerFactionId: FactionId.Brabanders,
+  aiFactionIds: [FactionId.Randstad],
   title: 'De Slag om de A2',
   briefingTitle: 'Missie 11: De Slag om de A2',
   briefingText:
@@ -1880,9 +1910,9 @@ const MISSION_11_A2: MissionDefinition = {
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: M11_FORT_BEST_X, z: M11_FORT_BEST_Z, complete: true },
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M11_FORT_BEST_X - 8, z: M11_FORT_BEST_Z, complete: true },
     // Randstad Veldkwartier (mobile HQ — represented as a northern TownHall)
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall, x: M11_A2_NORTH_X, z: 140, complete: true },
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: M11_A2_NORTH_X + 10, z: 140, complete: true },
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: M11_A2_NORTH_X - 10, z: 140, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: M11_A2_NORTH_X, z: 140, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: M11_A2_NORTH_X + 10, z: 140, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: M11_A2_NORTH_X - 10, z: 140, complete: true },
   ],
 
   units: [
@@ -1942,12 +1972,12 @@ const MISSION_11_A2: MissionDefinition = {
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -76, z: 22 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -86, z: 22 },
     // Veldkwartier guards
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -2, z: 138 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 2, z: 138 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -2, z: 142 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 2, z: 142 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -5, z: 140 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 5, z: 140 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -2, z: 138 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 2, z: 138 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -2, z: 142 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 2, z: 142 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -5, z: 140 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 5, z: 140 },
   ],
 
   goldMines: [
@@ -2128,7 +2158,7 @@ const MISSION_11_A2: MissionDefinition = {
     },
     {
       id: 'victory-a2',
-      condition: { type: 'building-destroyed', factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall },
+      condition: { type: 'building-destroyed', factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall },
       actions: [
         {
           type: 'message',
@@ -2246,6 +2276,8 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
   id: 'brabant-12-het-gouden-worstenbroodje',
   campaignId: 'brabanders',
   missionIndex: 11,
+  playerFactionId: FactionId.Brabanders,
+  aiFactionIds: [FactionId.Randstad],
   title: 'Het Gouden Worstenbroodje',
   briefingTitle: 'Missie 12: Het Gouden Worstenbroodje',
   briefingText:
@@ -2276,16 +2308,16 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.LumberCamp, x: M12_PLAYER_BASE_X + 10, z: M12_PLAYER_BASE_Z - 10, complete: true },
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Blacksmith, x: M12_PLAYER_BASE_X - 10, z: M12_PLAYER_BASE_Z - 10, complete: true },
     // Ring 1 — Buitenwijken (2 Barracks as Kantoor-torens at city gates)
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: -40, z: M12_RING1_Z, complete: true },
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: 40, z: M12_RING1_Z, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: -40, z: M12_RING1_Z, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 40, z: M12_RING1_Z, complete: true },
     // Ring 2 — Bedrijventerrein (2 Barracks as Coworking Spaces + Politicus patrol zone)
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: -30, z: M12_RING2_Z, complete: true },
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: 30, z: M12_RING2_Z, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: -30, z: M12_RING2_Z, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 30, z: M12_RING2_Z, complete: true },
     // Ring 3 — Centrum (TownHall as Corporate Tower, surrounded by Barracks as Kantoor-torens)
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall, x: M12_TOWER_X, z: M12_TOWER_Z, complete: true },
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: M12_TOWER_X - 20, z: M12_RING3_Z, complete: true },
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: M12_TOWER_X + 20, z: M12_RING3_Z, complete: true },
-    { factionId: FactionId.AI, buildingType: BuildingTypeId.Barracks, x: M12_TOWER_X, z: M12_RING3_Z - 15, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: M12_TOWER_X, z: M12_TOWER_Z, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: M12_TOWER_X - 20, z: M12_RING3_Z, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: M12_TOWER_X + 20, z: M12_RING3_Z, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: M12_TOWER_X, z: M12_RING3_Z - 15, complete: true },
   ],
 
   units: [
@@ -2348,90 +2380,90 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
 
     // --- ENEMY FORCES ---
     // Ring 1 — Buitenwijken: 10 Infantry (Managers) + 4 Ranged (Consultants) + 4 Infantry (Hipsters)
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -30, z: -45 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -25, z: -45 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -20, z: -42 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 20, z: -42 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 25, z: -45 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 30, z: -45 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -10, z: -38 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 10, z: -38 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 0, z: -42 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 5, z: -42 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -35, z: -40 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 35, z: -40 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -15, z: -38 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 15, z: -38 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -45, z: -38 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 45, z: -38 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -50, z: -35 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 50, z: -35 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -30, z: -45 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -25, z: -45 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -20, z: -42 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 20, z: -42 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 25, z: -45 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 30, z: -45 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -10, z: -38 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 10, z: -38 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 0, z: -42 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 5, z: -42 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -35, z: -40 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 35, z: -40 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -15, z: -38 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 15, z: -38 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -45, z: -38 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 45, z: -38 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -50, z: -35 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 50, z: -35 },
 
     // Ring 2 — Bedrijventerrein: 14 Infantry + 6 Ranged (Corporate Advocaten) + 4 Ranged (HR) + 3 Ranged (Influencers)
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -25, z: 25 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -20, z: 25 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -15, z: 28 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -10, z: 28 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -5, z: 30 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 0, z: 30 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 5, z: 30 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 10, z: 28 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 15, z: 28 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 20, z: 25 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 25, z: 25 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -35, z: 30 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 35, z: 30 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 0, z: 35 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -28, z: 32 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 28, z: 32 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -20, z: 32 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 20, z: 32 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -10, z: 34 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 10, z: 34 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -25, z: 25 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -20, z: 25 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -15, z: 28 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -10, z: 28 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -5, z: 30 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 0, z: 30 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 5, z: 30 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 10, z: 28 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 15, z: 28 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 20, z: 25 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 25, z: 25 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -35, z: 30 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 35, z: 30 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 0, z: 35 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -28, z: 32 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 28, z: 32 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -20, z: 32 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 20, z: 32 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -10, z: 34 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 10, z: 34 },
     // Politicus elite escorte
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -5, z: 32 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 5, z: 32 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 0, z: 28 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -3, z: 33 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 3, z: 33 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -15, z: 35 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 15, z: 35 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 0, z: 37 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -5, z: 32 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 5, z: 32 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 0, z: 28 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -3, z: 33 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 3, z: 33 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -15, z: 35 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 15, z: 35 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 0, z: 37 },
 
     // Ring 3 — Centrum: 12 Infantry + 8 Ranged + 4 Infantry (siege defense)
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -15, z: 95 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -10, z: 95 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -5, z: 98 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 0, z: 98 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 5, z: 98 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 10, z: 95 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 15, z: 95 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -20, z: 100 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 20, z: 100 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -15, z: 105 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 15, z: 105 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 0, z: 105 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -18, z: 102 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 18, z: 102 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -10, z: 102 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 10, z: 102 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -5, z: 108 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 5, z: 108 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: -10, z: 110 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 10, z: 110 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -15, z: 95 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -10, z: 95 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -5, z: 98 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 0, z: 98 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 5, z: 98 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 10, z: 95 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 15, z: 95 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -20, z: 100 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 20, z: 100 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -15, z: 105 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 15, z: 105 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 0, z: 105 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -18, z: 102 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 18, z: 102 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -10, z: 102 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 10, z: 102 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -5, z: 108 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 5, z: 108 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -10, z: 110 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 10, z: 110 },
     // Siege defenders (Vastgoedmakelaars)
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -22, z: 98 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 22, z: 98 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -22, z: 105 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 22, z: 105 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -22, z: 98 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 22, z: 98 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -22, z: 105 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 22, z: 105 },
 
     // Corporate Tower guards (CEO bodyguards) — 4 elite Infantry
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -3, z: 118 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 3, z: 118 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: -3, z: 122 },
-    { factionId: FactionId.AI, unitType: UnitTypeId.Infantry, x: 3, z: 122 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -3, z: 118 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 3, z: 118 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -3, z: 122 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 3, z: 122 },
     // CEO himself (represented as Ranged — uses ranged attacks from the tower)
-    { factionId: FactionId.AI, unitType: UnitTypeId.Ranged, x: 0, z: 120 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 0, z: 120 },
   ],
 
   goldMines: [
@@ -2659,7 +2691,7 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
     // Victory trigger — Corporate Tower (enemy TownHall) destroyed
     {
       id: 'victory-tower',
-      condition: { type: 'building-destroyed', factionId: FactionId.AI, buildingType: BuildingTypeId.TownHall },
+      condition: { type: 'building-destroyed', factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall },
       actions: [
         {
           type: 'message',
@@ -2700,6 +2732,8 @@ const MISSION_B1_EERSTE_FRITUUR: MissionDefinition = {
   campaignId: 'belgen',
   missionIndex: 0,
   title: 'De Eerste Frituur',
+  playerFactionId: FactionId.Belgen,
+  aiFactionIds: [FactionId.Randstad],
   briefingTitle: 'Missie 1: De Eerste Frituur',
   briefingText:
     'Welkom in Antwerpen, de poort van Belgie! Ge zijt de nieuwe adviseur van de Frietkoning, ' +
@@ -2892,6 +2926,8 @@ const MISSION_B2_CHOCOLADE_VERDRAG: MissionDefinition = {
   id: 'belgen-2-het-chocolade-verdrag',
   campaignId: 'belgen',
   missionIndex: 1,
+  playerFactionId: FactionId.Belgen,
+  aiFactionIds: [FactionId.Randstad],
   title: 'Het Chocolade Verdrag',
   briefingTitle: 'Missie 2: Het Chocolade Verdrag',
   briefingText:
@@ -3080,6 +3116,8 @@ const MISSION_B3_COMMISSIEVERGADERING: MissionDefinition = {
   id: 'belgen-3-de-commissievergadering',
   campaignId: 'belgen',
   missionIndex: 2,
+  playerFactionId: FactionId.Belgen,
+  aiFactionIds: [FactionId.Brabanders],
   title: 'De Commissievergadering',
   briefingTitle: 'Missie 3: De Commissievergadering',
   briefingText:
@@ -3329,6 +3367,8 @@ const LIMBURGERS_MISSION_1_EERSTE_SCHACHT: MissionDefinition = {
   campaignId: 'limburgers',
   missionIndex: 0,
   title: 'De Eerste Schacht',
+  playerFactionId: FactionId.Limburgers,
+  aiFactionIds: [FactionId.Randstad],
   briefingTitle: 'Missie 1: De Eerste Schacht',
   briefingText:
     'Diep onder Valkenburg trillen de grotten. De Mijnbaas voelt het in zijn botten — ' +
@@ -3443,6 +3483,8 @@ const LIMBURGERS_MISSION_2_DUISTERNIS_BENEDEN: MissionDefinition = {
   id: 'limburgers-2-duisternis-beneden',
   campaignId: 'limburgers',
   missionIndex: 1,
+  playerFactionId: FactionId.Limburgers,
+  aiFactionIds: [FactionId.Randstad],
   title: 'Duisternis Beneden',
   briefingTitle: 'Missie 2: Duisternis Beneden',
   briefingText:
@@ -3578,6 +3620,8 @@ const LIMBURGERS_MISSION_3_VLAAIPRODUCTIE: MissionDefinition = {
   campaignId: 'limburgers',
   missionIndex: 2,
   title: 'De Vlaaiproductie',
+  playerFactionId: FactionId.Limburgers,
+  aiFactionIds: [FactionId.Randstad],
   briefingTitle: 'Missie 3: De Vlaaiproductie',
   briefingText:
     'Maastricht heeft honger. De stad vraagt 500 Vlaai om de wintervoorraad te vullen — ' +
@@ -3786,6 +3830,8 @@ const LIMBURGERS_MISSION_4_VERRASSINGSAANVAL: MissionDefinition = {
   id: 'limburgers-4-verrassingsaanval',
   campaignId: 'limburgers',
   missionIndex: 3,
+  playerFactionId: FactionId.Limburgers,
+  aiFactionIds: [FactionId.Randstad],
   title: 'Verrassingsaanval',
   briefingTitle: 'Missie 4: Verrassingsaanval',
   briefingText:
@@ -3935,6 +3981,8 @@ const LIMBURGERS_MISSION_5_MERGELMUREN: MissionDefinition = {
   campaignId: 'limburgers',
   missionIndex: 4,
   title: 'De Mergelmuren',
+  playerFactionId: FactionId.Limburgers,
+  aiFactionIds: [FactionId.Randstad],
   briefingTitle: 'Missie 5: De Mergelmuren',
   briefingText:
     'De Randstad is woedend over Venlo. Ze sturen een invasiemacht — de grootste die ' +
@@ -4218,6 +4266,8 @@ const RANDSTAD_MISSION_1_EERSTE_VERGADERING: MissionDefinition = {
   campaignId: 'randstad',
   missionIndex: 0,
   title: 'De Eerste Vergadering',
+  playerFactionId: FactionId.Randstad,
+  aiFactionIds: [FactionId.Brabanders],
   briefingTitle: 'Missie 1: De Eerste Vergadering',
   briefingText:
     'Het is maandagochtend 07:03. De koffie is koud, de printer doet het niet, ' +
@@ -4318,6 +4368,8 @@ const RANDSTAD_MISSION_2_CONSULTANCY_RAPPORT: MissionDefinition = {
   campaignId: 'randstad',
   missionIndex: 1,
   title: 'Het Consultancy Rapport',
+  playerFactionId: FactionId.Randstad,
+  aiFactionIds: [FactionId.Brabanders],
   briefingTitle: 'Missie 2: Het Consultancy Rapport',
   briefingText:
     'Het consultancy rapport is binnen: "De Brabantse economie is inefficient, ' +
@@ -4433,6 +4485,8 @@ const RANDSTAD_MISSION_3_VIJANDIGE_OVERNAME: MissionDefinition = {
   campaignId: 'randstad',
   missionIndex: 2,
   title: 'De Vijandige Overname',
+  playerFactionId: FactionId.Randstad,
+  aiFactionIds: [FactionId.Limburgers],
   briefingTitle: 'Missie 3: De Vijandige Overname',
   briefingText:
     'Het Board of Directors heeft een nieuw target geidentificeerd: de Limburgse mijnbouw. ' +
@@ -4574,6 +4628,8 @@ const RANDSTAD_MISSION_4_GENTRIFICATIE: MissionDefinition = {
   campaignId: 'randstad',
   missionIndex: 3,
   title: 'Gentrificatie',
+  playerFactionId: FactionId.Randstad,
+  aiFactionIds: [FactionId.Belgen],
   briefingTitle: 'Missie 4: Gentrificatie',
   briefingText:
     'De Belgen zijn boos. Onze vastgoedprojecten in de grensregio hebben de frietprijzen ' +
@@ -4770,6 +4826,8 @@ const RANDSTAD_MISSION_5_BOARDROOM_BESLISSING: MissionDefinition = {
   campaignId: 'randstad',
   missionIndex: 4,
   title: 'De Boardroom Beslissing',
+  playerFactionId: FactionId.Randstad,
+  aiFactionIds: [FactionId.Brabanders, FactionId.Limburgers, FactionId.Belgen],
   briefingTitle: 'Missie 5: De Boardroom Beslissing',
   briefingText:
     'Dit is het. De ultieme boardroom meeting. De CEO heeft besloten: volledige dominantie ' +

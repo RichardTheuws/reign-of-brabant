@@ -182,12 +182,14 @@ export function createProductionSystem() {
 
           // Notify Bureaucracy system of completed action
           onRandstadActionCompleted(factionId);
-        }
-        // If no room, the unit is simply lost (could be improved with
-        // queue pausing, but PoC keeps it simple)
 
-        // Shift queue: move next queued unit into production
-        shiftQueue(bEid);
+          // Shift queue: move next queued unit into production
+          shiftQueue(bEid);
+        } else {
+          // Population full — pause production, hold progress at 1.0
+          // Unit stays in slot until population frees up (unit dies or housing built)
+          Production.progress[bEid] = 1.0;
+        }
       }
     }
   };

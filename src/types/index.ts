@@ -14,15 +14,14 @@
 
 /**
  * Faction identifiers.
- * 4 playable factions, with AI as backwards-compatible alias for Randstad.
+ * 4 playable factions. Each mission explicitly defines which factions are
+ * player-controlled and which are AI-controlled via MissionDefinition fields.
  */
 export enum FactionId {
   Brabanders = 0,
   Randstad = 1,
   Limburgers = 2,
   Belgen = 3,
-  /** @deprecated Use Randstad instead. Kept for backwards compatibility. */
-  AI = 1,
 }
 
 /**
@@ -405,10 +404,7 @@ export const FACTION_COLORS = {
   },
 } as const;
 
-/**
- * Backwards-compatible alias: FACTION_COLORS[FactionId.AI] resolves to
- * FACTION_COLORS[FactionId.Randstad] because AI = 1 = Randstad.
- */
+/** Faction colours are indexed by FactionId (0-3). */
 
 export const GOLD_MINE_COLOR = 0xffd700;
 export const TREE_RESOURCE_COLOR = 0x228b22;

@@ -1055,8 +1055,13 @@ export function getPlayerSpawn(map: GeneratedMap): SpawnPoint {
 }
 
 /**
- * Get the AI's spawn point from a generated map.
+ * Get a non-player spawn point from a generated map (for the AI opponent).
+ * @param playerFactionId The player's faction ID to exclude.
  */
-export function getAISpawn(map: GeneratedMap): SpawnPoint {
-  return map.spawns.find((s) => s.factionId === FactionId.AI)!;
+export function getAISpawn(map: GeneratedMap, playerFactionId?: FactionId): SpawnPoint {
+  if (playerFactionId !== undefined) {
+    return map.spawns.find((s) => s.factionId !== playerFactionId)!;
+  }
+  // Fallback: return the second spawn (index 1) for backwards compatibility
+  return map.spawns[1] ?? map.spawns[0];
 }
