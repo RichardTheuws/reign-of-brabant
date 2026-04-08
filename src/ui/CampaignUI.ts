@@ -44,7 +44,7 @@ const FACTION_CAMPAIGN_TABS: FactionCampaignTab[] = [
   {
     id: 'brabanders',
     label: 'Brabanders',
-    icon: '\u{1F33E}',
+    icon: 'B',
     subtitle: 'Het Gouden Worstenbroodje',
     available: true,
     missionCount: 12,
@@ -52,7 +52,7 @@ const FACTION_CAMPAIGN_TABS: FactionCampaignTab[] = [
   {
     id: 'limburgers',
     label: 'Limburgers',
-    icon: '\u26CF\uFE0F',
+    icon: 'L',
     subtitle: 'De Mijn van Valkenburg',
     available: true,
     missionCount: 5,
@@ -60,7 +60,7 @@ const FACTION_CAMPAIGN_TABS: FactionCampaignTab[] = [
   {
     id: 'belgen',
     label: 'Belgen',
-    icon: '\u{1F35F}',
+    icon: 'V',
     subtitle: 'Het Compromis',
     available: true,
     missionCount: 3,
@@ -68,7 +68,7 @@ const FACTION_CAMPAIGN_TABS: FactionCampaignTab[] = [
   {
     id: 'randstad',
     label: 'Randstad',
-    icon: '\u{1F4BC}',
+    icon: 'R',
     subtitle: 'De Grote Overname',
     available: true,
     missionCount: 5,
@@ -577,9 +577,9 @@ export class CampaignUI {
         // Check if this bonus was already completed in a previous run
         const wasCompleted = progress.bonusesCompleted.includes(obj.id);
         if (wasCompleted) {
-          iconSpan.textContent = '\u2705'; // checkmark
+          iconSpan.textContent = '[OK]';
         } else {
-          iconSpan.textContent = obj.isBonus ? '\u2B50' : '\u2694\uFE0F'; // star or swords
+          iconSpan.textContent = obj.isBonus ? '[*]' : '[-]';
         }
 
         const textSpan = document.createElement('span');
@@ -662,7 +662,7 @@ export class CampaignUI {
       ${bonuses.length > 0 ? `
         <div style="margin-bottom: 24px; text-align: center;">
           <div style="font-size: 0.8rem; color: #d4a853; margin-bottom: 8px;">BONUSSEN BEHAALD</div>
-          ${bonuses.map(b => `<div style="font-size: 0.85rem; color: #4CAF50;">\u2705 ${b}</div>`).join('')}
+          ${bonuses.map(b => `<div style="font-size: 0.85rem; color: #4CAF50;">[V] ${b}</div>`).join('')}
         </div>
       ` : ''}
       <div style="display: flex; gap: 16px;">

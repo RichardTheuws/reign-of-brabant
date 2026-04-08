@@ -453,7 +453,32 @@
     }
     .cmd-btn:disabled { opacity: 0.4; cursor: not-allowed; }
     .cmd-btn .hotkey { font-size: 0.55rem; color: #a0a0a0; margin-top: 2px; }
-    .cmd-btn .btn-icon { font-size: 1rem; }
+    .cmd-btn .btn-icon { font-size: 0.65rem; font-weight: 700; line-height: 1; text-transform: uppercase; letter-spacing: -0.02em; }
+
+    /* ---- Text-icon styling (replaces emoji) ---- */
+    .btn-icon--move { color: #7ec8e3; }
+    .btn-icon--attack { color: #e06040; }
+    .btn-icon--stop { color: #ff5555; }
+    .btn-icon--hold { color: #6a9fd8; }
+    .btn-icon--build { color: #d4a853; }
+    .btn-icon--train { color: #8bc34a; }
+    .btn-icon--rally { color: #7ec8e3; }
+    .btn-icon--hero { color: #ffd700; }
+    .btn-icon--ability { color: #e0b0ff; }
+    .btn-icon--research { color: #b0b0b0; }
+    .btn-icon--resource { color: #d4a853; }
+
+    /* Resource bar icon replacements */
+    .resource-icon--gold { display: inline-block; width: 12px; height: 12px; background: radial-gradient(circle, #ffd700 40%, #b8860b 100%); border-radius: 50%; vertical-align: middle; margin-right: 4px; box-shadow: 0 0 4px rgba(255,215,0,0.4); }
+    .resource-icon--wood { display: inline-block; width: 10px; height: 12px; background: linear-gradient(180deg, #228B22 30%, #6B4226 70%); border-radius: 2px 2px 1px 1px; vertical-align: middle; margin-right: 4px; }
+    .resource-icon--pop { display: inline-block; width: 14px; height: 12px; position: relative; vertical-align: middle; margin-right: 4px; }
+    .resource-icon--pop::before, .resource-icon--pop::after {
+      content: ''; position: absolute; top: 0; width: 6px; height: 6px;
+      background: #a0a0a0; border-radius: 50%;
+    }
+    .resource-icon--pop::before { left: 1px; }
+    .resource-icon--pop::after { right: 1px; }
+    .resource-icon--gez { display: inline-block; width: 12px; height: 12px; background: linear-gradient(180deg, #f0d060 20%, #c89030 100%); border-radius: 2px 2px 6px 6px; vertical-align: middle; margin-right: 4px; border: 1px solid rgba(200,144,48,0.5); }
 
     /* Hero-specific button styles */
     .cmd-btn--hero {
@@ -708,7 +733,7 @@
 
       <!-- ============ FULLSCREEN TIP (outside game-hud so always accessible) ============ -->
       <div id="fullscreen-tip" class="fullscreen-tip" hidden>
-        <span>&#x26A1; Speel in volledig scherm voor de beste ervaring</span>
+        <span>Speel in volledig scherm voor de beste ervaring</span>
         <button id="fullscreen-tip-btn" class="fullscreen-tip-btn">Volledig Scherm</button>
         <button id="fullscreen-tip-close" class="fullscreen-tip-close">&times;</button>
       </div>
@@ -723,23 +748,23 @@
 
         <nav class="menu-buttons" role="navigation" aria-label="Hoofdmenu">
           <button class="menu-btn" id="btn-campaign">
-            <span class="btn-icon">&#x1F3F0;</span>
+            <span class="btn-icon btn-icon--hero">I</span>
             <span>Campagne</span>
           </button>
           <button class="menu-btn" id="btn-play">
-            <span class="btn-icon">&#x2694;&#xFE0F;</span>
+            <span class="btn-icon btn-icon--attack">II</span>
             <span>Schermutsel</span>
           </button>
           <button class="menu-btn" id="btn-tutorial">
-            <span class="btn-icon">&#x1F4D6;</span>
+            <span class="btn-icon btn-icon--move">?</span>
             <span>Hoe Te Spelen</span>
           </button>
           <button class="menu-btn" id="btn-settings">
-            <span class="btn-icon">&#x2699;&#xFE0F;</span>
+            <span class="btn-icon btn-icon--research">*</span>
             <span>Instellingen</span>
           </button>
           <button class="menu-btn" disabled>
-            <span class="btn-icon">&#x1F310;</span>
+            <span class="btn-icon btn-icon--move">III</span>
             <span>Slagveld Online</span>
             <span class="btn-badge">v2.0</span>
           </button>
@@ -807,26 +832,26 @@
       <!-- ============ FACTION SELECT ============ -->
       <div id="faction-select" style="display: none;">
         <div class="faction-header">
-          <button class="faction-back-btn" id="faction-back-btn">&#x2190; Terug</button>
+          <button class="faction-back-btn" id="faction-back-btn">&lt; Terug</button>
           <h2 class="faction-header-title">Kies Je Factie</h2>
           <div style="width: 80px;"></div>
         </div>
 
         <div class="faction-cards-row">
           <div class="faction-card" id="faction-card-brabanders" data-faction="brabanders">
-            <span class="faction-card-icon">&#x1F981;</span>
+            <span class="faction-card-icon" style="color:#E67E22;font-family:Cinzel,serif;font-weight:900;">B</span>
             <div class="faction-card-name">Brabanders</div>
           </div>
           <div class="faction-card" id="faction-card-randstad" data-faction="randstad">
-            <span class="faction-card-icon">&#x1F3E2;</span>
+            <span class="faction-card-icon" style="color:#4A4A5A;font-family:Cinzel,serif;font-weight:900;">R</span>
             <div class="faction-card-name">Randstad</div>
           </div>
           <div class="faction-card" id="faction-card-limburgers" data-faction="limburgers">
-            <span class="faction-card-icon">&#x26CF;&#xFE0F;</span>
+            <span class="faction-card-icon" style="color:#8B6914;font-family:Cinzel,serif;font-weight:900;">L</span>
             <div class="faction-card-name">Limburgers</div>
           </div>
           <div class="faction-card" id="faction-card-belgen" data-faction="belgen">
-            <span class="faction-card-icon">&#x1F35F;</span>
+            <span class="faction-card-icon" style="color:#C0392B;font-family:Cinzel,serif;font-weight:900;">V</span>
             <div class="faction-card-name">Belgen</div>
           </div>
         </div>
@@ -846,7 +871,7 @@
             </select>
           </div>
           <button class="faction-confirm-btn" id="faction-confirm-btn" disabled>
-            Start Gevecht &#x2192;
+            Start Gevecht &gt;
           </button>
         </div>
       </div>
@@ -856,26 +881,26 @@
         <!-- Resource Bar -->
         <div class="resource-bar">
           <div class="resource-item" data-resource="gold">
-            <span class="resource-icon">&#x1FA99;</span>
+            <span class="resource-icon resource-icon--gold"></span>
             <span class="resource-value" id="res-gold">0</span>
           </div>
           <div class="resource-item" data-resource="wood">
-            <span class="resource-icon">&#x1FAB5;</span>
+            <span class="resource-icon resource-icon--wood"></span>
             <span class="resource-value" id="res-wood">0</span>
           </div>
           <div class="resource-item" data-resource="population">
-            <span class="resource-icon">&#x1F465;</span>
+            <span class="resource-icon resource-icon--pop"></span>
             <span><span class="resource-value" id="res-pop">0</span> / <span id="res-pop-max">10</span></span>
           </div>
           <div class="resource-item tertiary-resource-item" id="tertiary-resource" style="display: none; border-left: 1px solid rgba(212, 168, 83, 0.25); padding-left: 16px;">
-            <span class="resource-icon" id="res-tertiary-icon">⛏️</span>
+            <span class="resource-icon resource-icon--gold" id="res-tertiary-icon"></span>
             <span class="resource-value" id="res-tertiary">0</span>
           </div>
           <div class="resource-item gezelligheid-item" data-resource="gezelligheid">
-            <span class="resource-icon">&#x1F37A;</span>
+            <span class="resource-icon resource-icon--gez"></span>
             <span class="resource-value" id="res-gezelligheid">0</span>
             <button class="rage-btn" id="rage-btn" disabled title="Carnavalsrage (R) - Kost 100 Gezelligheid">
-              &#x1F389; Rage
+              Rage
               <span class="hotkey">R</span>
             </button>
             <span class="rage-duration" id="rage-duration" hidden>0s</span>
@@ -889,10 +914,10 @@
         </div>
 
         <!-- Audio Mute Button -->
-        <button id="audio-mute-btn" title="Geluid aan/uit (M)">&#x1F50A;</button>
+        <button id="audio-mute-btn" title="Geluid aan/uit (M)">SND</button>
 
         <!-- Pause Button -->
-        <button id="pause-btn" title="Pauzeren (Esc)" style="position: absolute; top: 8px; right: 140px; font-size: 1rem; cursor: pointer; background: rgba(20,15,10,0.85); border: 1px solid rgba(212,168,83,0.25); color: var(--color-text); padding: 3px 10px; border-radius: 6px; z-index: 20; line-height: 1; transition: background 0.15s, border-color 0.15s;">&#x23F8;&#xFE0F;</button>
+        <button id="pause-btn" title="Pauzeren (Esc)" style="position: absolute; top: 8px; right: 140px; font-size: 0.7rem; font-weight: 700; cursor: pointer; background: rgba(20,15,10,0.85); border: 1px solid rgba(212,168,83,0.25); color: var(--color-text); padding: 3px 10px; border-radius: 6px; z-index: 20; line-height: 1; transition: background 0.15s, border-color 0.15s;">II</button>
 
         <!-- Alert Container -->
         <div id="alert-container"></div>
@@ -932,7 +957,7 @@
           <div id="building-panel" hidden>
             <div class="building-info">
               <div class="unit-portrait" id="building-portrait">
-                <span class="portrait-placeholder">&#x1F3F0;</span>
+                <span class="portrait-placeholder" style="font-size:12px;font-weight:700;color:var(--color-gold);">BLD</span>
               </div>
               <div class="unit-details">
                 <div class="unit-name" id="building-name">Gebouw</div>
@@ -953,56 +978,52 @@
         </div>
 
         <div class="command-panel" id="cmd-unit" hidden>
-          <button class="cmd-btn" data-action="move" data-hotkey="Q"><span class="btn-icon">&#x1F4CD;</span><span class="hotkey">Q</span></button>
-          <button class="cmd-btn" data-action="attack" data-hotkey="W"><span class="btn-icon">&#x2694;&#xFE0F;</span><span class="hotkey">W</span></button>
-          <button class="cmd-btn" data-action="stop" data-hotkey="E"><span class="btn-icon">&#x1F6D1;</span><span class="hotkey">E</span></button>
-          <button class="cmd-btn" data-action="hold" data-hotkey="R"><span class="btn-icon">&#x1F6E1;&#xFE0F;</span><span class="hotkey">R</span></button>
+          <button class="cmd-btn" data-action="move" data-hotkey="Q"><span class="btn-icon btn-icon--move">MOV</span><span class="hotkey">Q</span></button>
+          <button class="cmd-btn" data-action="attack" data-hotkey="W"><span class="btn-icon btn-icon--attack">ATK</span><span class="hotkey">W</span></button>
+          <button class="cmd-btn" data-action="stop" data-hotkey="E"><span class="btn-icon btn-icon--stop">STP</span><span class="hotkey">E</span></button>
+          <button class="cmd-btn" data-action="hold" data-hotkey="R"><span class="btn-icon btn-icon--hold">HLD</span><span class="hotkey">R</span></button>
         </div>
         <div class="command-panel" id="cmd-multi" hidden>
-          <button class="cmd-btn" data-action="move" data-hotkey="Q"><span class="btn-icon">&#x1F4CD;</span><span class="hotkey">Q</span></button>
-          <button class="cmd-btn" data-action="attack" data-hotkey="W"><span class="btn-icon">&#x2694;&#xFE0F;</span><span class="hotkey">W</span></button>
-          <button class="cmd-btn" data-action="stop" data-hotkey="E"><span class="btn-icon">&#x1F6D1;</span><span class="hotkey">E</span></button>
+          <button class="cmd-btn" data-action="move" data-hotkey="Q"><span class="btn-icon btn-icon--move">MOV</span><span class="hotkey">Q</span></button>
+          <button class="cmd-btn" data-action="attack" data-hotkey="W"><span class="btn-icon btn-icon--attack">ATK</span><span class="hotkey">W</span></button>
+          <button class="cmd-btn" data-action="stop" data-hotkey="E"><span class="btn-icon btn-icon--stop">STP</span><span class="hotkey">E</span></button>
         </div>
         <div class="command-panel" id="cmd-worker" hidden>
-          <button class="cmd-btn" data-action="build-barracks" data-hotkey="Q"><span class="btn-icon">&#x1F3D7;&#xFE0F;</span><span>Kazerne</span><span class="hotkey">Q</span></button>
-          <button class="cmd-btn" data-action="build-lumbercamp"><span class="btn-icon">&#x1FAB5;</span><span>Houtzagerij</span></button>
-          <button class="cmd-btn" data-action="build-blacksmith" data-hotkey="R"><span class="btn-icon">&#x2692;&#xFE0F;</span><span>Smederij</span><span class="hotkey">R</span></button>
-          <button class="cmd-btn" data-action="move" data-hotkey="W"><span class="btn-icon">&#x1F4CD;</span><span class="hotkey">W</span></button>
-          <button class="cmd-btn" data-action="stop" data-hotkey="E"><span class="btn-icon">&#x1F6D1;</span><span class="hotkey">E</span></button>
+          <!-- Dynamically populated by HUD.rebuildWorkerCommands() based on faction -->
         </div>
         <div class="command-panel" id="cmd-building" hidden>
-          <button class="cmd-btn" data-action="train-worker" data-hotkey="Q"><span class="btn-icon">&#x1F9D1;&#x200D;&#x1F33E;</span><span>Boer</span><span class="hotkey">Q</span></button>
-          <button class="cmd-btn" data-action="train-infantry" data-hotkey="W"><span class="btn-icon">&#x2694;&#xFE0F;</span><span>Infanterie</span><span class="hotkey">W</span></button>
-          <button class="cmd-btn" data-action="train-ranged" data-hotkey="E"><span class="btn-icon">&#x1F3F9;</span><span>Sluiper</span><span class="hotkey">E</span></button>
-          <button class="cmd-btn cmd-btn--hero" data-action="train-hero-prins" data-hotkey="T"><span class="btn-icon">&#x1F451;</span><span>Prins</span><span class="hotkey">T</span></button>
-          <button class="cmd-btn cmd-btn--hero" data-action="train-hero-boer" data-hotkey="Y"><span class="btn-icon">&#x1F33E;</span><span>Boer Hero</span><span class="hotkey">Y</span></button>
-          <button class="cmd-btn cmd-btn--rally" data-action="rally-point" data-hotkey="R"><span class="btn-icon">&#x25B6;</span><span>Rally</span><span class="hotkey">R</span></button>
+          <button class="cmd-btn" data-action="train-worker" data-hotkey="Q"><span class="btn-icon btn-icon--train">WRK</span><span>Boer</span><span class="hotkey">Q</span></button>
+          <button class="cmd-btn" data-action="train-infantry" data-hotkey="W"><span class="btn-icon btn-icon--attack">INF</span><span>Infanterie</span><span class="hotkey">W</span></button>
+          <button class="cmd-btn" data-action="train-ranged" data-hotkey="E"><span class="btn-icon btn-icon--attack">RNG</span><span>Sluiper</span><span class="hotkey">E</span></button>
+          <button class="cmd-btn cmd-btn--hero" data-action="train-hero-prins" data-hotkey="T"><span class="btn-icon btn-icon--hero">H1</span><span>Prins</span><span class="hotkey">T</span></button>
+          <button class="cmd-btn cmd-btn--hero" data-action="train-hero-boer" data-hotkey="Y"><span class="btn-icon btn-icon--hero">H2</span><span>Boer Hero</span><span class="hotkey">Y</span></button>
+          <button class="cmd-btn cmd-btn--rally" data-action="rally-point" data-hotkey="R"><span class="btn-icon btn-icon--rally">RLY</span><span>Rally</span><span class="hotkey">R</span></button>
         </div>
         <!-- Blacksmith research panel (dynamically populated by HUD.showBlacksmithPanel) -->
         <div class="command-panel command-panel--blacksmith" id="cmd-blacksmith" hidden></div>
         <!-- Hero ability panel (shown when a hero is selected) -->
         <div class="command-panel command-panel--hero" id="cmd-hero" hidden>
           <button class="cmd-btn cmd-btn--ability" data-action="hero-ability-q" data-slot="0" data-hotkey="1">
-            <span class="btn-icon">&#x2728;</span>
+            <span class="btn-icon btn-icon--ability">AB1</span>
             <span class="ability-name">Q</span>
             <span class="ability-cd"></span>
             <span class="hotkey">1</span>
           </button>
           <button class="cmd-btn cmd-btn--ability" data-action="hero-ability-w" data-slot="1" data-hotkey="2">
-            <span class="btn-icon">&#x1F4A5;</span>
+            <span class="btn-icon btn-icon--ability">AB2</span>
             <span class="ability-name">W</span>
             <span class="ability-cd"></span>
             <span class="hotkey">2</span>
           </button>
           <button class="cmd-btn cmd-btn--ability" data-action="hero-ability-e" data-slot="2" data-hotkey="3">
-            <span class="btn-icon">&#x1F525;</span>
+            <span class="btn-icon btn-icon--ability">AB3</span>
             <span class="ability-name">E</span>
             <span class="ability-cd"></span>
             <span class="hotkey">3</span>
           </button>
-          <button class="cmd-btn" data-action="move"><span class="btn-icon">&#x1F4CD;</span><span class="hotkey">M</span></button>
-          <button class="cmd-btn" data-action="attack"><span class="btn-icon">&#x2694;&#xFE0F;</span><span class="hotkey">A</span></button>
-          <button class="cmd-btn" data-action="stop"><span class="btn-icon">&#x1F6D1;</span><span class="hotkey">S</span></button>
+          <button class="cmd-btn" data-action="move"><span class="btn-icon btn-icon--move">MOV</span><span class="hotkey">M</span></button>
+          <button class="cmd-btn" data-action="attack"><span class="btn-icon btn-icon--attack">ATK</span><span class="hotkey">A</span></button>
+          <button class="cmd-btn" data-action="stop"><span class="btn-icon btn-icon--stop">STP</span><span class="hotkey">S</span></button>
         </div>
 
         <!-- Pause Menu -->

@@ -82,34 +82,34 @@ export interface HUDEvents {
 }
 
 // ---------------------------------------------------------------------------
-// Emoji map for unit portraits
+// Text-based abbreviations for unit portraits (no emoji allowed)
 // ---------------------------------------------------------------------------
 
-const UNIT_EMOJI: Record<string, string> = {
-  worker: '\u{1F9D1}\u200D\u{1F33E}',   // farmer
-  infantry: '\u2694\uFE0F',               // swords
-  ranged: '\u{1F3F9}',                     // bow
-  townhall: '\u{1F3F0}',                  // castle
-  barracks: '\u2694\uFE0F',               // fallback
-  blacksmith: '\u2692\uFE0F',             // hammer and pick
-  smederij: '\u2692\uFE0F',              // hammer and pick (Dutch)
-  prins: '\u{1F451}',                      // crown
-  boer: '\u{1F33E}',                       // ear of rice
-  ceo: '\u{1F4BC}',                        // briefcase
-  politicus: '\u{1F3DB}\uFE0F',           // classical building
-  hero: '\u2B50',                          // star (fallback hero)
+const UNIT_ABBREV: Record<string, string> = {
+  worker: 'WRK',
+  infantry: 'INF',
+  ranged: 'RNG',
+  townhall: 'TH',
+  barracks: 'BRK',
+  blacksmith: 'BSM',
+  smederij: 'BSM',
+  prins: 'H1',
+  boer: 'WRK',
+  ceo: 'H1',
+  politicus: 'H2',
+  hero: 'HRO',
   // Randstad
-  stagiair: '\u{1F9D1}\u200D\u{1F4BB}',  // technologist
-  manager: '\u{1F4BC}',                    // briefcase
-  consultant: '\u{1F4C8}',                 // chart
+  stagiair: 'WRK',
+  manager: 'INF',
+  consultant: 'RNG',
   // Limburgers
-  mijnwerker: '\u26CF\uFE0F',             // pick
-  schutterij: '\u{1F3F9}',                // bow
-  vlaaienwerper: '\u{1F967}',              // pie
+  mijnwerker: 'WRK',
+  schutterij: 'INF',
+  vlaaienwerper: 'RNG',
   // Belgen
-  frietkraamhouder: '\u{1F35F}',           // fries
-  bierbouwer: '\u{1F37A}',                 // beer
-  chocolatier: '\u{1F36B}',                // chocolate
+  frietkraamhouder: 'WRK',
+  bierbouwer: 'INF',
+  chocolatier: 'RNG',
 };
 
 // ---------------------------------------------------------------------------
@@ -132,35 +132,36 @@ interface WorkerBuildCmd {
   icon: string;
   label: string;
   hotkey?: string;
+  iconClass?: string;
 }
 
 const BASE_WORKER_CMDS: WorkerBuildCmd[] = [
-  { action: 'move', icon: '\u{1F4CD}', label: '', hotkey: 'W' },
-  { action: 'stop', icon: '\u{1F6D1}', label: '', hotkey: 'E' },
+  { action: 'move', icon: 'MOV', label: '', hotkey: 'W', iconClass: 'btn-icon--move' },
+  { action: 'stop', icon: 'STP', label: '', hotkey: 'E', iconClass: 'btn-icon--stop' },
 ];
 
 const FACTION_WORKER_BUILDS: Record<Faction, WorkerBuildCmd[]> = {
   brabant: [
-    { action: 'build-barracks',    icon: '\u{1F3D7}\uFE0F', label: 'Kazerne',      hotkey: 'Q' },
-    { action: 'build-lumbercamp',  icon: '\u{1FAB5}',        label: 'Houtzagerij' },
-    { action: 'build-blacksmith',  icon: '\u2692\uFE0F',     label: 'Smederij',     hotkey: 'R' },
+    { action: 'build-barracks',    icon: 'BLD', label: 'Kazerne',      hotkey: 'Q', iconClass: 'btn-icon--build' },
+    { action: 'build-lumbercamp',  icon: 'BLD', label: 'Houtzagerij',               iconClass: 'btn-icon--build' },
+    { action: 'build-blacksmith',  icon: 'BLD', label: 'Smederij',     hotkey: 'R', iconClass: 'btn-icon--build' },
   ],
   randstad: [
-    { action: 'build-barracks',    icon: '\u{1F3D7}\uFE0F', label: 'Vergaderzaal',  hotkey: 'Q' },
-    { action: 'build-lumbercamp',  icon: '\u{1FAB5}',        label: 'Starbucks' },
-    { action: 'build-blacksmith',  icon: '\u2692\uFE0F',     label: 'CoworkingSpace', hotkey: 'R' },
+    { action: 'build-barracks',    icon: 'BLD', label: 'Vergaderzaal',  hotkey: 'Q', iconClass: 'btn-icon--build' },
+    { action: 'build-lumbercamp',  icon: 'BLD', label: 'Starbucks',                  iconClass: 'btn-icon--build' },
+    { action: 'build-blacksmith',  icon: 'BLD', label: 'CoworkingSpace', hotkey: 'R', iconClass: 'btn-icon--build' },
   ],
   limburg: [
-    { action: 'build-barracks',    icon: '\u{1F3D7}\uFE0F', label: 'Schuttershal',  hotkey: 'Q' },
-    { action: 'build-lumbercamp',  icon: '\u{1FAB5}',        label: 'Vlaaibakkerij' },
-    { action: 'build-blacksmith',  icon: '\u2692\uFE0F',     label: 'Klooster',     hotkey: 'R' },
-    { action: 'build-mijnschacht', icon: '\u26CF\uFE0F',     label: 'Mijnschacht' },
+    { action: 'build-barracks',    icon: 'BLD', label: 'Schuttershal',  hotkey: 'Q', iconClass: 'btn-icon--build' },
+    { action: 'build-lumbercamp',  icon: 'BLD', label: 'Vlaaibakkerij',              iconClass: 'btn-icon--build' },
+    { action: 'build-blacksmith',  icon: 'BLD', label: 'Klooster',     hotkey: 'R',  iconClass: 'btn-icon--build' },
+    { action: 'build-mijnschacht', icon: 'BLD', label: 'Mijnschacht',                iconClass: 'btn-icon--build' },
   ],
   belgen: [
-    { action: 'build-barracks',    icon: '\u{1F3D7}\uFE0F', label: 'Frituur',       hotkey: 'Q' },
-    { action: 'build-lumbercamp',  icon: '\u{1FAB5}',        label: 'Frietfabriek' },
-    { action: 'build-blacksmith',  icon: '\u2692\uFE0F',     label: 'EU-Parlement',  hotkey: 'R' },
-    { action: 'build-chocolaterie', icon: '\u{1F36B}',       label: 'Chocolaterie' },
+    { action: 'build-barracks',    icon: 'BLD', label: 'Frituur',       hotkey: 'Q', iconClass: 'btn-icon--build' },
+    { action: 'build-lumbercamp',  icon: 'BLD', label: 'Frietfabriek',               iconClass: 'btn-icon--build' },
+    { action: 'build-blacksmith',  icon: 'BLD', label: 'EU-Parlement',  hotkey: 'R', iconClass: 'btn-icon--build' },
+    { action: 'build-chocolaterie', icon: 'BLD', label: 'Chocolaterie',              iconClass: 'btn-icon--build' },
   ],
 };
 
@@ -471,7 +472,7 @@ export class HUD {
       if (existing) existing.remove();
       if (placeholder) {
         placeholder.style.display = '';
-        placeholder.textContent = this.getUnitEmoji(unit.name);
+        placeholder.textContent = this.getUnitAbbrev(unit.name);
       }
     }
 
@@ -516,7 +517,7 @@ export class HUD {
       } else {
         const span = document.createElement('span');
         span.className = 'portrait-placeholder portrait-placeholder--sm';
-        span.textContent = this.getUnitEmoji(unit.name);
+        span.textContent = this.getUnitAbbrev(unit.name);
         div.appendChild(span);
       }
 
@@ -626,7 +627,7 @@ export class HUD {
       const progressDiv = document.createElement('div');
       progressDiv.className = 'blacksmith-research-progress';
       progressDiv.innerHTML = `
-        <div class="research-label">\u2692\uFE0F ${this.escapeHtml(researchProgress.name)}</div>
+        <div class="research-label">${this.escapeHtml(researchProgress.name)}</div>
         <div class="research-bar-container">
           <div class="research-bar" style="width:${Math.min(researchProgress.progress, 1) * 100}%"></div>
         </div>
@@ -649,9 +650,9 @@ export class HUD {
       }
 
       btn.innerHTML = `
-        <span class="btn-icon">\u2692\uFE0F</span>
+        <span class="btn-icon btn-icon--research">UPG</span>
         <span class="research-name">${this.escapeHtml(upg.name)}</span>
-        <span class="research-cost">${upg.isResearched ? '\u2714' : upg.costGold + 'g'}</span>
+        <span class="research-cost">${upg.isResearched ? 'OK' : upg.costGold + 'g'}</span>
       `;
       btn.title = `${upg.name}\n${upg.description}\nKosten: ${upg.costGold} goud`;
 
@@ -702,13 +703,13 @@ export class HUD {
     alert.setAttribute('role', 'alert');
 
     const iconMap: Record<AlertType, string> = {
-      warning: '\u26A0\uFE0F',
-      info: '\u2139\uFE0F',
-      error: '\u274C',
+      warning: '!',
+      info: 'i',
+      error: 'X',
     };
 
     alert.innerHTML = `
-      <span class="alert__icon">${iconMap[type]}</span>
+      <span class="alert__icon" style="font-weight:900;font-size:0.85rem;">${iconMap[type]}</span>
       <span class="alert__message">${this.escapeHtml(message)}</span>
     `;
 
@@ -918,7 +919,7 @@ export class HUD {
     if (cmd.hotkey) btn.dataset.hotkey = cmd.hotkey;
 
     const iconSpan = document.createElement('span');
-    iconSpan.className = 'btn-icon';
+    iconSpan.className = 'btn-icon' + (cmd.iconClass ? ` ${cmd.iconClass}` : '');
     iconSpan.textContent = cmd.icon;
     btn.appendChild(iconSpan);
 
@@ -1004,7 +1005,7 @@ export class HUD {
     if (muteBtn) {
       const handler = () => {
         const muted = audioManager.toggleMute();
-        muteBtn.textContent = muted ? '\u{1F507}' : '\u{1F50A}';
+        muteBtn.textContent = muted ? 'OFF' : 'SND';
         muteBtn.classList.toggle('is-muted', muted);
       };
       muteBtn.addEventListener('click', handler);
@@ -1115,10 +1116,10 @@ export class HUD {
     return 'var(--color-hp-low)';
   }
 
-  private getUnitEmoji(name: string): string {
+  private getUnitAbbrev(name: string): string {
     const lower = name.toLowerCase();
-    for (const [key, emoji] of Object.entries(UNIT_EMOJI)) {
-      if (lower.includes(key)) return emoji;
+    for (const [key, abbrev] of Object.entries(UNIT_ABBREV)) {
+      if (lower.includes(key)) return abbrev;
     }
     return '?';
   }
