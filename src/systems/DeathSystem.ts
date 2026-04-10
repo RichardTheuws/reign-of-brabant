@@ -59,6 +59,11 @@ export function createDeathSystem() {
             : 1;
           playerState.removePopulation(factionId, popCost);
 
+          // Track military unit loss for upkeep system
+          if (unitTypeId !== UnitTypeId.Worker) {
+            playerState.removeMilitaryUnit(factionId);
+          }
+
           eventBus.emit('unit-died', {
             entityId: eid,
             factionId: factionId as FactionId,

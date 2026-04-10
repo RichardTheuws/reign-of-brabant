@@ -357,6 +357,55 @@ export const VERGADERING_COOLDOWN = 240;
 export const VERGADERING_INITIAL_DELAY = 240;
 
 // ---------------------------------------------------------------------------
+// Upkeep Constants (Late-game scaling)
+// ---------------------------------------------------------------------------
+
+/** Upkeep tick interval in seconds. Each military unit costs gold every N seconds. */
+export const UPKEEP_TICK_INTERVAL = 15;
+
+/** Gold cost per military unit per upkeep tick. */
+export const UPKEEP_COST_PER_UNIT = 1;
+
+/** Combat effectiveness multiplier when gold is 0 and upkeep is owed. */
+export const UPKEEP_DEBT_EFFECTIVENESS = 0.75;
+
+// ---------------------------------------------------------------------------
+// Resource Diminishing Returns Constants
+// ---------------------------------------------------------------------------
+
+/** Fraction of original resource remaining that triggers diminishing returns. */
+export const DIMINISHING_RETURNS_THRESHOLD = 0.25;
+
+/** Gather speed multiplier when a resource node is below the threshold. */
+export const DIMINISHING_RETURNS_GATHER_MULT = 0.70;
+
+// ---------------------------------------------------------------------------
+// AI Late-Game Scaling Constants
+// ---------------------------------------------------------------------------
+
+/** Game time in seconds when AI tier 1 scaling kicks in. */
+export const AI_SCALING_TIER1_TIME = 600; // 10 minutes
+
+/** Game time in seconds when AI tier 2 scaling kicks in. */
+export const AI_SCALING_TIER2_TIME = 1200; // 20 minutes
+
+/** Tier 1: HP and damage bonus multiplier for AI units. */
+export const AI_SCALING_TIER1_BONUS = 0.10; // +10%
+
+/** Tier 2: HP and damage bonus multiplier for AI units. */
+export const AI_SCALING_TIER2_BONUS = 0.20; // +20%
+
+// ---------------------------------------------------------------------------
+// Population Tier Warning Thresholds
+// ---------------------------------------------------------------------------
+
+/** Population ratio at which the HUD text turns yellow. */
+export const POP_WARNING_THRESHOLD = 0.60;
+
+/** Population ratio at which the HUD text turns orange. */
+export const POP_DANGER_THRESHOLD = 0.80;
+
+// ---------------------------------------------------------------------------
 // Timing Constants
 // ---------------------------------------------------------------------------
 

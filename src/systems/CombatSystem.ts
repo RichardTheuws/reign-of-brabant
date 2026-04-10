@@ -34,7 +34,14 @@ import {
   SELF_DEFENSE_RANGE,
   NO_ENTITY,
   MINIMUM_MELEE_RANGE,
+  UPKEEP_DEBT_EFFECTIVENESS,
+  AI_SCALING_TIER1_TIME,
+  AI_SCALING_TIER2_TIME,
+  AI_SCALING_TIER1_BONUS,
+  AI_SCALING_TIER2_BONUS,
 } from '../types/index';
+import { playerState } from '../core/PlayerState';
+import { gameConfig } from '../core/GameConfig';
 import { eventBus } from '../core/EventBus';
 import type { GameWorld } from '../ecs/world';
 
@@ -132,8 +139,24 @@ function processAttacking(world: GameWorld, eid: number, dt: number): void {
   }
 
   // Fire attack -- apply Gezelligheid bonus to attacker damage and target armor
-  const attackerDamage = Attack.damage[eid] * (GezeligheidBonus.attackMult[eid] || 1.0);
+  let attackerDamage = Attack.damage[eid] * (GezeligheidBonus.attackMult[eid] || 1.0);
   const targetArmor = Armor.value[targetEid] * (GezeligheidBonus.armorMult[targetEid] || 1.0);
+
+  // Upkeep debt: reduce attack effectiveness
+  const attackerFaction = Faction.id[eid];
+  if (playerState.isInUpkeepDebt(attackerFaction)) {
+    attackerDamage *= UPKEEP_DEBT_EFFECTIVENESS;
+  }
+
+  // AI late-game scaling: boost AI (non-player) unit damage
+  if (!gameConfig.isPlayerFaction(attackerFaction)) {
+    const elapsed = world.meta.elapsed;
+    const aiScaling = getAIScalingMult(elapsed);
+    if (aiScaling > 1.0) {
+      attackerDamage *= aiScaling;
+    }
+  }
+
   const rawDamage = attackerDamage - targetArmor * ARMOR_FACTOR;
   let effectiveDamage = Math.max(MIN_DAMAGE, rawDamage);
 
@@ -322,4 +345,30 @@ function clearAttackAndSeekNew(world: GameWorld, eid: number): void {
     // Clear stale previous target
     Gatherer.previousTarget[eid] = NO_ENTITY;
   }
+}
+
+// ---------------------------------------------------------------------------
+// AI Late-Game Scaling
+// ---------------------------------------------------------------------------
+
+/**
+ * Get the damage/HP multiplier for AI units based on elapsed game time.
+ * Returns 1.0 (no bonus) before tier 1 time, scales up in tiers.
+ */
+function getAIScalingMult(elapsedSeconds: number): number {
+  if (elapsedSeconds >= AI_SCALING_TIER2_TIME) {
+    return 1.0 + AI_SCALING_TIER2_BONUS;
+  }
+  if (elapsedSeconds >= AI_SCALING_TIER1_TIME) {
+    return 1.0 + AI_SCALING_TIER1_BONUS;
+  }
+  return 1.0;
+}
+
+/**
+ * Get the AI HP scaling multiplier for use by ProductionSystem when spawning AI units.
+ * Exported so other systems can query the current scaling tier.
+ */
+export function getAIHPScaling(elapsedSeconds: number): number {
+  return getAIScalingMult(elapsedSeconds);
 }

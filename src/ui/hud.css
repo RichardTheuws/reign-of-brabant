@@ -184,8 +184,22 @@ body {
   margin: 0 4px;
 }
 
-/* Population warning state */
+/* Population warning state -- tiered: yellow (60%), orange (80%), red (100%) */
+.resource-item[data-resource="population"].is-pop-warning .resource-value {
+  color: #FFD600;
+}
+
+.resource-item[data-resource="population"].is-pop-danger .resource-value {
+  color: #FF9800;
+}
+
 .resource-item[data-resource="population"].is-capped .resource-value {
+  color: var(--color-hp-low);
+  animation: pulse-red 1s ease-in-out infinite;
+}
+
+/* Upkeep debt: gold resource turns red */
+.resource-item.is-upkeep-debt .resource-value {
   color: var(--color-hp-low);
   animation: pulse-red 1s ease-in-out infinite;
 }

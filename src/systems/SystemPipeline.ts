@@ -194,6 +194,7 @@ import { createUndergroundSystem } from './UndergroundSystem';
 import { createDiplomacySystem } from './DiplomacySystem';
 import { createSeparationSystem } from './SeparationSystem';
 import { createDeathSystem } from './DeathSystem';
+import { createUpkeepSystem } from './UpkeepSystem';
 import { createVisionSystem } from './VisionSystem';
 import type { Terrain } from '../world/Terrain';
 
@@ -247,6 +248,7 @@ export function createGamePipeline(terrain: Terrain, devMode = false): SystemPip
   pipeline.add('ProductionSystem', createProductionSystem(), 'economy');
   pipeline.add('BuildSystem', createBuildSystem(), 'economy');
   pipeline.add('TechTreeSystem', createTechTreeSystem(), 'economy');
+  pipeline.add('UpkeepSystem', createUpkeepSystem(), 'economy');
 
   // Phase 6: Cleanup
   pipeline.add('DeathSystem', createDeathSystem(), 'cleanup');

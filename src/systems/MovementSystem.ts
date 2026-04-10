@@ -6,8 +6,10 @@
  */
 
 import { query, hasComponent } from 'bitecs';
-import { Position, Movement, Rotation, GezeligheidBonus, Stunned } from '../ecs/components';
+import { Position, Movement, Rotation, GezeligheidBonus, Stunned, Faction } from '../ecs/components';
 import { IsUnit } from '../ecs/tags';
+import { playerState } from '../core/PlayerState';
+import { UPKEEP_DEBT_EFFECTIVENESS } from '../types/index';
 import type { Terrain } from '../world/Terrain';
 import type { GameWorld } from '../ecs/world';
 
@@ -46,9 +48,14 @@ export function createMovementSystem(terrain: Terrain) {
         continue;
       }
 
-      // Normalize direction and scale by speed * dt (with Gezelligheid bonus)
+      // Normalize direction and scale by speed * dt (with Gezelligheid bonus + upkeep debt)
       _invDist = 1 / Math.max(_dist, 0.001);
-      const effectiveSpeed = Movement.speed[eid] * (GezeligheidBonus.speedMult[eid] || 1.0);
+      let effectiveSpeed = Movement.speed[eid] * (GezeligheidBonus.speedMult[eid] || 1.0);
+
+      // Upkeep debt: reduce movement speed
+      if (playerState.isInUpkeepDebt(Faction.id[eid])) {
+        effectiveSpeed *= UPKEEP_DEBT_EFFECTIVENESS;
+      }
       const stepX = _dx * _invDist * effectiveSpeed * dt;
       const stepZ = _dz * _invDist * effectiveSpeed * dt;
 

@@ -44,6 +44,8 @@ import {
 import { onRandstadActionCompleted } from './BureaucracySystem';
 import { ceoProductionBuff } from './HeroSystem';
 import { getFactionUnitArchetype } from '../data/factionData';
+import { gameConfig } from '../core/GameConfig';
+import { getAIHPScaling } from './CombatSystem';
 import type { GameWorld } from '../ecs/world';
 
 // ---------------------------------------------------------------------------
@@ -183,6 +185,11 @@ export function createProductionSystem() {
           spawnUnit(world, bEid, unitTypeId, factionId);
           playerState.addPopulation(factionId);
 
+          // Track military units for upkeep
+          if (unitTypeId !== UnitTypeId.Worker) {
+            playerState.addMilitaryUnit(factionId);
+          }
+
           // Notify Bureaucracy system of completed action
           onRandstadActionCompleted(factionId);
 
@@ -224,10 +231,17 @@ function spawnUnit(
   Position.y[eid] = Position.y[buildingEid];
   Position.z[eid] = Math.max(-halfMap + 1, Math.min(halfMap - 1, Position.z[buildingEid] + RALLY_OFFSET + scatterZ));
 
-  // Health
+  // Health (with AI late-game scaling for non-player factions)
   addComponent(world, eid, Health);
-  Health.current[eid] = template.hp;
-  Health.max[eid] = template.hp;
+  let hp = template.hp;
+  if (!gameConfig.isPlayerFaction(factionId)) {
+    const hpScale = getAIHPScaling(world.meta.elapsed);
+    if (hpScale > 1.0) {
+      hp = Math.round(hp * hpScale);
+    }
+  }
+  Health.current[eid] = hp;
+  Health.max[eid] = hp;
 
   // Attack
   addComponent(world, eid, Attack);

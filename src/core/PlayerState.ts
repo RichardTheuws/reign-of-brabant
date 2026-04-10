@@ -26,6 +26,10 @@ interface PlayerData {
   tertiary: number;
   /** Bureaucracy efficiency stacks (Randstad only). 0 for non-Randstad factions. */
   efficiencyStacks: number;
+  /** Number of military (non-worker) units currently alive. */
+  militaryCount: number;
+  /** Whether this player is in upkeep debt (gold=0, has military units). */
+  upkeepDebt: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -48,7 +52,7 @@ class PlayerStateManager {
   reset(playerCount: number = 4): void {
     this.players = [];
     for (let i = 0; i < playerCount; i++) {
-      this.players.push({ gold: 100, wood: 0, populationCurrent: 0, populationMax: 10, gezelligheid: 0, tertiary: 0, efficiencyStacks: 0 });
+      this.players.push({ gold: 100, wood: 0, populationCurrent: 0, populationMax: 10, gezelligheid: 0, tertiary: 0, efficiencyStacks: 0, militaryCount: 0, upkeepDebt: false });
     }
   }
 
@@ -140,6 +144,42 @@ class PlayerStateManager {
   /** Increase max population (when a housing building completes). */
   addPopulationCapacity(factionId: number, amount: number): void {
     this.players[factionId].populationMax += amount;
+  }
+
+  // -------------------------------------------------------------------------
+  // Military Unit Count (for upkeep)
+  // -------------------------------------------------------------------------
+
+  /** Get the number of military (non-worker) units for a player. */
+  getMilitaryCount(factionId: number): number {
+    return this.players[factionId].militaryCount;
+  }
+
+  /** Increase military unit count (when a military unit is trained/spawned). */
+  addMilitaryUnit(factionId: number, amount: number = 1): void {
+    this.players[factionId].militaryCount += amount;
+  }
+
+  /** Decrease military unit count (when a military unit dies). */
+  removeMilitaryUnit(factionId: number, amount: number = 1): void {
+    this.players[factionId].militaryCount = Math.max(
+      0,
+      this.players[factionId].militaryCount - amount,
+    );
+  }
+
+  // -------------------------------------------------------------------------
+  // Upkeep Debt
+  // -------------------------------------------------------------------------
+
+  /** Check if a player is in upkeep debt (gold=0, has military units owing upkeep). */
+  isInUpkeepDebt(factionId: number): boolean {
+    return this.players[factionId].upkeepDebt;
+  }
+
+  /** Set the upkeep debt flag for a player. */
+  setUpkeepDebt(factionId: number, inDebt: boolean): void {
+    this.players[factionId].upkeepDebt = inDebt;
   }
 
   // -------------------------------------------------------------------------

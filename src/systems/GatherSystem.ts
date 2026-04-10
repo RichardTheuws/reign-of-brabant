@@ -27,6 +27,8 @@ import {
   DEPOSIT_ARRIVAL_DISTANCE,
   NO_ENTITY,
   BuildingTypeId,
+  DIMINISHING_RETURNS_THRESHOLD,
+  DIMINISHING_RETURNS_GATHER_MULT,
 } from '../types/index';
 import type { GameWorld } from '../ecs/world';
 
@@ -110,8 +112,13 @@ function processGathering(world: GameWorld, eid: number, dt: number): void {
     return;
   }
 
-  // Harvest: +HARVEST_RATE per second
-  const harvestAmount = HARVEST_RATE * dt;
+  // Harvest: +HARVEST_RATE per second (with diminishing returns for depleted resources)
+  let effectiveRate = HARVEST_RATE;
+  const maxAmount = Resource.maxAmount[targetEid];
+  if (maxAmount > 0 && Resource.amount[targetEid] / maxAmount < DIMINISHING_RETURNS_THRESHOLD) {
+    effectiveRate *= DIMINISHING_RETURNS_GATHER_MULT;
+  }
+  const harvestAmount = effectiveRate * dt;
   const capacity = Gatherer.carryCapacity[eid] || CARRY_CAPACITY;
   const remaining = capacity - Gatherer.carrying[eid];
   const available = Resource.amount[targetEid];
