@@ -1,134 +1,1315 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reign of Brabant</title>
-  <meta name="description" content="Reign of Brabant — een browser-based 3D RTS (Warcraft vibes) met een Brabants sausje." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    :root{
-      --bg:#0a0806;
-      --panel:rgba(20,15,10,0.92);
-      --border:rgba(212,168,83,0.35);
-      --gold:#d4a853;
-      --gold2:#e8c065;
-      --text:#e8e6e3;
-      --dim:#a0a0a0;
-      --fontH:'Cinzel',serif;
-      --fontB:'Inter','Segoe UI',system-ui,sans-serif;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reign of Brabant — Nie Fokke Mee Brabant</title>
+    <meta name="description" content="Een satirische WarCraft-style RTS in je browser. 4 facties, Brabants dialect, 33.559 regels code. Gebouwd door 1 persoon met AI.">
+    <meta property="og:title" content="Reign of Brabant — Nie Fokke Mee Brabant">
+    <meta property="og:description" content="Een satirische WarCraft-style RTS in je browser. 4 facties, Brabants dialect, 33.559 regels code. Gebouwd door 1 persoon met AI.">
+    <meta property="og:image" content="/assets/steun/hero-banner.webp">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://reign-of-brabant.nl/">
+    <link rel="icon" href="/assets/ui/logo.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+    /* ============================================================
+       REIGN OF BRABANT — LANDING PAGE
+       Full immersive scroll-driven experience
+       ============================================================ */
+
+    /* --- CSS Custom Properties --------------------------------- */
+    :root {
+        --bg-abyss: #060504;
+        --bg-dark: #0a0806;
+        --bg-card: #12100d;
+        --bg-elevated: #1a1610;
+        --bg-panel: rgba(20, 15, 10, 0.92);
+
+        --gold: #d4a853;
+        --gold-light: #e8c065;
+        --gold-glow: rgba(212, 168, 83, 0.4);
+        --gold-dim: rgba(212, 168, 83, 0.15);
+        --parchment: #F5E6C8;
+        --cream: #e8e6e3;
+
+        --text-primary: #e8e6e3;
+        --text-secondary: #a09888;
+        --text-muted: #6a6050;
+        --border: rgba(212, 168, 83, 0.25);
+        --border-hover: rgba(212, 168, 83, 0.6);
+
+        --brabant: #E07020;
+        --brabant-glow: rgba(224, 112, 32, 0.3);
+        --randstad: #3498DB;
+        --randstad-glow: rgba(52, 152, 219, 0.3);
+        --limburg: #27AE60;
+        --limburg-glow: rgba(39, 174, 96, 0.3);
+        --belgen: #E74C3C;
+        --belgen-glow: rgba(231, 76, 60, 0.3);
+
+        --font-heading: 'Cinzel', serif;
+        --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+
+        --space-xs: 0.5rem;
+        --space-sm: 1rem;
+        --space-md: 2rem;
+        --space-lg: 4rem;
+        --space-xl: 6rem;
+        --space-2xl: 10rem;
+
+        --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+        --duration-fast: 200ms;
+        --duration-normal: 400ms;
+        --duration-slow: 800ms;
+        --duration-reveal: 1200ms;
+
+        --content-width: 1100px;
+        --content-narrow: 760px;
     }
-    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:var(--fontB);}
-    a{color:var(--gold2);text-decoration:none}
-    a:hover{text-decoration:underline}
-    .wrap{max-width:1100px;margin:0 auto;padding:28px 18px 70px}
-    .hero{
-      display:grid;
-      grid-template-columns:1.15fr 0.85fr;
-      gap:16px;
-      align-items:start;
+
+    /* --- Reset ------------------------------------------------- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
     }
-    @media (max-width: 920px){.hero{grid-template-columns:1fr}}
-    .card{
-      background:var(--panel);
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:18px 18px;
-      box-shadow:0 16px 44px rgba(0,0,0,0.55);
+
+    body {
+        background: var(--bg-abyss);
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        line-height: 1.7;
+        overflow-x: hidden;
     }
-    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
-    .brand{display:flex;align-items:center;gap:12px}
-    .brand img{width:56px;height:56px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(212,168,83,0.18))}
-    .brand-title{font-family:var(--fontH);font-weight:900;letter-spacing:0.06em}
-    .brand-sub{color:var(--dim);font-size:0.92rem}
-    h1{font-family:var(--fontH);margin:0 0 8px;color:var(--gold);font-weight:900}
-    h2{font-family:var(--fontH);margin:16px 0 8px;color:var(--gold2);font-weight:900;font-size:1.05rem}
-    p{margin:8px 0;line-height:1.65}
-    .small{color:var(--dim);font-size:0.92rem}
-    .btnRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-    .btn{
-      display:inline-flex;align-items:center;justify-content:center;gap:8px;
-      padding:10px 14px;border-radius:10px;border:1px solid var(--border);
-      background:rgba(212,168,83,0.10);color:var(--text);cursor:pointer;
-      font-family:var(--fontH);font-weight:800;letter-spacing:0.03em;
+
+    img, video { max-width: 100%; height: auto; display: block; }
+    a { color: var(--gold-light); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* --- Reduced motion --------------------------------------- */
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+        .hero__bg { transform: none !important; }
+        [data-reveal] {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+        }
+        [data-reveal-stagger] > * {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+        }
     }
-    .btn:hover{border-color:var(--gold);background:rgba(212,168,83,0.18)}
-    .btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-    .btnPrimary{background:rgba(212,168,83,0.18);border-color:rgba(212,168,83,0.55)}
-    .pill{display:inline-block;font-size:0.78rem;color:var(--dim);border:1px solid rgba(255,255,255,0.14);padding:2px 10px;border-radius:999px}
-    .list{margin:10px 0 0 18px;line-height:1.7}
-    .notice{padding:10px 12px;border-left:3px solid rgba(212,168,83,0.65);background:rgba(212,168,83,0.08);border-radius:10px}
-  </style>
+
+    /* --- Scroll Reveal System ---------------------------------- */
+    [data-reveal] {
+        opacity: 0;
+        transform: translateY(40px);
+        transition:
+            opacity var(--duration-reveal) var(--ease-out-expo),
+            transform var(--duration-reveal) var(--ease-out-expo);
+    }
+    [data-reveal].is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    [data-reveal="left"] { transform: translateX(-60px) translateY(0); }
+    [data-reveal="left"].is-visible { transform: translateX(0) translateY(0); }
+    [data-reveal="right"] { transform: translateX(60px) translateY(0); }
+    [data-reveal="right"].is-visible { transform: translateX(0) translateY(0); }
+    [data-reveal="scale"] { transform: scale(0.85); }
+    [data-reveal="scale"].is-visible { transform: scale(1); }
+
+    [data-reveal-stagger] > * {
+        opacity: 0;
+        transform: translateY(30px);
+        transition:
+            opacity var(--duration-slow) var(--ease-out-expo),
+            transform var(--duration-slow) var(--ease-out-expo);
+    }
+    [data-reveal-stagger].is-visible > *:nth-child(1) { transition-delay: 0ms; opacity: 1; transform: translateY(0); }
+    [data-reveal-stagger].is-visible > *:nth-child(2) { transition-delay: 120ms; opacity: 1; transform: translateY(0); }
+    [data-reveal-stagger].is-visible > *:nth-child(3) { transition-delay: 240ms; opacity: 1; transform: translateY(0); }
+    [data-reveal-stagger].is-visible > *:nth-child(4) { transition-delay: 360ms; opacity: 1; transform: translateY(0); }
+    [data-reveal-stagger].is-visible > *:nth-child(5) { transition-delay: 480ms; opacity: 1; transform: translateY(0); }
+    [data-reveal-stagger].is-visible > *:nth-child(6) { transition-delay: 600ms; opacity: 1; transform: translateY(0); }
+    [data-reveal-stagger].is-visible > *:nth-child(7) { transition-delay: 720ms; opacity: 1; transform: translateY(0); }
+
+
+    /* ============================================================
+       STICKY NAV
+       ============================================================ */
+    .sticky-nav {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        z-index: 1000;
+        background: rgba(6, 5, 4, 0.92);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border);
+        padding: 0.6rem var(--space-md);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transform: translateY(-100%);
+        transition: transform var(--duration-normal) var(--ease-out-expo);
+    }
+    .sticky-nav.is-visible { transform: translateY(0); }
+    .sticky-nav__brand {
+        display: flex; align-items: center; gap: 10px;
+        font-family: var(--font-heading);
+        font-weight: 900; font-size: 0.95rem;
+        color: var(--gold); letter-spacing: 0.04em;
+        text-decoration: none;
+    }
+    .sticky-nav__brand:hover { text-decoration: none; }
+    .sticky-nav__brand img { width: 32px; height: 32px; object-fit: contain; }
+    .sticky-nav__links { display: flex; align-items: center; gap: 0.6rem; }
+    .sticky-nav__links a {
+        color: var(--text-secondary);
+        font-size: 0.85rem; font-weight: 500;
+        padding: 0.3rem 0.6rem; border-radius: 6px;
+        transition: color var(--duration-fast), background var(--duration-fast);
+    }
+    .sticky-nav__links a:hover {
+        color: var(--gold);
+        background: var(--gold-dim);
+        text-decoration: none;
+    }
+
+
+    /* ============================================================
+       HERO
+       ============================================================ */
+    .hero {
+        position: relative;
+        min-height: 100vh;
+        min-height: 100dvh;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        text-align: center;
+        padding: var(--space-md);
+        overflow: hidden;
+    }
+
+    .hero__bg {
+        position: absolute;
+        inset: -20%;
+        background: url('/assets/steun/hero-banner.webp') center / cover no-repeat;
+        will-change: transform;
+        z-index: 0;
+    }
+
+    .hero__vignette {
+        position: absolute; inset: 0;
+        background:
+            radial-gradient(ellipse at 50% 50%, transparent 20%, var(--bg-abyss) 75%),
+            linear-gradient(to bottom, transparent 50%, var(--bg-abyss) 100%);
+        z-index: 1;
+    }
+
+    .hero__glow {
+        position: absolute; inset: 0;
+        background:
+            radial-gradient(ellipse at 15% 50%, var(--brabant-glow), transparent 40%),
+            radial-gradient(ellipse at 85% 50%, var(--randstad-glow), transparent 40%),
+            radial-gradient(ellipse at 35% 85%, var(--limburg-glow), transparent 30%),
+            radial-gradient(ellipse at 65% 85%, var(--belgen-glow), transparent 30%);
+        animation: heroGlow 8s ease-in-out infinite alternate;
+        z-index: 2; pointer-events: none;
+    }
+    @keyframes heroGlow { 0% { opacity: 0.3; } 100% { opacity: 0.8; } }
+
+    .hero__content { position: relative; z-index: 3; max-width: 800px; }
+
+    .hero__logo {
+        width: min(280px, 50vw); height: auto;
+        margin: 0 auto var(--space-sm);
+        filter: drop-shadow(0 0 50px var(--gold-glow));
+        border-radius: 12px;
+        opacity: 0;
+        animation: logoReveal 1.5s var(--ease-out-expo) 0.3s forwards;
+    }
+    @keyframes logoReveal {
+        from { opacity: 0; transform: scale(0.85) translateY(20px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .hero__title {
+        font-family: var(--font-heading);
+        font-size: clamp(2.2rem, 6vw, 4rem);
+        font-weight: 900;
+        background: linear-gradient(135deg, var(--gold), #f0d78c, var(--gold));
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: 0.06em;
+        line-height: 1.1;
+        margin-bottom: var(--space-xs);
+        text-transform: uppercase;
+        opacity: 0;
+        animation: fadeUp 1s var(--ease-out-expo) 1s forwards;
+    }
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(24px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero__tagline {
+        font-family: var(--font-heading);
+        font-size: clamp(1rem, 2.5vw, 1.6rem);
+        color: var(--parchment);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: var(--space-sm);
+        opacity: 0;
+        animation: fadeUp 1s var(--ease-out-expo) 1.4s forwards;
+    }
+
+    .hero__subtitle {
+        font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+        color: var(--text-secondary);
+        max-width: 600px;
+        margin: 0 auto var(--space-md);
+        line-height: 1.6;
+        opacity: 0;
+        animation: fadeUp 1s var(--ease-out-expo) 1.7s forwards;
+    }
+
+    .hero__cta-group {
+        display: flex; gap: 1rem;
+        justify-content: center; flex-wrap: wrap;
+        opacity: 0;
+        animation: fadeUp 1s var(--ease-out-expo) 2s forwards;
+    }
+
+    .hero__scroll-hint {
+        position: absolute; bottom: 2.5rem; left: 50%;
+        transform: translateX(-50%); z-index: 3;
+        color: var(--text-muted); font-size: 0.75rem;
+        letter-spacing: 0.12em; text-transform: uppercase;
+        animation: scrollBounce 2.5s ease-in-out infinite;
+        opacity: 0;
+        animation: scrollBounce 2.5s ease-in-out infinite, fadeUp 1s var(--ease-out-expo) 2.5s forwards;
+    }
+    .hero__scroll-hint::after {
+        content: ''; display: block;
+        width: 1px; height: 30px;
+        background: linear-gradient(to bottom, var(--gold), transparent);
+        margin: 8px auto 0;
+    }
+    @keyframes scrollBounce {
+        0%, 100% { transform: translateX(-50%) translateY(0); }
+        50% { transform: translateX(-50%) translateY(-8px); }
+    }
+
+
+    /* ============================================================
+       BUTTONS
+       ============================================================ */
+    .btn {
+        display: inline-flex; align-items: center; justify-content: center;
+        gap: 8px;
+        padding: 0.75rem 1.8rem;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: rgba(212, 168, 83, 0.08);
+        color: var(--text-primary);
+        font-family: var(--font-heading);
+        font-weight: 700;
+        font-size: 0.95rem;
+        letter-spacing: 0.04em;
+        cursor: pointer;
+        transition: all var(--duration-normal) var(--ease-out-expo);
+        text-decoration: none;
+    }
+    .btn:hover {
+        border-color: var(--gold);
+        background: rgba(212, 168, 83, 0.18);
+        box-shadow: 0 0 30px rgba(212, 168, 83, 0.15);
+        transform: translateY(-2px);
+        text-decoration: none;
+    }
+    .btn:focus-visible {
+        outline: 2px solid var(--gold);
+        outline-offset: 2px;
+    }
+
+    .btn--primary {
+        background: linear-gradient(135deg, rgba(212, 168, 83, 0.25), rgba(212, 168, 83, 0.12));
+        border-color: rgba(212, 168, 83, 0.5);
+        font-size: 1.05rem;
+        padding: 0.85rem 2.2rem;
+    }
+    .btn--primary:hover {
+        background: linear-gradient(135deg, rgba(212, 168, 83, 0.4), rgba(212, 168, 83, 0.2));
+        border-color: var(--gold);
+        box-shadow: 0 0 40px rgba(212, 168, 83, 0.25);
+    }
+
+    .btn--ghost {
+        background: transparent;
+        border-color: rgba(212, 168, 83, 0.2);
+        font-size: 0.85rem;
+        padding: 0.6rem 1.4rem;
+    }
+
+
+    /* ============================================================
+       SECTION UTILITY
+       ============================================================ */
+    .section {
+        padding: var(--space-xl) var(--space-md);
+        position: relative;
+    }
+
+    .section__inner {
+        max-width: var(--content-width);
+        margin: 0 auto;
+    }
+
+    .section__narrow {
+        max-width: var(--content-narrow);
+        margin: 0 auto;
+    }
+
+    .section__label {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--gold);
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        margin-bottom: var(--space-xs);
+    }
+
+    .section__title {
+        font-family: var(--font-heading);
+        font-size: clamp(1.6rem, 4vw, 2.4rem);
+        font-weight: 900;
+        background: linear-gradient(135deg, var(--gold), var(--gold-light));
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: 0.03em;
+        line-height: 1.2;
+        margin-bottom: var(--space-sm);
+    }
+
+    .section__text {
+        color: var(--text-secondary);
+        font-size: 1.05rem;
+        line-height: 1.7;
+        max-width: 640px;
+    }
+
+    .section__divider {
+        width: 60px;
+        height: 2px;
+        background: linear-gradient(to right, var(--gold), transparent);
+        margin: var(--space-lg) auto;
+    }
+
+
+    /* ============================================================
+       FACTION CARDS
+       ============================================================ */
+    .factions-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.2rem;
+        margin-top: var(--space-md);
+    }
+
+    .faction-card {
+        position: relative;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: var(--bg-card);
+        transition: all var(--duration-normal) var(--ease-out-expo);
+        text-decoration: none;
+        display: block;
+    }
+    .faction-card:hover {
+        border-color: var(--border-hover);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+        text-decoration: none;
+    }
+
+    .faction-card__img {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        display: block;
+    }
+
+    .faction-card__body {
+        padding: 1rem 1.2rem;
+    }
+
+    .faction-card__name {
+        font-family: var(--font-heading);
+        font-weight: 900;
+        font-size: 0.95rem;
+        letter-spacing: 0.03em;
+        margin-bottom: 0.3rem;
+    }
+
+    .faction-card--brabant .faction-card__name { color: var(--brabant); }
+    .faction-card--randstad .faction-card__name { color: var(--randstad); }
+    .faction-card--limburg .faction-card__name { color: var(--limburg); }
+    .faction-card--belgen .faction-card__name { color: var(--belgen); }
+
+    .faction-card__desc {
+        color: var(--text-secondary);
+        font-size: 0.82rem;
+        line-height: 1.5;
+    }
+
+    .faction-card__hover-bar {
+        height: 3px;
+        width: 0;
+        transition: width var(--duration-normal) var(--ease-out-expo);
+    }
+    .faction-card:hover .faction-card__hover-bar { width: 100%; }
+    .faction-card--brabant .faction-card__hover-bar { background: var(--brabant); }
+    .faction-card--randstad .faction-card__hover-bar { background: var(--randstad); }
+    .faction-card--limburg .faction-card__hover-bar { background: var(--limburg); }
+    .faction-card--belgen .faction-card__hover-bar { background: var(--belgen); }
+
+
+    /* ============================================================
+       CINEMATIC
+       ============================================================ */
+    .cinematic {
+        position: relative;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: var(--bg-card);
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .cinematic__video {
+        width: 100%;
+        display: block;
+        aspect-ratio: 16 / 9;
+        object-fit: cover;
+    }
+
+    .cinematic__overlay {
+        position: absolute; inset: 0;
+        display: flex; align-items: center; justify-content: center;
+        background: rgba(0, 0, 0, 0.3);
+        cursor: pointer;
+        transition: background var(--duration-fast);
+    }
+    .cinematic__overlay:hover { background: rgba(0, 0, 0, 0.15); }
+    .cinematic__overlay.is-hidden { opacity: 0; pointer-events: none; }
+
+    .cinematic__play-btn {
+        width: 72px; height: 72px;
+        border-radius: 50%;
+        background: rgba(212, 168, 83, 0.2);
+        border: 2px solid var(--gold);
+        display: flex; align-items: center; justify-content: center;
+        transition: all var(--duration-normal) var(--ease-out-expo);
+    }
+    .cinematic__play-btn::after {
+        content: '';
+        display: block;
+        width: 0; height: 0;
+        border-style: solid;
+        border-width: 12px 0 12px 22px;
+        border-color: transparent transparent transparent var(--gold);
+        margin-left: 4px;
+    }
+    .cinematic__overlay:hover .cinematic__play-btn {
+        transform: scale(1.1);
+        background: rgba(212, 168, 83, 0.35);
+        box-shadow: 0 0 40px var(--gold-glow);
+    }
+
+    .cinematic__caption {
+        text-align: center;
+        padding: var(--space-sm);
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        font-style: italic;
+    }
+
+
+    /* ============================================================
+       STATS COUNTER
+       ============================================================ */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 0.8rem;
+        text-align: center;
+        margin-bottom: var(--space-md);
+    }
+
+    .stat-item {
+        padding: 1.5rem 0.5rem;
+        border-radius: 12px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        transition: border-color var(--duration-normal);
+    }
+    .stat-item:hover { border-color: var(--border-hover); }
+
+    .stat-item__number {
+        font-family: var(--font-mono);
+        font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+        font-weight: 500;
+        color: var(--gold);
+        line-height: 1;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-item__label {
+        font-size: 0.72rem;
+        color: var(--text-secondary);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        line-height: 1.3;
+    }
+
+    .stats-tagline {
+        text-align: center;
+        font-family: var(--font-heading);
+        font-size: clamp(1rem, 2vw, 1.3rem);
+        color: var(--parchment);
+        font-style: italic;
+    }
+
+
+    /* ============================================================
+       BIO SECTION
+       ============================================================ */
+    .bio {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        gap: var(--space-md);
+        align-items: start;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .bio__photo {
+        width: 220px;
+        height: 280px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: var(--bg-card);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .bio__photo-placeholder {
+        width: 100%;
+        height: 100%;
+        background:
+            linear-gradient(135deg, var(--bg-elevated), var(--bg-card)),
+            radial-gradient(circle at 50% 40%, rgba(212, 168, 83, 0.08), transparent 60%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .bio__photo-initials {
+        font-family: var(--font-heading);
+        font-size: 3rem;
+        font-weight: 900;
+        color: var(--gold);
+        opacity: 0.3;
+        letter-spacing: 0.08em;
+    }
+
+    .bio__text { }
+
+    .bio__name {
+        font-family: var(--font-heading);
+        font-size: 1.6rem;
+        font-weight: 900;
+        color: var(--gold);
+        margin-bottom: 0.5rem;
+    }
+
+    .bio__desc {
+        color: var(--text-secondary);
+        font-size: 1rem;
+        line-height: 1.7;
+        margin-bottom: var(--space-sm);
+    }
+
+    .bio__links {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .bio__link {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        padding: 0.6rem 1rem;
+        border-radius: 10px;
+        border: 1px solid rgba(212, 168, 83, 0.1);
+        background: var(--bg-card);
+        transition: all var(--duration-fast);
+        text-decoration: none;
+    }
+    .bio__link:hover {
+        border-color: var(--border-hover);
+        color: var(--gold-light);
+        background: var(--bg-elevated);
+        text-decoration: none;
+    }
+
+    .bio__link-domain {
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: var(--gold);
+    }
+
+    .bio__link-desc {
+        color: var(--text-muted);
+        font-size: 0.78rem;
+    }
+
+
+    /* ============================================================
+       CTA BANNER
+       ============================================================ */
+    .cta-banner {
+        text-align: center;
+        padding: var(--space-xl) var(--space-md);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cta-banner__bg {
+        position: absolute; inset: 0;
+        background:
+            radial-gradient(ellipse at 50% 50%, rgba(212, 168, 83, 0.06), transparent 70%);
+        pointer-events: none;
+    }
+
+    .cta-banner__title {
+        font-family: var(--font-heading);
+        font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+        font-weight: 900;
+        color: var(--parchment);
+        margin-bottom: var(--space-sm);
+        position: relative;
+    }
+
+    .cta-banner__buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        position: relative;
+    }
+
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .site-footer {
+        border-top: 1px solid var(--border);
+        padding: var(--space-md) var(--space-md);
+        text-align: center;
+    }
+
+    .site-footer__nav {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin-bottom: var(--space-sm);
+    }
+    .site-footer__nav a {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: color var(--duration-fast);
+    }
+    .site-footer__nav a:hover {
+        color: var(--gold);
+        text-decoration: none;
+    }
+
+    .site-footer__tagline {
+        font-family: var(--font-heading);
+        font-size: 0.9rem;
+        color: var(--gold);
+        letter-spacing: 0.08em;
+        margin-bottom: 0.5rem;
+        opacity: 0.6;
+    }
+
+    .site-footer__copy {
+        color: var(--text-muted);
+        font-size: 0.78rem;
+    }
+
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 900px) {
+        .factions-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .stats-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+        .bio {
+            grid-template-columns: 1fr;
+            justify-items: center;
+            text-align: center;
+        }
+        .bio__links {
+            align-items: center;
+        }
+        .bio__link {
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .hero { padding: var(--space-sm); }
+        .section { padding: var(--space-lg) var(--space-sm); }
+        .factions-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+        }
+        .stats-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.6rem;
+        }
+        .stats-grid .stat-item:last-child {
+            grid-column: span 3;
+        }
+        .sticky-nav__links { gap: 0.3rem; }
+        .sticky-nav__links a { font-size: 0.78rem; padding: 0.25rem 0.4rem; }
+        .bio__photo { width: 160px; height: 200px; }
+    }
+
+    @media (max-width: 380px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .stats-grid .stat-item:last-child {
+            grid-column: span 2;
+        }
+    }
+
+    </style>
 </head>
 <body>
-  <div class="wrap">
-    <header class="topbar">
-      <div class="brand">
-        <img src="/assets/ui/logo.png" alt="Reign of Brabant logo" />
-        <div>
-          <div class="brand-title">Reign of Brabant</div>
-          <div class="brand-sub">Browser-based 3D RTS — gebouwd in het openbaar</div>
+
+    <!-- ============================================================
+         STICKY NAV (appears on scroll)
+         ============================================================ -->
+    <nav class="sticky-nav" id="stickyNav" aria-label="Hoofdnavigatie">
+        <a href="/" class="sticky-nav__brand">
+            <img src="/assets/ui/logo.png" alt="" width="32" height="32" loading="lazy">
+            Reign of Brabant
+        </a>
+        <div class="sticky-nav__links">
+            <a href="/play/">Spelen</a>
+            <a href="/het-verhaal/">Het Verhaal</a>
+            <a href="/steun/">Steun</a>
         </div>
-      </div>
-      <nav class="btnRow" aria-label="Navigatie">
-        <a class="btn btnPrimary" href="/play/">Speel</a>
-        <a class="btn" href="/doneer">Doneer</a>
-        <a class="btn" href="/het-verhaal/">Het Verhaal</a>
-        <a class="btn" href="/roadmap">Roadmap</a>
-        <a class="btn" href="/press">Press</a>
-      </nav>
-    </header>
+    </nav>
 
-    <section class="hero">
-      <div class="card">
-        <h1>Een supervette RTS met Warcraft vibes</h1>
-        <p>
-          Reign of Brabant is een browser-based 3D RTS (Three.js + TypeScript) met 4 facties, campagnemissies en schermutsel.
-          Alles groeit iteratief: elke update maakt de game strakker, sneller en leuker.
-        </p>
-        <div class="notice small">
-          Crowdfunding loopt via <strong>vrijwillige donaties</strong> (geen tegenprestatie). Zie <a href="/doneer">/doneer</a>.
+
+    <!-- ============================================================
+         HERO
+         ============================================================ -->
+    <section class="hero" id="hero">
+        <div class="hero__bg" id="heroBg" aria-hidden="true"></div>
+        <div class="hero__vignette" aria-hidden="true"></div>
+        <div class="hero__glow" aria-hidden="true"></div>
+
+        <div class="hero__content">
+            <img
+                src="/assets/ui/logo.png"
+                alt="Reign of Brabant logo"
+                class="hero__logo"
+                width="280"
+                height="280"
+            >
+            <h1 class="hero__title">Reign of Brabant</h1>
+            <p class="hero__tagline">Nie Fokke Mee Brabant</p>
+            <p class="hero__subtitle">
+                Een satirische RTS in de stijl van WarCraft.<br>
+                Gebouwd door 1 persoon. Met AI.
+            </p>
+            <div class="hero__cta-group">
+                <a href="/play/" class="btn btn--primary">Speel Nu</a>
+                <a href="/het-verhaal/" class="btn">Het Verhaal</a>
+                <a href="/steun/" class="btn btn--ghost">Steun het Project</a>
+            </div>
         </div>
 
-        <h2>Wat kun je nu doen?</h2>
-        <div class="btnRow">
-          <a class="btn btnPrimary" href="/play/">Start de game</a>
-          <a class="btn" href="/doneer">Steun de ontwikkeling</a>
-          <a class="btn" href="https://github.com/RichardTheuws/reign-of-brabant">Bekijk de GitHub repo</a>
-        </div>
-
-        <h2>Waarom dit werkt</h2>
-        <ul class="list">
-          <li><strong>Open development</strong>: roadmap en code zijn publiek.</li>
-          <li><strong>Snelle iteraties</strong>: duidelijke milestones gekoppeld aan donaties.</li>
-          <li><strong>Brabantse identiteit</strong>: humor + herkenning, maar met echte RTS diepgang.</li>
-        </ul>
-      </div>
-
-      <aside class="card">
-        <h2>Snelle links</h2>
-        <p class="small">
-          <span class="pill">site</span> <a href="/doneer">Doneer</a><br />
-          <span class="pill">lore</span> <a href="/het-verhaal/">Het Verhaal</a><br />
-          <span class="pill">updates</span> <a href="/roadmap">Roadmap</a><br />
-          <span class="pill">media</span> <a href="/press">Press</a>
-        </p>
-
-        <h2>Status</h2>
-        <p class="small">
-          Versie: <strong>v0.17.0</strong> (zie changelog in repo).<br />
-          Platform: browser (desktop aanbevolen).<br />
-        </p>
-
-        <h2>Tip voor makers/press</h2>
-        <p class="small">
-          Voor footage, factsheet en contact: ga naar <a href="/press">/press</a>.
-        </p>
-      </aside>
+        <div class="hero__scroll-hint" aria-hidden="true">Scroll</div>
     </section>
-  </div>
+
+
+    <!-- ============================================================
+         GAME SHOWCASE
+         ============================================================ -->
+    <section class="section" id="showcase">
+        <div class="section__inner">
+            <div data-reveal>
+                <p class="section__label">Het Spel</p>
+                <h2 class="section__title">Vier facties. Een hertogdom. Nul genade.</h2>
+                <p class="section__text">
+                    Bouw je basis, train je troepen en vecht voor de eer van je regio.
+                    Brabant, Randstad, Limburg en de Belgen — iedereen wil de troon.
+                </p>
+            </div>
+
+            <div class="factions-grid" data-reveal-stagger>
+                <a href="/play/" class="faction-card faction-card--brabant">
+                    <img
+                        src="/assets/steun/faction-brabant.webp"
+                        alt="Hertogdom Brabant"
+                        class="faction-card__img"
+                        loading="lazy"
+                        width="400" height="400"
+                    >
+                    <div class="faction-card__body">
+                        <div class="faction-card__name">Hertogdom Brabant</div>
+                        <div class="faction-card__desc">Worstenbroodjes, carnaval en een leger dat vecht op gevoel.</div>
+                    </div>
+                    <div class="faction-card__hover-bar" aria-hidden="true"></div>
+                </a>
+
+                <a href="/play/" class="faction-card faction-card--randstad">
+                    <img
+                        src="/assets/steun/faction-randstad.webp"
+                        alt="Randstad Corporatie"
+                        class="faction-card__img"
+                        loading="lazy"
+                        width="400" height="400"
+                    >
+                    <div class="faction-card__body">
+                        <div class="faction-card__name">Randstad Corporatie</div>
+                        <div class="faction-card__desc">Consultants, KPI's en passief-agressieve memos als wapen.</div>
+                    </div>
+                    <div class="faction-card__hover-bar" aria-hidden="true"></div>
+                </a>
+
+                <a href="/play/" class="faction-card faction-card--limburg">
+                    <img
+                        src="/assets/steun/faction-limburg.webp"
+                        alt="Hertogdom Limburg"
+                        class="faction-card__img"
+                        loading="lazy"
+                        width="400" height="400"
+                    >
+                    <div class="faction-card__body">
+                        <div class="faction-card__name">Hertogdom Limburg</div>
+                        <div class="faction-card__desc">Vlaaien, tunnels en een accent dat je vijanden verlamt.</div>
+                    </div>
+                    <div class="faction-card__hover-bar" aria-hidden="true"></div>
+                </a>
+
+                <a href="/play/" class="faction-card faction-card--belgen">
+                    <img
+                        src="/assets/steun/faction-belgen.webp"
+                        alt="Belgisch Imperium"
+                        class="faction-card__img"
+                        loading="lazy"
+                        width="400" height="400"
+                    >
+                    <div class="faction-card__body">
+                        <div class="faction-card__name">Belgisch Imperium</div>
+                        <div class="faction-card__desc">Frieten, bier en een onverwacht effectieve bureaucratie.</div>
+                    </div>
+                    <div class="faction-card__hover-bar" aria-hidden="true"></div>
+                </a>
+            </div>
+
+            <div data-reveal style="text-align: center; margin-top: var(--space-md);">
+                <a href="/het-verhaal/" class="btn btn--ghost">Lees het complete verhaal &rarr;</a>
+            </div>
+        </div>
+    </section>
+
+
+    <div class="section__divider" aria-hidden="true"></div>
+
+
+    <!-- ============================================================
+         CINEMATIC PREVIEW
+         ============================================================ -->
+    <section class="section" id="cinematic">
+        <div class="section__narrow">
+            <div data-reveal>
+                <p class="section__label">Preview</p>
+                <h2 class="section__title">AI-gegenereerde cinematics</h2>
+            </div>
+
+            <div class="cinematic" data-reveal="scale">
+                <video
+                    class="cinematic__video"
+                    src="/assets/steun/cinematic-preview.mp4"
+                    poster="/assets/steun/hero-banner.webp"
+                    autoplay
+                    muted
+                    loop
+                    playsinline
+                    preload="metadata"
+                ></video>
+                <div class="cinematic__overlay" id="cinematicOverlay" role="button" tabindex="0" aria-label="Geluid aan/uit">
+                    <div class="cinematic__play-btn"></div>
+                </div>
+                <p class="cinematic__caption">AI-gegenereerde cinematics. Dit is pas het begin.</p>
+            </div>
+        </div>
+    </section>
+
+
+    <div class="section__divider" aria-hidden="true"></div>
+
+
+    <!-- ============================================================
+         THE NUMBERS
+         ============================================================ -->
+    <section class="section" id="numbers">
+        <div class="section__inner">
+            <div data-reveal>
+                <p class="section__label" style="text-align: center;">In cijfers</p>
+            </div>
+
+            <div class="stats-grid" data-reveal-stagger>
+                <div class="stat-item">
+                    <div class="stat-item__number" data-count="33559">0</div>
+                    <div class="stat-item__label">Regels Code</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-item__number" data-count="127">0</div>
+                    <div class="stat-item__label">3D Modellen</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-item__number" data-count="525">0</div>
+                    <div class="stat-item__label">Stemmen</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-item__number" data-count="4">0</div>
+                    <div class="stat-item__label">Facties</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-item__number" data-count="1">0</div>
+                    <div class="stat-item__label">Persoon</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-item__number" data-count="3">0</div>
+                    <div class="stat-item__label">Dagen</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-item__number" data-count-text="AI">--</div>
+                    <div class="stat-item__label">Aangedreven</div>
+                </div>
+            </div>
+
+            <p class="stats-tagline" data-reveal>"Een proof of concept. Het beste moet nog komen."</p>
+        </div>
+    </section>
+
+
+    <div class="section__divider" aria-hidden="true"></div>
+
+
+    <!-- ============================================================
+         OVER RICHARD
+         ============================================================ -->
+    <section class="section" id="over">
+        <div class="section__inner">
+            <div data-reveal>
+                <p class="section__label">De Maker</p>
+                <h2 class="section__title">Over Richard</h2>
+            </div>
+
+            <div class="bio" data-reveal>
+                <!-- TODO: Add Richard's real photo -->
+                <div class="bio__photo">
+                    <div class="bio__photo-placeholder">
+                        <span class="bio__photo-initials">RT</span>
+                    </div>
+                </div>
+
+                <div class="bio__text">
+                    <h3 class="bio__name">Richard Theuws</h3>
+                    <p class="bio__desc">
+                        Brabander, consultant, en stiekem altijd al een game willen maken.
+                        Met een WarCraft-tattoo op zijn arm en een hoofd vol ideeën bouwt hij
+                        Reign of Brabant als solo passion project — met AI als co-piloot.
+                        Geen studio, geen team, geen excuses.
+                    </p>
+                    <p class="bio__desc">
+                        Overdag helpt hij ondernemers in de Kempen. 's Avonds bouwt hij
+                        een hertogdom.
+                    </p>
+
+                    <ul class="bio__links">
+                        <li>
+                            <a href="https://niefokkemeebrabant.nl" class="bio__link" target="_blank" rel="noopener">
+                                <span>
+                                    <span class="bio__link-domain">niefokkemeebrabant.nl</span><br>
+                                    <span class="bio__link-desc">Brabants lifestyle</span>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://ondernemenindekempen.nl" class="bio__link" target="_blank" rel="noopener">
+                                <span>
+                                    <span class="bio__link-domain">ondernemenindekempen.nl</span><br>
+                                    <span class="bio__link-desc">Ondernemen in de Kempen</span>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://theuws.nl/stamboom" class="bio__link" target="_blank" rel="noopener">
+                                <span>
+                                    <span class="bio__link-domain">theuws.nl/stamboom</span><br>
+                                    <span class="bio__link-desc">Familie Theuws</span>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================================
+         CTA BANNER
+         ============================================================ -->
+    <section class="cta-banner" id="cta">
+        <div class="cta-banner__bg" aria-hidden="true"></div>
+        <div data-reveal>
+            <h2 class="cta-banner__title">Het Hertogdom heeft versterkingen nodig</h2>
+            <div class="cta-banner__buttons">
+                <a href="/steun/" class="btn btn--primary">Steun het Project</a>
+                <a href="/play/" class="btn">Speel Nu</a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================================
+         FOOTER
+         ============================================================ -->
+    <footer class="site-footer">
+        <nav class="site-footer__nav" aria-label="Footer navigatie">
+            <a href="/play/">Spelen</a>
+            <a href="/het-verhaal/">Het Verhaal</a>
+            <a href="/steun/">Steun</a>
+            <a href="https://github.com/RichardTheuws/reign-of-brabant" target="_blank" rel="noopener">GitHub</a>
+        </nav>
+        <p class="site-footer__tagline">Nie Fokke Mee Brabant</p>
+        <p class="site-footer__copy">&copy; 2026 Richard Theuws. Alle rechten voorbehouden.</p>
+    </footer>
+
+
+    <!-- ============================================================
+         SCRIPTS
+         ============================================================ -->
+    <script>
+    (function() {
+        'use strict';
+
+        /* ---- Reduced motion check ---- */
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        /* ---- Parallax hero background ---- */
+        if (!prefersReducedMotion) {
+            const heroBg = document.getElementById('heroBg');
+            let ticking = false;
+
+            function updateParallax() {
+                const scrollY = window.scrollY;
+                const heroH = window.innerHeight;
+                if (scrollY < heroH * 1.5) {
+                    heroBg.style.transform = 'translateY(' + (scrollY * 0.35) + 'px)';
+                }
+                ticking = false;
+            }
+
+            window.addEventListener('scroll', function() {
+                if (!ticking) {
+                    requestAnimationFrame(updateParallax);
+                    ticking = true;
+                }
+            }, { passive: true });
+        }
+
+
+        /* ---- Sticky nav ---- */
+        const stickyNav = document.getElementById('stickyNav');
+        const heroSection = document.getElementById('hero');
+
+        const navObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    stickyNav.classList.remove('is-visible');
+                } else {
+                    stickyNav.classList.add('is-visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        navObserver.observe(heroSection);
+
+
+        /* ---- Scroll reveal ---- */
+        const revealElements = document.querySelectorAll('[data-reveal], [data-reveal-stagger]');
+
+        const revealObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.15,
+            rootMargin: '0px 0px -60px 0px'
+        });
+
+        revealElements.forEach(function(el) {
+            if (prefersReducedMotion) {
+                el.classList.add('is-visible');
+            } else {
+                revealObserver.observe(el);
+            }
+        });
+
+
+        /* ---- Animated counters ---- */
+        const counters = document.querySelectorAll('[data-count]');
+        let countersAnimated = false;
+
+        function animateCounters() {
+            if (countersAnimated) return;
+            countersAnimated = true;
+
+            counters.forEach(function(el) {
+                const target = parseInt(el.getAttribute('data-count'), 10);
+                const duration = 2000;
+                const startTime = performance.now();
+
+                function easeOutExpo(t) {
+                    return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+                }
+
+                function formatNumber(n) {
+                    return n.toLocaleString('nl-NL');
+                }
+
+                function updateCounter(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const easedProgress = easeOutExpo(progress);
+                    const current = Math.round(easedProgress * target);
+
+                    el.textContent = formatNumber(current);
+
+                    if (progress < 1) {
+                        requestAnimationFrame(updateCounter);
+                    }
+                }
+
+                requestAnimationFrame(updateCounter);
+            });
+
+            /* Handle text-based counters (like "AI") */
+            var textCounters = document.querySelectorAll('[data-count-text]');
+            textCounters.forEach(function(el) {
+                var text = el.getAttribute('data-count-text');
+                setTimeout(function() {
+                    el.textContent = text;
+                }, 1800);
+            });
+        }
+
+        var numbersSection = document.getElementById('numbers');
+        var counterObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    animateCounters();
+                    counterObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.3 });
+
+        if (prefersReducedMotion) {
+            counters.forEach(function(el) {
+                var target = el.getAttribute('data-count');
+                el.textContent = parseInt(target, 10).toLocaleString('nl-NL');
+            });
+            document.querySelectorAll('[data-count-text]').forEach(function(el) {
+                el.textContent = el.getAttribute('data-count-text');
+            });
+        } else {
+            counterObserver.observe(numbersSection);
+        }
+
+
+        /* ---- Cinematic video unmute ---- */
+        var overlay = document.getElementById('cinematicOverlay');
+        var video = document.querySelector('.cinematic__video');
+
+        if (overlay && video) {
+            function toggleMute() {
+                if (video.muted) {
+                    video.muted = false;
+                    overlay.classList.add('is-hidden');
+                } else {
+                    video.muted = true;
+                    overlay.classList.remove('is-hidden');
+                }
+            }
+
+            overlay.addEventListener('click', toggleMute);
+            overlay.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleMute();
+                }
+            });
+        }
+
+    })();
+    </script>
+
 </body>
 </html>
-
