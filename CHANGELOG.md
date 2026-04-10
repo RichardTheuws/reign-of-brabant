@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.18.0] - 2026-04-10
+
+### Added
+- **reign-of-brabant.nl** — Eigen domein live op Mac mini M4 in Bladel (Cloudflare Tunnel + Caddy)
+- **deploy-rob.sh** — rsync deploy script (build → backup → rsync → cache purge → health check)
+- **Faction-specifieke unit costs** — getFactionUnitArchetype() vervangt hardcoded cost tabellen
+- **MINIMUM_MELEE_RANGE constant** — 1.5 range op alle melee archetypes, workarounds verwijderd
+- **Worker auto-assign** — Nieuw getrainde workers gaan automatisch nearest resource gatheren
+- **Rally point op resources** — Rechts-klik resource met gebouw geselecteerd → workers auto-gather
+- **Minimap fog-of-war** — Enemy units/buildings gefilterd op visibility, explored = 40% alpha
+- **Hero ability UX panel** — Visuele Q/W/E knoppen, cooldown sweep, tooltips, click-to-cast
+- **Late-game scaling** — Unit upkeep (1g/15s per militair), diminishing returns (<25% = 70% gather), AI scaling (+10%/+20% na 10/20 min)
+- **Population tier warnings** — Geel 60%, oranje 80%, rood 100% + alert
+- **UpkeepSystem** — Nieuw ECS systeem in Phase 5 (economy)
+- **26 nieuwe tests** — UpkeepSystem (5), LateGameScaling (11), PlayerState military tracking (10)
+- **/steun/ crowdfunding pagina** — Worstenbroodjes-economie, iDEAL + crypto, Konami code easter egg
+- **/steun/bedankt/ pagina** — Canvas badge generator, confetti, social share
+- **13 fal.ai visual assets** — Hero banner, world map, 4 factie scenes, 4 hero portraits, concepts
+- **2 Kling cinematic previews** — Image-to-video (3.0 Pro) + text-to-video (2.5 Turbo)
+- **Landing page** — Ubergave root page met parallax, factie showcase, cinematic embed, bio Richard
+- **"Nie Fokke Mee Brabant"** tagline op landing + steun pagina
+
+### Changed
+- **vite.config.ts** — base: '/' (was '/games/reign-of-brabant/'), multi-page rollupOptions
+- **deploy-ftp.sh** — Hardcoded FTP wachtwoord verwijderd, --clean flag, upload counter
+
+### Fixed
+- **Symlink play/assets → assets** op server (game laadt assets relatief vanuit /play/)
+- **Voice sample paden** op steun pagina (correcte bestanden per factie)
+
 ## [0.17.0] - 2026-04-07
 
 ### Added
