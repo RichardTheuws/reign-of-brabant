@@ -31,13 +31,14 @@ import { FogOfWarRenderer } from '../rendering/FogOfWarRenderer';
 import { visionData } from '../systems/VisionSystem';
 import { playerState } from '../core/PlayerState';
 import { eventBus } from '../core/EventBus';
-import { HUD, type SelectedUnit, type CommandAction } from '../ui/HUD';
+import { HUD, type SelectedUnit, type CommandAction, type HeroAbilityData } from '../ui/HUD';
 import { activateCarnavalsrage, getCarnavalsrageState, getCarnavalsrageConfig } from '../systems/AbilitySystem';
 import { activateHeroAbility } from '../systems/HeroSystem';
 import { audioManager } from '../audio/AudioManager';
 import { playUnitVoice } from '../audio/UnitVoices';
 import { techTreeSystem, UPGRADE_DEFINITIONS, getUpgradeDefinition } from '../systems/TechTreeSystem';
 import { createMusicSystem, type MusicSystem } from '../systems/MusicSystem';
+import { getUpkeepPerTick, resetUpkeepTimers } from '../systems/UpkeepSystem';
 import { MissionSystem, type MissionCallbacks } from '../campaign/MissionSystem';
 import { getMissionById, type MissionDefinition, type MissionUnitSpawn } from '../campaign/MissionDefinitions';
 import type { Terrain } from '../world/Terrain';
@@ -113,6 +114,7 @@ export class Game {
 
   // Game over state
   private gameOver = false;
+  private popCapAlertShown = false;
 
   // HP tracking for damage flash detection
   private lastHpMap = new Map<number, number>();
@@ -589,7 +591,9 @@ export class Game {
         this.playerState.getGold(this.playerFactionId),
         this.playerState.getWood(this.playerFactionId),
         this.playerState.getPopulation(this.playerFactionId),
-        this.playerState.getPopulationMax(this.playerFactionId)
+        this.playerState.getPopulationMax(this.playerFactionId),
+        getUpkeepPerTick(this.playerFactionId),
+        this.playerState.isInUpkeepDebt(this.playerFactionId),
       );
     } catch (e) {
       console.warn('[Game] HUD init failed:', e);
@@ -981,6 +985,7 @@ export class Game {
         const heroArch = HERO_ARCHETYPES[htId];
         const ability = heroArch.abilities[slot];
         this.hud?.showAlert(`${ability.name}!`, 'info');
+        this.hud?.flashHeroAbility(slot);
       } else {
         const cd = slot === 0 ? HeroAbilities.ability0Cooldown[eid]
           : slot === 1 ? HeroAbilities.ability1Cooldown[eid]
@@ -1656,24 +1661,8 @@ export class Game {
               const el = document.getElementById(id);
               if (el) el.hidden = true;
             }
-            // Update ability button labels
-            const htId = Hero.heroTypeId[heroEid] as HeroTypeId;
-            const heroArch = HERO_ARCHETYPES[htId];
-            for (let i = 0; i < 3; i++) {
-              const btn = heroPanel.querySelector(`[data-slot="${i}"]`) as HTMLButtonElement;
-              if (btn && heroArch.abilities[i]) {
-                const nameEl = btn.querySelector('.ability-name');
-                if (nameEl) nameEl.textContent = heroArch.abilities[i].name;
-                const cdEl = btn.querySelector('.ability-cd');
-                const cd = i === 0 ? HeroAbilities.ability0Cooldown[heroEid]
-                  : i === 1 ? HeroAbilities.ability1Cooldown[heroEid]
-                    : HeroAbilities.ability2Cooldown[heroEid];
-                if (cdEl) {
-                  cdEl.textContent = cd > 0 ? `${Math.ceil(cd)}s` : '';
-                }
-                btn.disabled = cd > 0;
-              }
-            }
+            // Ability names, cooldowns, costs, and tooltips are updated
+            // every frame by updateHeroAbilityBar() in updateHUD().
           }
         }
       }
@@ -2337,8 +2326,13 @@ export class Game {
       this.playerState.getGold(this.playerFactionId),
       this.playerState.getWood(this.playerFactionId),
       this.playerState.getPopulation(this.playerFactionId),
-      this.playerState.getPopulationMax(this.playerFactionId)
+      this.playerState.getPopulationMax(this.playerFactionId),
+      getUpkeepPerTick(this.playerFactionId),
+      this.playerState.isInUpkeepDebt(this.playerFactionId),
     );
+
+    // Population cap reached alert (one-time)
+    this.checkPopulationCapAlert();
 
     // Update tertiary resource for non-Brabanders factions
     if (this.playerFactionId !== FactionId.Brabanders) {
@@ -2400,6 +2394,69 @@ export class Game {
           }
         }
       }
+    }
+
+    // Update hero ability bar (every frame when a hero is selected)
+    this.updateHeroAbilityBar();
+  }
+
+  /**
+   * Update the hero ability bar with current cooldowns and costs.
+   * Called every frame from updateHUD().
+   */
+  private updateHeroAbilityBar(): void {
+    if (!this.hud) return;
+
+    // Find selected hero
+    const heroEid = this.selectedEntities.find(eid =>
+      entityExists(world, eid) &&
+      hasComponent(world, eid, IsHero) &&
+      !hasComponent(world, eid, IsDead) &&
+      Faction.id[eid] === this.playerFactionId
+    );
+
+    if (heroEid === undefined) return;
+
+    const htId = Hero.heroTypeId[heroEid] as HeroTypeId;
+    const heroArch = HERO_ARCHETYPES[htId];
+    if (!heroArch) return;
+
+    const currentGez = this.playerState.getGezelligheid(this.playerFactionId);
+    const abilities: HeroAbilityData[] = [];
+
+    for (let i = 0; i < 3; i++) {
+      const abilityDef = heroArch.abilities[i];
+      if (!abilityDef) continue;
+
+      const cd = i === 0 ? HeroAbilities.ability0Cooldown[heroEid]
+        : i === 1 ? HeroAbilities.ability1Cooldown[heroEid]
+          : HeroAbilities.ability2Cooldown[heroEid];
+
+      abilities.push({
+        name: abilityDef.name,
+        hotkey: String(i + 1),
+        description: abilityDef.description,
+        cooldown: cd,
+        cooldownMax: abilityDef.cooldown,
+        gezelligheidCost: abilityDef.gezelligheidCost ?? 0,
+        currentGezelligheid: currentGez,
+      });
+    }
+
+    this.hud.updateHeroAbilities(abilities);
+  }
+
+  private checkPopulationCapAlert(): void {
+    if (!this.hud) return;
+    const pop = this.playerState.getPopulation(this.playerFactionId);
+    const maxPop = this.playerState.getPopulationMax(this.playerFactionId);
+    if (pop >= maxPop && !this.popCapAlertShown) {
+      this.popCapAlertShown = true;
+      this.hud.showPopulationCapAlert();
+    }
+    // Reset when population drops below cap (so it fires again if cap is hit again)
+    if (pop < maxPop) {
+      this.popCapAlertShown = false;
     }
   }
 
@@ -2645,6 +2702,12 @@ export class Game {
     }
 
     this.playerState.addPopulation(faction, 1);
+
+    // Track military units for upkeep
+    if (type !== UnitTypeId.Worker) {
+      this.playerState.addMilitaryUnit(faction);
+    }
+
     return eid;
   }
 
@@ -2825,6 +2888,9 @@ export class Game {
 
     // Reset tech tree research state
     techTreeSystem.reset();
+
+    // Reset upkeep timers
+    resetUpkeepTimers();
 
     // Stop music system
     this.musicSystem.stop(500);

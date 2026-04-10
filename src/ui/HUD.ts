@@ -73,6 +73,16 @@ export interface GameStats {
   resourcesGathered: number;
 }
 
+export interface HeroAbilityData {
+  name: string;
+  hotkey: string;
+  description: string;
+  cooldown: number;
+  cooldownMax: number;
+  gezelligheidCost: number;
+  currentGezelligheid: number;
+}
+
 export interface HUDEvents {
   onMinimapClick: (x: number, y: number) => void;
   onCommand: (action: CommandAction) => void;
@@ -338,20 +348,47 @@ export class HUD {
   // Resource bar
   // -----------------------------------------------------------------------
 
-  updateResources(gold: number, wood: number, pop: number, maxPop: number): void {
-    this.resGold.textContent = String(Math.floor(gold));
+  updateResources(gold: number, wood: number, pop: number, maxPop: number, upkeepPerTick: number = 0, inUpkeepDebt: boolean = false): void {
+    // Gold display with upkeep cost indicator
+    if (upkeepPerTick > 0) {
+      this.resGold.textContent = `${Math.floor(gold)} (-${upkeepPerTick})`;
+    } else {
+      this.resGold.textContent = String(Math.floor(gold));
+    }
+
+    // Upkeep debt visual: gold text turns red when in debt
+    if (this.resGold.parentElement) {
+      if (inUpkeepDebt) {
+        this.resGold.parentElement.classList.add('is-upkeep-debt');
+      } else {
+        this.resGold.parentElement.classList.remove('is-upkeep-debt');
+      }
+    }
+
     this.resWood.textContent = String(Math.floor(wood));
     this.resPop.textContent = String(pop);
     this.resPopMax.textContent = String(maxPop);
 
-    // Population cap warning
+    // Population tier warnings
     if (this.resPopItem) {
+      const ratio = maxPop > 0 ? pop / maxPop : 0;
+      this.resPopItem.classList.remove('is-capped', 'is-pop-warning', 'is-pop-danger');
       if (pop >= maxPop) {
         this.resPopItem.classList.add('is-capped');
-      } else {
-        this.resPopItem.classList.remove('is-capped');
+      } else if (ratio >= 0.80) {
+        this.resPopItem.classList.add('is-pop-danger');
+      } else if (ratio >= 0.60) {
+        this.resPopItem.classList.add('is-pop-warning');
       }
     }
+  }
+
+  /**
+   * Show a one-time population cap reached alert.
+   * Called by Game.ts when population first hits 100%.
+   */
+  showPopulationCapAlert(): void {
+    this.showAlert('Population cap reached', 'warning');
   }
 
   // -----------------------------------------------------------------------
@@ -686,6 +723,109 @@ export class HUD {
     this.unitMulti.hidden = true;
     this.buildingPanel.hidden = true;
     this.hideAllCommandPanels();
+  }
+
+  // -----------------------------------------------------------------------
+  // Hero ability bar
+  // -----------------------------------------------------------------------
+
+  /**
+   * Update the hero ability panel with current cooldowns, costs, and state.
+   * Called every frame when a hero is selected.
+   * @param abilities - Array of 3 ability data objects (Q, W, E)
+   */
+  updateHeroAbilities(abilities: HeroAbilityData[]): void {
+    const heroPanel = document.getElementById('cmd-hero');
+    if (!heroPanel || heroPanel.hidden) return;
+
+    const slotActions = ['hero-ability-q', 'hero-ability-w', 'hero-ability-e'];
+    const hotkeyLabels = ['1', '2', '3'];
+
+    for (let i = 0; i < 3; i++) {
+      const btn = heroPanel.querySelector(`[data-slot="${i}"]`) as HTMLButtonElement;
+      if (!btn) continue;
+      const ability = abilities[i];
+      if (!ability) continue;
+
+      // Update name
+      const nameEl = btn.querySelector('.ability-name');
+      if (nameEl) nameEl.textContent = ability.name;
+
+      // Update cost
+      const costEl = btn.querySelector('.ability-cost');
+      if (costEl) {
+        if (ability.gezelligheidCost > 0) {
+          costEl.textContent = `${ability.gezelligheidCost} Gez`;
+          costEl.classList.toggle('is-insufficient', ability.currentGezelligheid < ability.gezelligheidCost);
+        } else {
+          costEl.textContent = '';
+          costEl.classList.remove('is-insufficient');
+        }
+      }
+
+      // Update cooldown text and overlay
+      const cdEl = btn.querySelector('.ability-cd');
+      const cdOverlay = btn.querySelector(`[data-cd-overlay="${i}"]`) as HTMLElement;
+
+      const isOnCooldown = ability.cooldown > 0;
+      const canAfford = ability.gezelligheidCost <= 0 || ability.currentGezelligheid >= ability.gezelligheidCost;
+
+      if (isOnCooldown) {
+        if (cdEl) cdEl.textContent = `${Math.ceil(ability.cooldown)}s`;
+        if (cdOverlay) {
+          cdOverlay.hidden = false;
+          // Cooldown sweep: reveal from bottom to top as cooldown ticks down
+          const fraction = ability.cooldownMax > 0
+            ? ability.cooldown / ability.cooldownMax
+            : 0;
+          cdOverlay.style.clipPath = `inset(${(1 - fraction) * 100}% 0 0 0)`;
+        }
+      } else {
+        if (cdEl) cdEl.textContent = '';
+        if (cdOverlay) cdOverlay.hidden = true;
+      }
+
+      // Button state
+      btn.disabled = isOnCooldown || !canAfford;
+      btn.classList.toggle('is-on-cooldown', isOnCooldown);
+      btn.classList.toggle('is-no-resource', !isOnCooldown && !canAfford);
+
+      // Update tooltip
+      const ttTitle = btn.querySelector('[data-tt-title]');
+      const ttHotkey = btn.querySelector('[data-tt-hotkey]');
+      const ttDesc = btn.querySelector('[data-tt-desc]');
+      const ttMeta = btn.querySelector('[data-tt-meta]');
+
+      if (ttTitle) ttTitle.textContent = ability.name;
+      if (ttHotkey) ttHotkey.textContent = `Hotkey: ${hotkeyLabels[i]}`;
+      if (ttDesc) ttDesc.textContent = ability.description;
+      if (ttMeta) {
+        let meta = `Cooldown: ${ability.cooldownMax}s`;
+        if (ability.gezelligheidCost > 0) {
+          meta += `\nKost: ${ability.gezelligheidCost} Gezelligheid`;
+        }
+        ttMeta.innerHTML = meta.split('\n').map(s => `<span>${this.escapeHtml(s)}</span>`).join('');
+      }
+    }
+  }
+
+  /**
+   * Flash an ability button to indicate successful activation.
+   * @param slot - Ability slot (0=Q, 1=W, 2=E)
+   */
+  flashHeroAbility(slot: number): void {
+    const heroPanel = document.getElementById('cmd-hero');
+    if (!heroPanel) return;
+    const btn = heroPanel.querySelector(`[data-slot="${slot}"]`) as HTMLElement;
+    if (!btn) return;
+
+    btn.classList.remove('is-activated');
+    // Force reflow to restart animation
+    void btn.offsetWidth;
+    btn.classList.add('is-activated');
+    window.setTimeout(() => {
+      btn.classList.remove('is-activated');
+    }, 350);
   }
 
   // -----------------------------------------------------------------------
