@@ -1,0 +1,2403 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steun Reign of Brabant — Het Gouden Worstenbroodje</title>
+    <meta name="description" content="33.559 regels code. 127 3D modellen. 525 stemmen. 3 dagen. 1 persoon. Reign of Brabant is een WarCraft-achtige RTS in je browser. Steun het experiment.">
+    <meta property="og:title" content="Steun Reign of Brabant — Brabant staat op">
+    <meta property="og:description" content="Een RTS met vier facties, Brabants dialect en meer ambitie dan verstand. Gebouwd door een mens en een AI in 3 dagen. Steun het en word deel van het verhaal.">
+    <meta property="og:image" content="/assets/steun/hero-banner.webp">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://reign-of-brabant.nl/steun/">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" defer></script>
+
+    <style>
+    /* ============================================================
+       REIGN OF BRABANT — STEUN PAGE
+       Immersive scroll-driven crowdfunding experience
+       ============================================================ */
+
+    /* --- CSS Custom Properties --------------------------------- */
+    :root {
+        /* Core palette */
+        --bg-abyss: #060504;
+        --bg-dark: #0a0806;
+        --bg-card: #12100d;
+        --bg-elevated: #1a1610;
+        --bg-panel: rgba(20, 15, 10, 0.92);
+
+        --gold: #d4a853;
+        --gold-light: #e8c065;
+        --gold-glow: rgba(212, 168, 83, 0.4);
+        --gold-dim: rgba(212, 168, 83, 0.15);
+        --parchment: #F5E6C8;
+        --cream: #e8e6e3;
+
+        --text-primary: #e8e6e3;
+        --text-secondary: #a09888;
+        --text-muted: #6a6050;
+        --border: rgba(212, 168, 83, 0.25);
+        --border-hover: rgba(212, 168, 83, 0.6);
+
+        /* Faction colors */
+        --brabant: #E07020;
+        --brabant-glow: rgba(224, 112, 32, 0.3);
+        --randstad: #3498DB;
+        --randstad-glow: rgba(52, 152, 219, 0.3);
+        --limburg: #27AE60;
+        --limburg-glow: rgba(39, 174, 96, 0.3);
+        --belgen: #E74C3C;
+        --belgen-glow: rgba(231, 76, 60, 0.3);
+
+        /* Typography */
+        --font-heading: 'Cinzel', serif;
+        --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+
+        /* Spacing scale */
+        --space-xs: 0.5rem;
+        --space-sm: 1rem;
+        --space-md: 2rem;
+        --space-lg: 4rem;
+        --space-xl: 6rem;
+        --space-2xl: 10rem;
+
+        /* Animation */
+        --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+        --duration-fast: 200ms;
+        --duration-normal: 400ms;
+        --duration-slow: 800ms;
+        --duration-reveal: 1200ms;
+
+        /* Layout */
+        --content-width: 1100px;
+        --content-narrow: 760px;
+    }
+
+    /* --- Reset ------------------------------------------------- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+        background: var(--bg-abyss);
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        line-height: 1.7;
+        overflow-x: hidden;
+    }
+
+    img, video { max-width: 100%; height: auto; display: block; }
+    a { color: var(--gold-light); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* --- Scroll Reveal System ---------------------------------- */
+    [data-reveal] {
+        opacity: 0;
+        transform: translateY(40px);
+        transition:
+            opacity var(--duration-reveal) var(--ease-out-expo),
+            transform var(--duration-reveal) var(--ease-out-expo);
+    }
+    [data-reveal].is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    [data-reveal="left"] { transform: translateX(-60px) translateY(0); }
+    [data-reveal="left"].is-visible { transform: translateX(0) translateY(0); }
+    [data-reveal="right"] { transform: translateX(60px) translateY(0); }
+    [data-reveal="right"].is-visible { transform: translateX(0) translateY(0); }
+    [data-reveal="scale"] { transform: scale(0.85); }
+    [data-reveal="scale"].is-visible { transform: scale(1); }
+
+    /* Stagger children */
+    [data-reveal-stagger] > * {
+        opacity: 0;
+        transform: translateY(30px);
+        transition:
+            opacity var(--duration-slow) var(--ease-out-expo),
+            transform var(--duration-slow) var(--ease-out-expo);
+    }
+    [data-reveal-stagger].is-visible > *:nth-child(1) { transition-delay: 0ms; opacity: 1; transform: translateY(0); }
+    [data-reveal-stagger].is-visible > *:nth-child(2) { transition-delay: 120ms; opacity: 1; transform: translateY(0); }
+    [data-reveal-stagger].is-visible > *:nth-child(3) { transition-delay: 240ms; opacity: 1; transform: translateY(0); }
+    [data-reveal-stagger].is-visible > *:nth-child(4) { transition-delay: 360ms; opacity: 1; transform: translateY(0); }
+    [data-reveal-stagger].is-visible > *:nth-child(5) { transition-delay: 480ms; opacity: 1; transform: translateY(0); }
+    [data-reveal-stagger].is-visible > *:nth-child(6) { transition-delay: 600ms; opacity: 1; transform: translateY(0); }
+    [data-reveal-stagger].is-visible > *:nth-child(7) { transition-delay: 720ms; opacity: 1; transform: translateY(0); }
+    [data-reveal-stagger].is-visible > *:nth-child(8) { transition-delay: 840ms; opacity: 1; transform: translateY(0); }
+
+
+    /* ============================================================
+       STICKY NAV
+       ============================================================ */
+    .sticky-nav {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        z-index: 1000;
+        background: rgba(6, 5, 4, 0.92);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border);
+        padding: 0.6rem var(--space-md);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transform: translateY(-100%);
+        transition: transform var(--duration-normal) var(--ease-out-expo);
+    }
+    .sticky-nav.is-visible { transform: translateY(0); }
+    .sticky-nav__brand {
+        display: flex; align-items: center; gap: 10px;
+        font-family: var(--font-heading);
+        font-weight: 900; font-size: 0.95rem;
+        color: var(--gold); letter-spacing: 0.04em;
+    }
+    .sticky-nav__brand img { width: 32px; height: 32px; object-fit: contain; }
+    .sticky-nav__links { display: flex; align-items: center; gap: 1rem; }
+    .sticky-nav__links a {
+        color: var(--text-secondary);
+        font-size: 0.85rem; font-weight: 500;
+        padding: 0.3rem 0.6rem; border-radius: 6px;
+        transition: color var(--duration-fast), background var(--duration-fast);
+    }
+    .sticky-nav__links a:hover {
+        color: var(--gold);
+        background: var(--gold-dim);
+        text-decoration: none;
+    }
+
+
+    /* ============================================================
+       HERO
+       ============================================================ */
+    .hero {
+        position: relative;
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        text-align: center;
+        padding: var(--space-md);
+        overflow: hidden;
+    }
+    .hero__bg {
+        position: absolute; inset: -20%;
+        background-size: cover; background-position: center;
+        will-change: transform; z-index: 0;
+    }
+    .hero__vignette {
+        position: absolute; inset: 0;
+        background:
+            radial-gradient(ellipse at 50% 50%, transparent 30%, var(--bg-abyss) 80%),
+            linear-gradient(to bottom, transparent 60%, var(--bg-abyss) 100%);
+        z-index: 1;
+    }
+    .hero__glow {
+        position: absolute; inset: 0;
+        background:
+            radial-gradient(ellipse at 15% 50%, var(--brabant-glow), transparent 40%),
+            radial-gradient(ellipse at 85% 50%, var(--randstad-glow), transparent 40%),
+            radial-gradient(ellipse at 35% 85%, var(--limburg-glow), transparent 30%),
+            radial-gradient(ellipse at 65% 85%, var(--belgen-glow), transparent 30%);
+        animation: heroGlow 8s ease-in-out infinite alternate;
+        z-index: 2; pointer-events: none;
+    }
+    @keyframes heroGlow { 0% { opacity: 0.4; } 100% { opacity: 0.9; } }
+
+    .hero__content { position: relative; z-index: 3; max-width: 800px; }
+    .hero__logo {
+        width: min(360px, 65vw); height: auto;
+        margin: 0 auto var(--space-sm);
+        filter: drop-shadow(0 0 50px var(--gold-glow));
+        border-radius: 12px;
+        opacity: 0;
+        animation: logoFadeIn 1.5s var(--ease-out-expo) 2.5s forwards;
+    }
+    @keyframes logoFadeIn {
+        from { opacity: 0; transform: scale(0.9) translateY(20px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .hero__typewriter {
+        font-family: var(--font-heading);
+        font-size: clamp(1.2rem, 3vw, 1.8rem);
+        color: var(--parchment);
+        min-height: 4.5em;
+        margin-bottom: var(--space-xs);
+        line-height: 1.5;
+    }
+    .hero__typewriter-line {
+        display: block;
+        overflow: hidden;
+        white-space: nowrap;
+        border-right: 2px solid var(--gold);
+        width: 0;
+        animation-fill-mode: forwards;
+        margin: 0 auto;
+    }
+    .hero__typewriter-line:nth-child(1) {
+        animation: typewriter 1.8s steps(40) 0.3s forwards, blinkCaret 0.5s step-end 0.3s 4;
+    }
+    .hero__typewriter-line:nth-child(2) {
+        animation: typewriter 1.8s steps(40) 2.5s forwards, blinkCaret 0.5s step-end 2.5s 4;
+        margin-top: 0.3em;
+    }
+    @keyframes typewriter { to { width: 100%; } }
+    @keyframes blinkCaret { 50% { border-color: transparent; } }
+
+    .hero__title {
+        font-family: var(--font-heading);
+        font-size: clamp(2rem, 5.5vw, 3.5rem);
+        font-weight: 900;
+        background: linear-gradient(135deg, var(--gold), #f0d78c, var(--gold));
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: 0.04em; line-height: 1.15;
+        margin-bottom: var(--space-xs);
+        opacity: 0;
+        animation: fadeUp 1s var(--ease-out-expo) 3s forwards;
+    }
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero__stats-bar {
+        display: flex; flex-wrap: wrap; justify-content: center;
+        gap: 0.3rem 1.2rem;
+        font-family: var(--font-mono); font-size: 0.8rem;
+        color: var(--text-muted); letter-spacing: 0.02em;
+        margin-bottom: var(--space-md);
+        opacity: 0;
+        animation: fadeUp 1s var(--ease-out-expo) 3.3s forwards;
+    }
+    .hero__stats-bar span { white-space: nowrap; }
+    .hero__stats-bar .stat-sep {
+        color: var(--gold); opacity: 0.4;
+    }
+
+    .hero__cta-group {
+        display: flex; gap: 1rem;
+        justify-content: center; flex-wrap: wrap;
+        opacity: 0;
+        animation: fadeUp 1s var(--ease-out-expo) 3.6s forwards;
+    }
+
+    .hero__scroll-hint {
+        position: absolute; bottom: 2.5rem; left: 50%;
+        transform: translateX(-50%); z-index: 3;
+        color: var(--text-muted); font-size: 0.8rem;
+        letter-spacing: 0.1em; text-transform: uppercase;
+        animation: scrollBounce 2.5s ease-in-out infinite;
+    }
+    .hero__scroll-hint::after {
+        content: ''; display: block;
+        width: 1px; height: 30px;
+        background: linear-gradient(to bottom, var(--gold), transparent);
+        margin: 8px auto 0;
+    }
+    @keyframes scrollBounce {
+        0%, 100% { transform: translateX(-50%) translateY(0); }
+        50% { transform: translateX(-50%) translateY(-8px); }
+    }
+
+
+    /* ============================================================
+       BUTTONS
+       ============================================================ */
+    .btn {
+        display: inline-flex; align-items: center; justify-content: center;
+        gap: 8px; padding: 0.7rem 1.4rem; border-radius: 10px;
+        border: 1px solid var(--border); background: var(--gold-dim);
+        color: var(--text-primary); font-family: var(--font-heading);
+        font-weight: 700; font-size: 0.9rem; letter-spacing: 0.03em;
+        cursor: pointer; transition: all var(--duration-fast);
+        text-decoration: none;
+    }
+    .btn:hover {
+        border-color: var(--gold);
+        background: rgba(212, 168, 83, 0.22);
+        text-decoration: none;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 20px rgba(212, 168, 83, 0.15);
+    }
+    .btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+    .btn--primary {
+        background: linear-gradient(135deg, var(--gold), #c49840);
+        color: #0a0806; border-color: var(--gold);
+        font-size: 1rem; padding: 0.85rem 2rem;
+    }
+    .btn--primary:hover {
+        background: linear-gradient(135deg, var(--gold-light), var(--gold));
+        box-shadow: 0 6px 30px var(--gold-glow);
+    }
+    .btn--large { font-size: 1.15rem; padding: 1rem 2.5rem; border-radius: 14px; }
+    .btn--ghost {
+        background: transparent;
+        border-color: rgba(255, 255, 255, 0.15);
+        color: var(--text-secondary);
+    }
+    .btn--ghost:hover {
+        border-color: rgba(255, 255, 255, 0.3);
+        color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+
+    /* ============================================================
+       SECTIONS
+       ============================================================ */
+    .section {
+        position: relative;
+        padding: var(--space-xl) var(--space-md);
+        overflow: hidden;
+    }
+    .section__inner { max-width: var(--content-width); margin: 0 auto; }
+    .section__inner--narrow { max-width: var(--content-narrow); }
+    .section__label {
+        font-family: var(--font-mono); font-size: 0.75rem;
+        color: var(--gold); text-transform: uppercase;
+        letter-spacing: 0.15em; margin-bottom: 0.5rem;
+    }
+    .section__title {
+        font-family: var(--font-heading);
+        font-size: clamp(1.8rem, 4vw, 2.8rem);
+        font-weight: 900;
+        background: linear-gradient(135deg, var(--text-primary), var(--gold));
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem; line-height: 1.2;
+    }
+    .section__intro {
+        color: var(--text-secondary); font-size: 1.1rem;
+        max-width: 650px; margin-bottom: var(--space-lg);
+        line-height: 1.8;
+    }
+    .section__divider {
+        width: 60px; height: 2px;
+        background: linear-gradient(to right, var(--gold), transparent);
+        margin-bottom: var(--space-md);
+    }
+    .section--dark { background: var(--bg-abyss); }
+    .section--elevated { background: var(--bg-dark); }
+    .section--accent {
+        background:
+            radial-gradient(ellipse at 50% 0%, var(--gold-glow), transparent 60%),
+            var(--bg-abyss);
+    }
+
+
+    /* ============================================================
+       SPLIT LAYOUT
+       ============================================================ */
+    .split {
+        display: grid; grid-template-columns: 1fr 1fr;
+        gap: var(--space-lg); align-items: center;
+    }
+    .split--reverse { direction: rtl; }
+    .split--reverse > * { direction: ltr; }
+    .split__visual {
+        position: relative; border-radius: 16px; overflow: hidden;
+    }
+    .split__visual img {
+        width: 100%; border-radius: 16px;
+        border: 1px solid var(--border);
+    }
+    .split__visual::after {
+        content: ''; position: absolute; inset: -20%;
+        background: radial-gradient(circle, var(--gold-glow), transparent 70%);
+        z-index: -1; opacity: 0.5;
+    }
+    .split__text { display: flex; flex-direction: column; gap: var(--space-sm); }
+    .split__text h3 {
+        font-family: var(--font-heading);
+        font-size: 1.6rem; font-weight: 700; color: var(--text-primary);
+    }
+    .split__text p { color: var(--text-secondary); line-height: 1.8; }
+
+    .inline-cta {
+        display: flex; align-items: center; gap: var(--space-sm);
+        padding: 1rem 1.5rem; border: 1px solid var(--border);
+        border-radius: 14px; background: var(--bg-card);
+        margin-top: var(--space-md);
+        transition: border-color var(--duration-normal);
+    }
+    .inline-cta:hover { border-color: var(--border-hover); }
+    .inline-cta__text { flex: 1; color: var(--text-secondary); font-size: 0.95rem; }
+    .inline-cta__text strong { color: var(--text-primary); }
+
+
+    /* ============================================================
+       STATS GRID
+       ============================================================ */
+    .stats-grid {
+        display: flex; flex-wrap: wrap; justify-content: center;
+        gap: var(--space-sm);
+    }
+    .stat {
+        flex: 1 1 180px; max-width: 220px;
+        text-align: center; padding: 1.5rem 1rem;
+        border: 1px solid var(--border); border-radius: 16px;
+        background: var(--bg-card);
+        transition: border-color var(--duration-normal), box-shadow var(--duration-normal);
+    }
+    .stat:hover {
+        border-color: var(--border-hover);
+        box-shadow: 0 0 40px rgba(212, 168, 83, 0.08);
+    }
+    .stat__number {
+        font-family: var(--font-heading);
+        font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+        font-weight: 900; color: var(--gold);
+        line-height: 1; margin-bottom: 0.4rem;
+    }
+    .stat__label { font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; }
+
+
+    /* ============================================================
+       FACTION GALLERY
+       ============================================================ */
+    .gallery__track {
+        display: flex; gap: var(--space-md);
+        overflow-x: auto; scroll-snap-type: x mandatory;
+        scroll-padding: var(--space-md);
+        -webkit-overflow-scrolling: touch;
+        padding: var(--space-sm) 0 var(--space-md);
+        scrollbar-width: none;
+    }
+    .gallery__track::-webkit-scrollbar { display: none; }
+    .gallery__card {
+        flex: 0 0 320px; scroll-snap-align: start;
+        background: var(--bg-card); border: 1px solid var(--border);
+        border-radius: 16px; overflow: hidden;
+        transition: transform var(--duration-normal) var(--ease-out-expo),
+                    border-color var(--duration-normal);
+    }
+    .gallery__card:hover {
+        transform: translateY(-4px);
+        border-color: var(--border-hover);
+    }
+    .gallery__card-img {
+        width: 100%; aspect-ratio: 4 / 5;
+        object-fit: cover; background-color: var(--bg-elevated);
+    }
+    .gallery__card-body { padding: 1.2rem; }
+    .gallery__card-title {
+        font-family: var(--font-heading); font-weight: 700;
+        font-size: 1.1rem; margin-bottom: 0.4rem;
+    }
+    .gallery__card-desc {
+        color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;
+    }
+    .gallery__card[data-faction="brabant"] { border-top: 3px solid var(--brabant); }
+    .gallery__card[data-faction="randstad"] { border-top: 3px solid var(--randstad); }
+    .gallery__card[data-faction="limburg"] { border-top: 3px solid var(--limburg); }
+    .gallery__card[data-faction="belgen"] { border-top: 3px solid var(--belgen); }
+
+    /* Placeholder faction card */
+    .gallery__card-placeholder {
+        width: 100%; aspect-ratio: 4 / 5;
+        display: flex; align-items: center; justify-content: center;
+        font-family: var(--font-heading); font-size: 3rem;
+        font-weight: 900; color: rgba(255,255,255,0.15);
+        letter-spacing: 0.05em;
+    }
+    .gallery__card[data-faction="limburg"] .gallery__card-placeholder {
+        background: linear-gradient(135deg, rgba(39,174,96,0.15), rgba(39,174,96,0.05));
+    }
+    .gallery__card[data-faction="belgen"] .gallery__card-placeholder {
+        background: linear-gradient(135deg, rgba(231,76,60,0.15), rgba(231,76,60,0.05));
+    }
+
+
+    /* ============================================================
+       AI PIPELINE
+       ============================================================ */
+    .pipeline {
+        display: flex; gap: 0; align-items: stretch;
+        overflow-x: auto; padding-bottom: var(--space-sm);
+        scrollbar-width: none;
+    }
+    .pipeline::-webkit-scrollbar { display: none; }
+    .pipeline__step {
+        flex: 1 0 180px; text-align: center;
+        padding: 1.5rem 1rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        position: relative;
+    }
+    .pipeline__step:first-child { border-radius: 14px 0 0 14px; }
+    .pipeline__step:last-child { border-radius: 0 14px 14px 0; }
+    .pipeline__step + .pipeline__step { border-left: none; }
+    .pipeline__step-num {
+        font-family: var(--font-mono); font-size: 0.7rem;
+        color: var(--gold); margin-bottom: 0.5rem;
+        letter-spacing: 0.1em;
+    }
+    .pipeline__step-title {
+        font-family: var(--font-heading); font-weight: 700;
+        font-size: 0.95rem; margin-bottom: 0.3rem;
+    }
+    .pipeline__step-desc {
+        font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;
+    }
+    .pipeline__arrow {
+        position: absolute; right: -8px; top: 50%;
+        transform: translateY(-50%); z-index: 2;
+        width: 0; height: 0;
+        border-style: solid;
+        border-width: 10px 0 10px 14px;
+        border-color: transparent transparent transparent var(--gold);
+        opacity: 0.5;
+    }
+    .pipeline__step:last-child .pipeline__arrow { display: none; }
+
+
+    /* ============================================================
+       BEFORE/AFTER SLIDER
+       ============================================================ */
+    .compare {
+        position: relative; overflow: hidden;
+        border-radius: 16px; border: 1px solid var(--border);
+        cursor: col-resize; user-select: none;
+        -webkit-user-select: none; aspect-ratio: 16 / 9;
+    }
+    .compare__before, .compare__after { position: absolute; inset: 0; }
+    .compare__before img, .compare__after img {
+        width: 100%; height: 100%; object-fit: cover;
+    }
+    .compare__before { clip-path: inset(0 50% 0 0); }
+    .compare__handle {
+        position: absolute; top: 0; bottom: 0; left: 50%;
+        width: 3px; background: var(--gold);
+        transform: translateX(-50%); z-index: 10;
+        box-shadow: 0 0 20px var(--gold-glow);
+    }
+    .compare__handle::before {
+        content: ''; position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 40px; height: 40px;
+        background: var(--bg-card);
+        border: 2px solid var(--gold); border-radius: 50%;
+        box-shadow: 0 0 20px var(--gold-glow);
+        background-image:
+            linear-gradient(135deg, transparent 40%, var(--gold) 40%, var(--gold) 43%, transparent 43%),
+            linear-gradient(225deg, transparent 40%, var(--gold) 40%, var(--gold) 43%, transparent 43%),
+            linear-gradient(315deg, transparent 40%, var(--gold) 40%, var(--gold) 43%, transparent 43%),
+            linear-gradient(45deg, transparent 40%, var(--gold) 40%, var(--gold) 43%, transparent 43%);
+    }
+    .compare__label {
+        position: absolute; bottom: 1rem;
+        padding: 0.3rem 0.8rem; background: rgba(0,0,0,0.7);
+        border-radius: 6px; font-size: 0.75rem; font-weight: 600;
+        text-transform: uppercase; letter-spacing: 0.08em;
+        color: var(--text-secondary); z-index: 5;
+    }
+    .compare__label--before { left: 1rem; }
+    .compare__label--after { right: 1rem; }
+
+
+    /* ============================================================
+       VOICE PLAYER
+       ============================================================ */
+    .voice-player {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 1rem;
+    }
+    .voice-sample {
+        display: flex; align-items: center; gap: 12px;
+        padding: 1rem; border: 1px solid var(--border);
+        border-radius: 12px; background: var(--bg-card);
+        cursor: pointer;
+        transition: border-color var(--duration-fast), background var(--duration-fast);
+    }
+    .voice-sample:hover {
+        border-color: var(--border-hover); background: var(--bg-elevated);
+    }
+    .voice-sample.is-playing {
+        border-color: var(--gold); background: rgba(212,168,83,0.08);
+    }
+    .voice-sample__play {
+        width: 42px; height: 42px; flex-shrink: 0;
+        border-radius: 50%; background: var(--gold-dim);
+        border: 1px solid var(--border);
+        display: flex; align-items: center; justify-content: center;
+        transition: background var(--duration-fast);
+    }
+    .voice-sample:hover .voice-sample__play { background: rgba(212,168,83,0.25); }
+    .voice-sample__play::after {
+        content: ''; display: block;
+        width: 0; height: 0;
+        border-style: solid;
+        border-width: 7px 0 7px 12px;
+        border-color: transparent transparent transparent var(--gold);
+        margin-left: 2px;
+    }
+    .voice-sample.is-playing .voice-sample__play::after {
+        border: none; width: 10px; height: 14px;
+        border-left: 3px solid var(--gold);
+        border-right: 3px solid var(--gold);
+        margin-left: 0;
+    }
+    .voice-sample__info { flex: 1; min-width: 0; }
+    .voice-sample__name { font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
+    .voice-sample__faction { font-size: 0.8rem; color: var(--text-muted); }
+
+    /* Voice CTA */
+    .voice-cta {
+        text-align: center;
+        padding: var(--space-lg) var(--space-md);
+        background: var(--bg-card);
+        border: 1px solid var(--border); border-radius: 20px;
+        position: relative; overflow: hidden;
+    }
+    .voice-cta::before {
+        content: ''; position: absolute; inset: 0;
+        background: radial-gradient(circle at 50% 0%, var(--gold-glow), transparent 60%);
+        opacity: 0.3;
+    }
+    .voice-cta__content { position: relative; z-index: 1; }
+    .voice-cta__title {
+        font-family: var(--font-heading);
+        font-size: 1.6rem; font-weight: 900; color: var(--gold);
+        margin-bottom: 0.5rem;
+    }
+    .voice-cta__desc {
+        color: var(--text-secondary); margin-bottom: var(--space-md);
+        max-width: 500px; margin-left: auto; margin-right: auto;
+    }
+    .voice-cta__waveform {
+        height: 60px; margin: var(--space-sm) auto;
+        max-width: 400px; border-radius: 8px;
+        background: var(--bg-elevated);
+        border: 1px solid rgba(212,168,83,0.1);
+        overflow: hidden;
+    }
+
+
+    /* ============================================================
+       TECH TREE (Vision section)
+       ============================================================ */
+    .tech-tree {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    .tech-node {
+        padding: 1.2rem; border-radius: 14px;
+        border: 1px solid var(--border); background: var(--bg-card);
+        transition: all var(--duration-normal);
+        position: relative; overflow: hidden;
+    }
+    .tech-node--unlocked {
+        border-color: rgba(212,168,83,0.4);
+    }
+    .tech-node--unlocked::before {
+        content: ''; position: absolute; top: 0; left: 0; right: 0;
+        height: 3px; background: linear-gradient(to right, var(--gold), var(--gold-light));
+    }
+    .tech-node--locked {
+        opacity: 0.6;
+    }
+    .tech-node--locked::after {
+        content: ''; position: absolute; inset: 0;
+        background: radial-gradient(circle at 50% 50%, rgba(212,168,83,0.06), transparent 70%);
+        animation: lockedGlow 3s ease-in-out infinite alternate;
+    }
+    @keyframes lockedGlow {
+        0% { opacity: 0.3; }
+        100% { opacity: 1; }
+    }
+    .tech-node__status {
+        font-family: var(--font-mono); font-size: 0.7rem;
+        text-transform: uppercase; letter-spacing: 0.1em;
+        margin-bottom: 0.5rem;
+    }
+    .tech-node--unlocked .tech-node__status { color: var(--gold); }
+    .tech-node--locked .tech-node__status { color: var(--text-muted); }
+    .tech-node__title {
+        font-family: var(--font-heading); font-weight: 700;
+        font-size: 0.95rem; margin-bottom: 0.3rem;
+    }
+    .tech-node__desc {
+        font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;
+    }
+    /* Lock icon drawn in CSS */
+    .tech-node__lock {
+        position: absolute; top: 1rem; right: 1rem;
+        width: 18px; height: 22px;
+    }
+    .tech-node__lock::before {
+        content: ''; display: block;
+        width: 12px; height: 8px; margin: 0 auto;
+        border: 2px solid var(--text-muted);
+        border-radius: 8px 8px 0 0; border-bottom: none;
+    }
+    .tech-node__lock::after {
+        content: ''; display: block;
+        width: 18px; height: 12px;
+        background: var(--text-muted); border-radius: 3px;
+        margin-top: 0;
+    }
+
+
+    /* ============================================================
+       WORSTENBROODJES DONATIE INTERFACE
+       ============================================================ */
+    .donate {
+        max-width: 700px; margin: 0 auto;
+        text-align: center;
+    }
+    .donate__community {
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        padding: 0.6rem 1.5rem; border-radius: 100px;
+        background: var(--bg-card); border: 1px solid var(--border);
+        font-size: 0.85rem; color: var(--text-secondary);
+        margin-bottom: var(--space-lg);
+    }
+    .donate__community-dot {
+        width: 8px; height: 8px; border-radius: 50%;
+        background: var(--gold);
+        animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .donate__worstenbroodje-display {
+        margin-bottom: var(--space-md);
+    }
+    .donate__worstenbroodje-img {
+        width: 120px; height: 120px; margin: 0 auto var(--space-sm);
+        border-radius: 50%;
+        object-fit: cover;
+        filter: drop-shadow(0 0 30px rgba(212,168,83,0.3));
+        transition: transform 0.3s var(--ease-out-back);
+    }
+    .donate__worstenbroodje-img.is-bouncing {
+        animation: wbBounce 0.4s var(--ease-out-back);
+    }
+    @keyframes wbBounce {
+        0% { transform: scale(1); }
+        40% { transform: scale(1.25) rotate(-5deg); }
+        70% { transform: scale(0.95) rotate(2deg); }
+        100% { transform: scale(1) rotate(0deg); }
+    }
+
+    .donate__count {
+        font-family: var(--font-heading); font-weight: 900;
+        font-size: clamp(3rem, 8vw, 5rem);
+        color: var(--gold); line-height: 1;
+        margin-bottom: 0.3rem;
+        transition: transform 0.2s var(--ease-out-back);
+    }
+    .donate__count-label {
+        font-size: 1.1rem; color: var(--text-secondary);
+        margin-bottom: var(--space-xs);
+    }
+
+    .donate__quick-select {
+        display: flex; flex-wrap: wrap; justify-content: center;
+        gap: 0.6rem; margin-bottom: var(--space-md);
+    }
+    .donate__quick-btn {
+        padding: 0.7rem 1.5rem; border-radius: 10px;
+        border: 2px solid var(--border); background: var(--bg-card);
+        color: var(--text-primary);
+        font-family: var(--font-heading); font-weight: 700;
+        font-size: 1rem; cursor: pointer;
+        transition: all var(--duration-fast);
+        min-width: 60px;
+    }
+    .donate__quick-btn:hover {
+        border-color: var(--gold); background: var(--gold-dim);
+        transform: translateY(-2px);
+    }
+    .donate__quick-btn.is-active {
+        border-color: var(--gold); background: var(--gold);
+        color: #0a0806;
+    }
+    .donate__custom-input {
+        width: 80px; padding: 0.7rem; border-radius: 10px;
+        border: 2px solid var(--border); background: var(--bg-card);
+        color: var(--text-primary);
+        font-family: var(--font-heading); font-weight: 700;
+        font-size: 1rem; text-align: center;
+        display: none;
+    }
+    .donate__custom-input:focus {
+        border-color: var(--gold); outline: none;
+        box-shadow: 0 0 0 3px var(--gold-dim);
+    }
+    .donate__custom-input.is-visible { display: inline-block; }
+
+    .donate__total {
+        font-size: 1.3rem; color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        font-family: var(--font-heading); font-weight: 700;
+    }
+    .donate__total-amount {
+        color: var(--gold); font-size: 1.5rem;
+    }
+
+    .donate__title-indicator {
+        font-family: var(--font-mono); font-size: 0.8rem;
+        color: var(--gold); letter-spacing: 0.08em;
+        margin-bottom: var(--space-md);
+        padding: 0.5rem 1.2rem;
+        border: 1px solid var(--gold-dim); border-radius: 100px;
+        display: inline-block; background: rgba(212,168,83,0.05);
+    }
+
+    .donate__checkout-btn {
+        width: 100%; max-width: 400px;
+        padding: 1rem 2rem; border-radius: 14px;
+        background: linear-gradient(135deg, var(--gold), #c49840);
+        color: #0a0806; border: none;
+        font-family: var(--font-heading); font-weight: 900;
+        font-size: 1.2rem; letter-spacing: 0.03em;
+        cursor: pointer;
+        transition: all var(--duration-fast);
+        box-shadow: 0 4px 20px rgba(212,168,83,0.2);
+    }
+    .donate__checkout-btn:hover {
+        background: linear-gradient(135deg, var(--gold-light), var(--gold));
+        box-shadow: 0 8px 40px rgba(212,168,83,0.3);
+        transform: translateY(-2px);
+    }
+
+    /* Payment methods panel */
+    .donate__payment-panel {
+        display: none; margin-top: var(--space-md);
+        text-align: left;
+        padding: var(--space-md);
+        border: 1px solid var(--border); border-radius: 16px;
+        background: var(--bg-card);
+        animation: fadeIn var(--duration-normal) var(--ease-out-expo);
+    }
+    .donate__payment-panel.is-visible { display: block; }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .donate__payment-section {
+        margin-bottom: var(--space-md);
+    }
+    .donate__payment-section:last-child { margin-bottom: 0; }
+    .donate__payment-section-title {
+        font-family: var(--font-mono); font-size: 0.75rem;
+        color: var(--gold); text-transform: uppercase;
+        letter-spacing: 0.1em; margin-bottom: var(--space-sm);
+    }
+
+    .donate__payment-methods {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 0.6rem;
+    }
+    .donate__payment-method {
+        display: flex; align-items: center; justify-content: center;
+        gap: 0.5rem; padding: 0.8rem 1rem;
+        border: 1px solid var(--border); border-radius: 10px;
+        background: var(--bg-elevated);
+        color: var(--text-primary); font-weight: 600;
+        font-size: 0.9rem; cursor: pointer;
+        transition: all var(--duration-fast);
+        text-decoration: none;
+    }
+    .donate__payment-method:hover {
+        border-color: var(--gold); background: var(--gold-dim);
+        text-decoration: none; transform: translateY(-1px);
+    }
+
+    /* Crypto section */
+    .donate__crypto-detail {
+        display: none; margin-top: var(--space-sm);
+        padding: 1.2rem; border: 1px solid var(--border);
+        border-radius: 12px; background: var(--bg-elevated);
+        text-align: center;
+    }
+    .donate__crypto-detail.is-visible { display: block; }
+    .donate__crypto-qr {
+        width: 180px; height: 180px;
+        margin: 0 auto var(--space-sm);
+        background: #fff; border-radius: 8px;
+        padding: 12px;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .donate__crypto-address {
+        font-family: var(--font-mono); font-size: 0.7rem;
+        color: var(--text-secondary);
+        word-break: break-all; padding: 0.5rem;
+        background: var(--bg-dark); border-radius: 6px;
+        cursor: pointer; user-select: all;
+        border: 1px solid var(--border);
+    }
+    .donate__crypto-copy {
+        font-size: 0.75rem; color: var(--gold);
+        margin-top: 0.4rem; cursor: pointer;
+    }
+
+
+    /* ============================================================
+       MILESTONES
+       ============================================================ */
+    .milestones { display: flex; flex-direction: column; gap: var(--space-md); }
+    .milestone {
+        display: grid; grid-template-columns: 140px 1fr;
+        gap: var(--space-md); padding: var(--space-md);
+        border: 1px solid var(--border); border-radius: 16px;
+        background: var(--bg-card);
+        transition: border-color var(--duration-normal);
+    }
+    .milestone:hover { border-color: var(--border-hover); }
+    .milestone__amount {
+        font-family: var(--font-heading); font-weight: 900;
+        color: var(--gold); text-align: center;
+        display: flex; flex-direction: column; justify-content: center;
+        align-items: center; gap: 0.3rem;
+    }
+    .milestone__amount-number { font-size: 1.6rem; line-height: 1; }
+    .milestone__amount-unit {
+        font-size: 0.7rem; color: var(--text-muted);
+        font-family: var(--font-mono); letter-spacing: 0.05em;
+    }
+    .milestone__content h4 {
+        font-family: var(--font-heading); font-weight: 700;
+        font-size: 1.1rem; margin-bottom: 0.5rem;
+    }
+    .milestone__content ul { list-style: none; padding: 0; }
+    .milestone__content li {
+        color: var(--text-secondary); padding: 0.3rem 0;
+        padding-left: 1.4rem; position: relative; font-size: 0.95rem;
+    }
+    .milestone__content li::before {
+        content: ''; position: absolute;
+        left: 0; top: 0.65rem;
+        width: 6px; height: 6px; border-radius: 50%;
+        background: var(--gold-dim); border: 1px solid var(--gold);
+    }
+    .milestone__bar {
+        grid-column: 1 / -1;
+        height: 4px; background: rgba(255,255,255,0.06);
+        border-radius: 4px; overflow: hidden;
+        margin-top: 0.5rem;
+    }
+    .milestone__bar-fill {
+        height: 100%;
+        background: linear-gradient(to right, var(--gold), var(--gold-light));
+        border-radius: 4px; width: 0%;
+        transition: width 1.5s var(--ease-out-expo);
+    }
+
+
+    /* ============================================================
+       FAQ
+       ============================================================ */
+    .faq-list {
+        display: flex; flex-direction: column;
+        gap: 1rem; max-width: var(--content-narrow);
+    }
+    .faq-item {
+        border: 1px solid var(--border); border-radius: 14px;
+        background: var(--bg-card); overflow: hidden;
+        transition: border-color var(--duration-normal);
+    }
+    .faq-item:hover { border-color: var(--border-hover); }
+    .faq-question {
+        width: 100%; display: flex; align-items: center;
+        justify-content: space-between;
+        padding: 1.2rem 1.5rem; background: none;
+        border: none; color: var(--text-primary);
+        font-family: var(--font-heading); font-size: 1rem;
+        font-weight: 700; cursor: pointer; text-align: left; gap: 1rem;
+    }
+    .faq-question::after {
+        content: '+'; font-size: 1.3rem; color: var(--gold);
+        flex-shrink: 0; transition: transform var(--duration-fast);
+    }
+    .faq-item.is-open .faq-question::after { transform: rotate(45deg); }
+    .faq-answer {
+        max-height: 0; overflow: hidden;
+        transition: max-height var(--duration-normal) var(--ease-out-expo);
+    }
+    .faq-item.is-open .faq-answer { max-height: 300px; }
+    .faq-answer p {
+        padding: 0 1.5rem 1.2rem; color: var(--text-secondary);
+        line-height: 1.8; font-size: 0.95rem;
+    }
+
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .page-footer {
+        border-top: 1px solid var(--border);
+        padding: var(--space-lg) var(--space-md);
+        text-align: center; color: var(--text-muted); font-size: 0.85rem;
+    }
+    .page-footer a { color: var(--text-secondary); }
+    .page-footer__links {
+        display: flex; gap: 1.5rem; justify-content: center;
+        flex-wrap: wrap; margin-bottom: var(--space-sm);
+    }
+    .page-footer__disclaimer {
+        font-size: 0.75rem; color: var(--text-muted);
+        margin-top: var(--space-sm); font-style: italic;
+        max-width: 600px; margin-left: auto; margin-right: auto;
+    }
+
+
+    /* ============================================================
+       LAZY LOADING
+       ============================================================ */
+    .lazy-img {
+        opacity: 0;
+        transition: opacity var(--duration-slow) var(--ease-out-expo);
+    }
+    .lazy-img.is-loaded { opacity: 1; }
+    .img-placeholder {
+        position: relative; overflow: hidden; background: var(--bg-elevated);
+    }
+
+
+    /* ============================================================
+       KONAMI EASTER EGG
+       ============================================================ */
+    .konami-overlay {
+        position: fixed; inset: 0; z-index: 9999;
+        pointer-events: none; overflow: hidden;
+    }
+    .konami-text {
+        position: fixed; top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        font-family: var(--font-heading); font-weight: 900;
+        font-size: clamp(4rem, 15vw, 10rem);
+        color: var(--gold);
+        text-shadow: 0 0 80px var(--gold-glow), 0 0 160px var(--gold-glow);
+        z-index: 10000; pointer-events: none;
+        opacity: 0;
+        animation: konamiFlash 2s var(--ease-out-expo) forwards;
+    }
+    @keyframes konamiFlash {
+        0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+        30% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+        100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+    }
+    .confetti-particle {
+        position: absolute; width: 10px; height: 10px;
+        pointer-events: none;
+    }
+
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 1024px) {
+        .tech-tree { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+    }
+    @media (max-width: 768px) {
+        :root { --space-xl: 4rem; --space-lg: 2.5rem; }
+        .split { grid-template-columns: 1fr; gap: var(--space-md); }
+        .split--reverse { direction: ltr; }
+        .gallery__card { flex: 0 0 280px; }
+        .milestone { grid-template-columns: 1fr; }
+        .milestone__amount { text-align: left; flex-direction: row; justify-content: flex-start; }
+        .hero__bg { inset: 0; transform: none !important; }
+        .sticky-nav__brand span { display: none; }
+        .pipeline__step { flex: 1 0 140px; padding: 1rem 0.6rem; }
+        .donate__payment-methods { grid-template-columns: 1fr 1fr; }
+        .hero__typewriter-line { white-space: normal; border-right: none; width: auto; animation: fadeUp 1s var(--ease-out-expo) 0.3s forwards; }
+        .hero__typewriter-line:nth-child(2) { animation-delay: 1.5s; }
+    }
+    @media (max-width: 480px) {
+        .hero__cta-group { flex-direction: column; align-items: center; }
+        .voice-player { grid-template-columns: 1fr; }
+        .tech-tree { grid-template-columns: 1fr 1fr; }
+        .donate__quick-select { gap: 0.4rem; }
+        .donate__quick-btn { min-width: 50px; padding: 0.6rem 1rem; font-size: 0.9rem; }
+        .pipeline { flex-wrap: wrap; }
+        .pipeline__step { flex: 1 0 45%; border-radius: 10px !important; }
+        .pipeline__step + .pipeline__step { border-left: 1px solid var(--border); }
+        .pipeline__arrow { display: none; }
+        .donate__payment-methods { grid-template-columns: 1fr; }
+    }
+
+    /* Reduce motion */
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+        [data-reveal], [data-reveal-stagger] > * {
+            opacity: 1; transform: none;
+        }
+        .hero__bg { transform: none !important; }
+        .hero__logo, .hero__title, .hero__stats-bar, .hero__cta-group {
+            opacity: 1;
+        }
+        .hero__typewriter-line {
+            width: auto; border-right: none; opacity: 1;
+        }
+    }
+
+    /* GPU hints */
+    .hero__bg, .hero__glow, .compare__before, .compare__handle, .sticky-nav {
+        will-change: transform;
+    }
+    </style>
+</head>
+<body>
+
+    <!-- ========================================================
+         STICKY NAV
+         ======================================================== -->
+    <nav class="sticky-nav" id="stickyNav" aria-label="Navigatie">
+        <div class="sticky-nav__brand">
+            <img src="/assets/ui/logo.png" alt="" width="32" height="32">
+            <span>Reign of Brabant</span>
+        </div>
+        <div class="sticky-nav__links">
+            <a href="/play/">Spelen</a>
+            <a href="#het-verhaal">Het Verhaal</a>
+            <a href="#pipeline">AI Pipeline</a>
+            <a href="#steun" class="btn btn--primary" style="padding:0.4rem 1rem;font-size:0.85rem">Steun nu</a>
+        </div>
+    </nav>
+
+
+    <!-- ========================================================
+         1. HERO — Typewriter, parallax, stats bar
+         ======================================================== -->
+    <section class="hero" id="top">
+        <div class="hero__bg" id="heroBg" style="background-image:url('/assets/steun/hero-banner.webp')"></div>
+        <div class="hero__vignette"></div>
+        <div class="hero__glow"></div>
+
+        <div class="hero__content">
+            <div class="hero__typewriter" aria-label="Het Gouden Worstenbroodje is gestolen. En een Brabander ging het terugpakken.">
+                <span class="hero__typewriter-line">Het Gouden Worstenbroodje is gestolen.</span>
+                <span class="hero__typewriter-line">En een Brabander ging het terugpakken.</span>
+            </div>
+
+            <img class="hero__logo" src="/assets/ui/logo.png" alt="Reign of Brabant"
+                 width="360" height="360" loading="eager">
+
+            <div class="hero__stats-bar">
+                <span>33.559 regels code</span>
+                <span class="stat-sep">|</span>
+                <span>127 3D modellen</span>
+                <span class="stat-sep">|</span>
+                <span>525 stemmen</span>
+                <span class="stat-sep">|</span>
+                <span>3 dagen</span>
+                <span class="stat-sep">|</span>
+                <span>1 persoon</span>
+            </div>
+
+            <div class="hero__cta-group">
+                <a href="#steun" class="btn btn--primary btn--large">Steun het experiment</a>
+                <a href="/play/" class="btn btn--ghost btn--large">Eerst zelf spelen</a>
+            </div>
+        </div>
+
+        <div class="hero__scroll-hint" aria-hidden="true">Scroll</div>
+    </section>
+
+
+    <!-- ========================================================
+         2. THE STORY — "Wa hedde we hier?"
+         ======================================================== -->
+    <section class="section section--elevated" id="het-verhaal">
+        <div class="section__inner">
+            <div class="split">
+                <div class="split__visual" data-reveal="left">
+                    <img src="/assets/steun/world-map.webp"
+                         alt="Reign of Brabant wereldkaart — vier facties, een continent"
+                         width="800" height="600"
+                         loading="lazy">
+                </div>
+                <div class="split__text" data-reveal="right">
+                    <div class="section__label">Wa hedde we hier?</div>
+                    <h3>Een proof of concept. In 3 dagen gebouwd.</h3>
+                    <p>
+                        Dit is geen finished product. Dit is een proof of concept, gebouwd door 1 persoon
+                        met AI in 3 dagen. Geen team. Geen studio. Geen budget. Alleen een developer uit Brabant
+                        met een WarCraft-tattoo, een MacBook en een stapel AI-tools die twee jaar geleden
+                        nog niet bestonden.
+                    </p>
+                    <p>
+                        Het is al speelbaar. Vier facties, twintig unit types, base building, resource management,
+                        voice-acted cutscenes in Brabants dialect. Maar het is nog maar het begin.
+                        Stel je voor wat er mogelijk is met meer tijd en een community erachter.
+                    </p>
+                    <p>
+                        Brabantse boeren met hooivorken. Randstedelijke consultants met PowerPoints.
+                        Limburgse mijnwerkers die tunnels graven achter vijandelijke linies.
+                        En Belgen met een frituur als fort. Ja. Echt.
+                    </p>
+                    <div class="inline-cta">
+                        <span class="inline-cta__text"><strong>Geloof je 't nie?</strong> Speel het zelf. Kost niks.</span>
+                        <a href="/play/" class="btn">Speel nu</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ========================================================
+         3. FACTION SHOWCASE — Horizontal scroll gallery
+         ======================================================== -->
+    <section class="section section--accent" id="facties">
+        <div class="section__inner">
+            <div class="section__label" data-reveal>Vier facties, vier verhalen</div>
+            <h2 class="section__title" data-reveal>Kies je kant. Of kies ze allemaal.</h2>
+            <p class="section__intro" data-reveal>
+                Elke factie heeft eigen units, eigen gebouwen, eigen muziek en eigen stemacteurs.
+                Van Brabantse boeren met hooivorken tot Randstedelijke consultants met PowerPoints.
+                Dit is geen reskin. Dit zijn vier compleet verschillende speelervaringen.
+            </p>
+
+            <div class="gallery" data-reveal>
+                <div class="gallery__track">
+                    <div class="gallery__card" data-faction="brabant">
+                        <img class="gallery__card-img" src="/assets/steun/faction-brabant.webp"
+                             alt="De Brabanders — Carnaval meets slagveld"
+                             width="320" height="180" loading="lazy">
+                        <div class="gallery__card-body">
+                            <div class="gallery__card-title">De Brabanders</div>
+                            <div class="gallery__card-desc">
+                                Boeren, cafebazen en carnavalvierders. Brute kracht en ontembaar moreel.
+                                Hun cafe geneest verwonde eenheden. Wa een gastvrij volk.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gallery__card" data-faction="randstad">
+                        <img class="gallery__card-img" src="/assets/steun/faction-randstad.webp"
+                             alt="De Randstad — Corporate warfare"
+                             width="320" height="180" loading="lazy">
+                        <div class="gallery__card-body">
+                            <div class="gallery__card-title">De Randstad</div>
+                            <div class="gallery__card-desc">
+                                Consultants, managers en hipsters met havermelk. Technologisch superieur,
+                                moreel bankroet. Eventuele gelijkenis met bestaande consultancy firms is volkomen bedoeld.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gallery__card" data-faction="limburg">
+                        <img class="gallery__card-img" src="/assets/steun/faction-limburg.webp" alt="Limburgers factie" loading="lazy">
+                        <div class="gallery__card-body">
+                            <div class="gallery__card-title">De Limburgers</div>
+                            <div class="gallery__card-desc">
+                                Mijnwerkers, heuvelbewoners en vlaaienbakkers. Langzaam maar onbreekbaar.
+                                Hun tunnels verschijnen achter vijandelijke linies. Verrassing.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gallery__card" data-faction="belgen">
+                        <img class="gallery__card-img" src="/assets/steun/faction-belgen.webp" alt="Belgen factie" loading="lazy">
+                        <div class="gallery__card-body">
+                            <div class="gallery__card-title">De Belgen</div>
+                            <div class="gallery__card-desc">
+                                De Frietkoning en zijn leger van frituurstrijders. Onderschat ze niet.
+                                Hun frituur is hun fort, frietsaus hun chemisch wapen. Oorlog is vettig.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ========================================================
+         4. AI PIPELINE — "Hoe bouw je een koninkrijk met AI?"
+         ======================================================== -->
+    <section class="section section--dark" id="pipeline">
+        <div class="section__inner">
+            <div class="section__label" data-reveal>De AI-pipeline</div>
+            <h2 class="section__title" data-reveal>Hoe bouw je een koninkrijk met AI?</h2>
+            <p class="section__intro" data-reveal>
+                Het begint met een zin. "Brabantse boer met hooivork, medieval fantasy."
+                60 seconden later staat er een geript, geanimeerd, gestemd 3D model in je game.
+                Geen 3D-artist. Geen stemacteur. Geen maanden wachten.
+            </p>
+
+            <!-- 5-step pipeline -->
+            <div class="pipeline" data-reveal>
+                <div class="pipeline__step">
+                    <div class="pipeline__step-num">01</div>
+                    <div class="pipeline__step-title">Claude Code</div>
+                    <div class="pipeline__step-desc">Code, architectuur, game logic, AI behavior</div>
+                    <div class="pipeline__arrow"></div>
+                </div>
+                <div class="pipeline__step">
+                    <div class="pipeline__step-num">02</div>
+                    <div class="pipeline__step-title">Flux / Meshy</div>
+                    <div class="pipeline__step-desc">2D sprites, concept art, 3D modellen</div>
+                    <div class="pipeline__arrow"></div>
+                </div>
+                <div class="pipeline__step">
+                    <div class="pipeline__step-num">03</div>
+                    <div class="pipeline__step-title">Blender</div>
+                    <div class="pipeline__step-desc">Auto-rig, animatie, export naar game</div>
+                    <div class="pipeline__arrow"></div>
+                </div>
+                <div class="pipeline__step">
+                    <div class="pipeline__step-num">04</div>
+                    <div class="pipeline__step-title">ElevenLabs</div>
+                    <div class="pipeline__step-desc">525 voice lines in 4 dialecten</div>
+                    <div class="pipeline__arrow"></div>
+                </div>
+                <div class="pipeline__step">
+                    <div class="pipeline__step-num">05</div>
+                    <div class="pipeline__step-title">Suno</div>
+                    <div class="pipeline__step-desc">Soundtrack, ambient, faction themes</div>
+                </div>
+            </div>
+
+            <!-- Stat counters -->
+            <div class="stats-grid" data-reveal-stagger style="margin-top: var(--space-lg);">
+                <div class="stat">
+                    <div class="stat__number" data-count-to="33559">0</div>
+                    <div class="stat__label">Regels code</div>
+                </div>
+                <div class="stat">
+                    <div class="stat__number" data-count-to="127">0</div>
+                    <div class="stat__label">3D modellen</div>
+                </div>
+                <div class="stat">
+                    <div class="stat__number" data-count-to="525">0</div>
+                    <div class="stat__label">Voice lines</div>
+                </div>
+                <div class="stat">
+                    <div class="stat__number" data-count-to="3">0</div>
+                    <div class="stat__label">Dagen</div>
+                </div>
+                <div class="stat">
+                    <div class="stat__number" data-count-to="1">0</div>
+                    <div class="stat__label">Persoon</div>
+                </div>
+            </div>
+
+            <!-- Before/After -->
+            <div style="margin-top: var(--space-lg);">
+                <div class="split split--reverse">
+                    <div class="split__text" data-reveal="left">
+                        <h3>Van wireframe naar vechtklaar in 60 seconden</h3>
+                        <p>
+                            127 modellen. Allemaal via dezelfde pipeline. Meshy v6 maakt het model,
+                            Blender rigt en animeert automatisch, ElevenLabs geeft het een stem.
+                            Schuif de slider en zie het verschil.
+                        </p>
+                        <p style="color: var(--text-muted); font-style: italic;">
+                            De AI-tools kosten samen honderden euro's per maand. Claude Code, ElevenLabs,
+                            Meshy, fal.ai, Suno, hosting. Dat is waar jouw steun voor nodig is.
+                        </p>
+                    </div>
+                    <div class="split__visual" data-reveal="right">
+                        <div class="compare" id="compareSlider" aria-label="Vergelijk wireframe met getextureerd model">
+                            <div class="compare__after">
+                                <img src="/assets/steun/hero-prins.webp"
+                                     alt="Getextureerd 3D model"
+                                     width="600" height="338" loading="lazy">
+                            </div>
+                            <div class="compare__before">
+                                <img src="/assets/steun/hero-prins.webp"
+                                     alt="Wireframe 3D model"
+                                     style="filter: grayscale(1) brightness(0.5) contrast(1.3)"
+                                     width="600" height="338" loading="lazy">
+                            </div>
+                            <div class="compare__handle" id="compareHandle"></div>
+                            <span class="compare__label compare__label--before">Wireframe</span>
+                            <span class="compare__label compare__label--after">Eindresultaat</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ========================================================
+         5. VOICE ACTING — "Ze praten. In dialect."
+         ======================================================== -->
+    <section class="section section--elevated" id="stemmen">
+        <div class="section__inner">
+            <div class="section__label" data-reveal>525 stemmen en dat is pas het begin</div>
+            <h2 class="section__title" data-reveal>Ze praten. In dialect.</h2>
+            <p class="section__intro" data-reveal>
+                AI-stemmen zijn goed. Maar ze zijn niet echt. De nuances van een Tilburgse boer,
+                het zangerige van een Limburger, de arrogantie van een Randstedelijke consultant.
+                Dat kun je niet faken. Daarvoor heb je echte native speakers nodig.
+                En daar is jouw steun voor nodig.
+            </p>
+
+            <div class="voice-player" data-reveal-stagger>
+                <div class="voice-sample" data-audio="/assets/audio/voices/brabanders/attack_1.mp3">
+                    <div class="voice-sample__play" aria-label="Speel voice line af"></div>
+                    <div class="voice-sample__info">
+                        <div class="voice-sample__name">"Komaan, jongens!"</div>
+                        <div class="voice-sample__faction">Brabander Boer -- Aanvalscommando</div>
+                    </div>
+                </div>
+                <div class="voice-sample" data-audio="/assets/audio/voices/brabanders/death_1.mp3">
+                    <div class="voice-sample__play" aria-label="Speel voice line af"></div>
+                    <div class="voice-sample__info">
+                        <div class="voice-sample__name">"Nondeju..."</div>
+                        <div class="voice-sample__faction">Brabander -- Sneuvelt</div>
+                    </div>
+                </div>
+                <div class="voice-sample" data-audio="/assets/audio/voices/brabanders/idle_1.mp3">
+                    <div class="voice-sample__play" aria-label="Speel voice line af"></div>
+                    <div class="voice-sample__info">
+                        <div class="voice-sample__name">"Ist al vier uur?"</div>
+                        <div class="voice-sample__faction">Brabander -- Wacht op orders</div>
+                    </div>
+                </div>
+                <div class="voice-sample" data-audio="/assets/audio/voices/randstad/attack_1.mp3">
+                    <div class="voice-sample__play" aria-label="Speel voice line af"></div>
+                    <div class="voice-sample__info">
+                        <div class="voice-sample__name">"Synergy activeren!"</div>
+                        <div class="voice-sample__faction">Randstad Consultant -- Aanval</div>
+                    </div>
+                </div>
+                <div class="voice-sample" data-audio="/assets/audio/voices/limburgers/idle_1.mp3">
+                    <div class="voice-sample__play" aria-label="Speel voice line af"></div>
+                    <div class="voice-sample__info">
+                        <div class="voice-sample__name">"Sjoen weer vandaag, neet?"</div>
+                        <div class="voice-sample__faction">Limburger -- Wacht op orders</div>
+                    </div>
+                </div>
+                <div class="voice-sample" data-audio="/assets/audio/voices/belgen/attack_1.mp3">
+                    <div class="voice-sample__play" aria-label="Speel voice line af"></div>
+                    <div class="voice-sample__info">
+                        <div class="voice-sample__name">"Allez, vooruit!"</div>
+                        <div class="voice-sample__faction">Belg -- Aanvalscommando</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- "Jouw Stem" CTA -->
+            <div class="voice-cta" data-reveal style="margin-top: var(--space-lg);">
+                <div class="voice-cta__content">
+                    <div class="voice-cta__title">Jouw stem in de game</div>
+                    <p class="voice-cta__desc">
+                        Supporters worden een karakter. Spreek je dialect? Schrijf je eigen lines,
+                        spreek ze in, en elke keer als iemand op 'aanval' klikt horen ze jou schreeuwen.
+                    </p>
+                    <div class="voice-cta__waveform" id="voiceWaveform" aria-hidden="true"></div>
+                    <a href="#steun" class="btn btn--primary btn--large" style="margin-top: var(--space-sm);">
+                        Steun en word gehoord
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ========================================================
+         6. THE VISION — "Stel je voor..."
+         ======================================================== -->
+    <section class="section section--dark" id="visie">
+        <div class="section__inner">
+            <div class="section__label" data-reveal>De visie</div>
+            <h2 class="section__title" data-reveal>Stel je voor...</h2>
+            <p class="section__intro" data-reveal>
+                Dit is wat er al is. En dit is wat er mogelijk wordt. De gouden nodes zijn wat
+                we in 3 dagen hebben gebouwd. De gesloten nodes? Die staan klaar.
+                Ze wachten alleen op jou.
+            </p>
+
+            <div class="tech-tree" data-reveal-stagger>
+                <!-- UNLOCKED nodes -->
+                <div class="tech-node tech-node--unlocked">
+                    <div class="tech-node__status">Ontgrendeld</div>
+                    <div class="tech-node__title">4 Speelbare facties</div>
+                    <div class="tech-node__desc">Elk met eigen units, gebouwen en stemmen</div>
+                </div>
+                <div class="tech-node tech-node--unlocked">
+                    <div class="tech-node__status">Ontgrendeld</div>
+                    <div class="tech-node__title">127 3D modellen</div>
+                    <div class="tech-node__desc">Geript, geanimeerd, gevechtsklaar</div>
+                </div>
+                <div class="tech-node tech-node--unlocked">
+                    <div class="tech-node__status">Ontgrendeld</div>
+                    <div class="tech-node__title">12 Campagne missies</div>
+                    <div class="tech-node__desc">Met voice-acted cutscenes</div>
+                </div>
+                <div class="tech-node tech-node--unlocked">
+                    <div class="tech-node__status">Ontgrendeld</div>
+                    <div class="tech-node__title">525 Voice lines</div>
+                    <div class="tech-node__desc">In 4 dialecten via ElevenLabs</div>
+                </div>
+                <div class="tech-node tech-node--unlocked">
+                    <div class="tech-node__status">Ontgrendeld</div>
+                    <div class="tech-node__title">Base building</div>
+                    <div class="tech-node__desc">Resources, gebouwen, upgrades</div>
+                </div>
+
+                <!-- LOCKED nodes -->
+                <div class="tech-node tech-node--locked">
+                    <div class="tech-node__lock"></div>
+                    <div class="tech-node__status">Met funding</div>
+                    <div class="tech-node__title">Echte stemacteurs</div>
+                    <div class="tech-node__desc">Native speakers per dialect, community voice casting</div>
+                </div>
+                <div class="tech-node tech-node--locked">
+                    <div class="tech-node__lock"></div>
+                    <div class="tech-node__status">Met funding</div>
+                    <div class="tech-node__title">Wizard / Mage units</div>
+                    <div class="tech-node__desc">Magische eenheden met spell effects</div>
+                </div>
+                <div class="tech-node tech-node--locked">
+                    <div class="tech-node__lock"></div>
+                    <div class="tech-node__status">Met funding</div>
+                    <div class="tech-node__title">Siege engines</div>
+                    <div class="tech-node__desc">Belegeringswapens: katapulten, stormrammen</div>
+                </div>
+                <div class="tech-node tech-node--locked">
+                    <div class="tech-node__lock"></div>
+                    <div class="tech-node__status">Met funding</div>
+                    <div class="tech-node__title">Online multiplayer</div>
+                    <div class="tech-node__desc">Brabant vs Randstad. De eeuwige strijd.</div>
+                </div>
+                <div class="tech-node tech-node--locked">
+                    <div class="tech-node__lock"></div>
+                    <div class="tech-node__status">Met funding</div>
+                    <div class="tech-node__title">Vijfde factie</div>
+                    <div class="tech-node__desc">De Zeeuwen? De Friezen? We stemmen.</div>
+                </div>
+                <div class="tech-node tech-node--locked">
+                    <div class="tech-node__lock"></div>
+                    <div class="tech-node__status">Met funding</div>
+                    <div class="tech-node__title">Custom maps</div>
+                    <div class="tech-node__desc">Map editor, community maps, scenario's</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ========================================================
+         7. WORSTENBROODJES DONATIE-INTERFACE
+         ======================================================== -->
+    <section class="section section--accent" id="steun">
+        <div class="section__inner">
+            <div class="donate" data-reveal="scale">
+                <!-- Community counter -->
+                <div class="donate__community">
+                    <div class="donate__community-dot"></div>
+                    <span id="communityCounter">0 worstenbroodjes gedoneerd door 0 supporters</span>
+                </div>
+
+                <div class="section__label">Doe mee</div>
+                <h2 class="section__title" style="text-align:center; margin-bottom: 0.3rem;">Gooi er een worstenbroodje bij</h2>
+                <p style="color: var(--text-secondary); margin-bottom: var(--space-md); font-size: 1.05rem;">
+                    1 worstenbroodje = EUR 2. Kies er zoveel als je wilt.
+                </p>
+
+                <!-- Worstenbroodje display -->
+                <div class="donate__worstenbroodje-display">
+                    <img class="donate__worstenbroodje-img" id="wbImage"
+                         src="/assets/steun/golden-worstenbroodje.webp"
+                         alt="Gouden worstenbroodje"
+                         width="120" height="120">
+                    <div class="donate__count" id="wbCount">5</div>
+                    <div class="donate__count-label">worstenbroodjes</div>
+                </div>
+
+                <!-- Quick-select buttons -->
+                <div class="donate__quick-select" id="quickSelect">
+                    <button class="donate__quick-btn" data-amount="1">1</button>
+                    <button class="donate__quick-btn is-active" data-amount="5">5</button>
+                    <button class="donate__quick-btn" data-amount="10">10</button>
+                    <button class="donate__quick-btn" data-amount="25">25</button>
+                    <button class="donate__quick-btn" data-amount="50">50</button>
+                    <button class="donate__quick-btn" data-amount="custom" id="customBtn">anders...</button>
+                    <input type="number" class="donate__custom-input" id="customInput"
+                           min="1" max="999" placeholder="?" aria-label="Aangepast aantal worstenbroodjes">
+                </div>
+
+                <!-- Live total -->
+                <div class="donate__total">
+                    <span id="wbSummary">5 worstenbroodjes</span> = <span class="donate__total-amount" id="wbEuro">EUR 10</span>
+                </div>
+
+                <!-- Title indicator -->
+                <div class="donate__title-indicator" id="titleIndicator">
+                    Jouw titel: Stamgast
+                </div>
+
+                <br>
+
+                <!-- Checkout button -->
+                <button class="donate__checkout-btn" id="checkoutBtn">Afrekenen</button>
+
+                <!-- Payment methods (hidden until checkout click) -->
+                <div class="donate__payment-panel" id="paymentPanel">
+                    <div class="donate__payment-section">
+                        <div class="donate__payment-section-title">Betaalmethode kiezen</div>
+                        <div class="donate__payment-methods">
+                            <a href="#" class="donate__payment-method" id="payIdeal" data-method="ideal">iDEAL</a>
+                            <a href="#" class="donate__payment-method" id="payCreditcard" data-method="creditcard">Creditcard</a>
+                            <a href="#" class="donate__payment-method" id="payBancontact" data-method="bancontact">Bancontact</a>
+                            <a href="#" class="donate__payment-method" id="payPaypal" data-method="paypal">PayPal</a>
+                        </div>
+                    </div>
+
+                    <div class="donate__payment-section">
+                        <div class="donate__payment-section-title">Of betaal met crypto</div>
+                        <div class="donate__payment-methods">
+                            <button class="donate__payment-method" id="cryptoBtc">Bitcoin</button>
+                            <button class="donate__payment-method" id="cryptoEth">Ethereum</button>
+                        </div>
+                        <!-- Bitcoin detail -->
+                        <div class="donate__crypto-detail" id="btcDetail">
+                            <div class="donate__crypto-qr" id="btcQr"></div>
+                            <div class="donate__crypto-address" id="btcAddress">bc1q_placeholder_btc_address</div>
+                            <div class="donate__crypto-copy" id="btcCopy">Klik om te kopieren</div>
+                        </div>
+                        <!-- Ethereum detail -->
+                        <div class="donate__crypto-detail" id="ethDetail">
+                            <div class="donate__crypto-qr" id="ethQr"></div>
+                            <div class="donate__crypto-address" id="ethAddress">0x_placeholder_eth_address</div>
+                            <div class="donate__crypto-copy" id="ethCopy">Klik om te kopieren</div>
+                        </div>
+                    </div>
+                </div>
+
+                <p style="color:var(--text-muted);font-size:0.8rem;margin-top:var(--space-md)">
+                    De game blijft gratis voor iedereen. Geen tier-locked content. Geen pay-to-win.
+                    Donaties zijn vrijwillige bijdragen aan een passieproject. Milestones zijn best-effort.
+                    Alle voortgang is publiek op GitHub.
+                </p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ========================================================
+         8. MILESTONES — In worstenbroodjes
+         ======================================================== -->
+    <section class="section section--dark" id="milestones">
+        <div class="section__inner">
+            <div class="section__label" data-reveal>De route</div>
+            <h2 class="section__title" data-reveal>Waar gaan de worstenbroodjes naartoe?</h2>
+            <p class="section__intro" data-reveal>
+                Geen vage beloftes. Concrete deliverables die je zelf kunt checken.
+                Alles openbaar, alles afrekenbaar.
+            </p>
+
+            <div class="milestones" data-reveal-stagger>
+                <div class="milestone">
+                    <div class="milestone__amount">
+                        <div class="milestone__amount-number">500</div>
+                        <div class="milestone__amount-unit">worstenbroodjes</div>
+                    </div>
+                    <div class="milestone__content">
+                        <h4>Core Polish</h4>
+                        <ul>
+                            <li>Performance pass: 60fps op een gemiddelde laptop</li>
+                            <li>Top 10 bugs genadeloos afgeknald</li>
+                            <li>1 uur spelen zonder crash. Beloofd.</li>
+                        </ul>
+                    </div>
+                    <div class="milestone__bar">
+                        <div class="milestone__bar-fill" data-width="0"></div>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <div class="milestone__amount">
+                        <div class="milestone__amount-number">1.500</div>
+                        <div class="milestone__amount-unit">worstenbroodjes</div>
+                    </div>
+                    <div class="milestone__content">
+                        <h4>Echte Brabantse stemacteurs</h4>
+                        <ul>
+                            <li>Native speakers voor de Brabanders-factie</li>
+                            <li>Voice casting via de community</li>
+                            <li>Jouw stem in de game als je dialect spreekt</li>
+                        </ul>
+                    </div>
+                    <div class="milestone__bar">
+                        <div class="milestone__bar-fill" data-width="0"></div>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <div class="milestone__amount">
+                        <div class="milestone__amount-number">5.000</div>
+                        <div class="milestone__amount-unit">worstenbroodjes</div>
+                    </div>
+                    <div class="milestone__content">
+                        <h4>Combat VFX en audio</h4>
+                        <ul>
+                            <li>VFX, screen shake, audio feedback bij elke klap</li>
+                            <li>Pathfinding die niet door muren loopt</li>
+                            <li>Hotkeys en UI op WarCraft-niveau</li>
+                        </ul>
+                    </div>
+                    <div class="milestone__bar">
+                        <div class="milestone__bar-fill" data-width="0"></div>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <div class="milestone__amount">
+                        <div class="milestone__amount-number">25.000</div>
+                        <div class="milestone__amount-unit">worstenbroodjes</div>
+                    </div>
+                    <div class="milestone__content">
+                        <h4>Campaign Slice met cutscenes</h4>
+                        <ul>
+                            <li>Alle 4 facties met echte stemacteurs</li>
+                            <li>Nieuwe maps en campagne-missies</li>
+                            <li>Gerenderde cutscenes met voiceover</li>
+                        </ul>
+                    </div>
+                    <div class="milestone__bar">
+                        <div class="milestone__bar-fill" data-width="0"></div>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <div class="milestone__amount">
+                        <div class="milestone__amount-number">50.000</div>
+                        <div class="milestone__amount-unit">worstenbroodjes</div>
+                    </div>
+                    <div class="milestone__content">
+                        <h4>Vijfde factie</h4>
+                        <ul>
+                            <li>Online multiplayer: Brabant vs Randstad. De eeuwige strijd.</li>
+                            <li>Ranked leaderboard met seizoenen</li>
+                            <li>Vijfde factie: De Zeeuwen of de Friezen. We stemmen.</li>
+                        </ul>
+                    </div>
+                    <div class="milestone__bar">
+                        <div class="milestone__bar-fill" data-width="0"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ========================================================
+         9. FAQ
+         ======================================================== -->
+    <section class="section section--elevated" id="faq">
+        <div class="section__inner">
+            <div class="section__label" data-reveal>Veelgestelde vragen die niemand stelde</div>
+            <h2 class="section__title" data-reveal>FAQ</h2>
+            <div class="section__divider" data-reveal></div>
+
+            <div class="faq-list" data-reveal-stagger>
+                <div class="faq-item">
+                    <button class="faq-question">"Is dit een WarCraft-kloon?"</button>
+                    <div class="faq-answer">
+                        <p>
+                            Het is een liefdesbrief aan WarCraft, geschreven in Brabants dialect.
+                            Blizzard heeft nooit worstenbroodjes als resource gehad.
+                            Dat is het verschil.
+                        </p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">"Kan ik met crypto betalen?"</button>
+                    <div class="faq-answer">
+                        <p>
+                            Ja. Bitcoin, Ethereum. We zijn geen boomers.
+                            Scroll naar boven, klik op 'Afrekenen', en kies je coin.
+                        </p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">"Wat als het project stopt?"</button>
+                    <div class="faq-answer">
+                        <p>
+                            Dan heb je een worstenbroodje gekocht voor een Brabander. Slechtere deals bestaan.
+                            Maar serieus: de code is open source op GitHub, er zitten 33.559 regels in,
+                            en dit ding gaat nergens heen.
+                        </p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">"Waarom geen Kickstarter?"</button>
+                    <div class="faq-answer">
+                        <p>
+                            Te veel regels. Te weinig worstenbroodjes. Kickstarter neemt een flinke fee
+                            en vereist een heel circus aan rewards. Wij houden het simpel: direct steunen,
+                            geen gedoe, al het geld naar de game.
+                        </p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">"Hoe weet ik dat m'n geld goed besteed wordt?"</button>
+                    <div class="faq-answer">
+                        <p>
+                            Alles is openbaar. Elke commit, elke milestone, elke beslissing.
+                            Transparantie is geen optie hier, het is de standaard.
+                            Volg de voortgang op GitHub of via de roadmap op de site.
+                        </p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">"Kan ik helpen zonder geld?"</button>
+                    <div class="faq-answer">
+                        <p>
+                            Absoluut. Spreek je Brabants, Limburgs of Belgisch-Nederlands? Stuur een voice sample.
+                            Kun je 3D modellen maken? Pull request. Kun je bugs vinden? Dat helpt ook.
+                            Of deel de link gewoon met iemand die dit vet zou vinden.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ========================================================
+         10. FOOTER
+         ======================================================== -->
+    <footer class="page-footer">
+        <div class="page-footer__links">
+            <a href="/play/">Spelen</a>
+            <a href="https://github.com/RichardTheuws/reign-of-brabant">GitHub</a>
+            <a href="mailto:richard@theuws.com">Contact</a>
+        </div>
+        <p>Gebouwd met ambitie, AI en een onverantwoorde hoeveelheid koffie.</p>
+        <p class="page-footer__disclaimer">
+            Eventuele gelijkenis met bestaande consultancy firms is volkomen bedoeld.
+        </p>
+    </footer>
+
+
+    <!-- ========================================================
+         JAVASCRIPT
+         ======================================================== -->
+    <script>
+    (function() {
+        'use strict';
+
+        // ========================================================
+        // 1. SCROLL REVEAL (Intersection Observer)
+        // ========================================================
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+        document.querySelectorAll('[data-reveal], [data-reveal-stagger]').forEach(el => {
+            revealObserver.observe(el);
+        });
+
+
+        // ========================================================
+        // 2. STICKY NAV
+        // ========================================================
+        const stickyNav = document.getElementById('stickyNav');
+        const heroSection = document.querySelector('.hero');
+
+        if (stickyNav && heroSection) {
+            const navObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    stickyNav.classList.toggle('is-visible', !entry.isIntersecting);
+                });
+            }, { threshold: 0.05 });
+            navObserver.observe(heroSection);
+        }
+
+
+        // ========================================================
+        // 3. PARALLAX
+        // ========================================================
+        const heroBg = document.getElementById('heroBg');
+        let ticking = false;
+
+        if (heroBg && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+            && window.innerWidth > 768) {
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    requestAnimationFrame(() => {
+                        heroBg.style.transform = `translateY(${window.scrollY * 0.3}px)`;
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            }, { passive: true });
+        }
+
+
+        // ========================================================
+        // 4. ANIMATED STAT COUNTERS
+        // ========================================================
+        const statNumbers = document.querySelectorAll('[data-count-to]');
+
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    const target = parseInt(el.dataset.countTo, 10);
+                    animateCounter(el, 0, target, target > 1000 ? 2000 : 1200);
+                    counterObserver.unobserve(el);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        statNumbers.forEach(el => counterObserver.observe(el));
+
+        function animateCounter(el, start, end, duration) {
+            const startTime = performance.now();
+            const useComma = end >= 1000;
+
+            function formatNumber(n) {
+                if (!useComma) return n.toString();
+                return n.toLocaleString('nl-NL');
+            }
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const current = Math.round(start + (end - start) * eased);
+                el.textContent = formatNumber(current);
+                if (progress < 1) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        }
+
+
+        // ========================================================
+        // 5. BEFORE/AFTER COMPARISON SLIDER
+        // ========================================================
+        const compareSlider = document.getElementById('compareSlider');
+
+        if (compareSlider) {
+            const handle = document.getElementById('compareHandle');
+            const beforeLayer = compareSlider.querySelector('.compare__before');
+            let isDragging = false;
+
+            function updateSlider(clientX) {
+                const rect = compareSlider.getBoundingClientRect();
+                let percent = ((clientX - rect.left) / rect.width) * 100;
+                percent = Math.max(2, Math.min(98, percent));
+                beforeLayer.style.clipPath = `inset(0 ${100 - percent}% 0 0)`;
+                handle.style.left = percent + '%';
+            }
+
+            compareSlider.addEventListener('mousedown', (e) => { isDragging = true; updateSlider(e.clientX); e.preventDefault(); });
+            document.addEventListener('mousemove', (e) => { if (isDragging) updateSlider(e.clientX); });
+            document.addEventListener('mouseup', () => { isDragging = false; });
+            compareSlider.addEventListener('touchstart', (e) => { isDragging = true; updateSlider(e.touches[0].clientX); }, { passive: true });
+            document.addEventListener('touchmove', (e) => { if (isDragging) updateSlider(e.touches[0].clientX); }, { passive: true });
+            document.addEventListener('touchend', () => { isDragging = false; });
+        }
+
+
+        // ========================================================
+        // 6. VOICE SAMPLE PLAYER
+        // ========================================================
+        let currentAudio = null;
+        let currentSample = null;
+
+        document.querySelectorAll('.voice-sample').forEach(sample => {
+            sample.addEventListener('click', () => {
+                const audioSrc = sample.dataset.audio;
+                if (!audioSrc) return;
+
+                if (currentSample === sample && currentAudio && !currentAudio.paused) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                    sample.classList.remove('is-playing');
+                    currentSample = null;
+                    return;
+                }
+
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                    if (currentSample) currentSample.classList.remove('is-playing');
+                }
+
+                currentAudio = new Audio(audioSrc);
+                currentSample = sample;
+                sample.classList.add('is-playing');
+
+                currentAudio.play().catch(() => { sample.classList.remove('is-playing'); });
+                currentAudio.addEventListener('ended', () => {
+                    sample.classList.remove('is-playing');
+                    currentSample = null;
+                });
+            });
+        });
+
+
+        // ========================================================
+        // 7. MILESTONE PROGRESS BARS
+        // ========================================================
+        const milestoneBars = document.querySelectorAll('.milestone__bar-fill');
+
+        const barObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const bar = entry.target;
+                    const width = bar.dataset.width || '0';
+                    setTimeout(() => { bar.style.width = width + '%'; }, 300);
+                    barObserver.unobserve(bar);
+                }
+            });
+        }, { threshold: 0.3 });
+
+        milestoneBars.forEach(bar => barObserver.observe(bar));
+
+
+        // ========================================================
+        // 8. FAQ TOGGLE
+        // ========================================================
+        document.querySelectorAll('.faq-question').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.closest('.faq-item');
+                const wasOpen = item.classList.contains('is-open');
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('is-open'));
+                if (!wasOpen) item.classList.add('is-open');
+            });
+        });
+
+
+        // ========================================================
+        // 9. WAVEFORM VISUALIZATION
+        // ========================================================
+        const waveformEl = document.getElementById('voiceWaveform');
+
+        if (waveformEl) {
+            const canvas = document.createElement('canvas');
+            canvas.width = waveformEl.offsetWidth * 2 || 800;
+            canvas.height = waveformEl.offsetHeight * 2 || 120;
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+            waveformEl.appendChild(canvas);
+
+            const ctx = canvas.getContext('2d');
+            const bars = 60;
+            const barWidth = canvas.width / bars;
+            let frame = 0;
+            let animating = false;
+
+            function drawWaveform() {
+                if (!animating) return;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const centerY = canvas.height / 2;
+
+                for (let i = 0; i < bars; i++) {
+                    const amplitude = Math.sin(i * 0.15 + frame * 0.03) *
+                                     Math.sin(i * 0.08 + frame * 0.02) *
+                                     centerY * 0.6;
+                    const height = Math.abs(amplitude) + 4;
+
+                    ctx.fillStyle = `rgba(212, 168, 83, ${0.3 + Math.abs(amplitude) / centerY * 0.5})`;
+                    ctx.fillRect(i * barWidth + 2, centerY - height / 2, barWidth - 4, height);
+                }
+                frame++;
+                requestAnimationFrame(drawWaveform);
+            }
+
+            const waveObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !animating) {
+                        animating = true;
+                        drawWaveform();
+                    } else if (!entry.isIntersecting) {
+                        animating = false;
+                    }
+                });
+            });
+            waveObserver.observe(waveformEl);
+        }
+
+
+        // ========================================================
+        // 10. WORSTENBROODJES DONATIE INTERFACE
+        // ========================================================
+        const PRICE_PER_WB = 2;
+        const TITLES = [
+            { min: 1, title: 'Dorpeling' },
+            { min: 5, title: 'Stamgast' },
+            { min: 10, title: 'Raadslid' },
+            { min: 25, title: 'Schepen' },
+            { min: 50, title: 'Burgemeester' },
+            { min: 100, title: 'Hertog' },
+        ];
+
+        let selectedAmount = 5;
+        const wbCount = document.getElementById('wbCount');
+        const wbImage = document.getElementById('wbImage');
+        const wbSummary = document.getElementById('wbSummary');
+        const wbEuro = document.getElementById('wbEuro');
+        const titleIndicator = document.getElementById('titleIndicator');
+        const quickSelect = document.getElementById('quickSelect');
+        const customBtn = document.getElementById('customBtn');
+        const customInput = document.getElementById('customInput');
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        const paymentPanel = document.getElementById('paymentPanel');
+
+        function getTitle(amount) {
+            let title = TITLES[0].title;
+            for (const t of TITLES) {
+                if (amount >= t.min) title = t.title;
+            }
+            return title;
+        }
+
+        function updateDonation(amount) {
+            selectedAmount = Math.max(1, Math.min(999, amount));
+            const total = selectedAmount * PRICE_PER_WB;
+
+            wbCount.textContent = selectedAmount;
+            wbSummary.textContent = selectedAmount + ' worstenbroodjes';
+            wbEuro.textContent = 'EUR ' + total;
+            titleIndicator.textContent = 'Jouw titel: ' + getTitle(selectedAmount);
+
+            // Bounce the image
+            wbImage.classList.remove('is-bouncing');
+            void wbImage.offsetWidth; // force reflow
+            wbImage.classList.add('is-bouncing');
+
+            // Update active button
+            document.querySelectorAll('.donate__quick-btn').forEach(b => {
+                b.classList.toggle('is-active',
+                    b.dataset.amount !== 'custom' && parseInt(b.dataset.amount) === selectedAmount);
+            });
+
+            // Update Mollie payment links
+            updatePaymentLinks(total);
+        }
+
+        function updatePaymentLinks(total) {
+            // Placeholder URLs — will be replaced with actual Mollie payment links
+            const baseUrl = 'https://reign-of-brabant.nl/api/payment';
+            const params = `?amount=${total}&description=Steun+Reign+of+Brabant+-+${selectedAmount}+worstenbroodjes`;
+
+            document.getElementById('payIdeal').href = baseUrl + params + '&method=ideal';
+            document.getElementById('payCreditcard').href = baseUrl + params + '&method=creditcard';
+            document.getElementById('payBancontact').href = baseUrl + params + '&method=bancontact';
+            document.getElementById('payPaypal').href = baseUrl + params + '&method=paypal';
+        }
+
+        // Quick-select buttons
+        quickSelect.addEventListener('click', (e) => {
+            const btn = e.target.closest('.donate__quick-btn');
+            if (!btn) return;
+
+            if (btn.dataset.amount === 'custom') {
+                customInput.classList.toggle('is-visible');
+                if (customInput.classList.contains('is-visible')) {
+                    customInput.focus();
+                }
+                return;
+            }
+
+            customInput.classList.remove('is-visible');
+            updateDonation(parseInt(btn.dataset.amount));
+        });
+
+        // Custom input
+        customInput.addEventListener('input', () => {
+            const val = parseInt(customInput.value);
+            if (val && val > 0) updateDonation(val);
+        });
+        customInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') customInput.blur();
+        });
+
+        // Checkout button
+        checkoutBtn.addEventListener('click', () => {
+            paymentPanel.classList.toggle('is-visible');
+            if (paymentPanel.classList.contains('is-visible')) {
+                paymentPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        });
+
+        // Crypto buttons
+        const btcAddress = 'bc1q_placeholder_btc_address';
+        const ethAddress = '0x_placeholder_eth_address';
+
+        document.getElementById('cryptoBtc').addEventListener('click', () => {
+            const detail = document.getElementById('btcDetail');
+            const wasVisible = detail.classList.contains('is-visible');
+            document.querySelectorAll('.donate__crypto-detail').forEach(d => d.classList.remove('is-visible'));
+            if (!wasVisible) {
+                detail.classList.add('is-visible');
+                // Generate QR
+                const qrContainer = document.getElementById('btcQr');
+                if (qrContainer.children.length === 0 && typeof QRCode !== 'undefined') {
+                    new QRCode(qrContainer, {
+                        text: 'bitcoin:' + btcAddress,
+                        width: 156, height: 156,
+                        colorDark: '#0a0806',
+                        colorLight: '#ffffff',
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                }
+            }
+        });
+
+        document.getElementById('cryptoEth').addEventListener('click', () => {
+            const detail = document.getElementById('ethDetail');
+            const wasVisible = detail.classList.contains('is-visible');
+            document.querySelectorAll('.donate__crypto-detail').forEach(d => d.classList.remove('is-visible'));
+            if (!wasVisible) {
+                detail.classList.add('is-visible');
+                const qrContainer = document.getElementById('ethQr');
+                if (qrContainer.children.length === 0 && typeof QRCode !== 'undefined') {
+                    new QRCode(qrContainer, {
+                        text: 'ethereum:' + ethAddress,
+                        width: 156, height: 156,
+                        colorDark: '#0a0806',
+                        colorLight: '#ffffff',
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                }
+            }
+        });
+
+        // Copy crypto addresses
+        document.getElementById('btcCopy').addEventListener('click', () => {
+            navigator.clipboard.writeText(btcAddress).then(() => {
+                document.getElementById('btcCopy').textContent = 'Gekopieerd!';
+                setTimeout(() => { document.getElementById('btcCopy').textContent = 'Klik om te kopieren'; }, 2000);
+            });
+        });
+        document.getElementById('ethCopy').addEventListener('click', () => {
+            navigator.clipboard.writeText(ethAddress).then(() => {
+                document.getElementById('ethCopy').textContent = 'Gekopieerd!';
+                setTimeout(() => { document.getElementById('ethCopy').textContent = 'Klik om te kopieren'; }, 2000);
+            });
+        });
+
+        // Initialize
+        updateDonation(5);
+
+
+        // ========================================================
+        // 11. SMOOTH SCROLL
+        // ========================================================
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+
+        // ========================================================
+        // 12. KONAMI CODE EASTER EGG
+        // ========================================================
+        const konamiSequence = [
+            'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
+            'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight',
+            'KeyB', 'KeyA'
+        ];
+        let konamiIndex = 0;
+        let konamiTriggered = false;
+
+        document.addEventListener('keydown', (e) => {
+            if (konamiTriggered) return;
+
+            if (e.code === konamiSequence[konamiIndex]) {
+                konamiIndex++;
+                if (konamiIndex === konamiSequence.length) {
+                    konamiTriggered = true;
+                    triggerKonami();
+                }
+            } else {
+                konamiIndex = 0;
+            }
+        });
+
+        function triggerKonami() {
+            // Create overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'konami-overlay';
+            document.body.appendChild(overlay);
+
+            // ALAAF text
+            const text = document.createElement('div');
+            text.className = 'konami-text';
+            text.textContent = 'ALAAF!';
+            document.body.appendChild(text);
+
+            // Confetti
+            const colors = ['#d4a853', '#E07020', '#3498DB', '#27AE60', '#E74C3C', '#f0d78c'];
+            for (let i = 0; i < 80; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'confetti-particle';
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const startX = Math.random() * 100;
+                const endX = startX + (Math.random() - 0.5) * 40;
+                const size = 6 + Math.random() * 10;
+                const duration = 1.5 + Math.random() * 2;
+                const delay = Math.random() * 0.5;
+                const rotation = Math.random() * 720;
+
+                particle.style.cssText = `
+                    left: ${startX}vw; top: -20px;
+                    width: ${size}px; height: ${size * 0.6}px;
+                    background: ${color};
+                    border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+                    animation: confettiFall ${duration}s ${delay}s ease-out forwards;
+                    --end-x: ${endX - startX}vw;
+                    --rotation: ${rotation}deg;
+                `;
+                overlay.appendChild(particle);
+            }
+
+            // Add confetti keyframes if not present
+            if (!document.getElementById('confettiStyle')) {
+                const style = document.createElement('style');
+                style.id = 'confettiStyle';
+                style.textContent = `
+                    @keyframes confettiFall {
+                        0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 1; }
+                        100% {
+                            transform: translateY(100vh) translateX(var(--end-x)) rotate(var(--rotation));
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            // Cleanup
+            setTimeout(() => {
+                overlay.remove();
+                text.remove();
+            }, 4000);
+        }
+
+    })();
+    </script>
+
+</body>
+</html>

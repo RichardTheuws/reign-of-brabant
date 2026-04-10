@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bedankt! — Reign of Brabant</title>
+    <meta name="description" content="Je hebt Reign of Brabant gesteund met worstenbroodjes. Het Hertogdom dankt je.">
+    <meta property="og:title" content="Ik steun Reign of Brabant">
+    <meta property="og:description" content="Een RTS met vier facties, Brabants dialect en meer ambitie dan verstand. Gebouwd door een mens en een AI.">
+    <meta property="og:image" content="/assets/ui/og-image.png">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://reign-of-brabant.nl/steun/bedankt/">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+    /* ============================================================
+       REIGN OF BRABANT — BEDANKT PAGE
+       Post-donation celebration with confetti + badge generator
+       ============================================================ */
+
+    /* --- CSS Custom Properties --------------------------------- */
+    :root {
+        --bg-abyss: #060504;
+        --bg-dark: #0a0806;
+        --bg-card: #12100d;
+        --bg-elevated: #1a1610;
+        --bg-panel: rgba(20, 15, 10, 0.92);
+
+        --gold: #d4a853;
+        --gold-light: #e8c065;
+        --gold-glow: rgba(212, 168, 83, 0.4);
+        --gold-dim: rgba(212, 168, 83, 0.15);
+        --parchment: #F5E6C8;
+        --cream: #e8e6e3;
+
+        --text-primary: #e8e6e3;
+        --text-secondary: #a09888;
+        --text-muted: #6a6050;
+        --border: rgba(212, 168, 83, 0.25);
+        --border-hover: rgba(212, 168, 83, 0.6);
+
+        --brabant: #E07020;
+        --brabant-glow: rgba(224, 112, 32, 0.3);
+        --randstad: #3498DB;
+        --limburg: #27AE60;
+        --belgen: #E74C3C;
+
+        --font-heading: 'Cinzel', serif;
+        --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
+
+        --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+        --content-width: 1100px;
+        --content-narrow: 760px;
+    }
+
+    /* --- Reset ------------------------------------------------- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+        background: var(--bg-abyss);
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        line-height: 1.7;
+        overflow-x: hidden;
+        min-height: 100vh;
+    }
+
+    a { color: var(--gold-light); text-decoration: none; }
+    a:hover { color: var(--gold); }
+
+    /* --- Confetti ---------------------------------------------- */
+    .confetti-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1000;
+        overflow: hidden;
+        animation: confetti-fadeout 5s ease-in forwards;
+    }
+
+    @keyframes confetti-fadeout {
+        0%, 70% { opacity: 1; }
+        100% { opacity: 0; }
+    }
+
+    .confetti-piece {
+        position: absolute;
+        top: -20px;
+        width: 10px;
+        height: 10px;
+        animation: confetti-fall linear forwards;
+    }
+
+    @keyframes confetti-fall {
+        0% {
+            transform: translateY(-100vh) rotate(0deg) scale(1);
+            opacity: 1;
+        }
+        80% {
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(100vh) rotate(720deg) scale(0.5);
+            opacity: 0;
+        }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+        .confetti-container { display: none; }
+        .hero-count { animation: none !important; }
+        .hero-section { animation: none !important; }
+        .title-reveal { animation: none !important; opacity: 1 !important; }
+    }
+
+    /* --- Background texture ------------------------------------ */
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background:
+            radial-gradient(ellipse at 50% 0%, rgba(212, 168, 83, 0.06) 0%, transparent 60%),
+            radial-gradient(ellipse at 50% 100%, rgba(224, 112, 32, 0.04) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    /* --- Layout ------------------------------------------------ */
+    .page-wrapper {
+        position: relative;
+        z-index: 1;
+        max-width: var(--content-narrow);
+        margin: 0 auto;
+        padding: 2rem 1.5rem 4rem;
+    }
+
+    /* --- Hero Section ------------------------------------------ */
+    .hero-section {
+        text-align: center;
+        padding: 4rem 0 3rem;
+        animation: hero-enter 1s var(--ease-out-expo) forwards;
+    }
+
+    @keyframes hero-enter {
+        0% { opacity: 0; transform: translateY(30px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-count-line {
+        font-family: var(--font-heading);
+        font-weight: 900;
+        font-size: clamp(2rem, 6vw, 3.5rem);
+        color: var(--gold-light);
+        line-height: 1.2;
+        margin-bottom: 0.5rem;
+        text-shadow:
+            0 0 20px var(--gold-glow),
+            0 0 60px rgba(212, 168, 83, 0.2);
+    }
+
+    .hero-count {
+        display: inline-block;
+        min-width: 1.5ch;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .hero-subtitle {
+        font-size: clamp(1rem, 2.5vw, 1.25rem);
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+        line-height: 1.6;
+    }
+
+    .hero-subtitle .donor-name {
+        color: var(--cream);
+        font-weight: 600;
+    }
+
+    .title-reveal {
+        display: inline-block;
+        font-family: var(--font-heading);
+        font-weight: 700;
+        font-size: clamp(1.5rem, 4vw, 2.2rem);
+        color: var(--gold);
+        margin-top: 1rem;
+        text-shadow:
+            0 0 30px var(--gold-glow),
+            0 0 80px rgba(212, 168, 83, 0.15);
+        animation: title-glow 2s ease-in-out infinite alternate;
+        opacity: 0;
+        animation: title-appear 0.8s 1.5s var(--ease-out-back) forwards,
+                   title-glow 2s 2.3s ease-in-out infinite alternate;
+    }
+
+    @keyframes title-appear {
+        0% { opacity: 0; transform: scale(0.8); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes title-glow {
+        0% { text-shadow: 0 0 20px var(--gold-glow), 0 0 60px rgba(212, 168, 83, 0.1); }
+        100% { text-shadow: 0 0 40px var(--gold-glow), 0 0 100px rgba(212, 168, 83, 0.25); }
+    }
+
+    /* --- Divider ----------------------------------------------- */
+    .section-divider {
+        width: 120px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        margin: 2.5rem auto;
+        border: none;
+    }
+
+    /* --- Badge Section ----------------------------------------- */
+    .badge-section {
+        margin-bottom: 3rem;
+    }
+
+    .badge-section h2 {
+        font-family: var(--font-heading);
+        font-size: 1.1rem;
+        color: var(--gold);
+        text-align: center;
+        margin-bottom: 1.5rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+    }
+
+    .badge-canvas-wrapper {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .badge-canvas-wrapper canvas {
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+    }
+
+    .badge-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        justify-content: center;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-family: var(--font-body);
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--gold), var(--gold-light));
+        color: #0a0806;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 20px var(--gold-glow);
+    }
+
+    .btn-secondary {
+        background: var(--bg-elevated);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+        border-color: var(--border-hover);
+        background: var(--bg-card);
+    }
+
+    .btn-twitter {
+        background: #1DA1F2;
+        color: #fff;
+    }
+
+    .btn-twitter:hover {
+        background: #0d8ddb;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 20px rgba(29, 161, 242, 0.3);
+    }
+
+    .btn svg {
+        width: 18px;
+        height: 18px;
+        fill: currentColor;
+        flex-shrink: 0;
+    }
+
+    /* Copy feedback */
+    .btn[data-copied="true"]::after {
+        content: 'Gekopieerd!';
+        position: absolute;
+        top: -2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.75rem;
+        color: var(--gold);
+        animation: copy-fade 1.5s forwards;
+    }
+
+    @keyframes copy-fade {
+        0%, 60% { opacity: 1; }
+        100% { opacity: 0; }
+    }
+
+    .btn { position: relative; }
+
+    /* --- Next Actions ------------------------------------------ */
+    .next-actions {
+        margin-bottom: 3rem;
+    }
+
+    .next-actions h2 {
+        font-family: var(--font-heading);
+        font-size: 1.1rem;
+        color: var(--gold);
+        text-align: center;
+        margin-bottom: 1.5rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+    }
+
+    .action-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .action-card {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.25rem 1.5rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        color: var(--text-primary);
+        cursor: pointer;
+    }
+
+    .action-card:hover {
+        border-color: var(--border-hover);
+        background: var(--bg-elevated);
+        transform: translateX(4px);
+    }
+
+    .action-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .action-icon svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .action-icon--gold {
+        background: var(--gold-dim);
+    }
+
+    .action-icon--gold svg { fill: var(--gold); }
+
+    .action-icon--orange {
+        background: var(--brabant-glow);
+    }
+
+    .action-icon--orange svg { fill: var(--brabant); }
+
+    .action-icon--blue {
+        background: rgba(52, 152, 219, 0.15);
+    }
+
+    .action-icon--blue svg { fill: var(--randstad); }
+
+    .action-text strong {
+        display: block;
+        font-size: 0.95rem;
+        margin-bottom: 0.15rem;
+    }
+
+    .action-text span {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+
+    /* --- Voice Line -------------------------------------------- */
+    .voice-section {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+    }
+
+    .voice-section p {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 0.75rem;
+        font-style: italic;
+    }
+
+    .voice-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1.2rem;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--gold);
+        font-family: var(--font-body);
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .voice-btn:hover {
+        border-color: var(--border-hover);
+        background: var(--bg-card);
+    }
+
+    .voice-btn svg {
+        width: 16px;
+        height: 16px;
+        fill: var(--gold);
+    }
+
+    .voice-btn.playing {
+        border-color: var(--gold);
+        color: var(--gold-light);
+    }
+
+    /* --- Footer ------------------------------------------------ */
+    .page-footer {
+        text-align: center;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(212, 168, 83, 0.1);
+    }
+
+    .footer-tagline {
+        font-family: var(--font-heading);
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        letter-spacing: 0.15em;
+    }
+
+    .footer-link {
+        display: block;
+        margin-top: 0.5rem;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+
+    .footer-link:hover { color: var(--gold); }
+
+    /* --- Fallback State ---------------------------------------- */
+    .fallback-state {
+        text-align: center;
+        padding: 6rem 1.5rem;
+    }
+
+    .fallback-state h1 {
+        font-family: var(--font-heading);
+        font-size: clamp(1.5rem, 4vw, 2rem);
+        color: var(--gold);
+        margin-bottom: 1rem;
+    }
+
+    .fallback-state p {
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+    }
+
+    /* --- Responsive -------------------------------------------- */
+    @media (min-width: 640px) {
+        .action-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .badge-actions {
+            flex-wrap: nowrap;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .page-wrapper {
+            padding: 1rem 1rem 3rem;
+        }
+
+        .hero-section {
+            padding: 3rem 0 2rem;
+        }
+
+        .badge-actions {
+            flex-direction: column;
+        }
+
+        .badge-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+    </style>
+</head>
+<body>
+
+<!-- Confetti container — populated by JS, CSS-animated -->
+<div class="confetti-container" id="confettiContainer" aria-hidden="true"></div>
+
+<!-- Main content (shown when params exist) -->
+<div class="page-wrapper" id="mainContent" style="display:none;">
+
+    <!-- Hero Confirmation -->
+    <section class="hero-section">
+        <div class="hero-count-line">
+            <span class="hero-count" id="heroCount">0</span> worstenbroodjes afgeleverd!
+        </div>
+        <p class="hero-subtitle">
+            Bedankt, <span class="donor-name" id="donorName">held</span>!
+            Je bent nu <span id="titleInline" style="color:var(--gold);font-weight:600;"></span> van het Hertogdom.
+        </p>
+        <div class="title-reveal" id="titleReveal"></div>
+    </section>
+
+    <hr class="section-divider">
+
+    <!-- Shareable Badge -->
+    <section class="badge-section">
+        <h2>Jouw badge</h2>
+        <div class="badge-canvas-wrapper">
+            <canvas id="badgeCanvas" width="1200" height="630"></canvas>
+        </div>
+        <div class="badge-actions">
+            <button class="btn btn-primary" id="btnDownload">
+                <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                Download badge
+            </button>
+            <a class="btn btn-twitter" id="btnTwitter" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                Deel op X
+            </a>
+            <button class="btn btn-secondary" id="btnCopy">
+                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                Kopieer link
+            </button>
+        </div>
+    </section>
+
+    <hr class="section-divider">
+
+    <!-- Voice Line (optional — shown when audio exists) -->
+    <section class="voice-section" id="voiceSection" style="display:none;">
+        <p>"Het Hertogdom dankt u voor uw steun."</p>
+        <button class="voice-btn" id="voiceBtn">
+            <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+            Luister naar de Prins
+        </button>
+        <audio id="voiceAudio" preload="auto"></audio>
+    </section>
+
+    <!-- Next Actions -->
+    <section class="next-actions">
+        <h2>Wat nu?</h2>
+        <div class="action-grid">
+            <a href="/steun/" class="action-card">
+                <div class="action-icon action-icon--gold">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                </div>
+                <div class="action-text">
+                    <strong>Nog een ronde?</strong>
+                    <span>Meer worstenbroodjes, hogere titel</span>
+                </div>
+            </a>
+            <a href="/play/" class="action-card">
+                <div class="action-icon action-icon--orange">
+                    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </div>
+                <div class="action-text">
+                    <strong>Terug naar de game</strong>
+                    <span>Brabant wacht op je bevelen</span>
+                </div>
+            </a>
+            <button class="action-card" id="btnShare" style="border:none;font:inherit;text-align:left;">
+                <div class="action-icon action-icon--blue">
+                    <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+                </div>
+                <div class="action-text">
+                    <strong>Vertel het verder</strong>
+                    <span>Kopieer de link naar de steunpagina</span>
+                </div>
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="page-footer">
+        <p class="footer-tagline">Een mens. Een AI. Een game.</p>
+        <a href="https://reign-of-brabant.nl" class="footer-link">reign-of-brabant.nl</a>
+    </footer>
+</div>
+
+<!-- Fallback (shown when params missing) -->
+<div class="page-wrapper" id="fallbackContent" style="display:none;">
+    <section class="fallback-state">
+        <h1>Je hebt het Hertogdom gevonden!</h1>
+        <p>Steun Reign of Brabant en word deel van het verhaal.</p>
+        <a href="/steun/" class="btn btn-primary">Naar de steunpagina</a>
+    </section>
+    <footer class="page-footer">
+        <p class="footer-tagline">Een mens. Een AI. Een game.</p>
+        <a href="https://reign-of-brabant.nl" class="footer-link">reign-of-brabant.nl</a>
+    </footer>
+</div>
+
+<script>
+(function() {
+    'use strict';
+
+    /* ============================================================
+       CONFIG
+       ============================================================ */
+
+    const TITLES = {
+        1:   'Dorpeling',
+        5:   'Stamgast',
+        15:  'Raadslid',
+        25:  'Schepen',
+        50:  'Burgemeester',
+        100: 'Hertog van Brabant',
+        250: 'Opperworstenansen'
+    };
+
+    const CONFETTI_COLORS = [
+        '#E07020', // Brabant orange
+        '#3498DB', // Randstad blue
+        '#27AE60', // Limburg green
+        '#E74C3C', // Belgen red
+        '#d4a853', // Gold
+        '#e8c065'  // Gold light
+    ];
+
+    const CONFETTI_COUNT = 40;
+
+    /* ============================================================
+       URL PARAMS
+       ============================================================ */
+
+    const params = new URLSearchParams(window.location.search);
+    const broodjesRaw = parseInt(params.get('broodjes'), 10);
+    const broodjes = isNaN(broodjesRaw) || broodjesRaw < 1 ? 0 : broodjesRaw;
+    const naam = params.get('naam') || 'onbekende held';
+    const titelParam = params.get('titel') || '';
+
+    /* ============================================================
+       TITLE LOOKUP
+       ============================================================ */
+
+    function getTitleForCount(count) {
+        const thresholds = Object.keys(TITLES).map(Number).sort((a, b) => a - b);
+        let title = TITLES[thresholds[0]];
+        for (const threshold of thresholds) {
+            if (count >= threshold) {
+                title = TITLES[threshold];
+            }
+        }
+        return title;
+    }
+
+    const titel = titelParam || getTitleForCount(broodjes);
+
+    /* ============================================================
+       ROUTING: show main or fallback
+       ============================================================ */
+
+    if (broodjes === 0) {
+        document.getElementById('fallbackContent').style.display = '';
+        return;
+    }
+
+    document.getElementById('mainContent').style.display = '';
+
+    /* ============================================================
+       CONFETTI (CSS-only animation, JS creates elements)
+       ============================================================ */
+
+    function spawnConfetti() {
+        // Respect reduced motion
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        const container = document.getElementById('confettiContainer');
+        for (let i = 0; i < CONFETTI_COUNT; i++) {
+            const piece = document.createElement('div');
+            piece.className = 'confetti-piece';
+            const color = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+            const left = Math.random() * 100;
+            const delay = Math.random() * 2.5;
+            const duration = 2.5 + Math.random() * 2;
+            const size = 6 + Math.random() * 10;
+            const shape = Math.random() > 0.5 ? '50%' : '2px';
+
+            piece.style.cssText = `
+                left: ${left}%;
+                width: ${size}px;
+                height: ${size}px;
+                background: ${color};
+                border-radius: ${shape};
+                animation-duration: ${duration}s;
+                animation-delay: ${delay}s;
+            `;
+            container.appendChild(piece);
+        }
+
+        // Clean up after animation
+        setTimeout(function() {
+            container.remove();
+        }, 6000);
+    }
+
+    spawnConfetti();
+
+    /* ============================================================
+       COUNTING ANIMATION
+       ============================================================ */
+
+    function animateCount(element, target) {
+        const duration = 1500;
+        const start = performance.now();
+
+        function tick(now) {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            // Ease out cubic
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const current = Math.round(eased * target);
+            element.textContent = current;
+            if (progress < 1) {
+                requestAnimationFrame(tick);
+            }
+        }
+
+        requestAnimationFrame(tick);
+    }
+
+    const heroCount = document.getElementById('heroCount');
+    // Delay count animation slightly so page settles
+    setTimeout(function() {
+        animateCount(heroCount, broodjes);
+    }, 300);
+
+    /* ============================================================
+       POPULATE TEXT
+       ============================================================ */
+
+    document.getElementById('donorName').textContent = naam;
+    document.getElementById('titleInline').textContent = titel;
+    document.getElementById('titleReveal').textContent = titel;
+
+    /* ============================================================
+       BADGE CANVAS
+       ============================================================ */
+
+    function drawBadge() {
+        var canvas = document.getElementById('badgeCanvas');
+        var ctx = canvas.getContext('2d');
+        var w = canvas.width;
+        var h = canvas.height;
+
+        // Background
+        ctx.fillStyle = '#0a0806';
+        ctx.fillRect(0, 0, w, h);
+
+        // Gold border
+        ctx.strokeStyle = '#d4a853';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(12, 12, w - 24, h - 24);
+
+        // Inner subtle border
+        ctx.strokeStyle = 'rgba(212, 168, 83, 0.2)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(20, 20, w - 40, h - 40);
+
+        // Decorative corner accents
+        var cornerSize = 30;
+        ctx.strokeStyle = '#d4a853';
+        ctx.lineWidth = 2;
+        // Top-left
+        ctx.beginPath(); ctx.moveTo(12, 42); ctx.lineTo(12, 12); ctx.lineTo(42, 12); ctx.stroke();
+        // Top-right
+        ctx.beginPath(); ctx.moveTo(w-42, 12); ctx.lineTo(w-12, 12); ctx.lineTo(w-12, 42); ctx.stroke();
+        // Bottom-left
+        ctx.beginPath(); ctx.moveTo(12, h-42); ctx.lineTo(12, h-12); ctx.lineTo(42, h-12); ctx.stroke();
+        // Bottom-right
+        ctx.beginPath(); ctx.moveTo(w-42, h-12); ctx.lineTo(w-12, h-12); ctx.lineTo(w-12, h-42); ctx.stroke();
+
+        // Top text: "Ik steun Reign of Brabant"
+        ctx.fillStyle = '#d4a853';
+        ctx.font = '700 36px "Cinzel", Georgia, serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('Ik steun Reign of Brabant', w / 2, 100);
+
+        // Decorative line under heading
+        ctx.strokeStyle = 'rgba(212, 168, 83, 0.5)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(w / 2 - 180, 135);
+        ctx.lineTo(w / 2 + 180, 135);
+        ctx.stroke();
+
+        // Worstenbroodje count (large)
+        ctx.fillStyle = '#e8c065';
+        ctx.font = '900 96px "Cinzel", Georgia, serif';
+        ctx.fillText(broodjes.toString(), w / 2, 260);
+
+        // "worstenbroodjes" label
+        ctx.fillStyle = '#a09888';
+        ctx.font = '400 28px "Inter", "Segoe UI", sans-serif';
+        ctx.fillText('worstenbroodjes', w / 2, 320);
+
+        // Title
+        ctx.fillStyle = '#d4a853';
+        ctx.font = '700 42px "Cinzel", Georgia, serif';
+        ctx.fillText(titel, w / 2, 410);
+
+        // Donor name (if provided and not default)
+        if (naam && naam !== 'onbekende held') {
+            ctx.fillStyle = '#e8e6e3';
+            ctx.font = '400 22px "Inter", "Segoe UI", sans-serif';
+            ctx.fillText(naam, w / 2, 460);
+        }
+
+        // Bottom line
+        ctx.strokeStyle = 'rgba(212, 168, 83, 0.3)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(w / 2 - 200, 520);
+        ctx.lineTo(w / 2 + 200, 520);
+        ctx.stroke();
+
+        // URL
+        ctx.fillStyle = '#6a6050';
+        ctx.font = '400 20px "Inter", "Segoe UI", sans-serif';
+        ctx.fillText('reign-of-brabant.nl/steun', w / 2, 558);
+
+        // Tagline
+        ctx.fillStyle = '#4a4238';
+        ctx.font = '300 16px "Inter", "Segoe UI", sans-serif';
+        ctx.fillText('Een mens. Een AI. Een game.', w / 2, 590);
+    }
+
+    // Wait a tick for fonts to load (or proceed anyway)
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(drawBadge);
+    } else {
+        setTimeout(drawBadge, 500);
+    }
+
+    /* ============================================================
+       BADGE DOWNLOAD
+       ============================================================ */
+
+    document.getElementById('btnDownload').addEventListener('click', function() {
+        var canvas = document.getElementById('badgeCanvas');
+        canvas.toBlob(function(blob) {
+            if (!blob) return;
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'reign-of-brabant-badge.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+        }, 'image/png');
+    });
+
+    /* ============================================================
+       SHARE BUTTONS
+       ============================================================ */
+
+    var shareUrl = 'https://reign-of-brabant.nl/steun/';
+    var tweetText = 'Ik heb ' + broodjes + ' worstenbroodjes gedoneerd aan Reign of Brabant \u2014 een WarCraft-achtige RTS gebouwd door een mens en een AI. Steun het project:';
+
+    // Twitter/X
+    document.getElementById('btnTwitter').href =
+        'https://twitter.com/intent/tweet?text=' + encodeURIComponent(tweetText) +
+        '&url=' + encodeURIComponent(shareUrl);
+
+    // Copy link
+    document.getElementById('btnCopy').addEventListener('click', function() {
+        var btn = this;
+        navigator.clipboard.writeText(shareUrl).then(function() {
+            btn.setAttribute('data-copied', 'true');
+            var orig = btn.innerHTML;
+            btn.querySelector('svg + *') || btn;
+            var textNode = btn.childNodes[btn.childNodes.length - 1];
+            if (textNode.nodeType === 3) {
+                textNode.textContent = ' Gekopieerd!';
+                setTimeout(function() {
+                    textNode.textContent = ' Kopieer link';
+                    btn.removeAttribute('data-copied');
+                }, 2000);
+            }
+        });
+    });
+
+    // Share action card
+    document.getElementById('btnShare').addEventListener('click', function() {
+        if (navigator.share) {
+            navigator.share({
+                title: 'Steun Reign of Brabant',
+                text: tweetText,
+                url: shareUrl
+            });
+        } else {
+            navigator.clipboard.writeText(shareUrl).then(function() {
+                var textEl = document.querySelector('#btnShare .action-text span');
+                if (textEl) {
+                    var origText = textEl.textContent;
+                    textEl.textContent = 'Link gekopieerd!';
+                    textEl.style.color = 'var(--gold)';
+                    setTimeout(function() {
+                        textEl.textContent = origText;
+                        textEl.style.color = '';
+                    }, 2000);
+                }
+            });
+        }
+    });
+
+    /* ============================================================
+       VOICE LINE (optional)
+       ============================================================ */
+
+    // Check if a thank-you voice audio exists
+    var voiceUrl = '/assets/audio/voices/bedankt.mp3';
+    var voiceAudio = document.getElementById('voiceAudio');
+
+    function initVoice() {
+        var testAudio = new Audio();
+        testAudio.addEventListener('canplaythrough', function() {
+            voiceAudio.src = voiceUrl;
+            document.getElementById('voiceSection').style.display = '';
+
+            document.getElementById('voiceBtn').addEventListener('click', function() {
+                var btn = this;
+                if (voiceAudio.paused) {
+                    voiceAudio.play();
+                    btn.classList.add('playing');
+                } else {
+                    voiceAudio.pause();
+                    voiceAudio.currentTime = 0;
+                    btn.classList.remove('playing');
+                }
+            });
+
+            voiceAudio.addEventListener('ended', function() {
+                document.getElementById('voiceBtn').classList.remove('playing');
+            });
+        }, { once: true });
+
+        testAudio.addEventListener('error', function() {
+            // No voice file available — section stays hidden
+        }, { once: true });
+
+        testAudio.src = voiceUrl;
+    }
+
+    initVoice();
+
+})();
+</script>
+
+</body>
+</html>
