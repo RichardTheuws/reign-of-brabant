@@ -18,6 +18,19 @@ import { PostProcessing } from './rendering/PostProcessing';
 import { ParticleSystem } from './rendering/ParticleSystem';
 
 // ---------------------------------------------------------------------------
+// Version (injected by Vite from package.json)
+// ---------------------------------------------------------------------------
+declare const __APP_VERSION__: string;
+const appVersion = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev';
+document.querySelectorAll('.menu-version, .loading-version').forEach(el => {
+  el.textContent = `v${appVersion}`;
+});
+const debugVersion = document.getElementById('fps-value')?.parentElement;
+if (debugVersion) {
+  debugVersion.innerHTML = debugVersion.innerHTML.replace(/v__VERSION__/, `v${appVersion}`);
+}
+
+// ---------------------------------------------------------------------------
 // Renderer
 // ---------------------------------------------------------------------------
 const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
