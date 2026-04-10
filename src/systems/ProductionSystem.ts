@@ -38,9 +38,11 @@ import {
   NO_ENTITY,
   CARRY_CAPACITY,
   MAP_SIZE,
+  MINIMUM_MELEE_RANGE,
 } from '../types/index';
 import { onRandstadActionCompleted } from './BureaucracySystem';
 import { ceoProductionBuff } from './HeroSystem';
+import { getFactionUnitArchetype } from '../data/factionData';
 import type { GameWorld } from '../ecs/world';
 
 // ---------------------------------------------------------------------------
@@ -66,7 +68,7 @@ const UNIT_TEMPLATES: Record<number, UnitTemplate> = {
     attackSpeed: 2.0,
     armor: 0,
     speed: 4.5,
-    range: 1.0,
+    range: MINIMUM_MELEE_RANGE,
     sightRange: 8,
     population: 1,
     carryCapacity: CARRY_CAPACITY,
@@ -78,7 +80,7 @@ const UNIT_TEMPLATES: Record<number, UnitTemplate> = {
     attackSpeed: 1.5,
     armor: 2,
     speed: 4.0,
-    range: 1.0,
+    range: MINIMUM_MELEE_RANGE,
     sightRange: 8,
     population: 1,
     carryCapacity: 0,
@@ -106,7 +108,7 @@ const RANDSTAD_UNIT_TEMPLATES: Record<number, UnitTemplate> = {
     attackSpeed: 1.5,
     armor: 0,
     speed: 5.5,
-    range: 1.0,
+    range: MINIMUM_MELEE_RANGE,
     sightRange: 8,
     population: 1,
     carryCapacity: 8,   // Stagiair carries less
@@ -184,7 +186,7 @@ export function createProductionSystem() {
           onRandstadActionCompleted(factionId);
 
           // Shift queue: move next queued unit into production
-          shiftQueue(bEid);
+          shiftQueue(bEid, factionId);
         } else {
           // Population full — pause production, hold progress at 1.0
           // Unit stays in slot until population frees up (unit dies or housing built)
@@ -324,7 +326,7 @@ function spawnUnit(
  * Shift the production queue: move queue[0] into active production,
  * shift everything down by one slot.
  */
-function shiftQueue(bEid: number): void {
+function shiftQueue(bEid: number, factionId: number): void {
   const slots = [
     Production.queue0,
     Production.queue1,
@@ -341,16 +343,12 @@ function shiftQueue(bEid: number): void {
     Production.unitType[bEid] = nextType;
     Production.progress[bEid] = 0;
 
-    // Determine build time for next unit
-    const template = UNIT_TEMPLATES[nextType];
-    if (template) {
-      // Duration was already set when queued, but we recalculate for safety
-      const buildTimes: Record<number, number> = {
-        [UnitTypeId.Worker]: 12,
-        [UnitTypeId.Infantry]: 18,
-        [UnitTypeId.Ranged]: 20,
-      };
-      Production.duration[bEid] = buildTimes[nextType] || 15;
+    // Determine build time for next unit from faction data
+    try {
+      const arch = getFactionUnitArchetype(factionId, nextType);
+      Production.duration[bEid] = arch.buildTime;
+    } catch {
+      Production.duration[bEid] = 15;
     }
 
     // Shift queue slots down

@@ -19,6 +19,7 @@ import {
   type EntityId,
   MAP_SIZE,
 } from '../types/index';
+import { getFactionUnitArchetype } from '../data/factionData';
 import {
   AIController,
   AICommandType,
@@ -511,12 +512,12 @@ function executeCommand(
     case AICommandType.TrainUnit: {
       if (cmd.targetEntityId == null || cmd.unitType == null) break;
 
-      // Check gold cost (must match AIController costs)
-      let cost = 50; // Worker default
-      if (cmd.unitType === UnitTypeId.Infantry) cost = 60;
-      if (cmd.unitType === UnitTypeId.Ranged) cost = 80;
-      if (cmd.unitType === UnitTypeId.Heavy) cost = 120;
-      if (cmd.unitType === UnitTypeId.Support) cost = 100;
+      let cost: number;
+      try {
+        cost = getFactionUnitArchetype(aiFactionId, cmd.unitType).costGold;
+      } catch {
+        cost = 50;
+      }
 
       if (!cb.deductGold(cost)) break;
 

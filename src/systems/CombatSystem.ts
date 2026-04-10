@@ -33,6 +33,7 @@ import {
   AGGRO_RANGE,
   SELF_DEFENSE_RANGE,
   NO_ENTITY,
+  MINIMUM_MELEE_RANGE,
 } from '../types/index';
 import { eventBus } from '../core/EventBus';
 import type { GameWorld } from '../ecs/world';
@@ -104,8 +105,7 @@ function processAttacking(world: GameWorld, eid: number, dt: number): void {
   _dx = Position.x[targetEid] - Position.x[eid];
   _dz = Position.z[targetEid] - Position.z[eid];
   _distSq = _dx * _dx + _dz * _dz;
-  // Melee range = 0 in archetypes, use minimum effective range of 1.5
-  const range = Math.max(Attack.range[eid], 1.5);
+  const range = Attack.range[eid];
   const rangeSq = range * range;
 
   if (_distSq > rangeSq) {
@@ -162,7 +162,7 @@ function processAttacking(world: GameWorld, eid: number, dt: number): void {
   }
 
   // Emit combat-hit event for audio
-  const isRanged = Attack.range[eid] > 1.5;
+  const isRanged = Attack.range[eid] > MINIMUM_MELEE_RANGE;
   eventBus.emit('combat-hit', {
     attackerEid: eid,
     targetEid,

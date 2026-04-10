@@ -11,6 +11,7 @@ import {
   UnitTypeId,
   BuildingTypeId,
   ArmorType,
+  MINIMUM_MELEE_RANGE,
   type UnitArchetype,
   type BuildingArchetype,
   type GoldMineDefinition,
@@ -33,7 +34,7 @@ export const UNIT_ARCHETYPES: readonly UnitArchetype[] = [
     armor: 0,
     armorType: ArmorType.Unarmored,
     speed: 5.0,           // world units per second
-    range: 0,             // melee
+    range: MINIMUM_MELEE_RANGE,
     buildTime: 15,        // seconds to train
     costGold: 50,
     costSecondary: 0,
@@ -53,7 +54,7 @@ export const UNIT_ARCHETYPES: readonly UnitArchetype[] = [
     armor: 1,
     armorType: ArmorType.Light,
     speed: 5.5,
-    range: 0,             // melee
+    range: MINIMUM_MELEE_RANGE,
     buildTime: 18,
     costGold: 75,
     costSecondary: 25,    // secondary resource (not used in PoC, gold only)
@@ -100,7 +101,7 @@ export const RANDSTAD_UNIT_ARCHETYPES: readonly UnitArchetype[] = [
     armor: 0,
     armorType: ArmorType.Unarmored,
     speed: 5.5,
-    range: 0,
+    range: MINIMUM_MELEE_RANGE,
     buildTime: 12,
     costGold: 35,
     costSecondary: 0,

@@ -32,6 +32,7 @@ import {
   MAP_SIZE,
   type EntityId,
 } from '../types/index';
+import { getFactionUnitArchetype } from '../data/factionData';
 import { distance2D } from '../utils/math';
 
 // ---------------------------------------------------------------------------
@@ -43,21 +44,6 @@ const DECISION_INTERVAL = 2.0;
 
 /** Gold cost for a Barracks. */
 const BARRACKS_COST = 200;
-
-/** Gold cost for an Infantry unit. */
-const INFANTRY_COST = 60;
-
-/** Gold cost for a Ranged unit. */
-const RANGED_COST = 80;
-
-/** Gold cost for a Heavy unit. */
-const HEAVY_COST = 120;
-
-/** Gold cost for a Support unit. */
-const SUPPORT_COST = 100;
-
-/** Gold cost for a Worker. */
-const WORKER_COST = 50;
 
 /** Max workers before AI stops training them. */
 const MAX_WORKERS = 6;
@@ -389,7 +375,7 @@ export class AIController {
     }
 
     // 4. Train extra workers if we have few
-    if (snapshot.workers.length < this.strategy.maxWorkers && snapshot.gold >= WORKER_COST) {
+    if (snapshot.workers.length < this.strategy.maxWorkers && snapshot.gold >= this.getUnitCost(UnitTypeId.Worker)) {
       this.issueTrainWorker(snapshot);
     }
   }
@@ -403,7 +389,7 @@ export class AIController {
     this.issueGatherCommands(snapshot);
 
     // 2. Train workers if below minimum
-    if (snapshot.workers.length < 4 && snapshot.gold >= WORKER_COST) {
+    if (snapshot.workers.length < 4 && snapshot.gold >= this.getUnitCost(UnitTypeId.Worker)) {
       this.issueTrainWorker(snapshot);
     }
 
@@ -569,7 +555,7 @@ export class AIController {
         targetEntityId: barracksId,
         unitType: unitToTrain,
       });
-    } else if (snapshot.gold >= INFANTRY_COST && unitToTrain !== UnitTypeId.Infantry) {
+    } else if (snapshot.gold >= this.getUnitCost(UnitTypeId.Infantry) && unitToTrain !== UnitTypeId.Infantry) {
       // Fallback: train Infantry if we can't afford the preferred unit
       this.pendingCommands.push({
         type: AICommandType.TrainUnit,
@@ -708,13 +694,10 @@ export class AIController {
    * Get the gold cost for a unit type.
    */
   private getUnitCost(unitType: UnitTypeId): number {
-    switch (unitType) {
-      case UnitTypeId.Worker: return WORKER_COST;
-      case UnitTypeId.Infantry: return INFANTRY_COST;
-      case UnitTypeId.Ranged: return RANGED_COST;
-      case UnitTypeId.Heavy: return HEAVY_COST;
-      case UnitTypeId.Support: return SUPPORT_COST;
-      default: return INFANTRY_COST;
+    try {
+      return getFactionUnitArchetype(this.factionId, unitType).costGold;
+    } catch {
+      return 50;
     }
   }
 

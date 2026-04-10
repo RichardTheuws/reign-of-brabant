@@ -15,6 +15,7 @@ import { IsUnit, IsBuilding, IsResource, IsWorker, IsDead, IsHero } from '../ecs
 import { FactionId, UnitTypeId, BuildingTypeId, HeroTypeId, UpgradeId, ResourceType, MAP_SIZE, UnitAIState, NO_PRODUCTION, NO_ENTITY, HERO_POPULATION_COST } from '../types/index';
 import { UNIT_ARCHETYPES, BUILDING_ARCHETYPES } from '../entities/archetypes';
 import { HERO_ARCHETYPES } from '../entities/heroArchetypes';
+import { getFactionUnitArchetype } from '../data/factionData';
 import { createHero, isHeroActive } from '../entities/heroFactory';
 import { createGamePipeline, type SystemPipeline } from '../systems/SystemPipeline';
 import { generateMap, type GeneratedMap, DecoType } from '../world/MapGenerator';
@@ -895,12 +896,12 @@ export class Game {
       const arch = BUILDING_ARCHETYPES[buildingType];
       if (!arch.produces.includes(unitType)) continue;
 
-      const unitArch = UNIT_ARCHETYPES[unitType];
+      const factionUnitArch = getFactionUnitArchetype(this.playerFactionId, unitType);
       queueCommand({
         type: 'train',
         buildingEid: eid,
         unitTypeId: unitType,
-        cost: unitArch.costGold,
+        cost: factionUnitArch.costGold,
       });
       return;
     }

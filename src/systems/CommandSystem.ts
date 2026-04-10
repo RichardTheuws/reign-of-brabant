@@ -26,6 +26,7 @@ import { IsUnit, IsWorker, IsBuilding, NeedsPathfinding } from '../ecs/tags';
 import { playerState } from '../core/PlayerState';
 import { UnitAIState, NO_ENTITY, NO_PRODUCTION } from '../types/index';
 import { gameConfig } from '../core/GameConfig';
+import { getFactionUnitArchetype } from '../data/factionData';
 import type { GameWorld } from '../ecs/world';
 
 // ---------------------------------------------------------------------------
@@ -85,19 +86,24 @@ export function queueCommand(cmd: Command): void {
 }
 
 // ---------------------------------------------------------------------------
-// Unit stat lookups for train costs (simplified PoC)
+// Faction-aware unit cost/build-time lookups via factionData.ts
 // ---------------------------------------------------------------------------
-const UNIT_COSTS: Record<number, number> = {
-  0: 50,  // Worker
-  1: 75,  // Infantry
-  2: 80,  // Ranged
-};
 
-const UNIT_BUILD_TIMES: Record<number, number> = {
-  0: 12,  // Worker: 12 seconds
-  1: 18,  // Infantry: 18 seconds
-  2: 20,  // Ranged: 20 seconds
-};
+function getUnitCostForFaction(factionId: number, unitTypeId: number): number {
+  try {
+    return getFactionUnitArchetype(factionId, unitTypeId).costGold;
+  } catch {
+    return 50;
+  }
+}
+
+function getUnitBuildTimeForFaction(factionId: number, unitTypeId: number): number {
+  try {
+    return getFactionUnitArchetype(factionId, unitTypeId).buildTime;
+  } catch {
+    return 15;
+  }
+}
 
 // ---------------------------------------------------------------------------
 // System
@@ -229,9 +235,7 @@ function handleAttack(world: GameWorld, units: number[], cmd: AttackCommand): vo
     const dz = targetZ - Position.z[eid];
     const dist = Math.sqrt(dx * dx + dz * dz);
 
-    // Melee range = 0 in archetypes, use minimum 1.5
-    const effectiveRange = Math.max(Attack.range[eid], 1.5);
-    if (dist > effectiveRange) {
+    if (dist > Attack.range[eid]) {
       Movement.targetX[eid] = targetX;
       Movement.targetZ[eid] = targetZ;
       Movement.hasTarget[eid] = 1;
@@ -307,8 +311,8 @@ function handleTrain(world: GameWorld, cmd: TrainCommand): void {
 
   const factionId = Faction.id[bEid];
 
-  // Check cost
-  const cost = cmd.cost || UNIT_COSTS[cmd.unitTypeId] || 50;
+  // Check cost -- use command-provided cost, or look up faction-specific cost
+  const cost = cmd.cost || getUnitCostForFaction(factionId, cmd.unitTypeId);
   if (!playerState.canAfford(factionId, cost)) return;
 
   // Check population
@@ -321,7 +325,7 @@ function handleTrain(world: GameWorld, cmd: TrainCommand): void {
   if (Production.unitType[bEid] === NO_PRODUCTION) {
     Production.unitType[bEid] = cmd.unitTypeId;
     Production.progress[bEid] = 0;
-    Production.duration[bEid] = UNIT_BUILD_TIMES[cmd.unitTypeId] || 15;
+    Production.duration[bEid] = getUnitBuildTimeForFaction(factionId, cmd.unitTypeId);
     return;
   }
 

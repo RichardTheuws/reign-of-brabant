@@ -297,6 +297,9 @@ export const AGGRO_RANGE = 12;
 /** Self-defense radius: gathering/working units react to enemies this close. */
 export const SELF_DEFENSE_RANGE = 6;
 
+/** Minimum effective attack range for melee units. */
+export const MINIMUM_MELEE_RANGE = 1.5;
+
 /** Death animation duration in seconds before entity removal. */
 export const DEATH_TIMER = 2.0;
 
