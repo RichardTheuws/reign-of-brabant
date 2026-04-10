@@ -1,1121 +1,134 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Reign of Brabant</title>
-  <meta name="description" content="Browser-based 3D RTS set in medieval Brabant">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="description" content="Reign of Brabant — een browser-based 3D RTS (Warcraft vibes) met een Brabants sausje." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    :root {
-      --color-gold: #d4a853;
-      --color-gold-bright: #e8c065;
-      --color-gold-dark: #8B6914;
-      --color-panel-bg: rgba(20, 15, 10, 0.88);
-      --color-panel-border: rgba(212, 168, 83, 0.35);
-      --color-text: #e8e6e3;
-      --color-text-dim: #a0a0a0;
-      --color-hp-high: #4CAF50;
-      --color-hp-mid: #FFC107;
-      --color-hp-low: #F44336;
-      --color-btn-bg: rgba(212, 168, 83, 0.12);
-      --color-btn-hover: rgba(212, 168, 83, 0.25);
-      --color-btn-border: rgba(212, 168, 83, 0.4);
-      --color-brabant-orange: #E67E22;
-      --color-randstad-grey: #4A4A5A;
-      --color-dark-bg: #0a0806;
-      --color-parchment: #F5E6C8;
-      --color-brabant-red: #8B1A1A;
-      --font-heading: 'Cinzel', serif;
-      --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
-
-    html, body {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background: var(--color-dark-bg);
-      font-family: var(--font-body);
-      color: var(--color-text);
-    }
-    #app {
-      width: 100%;
-      height: 100%;
-      position: relative;
-    }
-    #game-canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 0;
-      cursor: default;
-    }
-    #ui-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 1;
-    }
-    #ui-overlay > * {
-      pointer-events: auto;
-    }
-
-    /* ================================================================ MAIN MENU */
-    #main-menu {
-      position: absolute;
-      inset: 0;
-      z-index: 60;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, rgba(10,8,6,0.92) 0%, rgba(20,15,10,0.85) 100%);
-      overflow-y: auto;
-      padding: 24px;
-      max-height: 100vh;
-      max-height: 100dvh;
-    }
-    .menu-logo { margin-bottom: 8px; }
-    .menu-logo img {
-      max-width: 360px; width: 80vw; height: auto;
-      filter: drop-shadow(0 0 30px rgba(212,168,83,0.3));
-    }
-    .menu-title {
-      font-family: var(--font-heading); font-weight: 900;
-      font-size: clamp(2rem,5vw,3.5rem); color: var(--color-gold);
-      text-shadow: 0 2px 20px rgba(212,168,83,0.4), 0 0 60px rgba(212,168,83,0.15);
-      letter-spacing: 0.08em; text-align: center; margin-bottom: 4px;
-    }
-    .menu-subtitle {
-      font-family: var(--font-heading); font-size: clamp(0.75rem,1.5vw,1rem);
-      color: var(--color-text-dim); letter-spacing: 0.2em;
-      text-transform: uppercase; margin-bottom: 40px;
-    }
-    .menu-buttons {
-      display: flex; flex-direction: column; gap: 12px;
-      min-width: 280px; max-width: 340px; width: 100%;
-    }
-    .menu-btn {
-      display: flex; align-items: center; gap: 14px; padding: 14px 24px;
-      border: 2px solid var(--color-panel-border); border-radius: 8px;
-      background: var(--color-panel-bg); color: var(--color-text);
-      font-family: var(--font-heading); font-size: 1.1rem; font-weight: 500;
-      cursor: pointer; transition: background 0.2s, border-color 0.2s, transform 0.15s;
-      text-align: left;
-    }
-    .menu-btn:hover:not(:disabled) {
-      background: var(--color-btn-hover); border-color: var(--color-gold);
-      transform: translateX(4px);
-    }
-    .menu-btn:focus-visible { outline: 2px solid var(--color-gold); outline-offset: 2px; }
-    .menu-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .menu-btn .btn-icon { font-size: 1.3rem; width: 28px; text-align: center; }
-    .menu-btn .btn-badge {
-      margin-left: auto; font-size: 0.65rem; padding: 2px 8px; border-radius: 10px;
-      background: var(--color-brabant-red); color: var(--color-parchment);
-      font-family: var(--font-body); letter-spacing: 0.05em;
-    }
-    .menu-version {
-      position: absolute; bottom: 12px; right: 16px;
-      font-size: 0.75rem; color: var(--color-text-dim); opacity: 0.6;
-    }
-
-    /* ================================================================ FACTION SELECT */
-    #faction-select {
-      position: absolute; inset: 0; z-index: 60; display: none; flex-direction: column;
-      background: linear-gradient(135deg, rgba(10,8,6,0.94) 0%, rgba(20,15,10,0.88) 100%);
-      padding: 24px; overflow-y: auto;
-    }
-    .faction-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
-    .faction-back-btn {
-      background: none; border: 1px solid var(--color-panel-border); color: var(--color-text);
-      padding: 8px 16px; border-radius: 6px; cursor: pointer;
-      font-family: var(--font-body); font-size: 0.9rem; transition: background 0.15s;
-    }
-    .faction-back-btn:hover { background: var(--color-btn-hover); }
-    .faction-header-title {
-      font-family: var(--font-heading); font-size: clamp(1.3rem,3vw,2rem);
-      color: var(--color-gold); flex: 1; text-align: center;
-    }
-    .faction-cards-row {
-      display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px;
-    }
-    .faction-card {
-      width: 150px; padding: 16px; border: 2px solid var(--color-panel-border);
-      border-radius: 10px; background: var(--color-panel-bg); cursor: pointer;
-      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s; text-align: center;
-    }
-    .faction-card:hover:not(.is-locked) { border-color: var(--color-gold); transform: translateY(-4px); }
-    .faction-card.is-selected {
-      border-color: var(--color-gold-bright);
-      box-shadow: 0 0 20px rgba(212,168,83,0.3), inset 0 0 15px rgba(212,168,83,0.08);
-    }
-    .faction-card.is-locked { opacity: 0.4; cursor: not-allowed; }
-    .faction-card-icon { font-size: 2.5rem; margin-bottom: 8px; display: block; }
-    .faction-card-name {
-      font-family: var(--font-heading); font-size: 1rem; font-weight: 700;
-      color: var(--color-text); margin-bottom: 4px;
-    }
-    .faction-card-lock { font-size: 0.75rem; color: var(--color-text-dim); }
-    #faction-preview { max-width: 700px; width: 100%; margin: 0 auto 24px; min-height: 200px; }
-    .faction-preview-placeholder {
-      text-align: center; color: var(--color-text-dim); font-style: italic; padding: 40px 0;
-    }
-    .faction-preview-content {
-      display: flex; gap: 24px; background: var(--color-panel-bg);
-      border: 1px solid var(--color-panel-border); border-radius: 10px;
-      padding: 20px; animation: fadeSlideUp 0.3s ease-out;
-    }
-    @keyframes fadeSlideUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .faction-preview-image {
-      flex-shrink: 0; width: 180px; height: 220px; border-radius: 8px;
-      overflow: hidden; border: 2px solid var(--color-panel-border); background: rgba(0,0,0,0.3);
-    }
-    .faction-preview-image img { width: 100%; height: 100%; object-fit: cover; }
-    .faction-preview-info { flex: 1; }
-    .faction-preview-name {
-      font-family: var(--font-heading); font-size: 1.6rem; font-weight: 700;
-      color: var(--color-gold); margin: 0 0 4px 0;
-    }
-    .faction-preview-subtitle {
-      font-style: italic; color: var(--color-text-dim); margin: 0 0 12px 0; font-size: 0.95rem;
-    }
-    .faction-preview-description {
-      color: var(--color-text); font-size: 0.9rem; line-height: 1.5; margin: 0 0 16px 0;
-    }
-    .faction-preview-traits { display: flex; gap: 8px; flex-wrap: wrap; }
-    .trait-badge {
-      padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
-      background: rgba(212,168,83,0.15); border: 1px solid var(--color-panel-border);
-      color: var(--color-gold);
-    }
-    .faction-confirm-area { text-align: center; }
-    .faction-confirm-btn {
-      padding: 14px 48px; border: 2px solid var(--color-gold); border-radius: 8px;
-      background: rgba(212,168,83,0.12); color: var(--color-gold);
-      font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700;
-      cursor: pointer; transition: background 0.2s, transform 0.15s;
-    }
-    .faction-confirm-btn:hover:not(:disabled) { background: rgba(212,168,83,0.25); transform: scale(1.02); }
-    .faction-confirm-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    @media (max-width: 640px) {
-      .faction-preview-content { flex-direction: column; align-items: center; }
-      .faction-preview-image { width: 140px; height: 170px; }
-      .faction-card { width: 120px; padding: 12px; }
-    }
-    @media (max-height: 600px) {
-      #main-menu { padding: 12px; gap: 8px; }
-      .menu-logo img { max-width: 200px; }
-      .menu-title { font-size: 1.5rem; margin-bottom: 2px; }
-      .menu-subtitle { margin-bottom: 16px; font-size: 0.7rem; }
-      .menu-buttons { gap: 8px; min-width: 240px; }
-      .menu-btn { padding: 10px 16px; font-size: 0.9rem; }
-    }
-
-    /* ================================================================ LOADING SCREEN */
-    #loading-screen {
-      position: absolute; inset: 0; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      background: var(--color-dark-bg); color: var(--color-text);
-      z-index: 100; transition: opacity 0.5s;
-    }
-    #loading-screen.hidden { opacity: 0; pointer-events: none; }
-    .loading-logo { margin-bottom: 12px; }
-    .loading-logo img {
-      max-width: 300px; width: 70vw; height: auto;
-      filter: drop-shadow(0 0 20px rgba(212,168,83,0.25));
-    }
-    .loading-title {
-      font-family: var(--font-heading); font-size: clamp(1.5rem,4vw,2.5rem);
-      font-weight: 900; color: var(--color-gold);
-      text-shadow: 0 2px 15px rgba(212,168,83,0.3); margin-bottom: 32px;
-    }
-    .loading-bar-container { width: min(400px,80vw); margin-bottom: 16px; }
-    .loading-bar-track {
-      width: 100%; height: 12px; background: rgba(255,255,255,0.08);
-      border-radius: 6px; overflow: hidden; border: 1px solid var(--color-panel-border);
-    }
-    .loading-bar-fill {
-      width: 0%; height: 100%;
-      background: linear-gradient(90deg, var(--color-gold-dark), var(--color-gold), var(--color-gold-bright));
-      border-radius: 6px; transition: width 0.3s ease-out;
-    }
-    .loading-meta {
-      display: flex; justify-content: space-between; width: min(400px,80vw);
-      font-size: 0.8rem; color: var(--color-text-dim); margin-bottom: 24px;
-    }
-    .loading-tip-container {
-      max-width: 500px; text-align: center; min-height: 48px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .loading-tip {
-      font-size: 0.85rem; color: var(--color-parchment); font-style: italic;
-      line-height: 1.5; transition: opacity 0.3s;
-    }
-    .loading-version {
-      position: absolute; bottom: 12px; right: 16px;
-      font-size: 0.7rem; color: var(--color-text-dim); opacity: 0.5;
-    }
-
-    /* ================================================================ GAME HUD */
-    /* game-hud visibility controlled by inline style via MenuScreens.setGameHUDVisible() */
-
-    .resource-bar {
-      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-      display: flex; gap: 24px; padding: 8px 24px;
-      background: rgba(20, 15, 10, 0.92);
-      border-bottom: 2px solid rgba(212, 168, 83, 0.4);
-      border-radius: 0 0 12px 12px;
-      font-family: 'Cinzel', serif; font-size: 0.95rem;
-      color: #e8e6e3; z-index: 20;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-    }
-    .resource-item { display: flex; align-items: center; gap: 6px; }
-    .resource-item.is-capped { color: var(--color-hp-low); }
-    .resource-item.is-capped #res-pop,
-    .resource-item.is-capped #res-pop-max { color: var(--color-hp-low); }
-    .resource-icon { font-size: 1.1rem; }
-    .resource-value { font-weight: 700; min-width: 32px; text-align: right; }
-    #res-gold { color: #f0d060; }
-    #res-wood { color: #66bb6a; }
-    #res-pop, #res-pop-max { color: #88ccff; }
-    #res-gezelligheid { color: #ff9944; }
-
-    .gezelligheid-item { border-left: 1px solid rgba(212, 168, 83, 0.25); padding-left: 16px; }
-    .rage-btn {
-      display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px;
-      margin-left: 8px; background: rgba(212,168,83,0.12);
-      border: 1px solid rgba(212, 168, 83, 0.3); border-radius: 6px;
-      color: var(--color-text); font-size: 0.75rem; cursor: pointer;
-      font-family: 'Cinzel', serif;
-      transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
-    }
-    .rage-btn:hover:not(:disabled) { background: rgba(212,168,83,0.3); border-color: var(--color-gold); box-shadow: 0 0 8px rgba(212,168,83,0.2); }
-    .rage-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .rage-btn.is-active {
-      background: rgba(231,76,60,0.3); border-color: #e74c3c; opacity: 1;
-      animation: rage-pulse 0.5s ease-in-out infinite alternate;
-    }
-    .rage-btn.is-cooldown { opacity: 0.4; }
-    .rage-btn .hotkey {
-      font-size: 0.6rem; padding: 0 3px; border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 2px; margin-left: 2px;
-    }
-    .rage-duration, .rage-cooldown { font-size: 0.7rem; margin-left: 4px; color: var(--color-text-dim); }
-    .rage-duration { color: #e74c3c; font-weight: 700; }
-    @keyframes rage-pulse {
-      from { box-shadow: 0 0 4px rgba(231,76,60,0.3); }
-      to   { box-shadow: 0 0 12px rgba(231,76,60,0.6); }
-    }
-
-    #fps-counter {
-      position: absolute; top: 8px; right: 8px; font-size: 0.7rem;
-      color: var(--color-text-dim); background: rgba(20, 15, 10, 0.85);
-      padding: 3px 10px; border-radius: 6px;
-      border: 1px solid rgba(212, 168, 83, 0.15);
-      z-index: 18;
-    }
-    #audio-mute-btn {
-      position: absolute; top: 8px; right: 80px; font-size: 1rem; cursor: pointer;
-      background: rgba(20, 15, 10, 0.85); border: 1px solid rgba(212, 168, 83, 0.25);
-      color: var(--color-text); padding: 3px 10px; border-radius: 6px;
-      z-index: 20; line-height: 1;
-      transition: background 0.15s, border-color 0.15s;
-    }
-    #audio-mute-btn:hover { background: rgba(212, 168, 83, 0.2); border-color: rgba(212, 168, 83, 0.5); }
-    #audio-mute-btn.is-muted { opacity: 0.5; }
-    #alert-container {
-      position: absolute; top: 52px; left: 50%; transform: translateX(-50%);
-      display: flex; flex-direction: column; gap: 4px; z-index: 30; pointer-events: none;
-    }
-    .alert {
-      padding: 8px 20px; border-radius: 8px; font-size: 0.85rem;
-      background: rgba(20, 15, 10, 0.95); border: 1px solid rgba(212, 168, 83, 0.5);
-      display: flex; align-items: center; gap: 8px;
-      animation: slideDown 0.3s ease-out; white-space: nowrap;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-      color: #e8e6e3;
-    }
-    .alert.is-leaving { opacity: 0; transition: opacity 0.25s; }
-    .alert--warning { border-color: var(--color-hp-mid); }
-    .alert--error { border-color: var(--color-hp-low); }
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    #selection-panel {
-      position: absolute; bottom: 8px; right: 8px;
-      width: 220px; padding: 12px;
-      background: rgba(20, 15, 10, 0.92);
-      border: 1px solid rgba(212, 168, 83, 0.3);
-      border-radius: 8px;
-      z-index: 16;
-      color: #e8e6e3; font-size: 0.85rem;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-    }
-    #selection-panel[hidden] { display: none !important; }
-    .unit-info { display: flex; align-items: center; gap: 10px; }
-    .unit-portrait {
-      width: 44px; height: 44px; border: 2px solid rgba(212, 168, 83, 0.4);
-      border-radius: 6px; display: flex; align-items: center; justify-content: center;
-      background: rgba(0,0,0,0.5); position: relative; overflow: hidden;
-      flex-shrink: 0;
-    }
-    .unit-portrait img { width: 100%; height: 100%; object-fit: cover; }
-    .portrait-placeholder { font-size: 22px; }
-    .portrait-placeholder--sm { font-size: 14px; }
-    .unit-level {
-      position: absolute; bottom: -2px; right: -2px; background: var(--color-gold);
-      color: #000; font-size: 9px; font-weight: 700; width: 15px; height: 15px;
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    }
-    .unit-details { flex: 1; min-width: 0; }
-    .unit-name {
-      font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.8rem;
-      margin-bottom: 4px; color: var(--color-gold-bright);
-    }
-    .hp-bar-bg {
-      background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px;
-      overflow: hidden; margin-bottom: 3px;
-    }
-    .unit-hp-bar { height: 100%; border-radius: 4px; transition: width 0.2s; }
-    .hp-high { background: var(--color-hp-high); }
-    .hp-mid { background: var(--color-hp-mid); }
-    .hp-low { background: var(--color-hp-low); }
-    .unit-hp-text { font-size: 0.65rem; color: var(--color-text-dim); }
-    .unit-stats { display: flex; gap: 8px; margin-top: 4px; font-size: 0.7rem; color: var(--color-text-dim); }
-    .stat-label { margin-right: 2px; color: rgba(212, 168, 83, 0.6); font-weight: 600; }
-    .unit-status { font-size: 0.65rem; color: var(--color-gold); margin-top: 3px; font-style: italic; }
-
-    .multi-header { font-size: 0.75rem; margin-bottom: 6px; color: var(--color-text-dim); }
-    .multi-grid { display: flex; flex-wrap: wrap; gap: 3px; }
-    .multi-portrait {
-      width: 28px; height: 28px; border: 1px solid rgba(212, 168, 83, 0.25);
-      border-radius: 4px; display: flex; align-items: center; justify-content: center;
-      background: rgba(0,0,0,0.4); position: relative; cursor: pointer; overflow: hidden;
-      transition: border-color 0.15s;
-    }
-    .multi-portrait:hover { border-color: var(--color-gold); }
-    .multi-hp-bar { position: absolute; bottom: 0; left: 0; height: 2px; }
-
-    .building-info { display: flex; align-items: center; gap: 10px; }
-    .queue-progress { margin-top: 8px; font-size: 0.7rem; }
-    .queue-bar-bg {
-      background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px;
-      overflow: hidden; margin-top: 4px;
-    }
-    .queue-bar { height: 100%; background: linear-gradient(90deg, var(--color-gold-dark), var(--color-gold)); border-radius: 3px; transition: width 0.3s; }
-    .queue-time { font-size: 0.6rem; color: var(--color-text-dim); margin-top: 2px; }
-
-    .command-panel {
-      position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
-      display: flex; gap: 4px; padding: 8px 12px;
-      background: rgba(20, 15, 10, 0.92);
-      border: 1px solid rgba(212, 168, 83, 0.3);
-      border-radius: 8px; z-index: 15;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-    }
-    .command-panel[hidden] { display: none !important; }
-    .cmd-btn {
-      width: 44px; height: 44px;
-      background: rgba(40, 35, 25, 0.9);
-      border: 1px solid rgba(212, 168, 83, 0.3);
-      border-radius: 6px; color: #e8e6e3;
-      font-size: 0.7rem; cursor: pointer;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 1px;
-      transition: all 0.15s;
-    }
-    .cmd-btn:hover:not(:disabled) {
-      background: rgba(212, 168, 83, 0.2);
-      border-color: rgba(212, 168, 83, 0.6);
-    }
-    .cmd-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .cmd-btn .hotkey { font-size: 0.55rem; color: #a0a0a0; margin-top: 2px; }
-    .cmd-btn .btn-icon { font-size: 0.65rem; font-weight: 700; line-height: 1; text-transform: uppercase; letter-spacing: -0.02em; }
-
-    /* ---- Text-icon styling (replaces emoji) ---- */
-    .btn-icon--move { color: #7ec8e3; }
-    .btn-icon--attack { color: #e06040; }
-    .btn-icon--stop { color: #ff5555; }
-    .btn-icon--hold { color: #6a9fd8; }
-    .btn-icon--build { color: #d4a853; }
-    .btn-icon--train { color: #8bc34a; }
-    .btn-icon--rally { color: #7ec8e3; }
-    .btn-icon--hero { color: #ffd700; }
-    .btn-icon--ability { color: #e0b0ff; }
-    .btn-icon--research { color: #b0b0b0; }
-    .btn-icon--resource { color: #d4a853; }
-
-    /* Resource bar icon replacements */
-    .resource-icon--gold { display: inline-block; width: 12px; height: 12px; background: radial-gradient(circle, #ffd700 40%, #b8860b 100%); border-radius: 50%; vertical-align: middle; margin-right: 4px; box-shadow: 0 0 4px rgba(255,215,0,0.4); }
-    .resource-icon--wood { display: inline-block; width: 10px; height: 12px; background: linear-gradient(180deg, #228B22 30%, #6B4226 70%); border-radius: 2px 2px 1px 1px; vertical-align: middle; margin-right: 4px; }
-    .resource-icon--pop { display: inline-block; width: 14px; height: 12px; position: relative; vertical-align: middle; margin-right: 4px; }
-    .resource-icon--pop::before, .resource-icon--pop::after {
-      content: ''; position: absolute; top: 0; width: 6px; height: 6px;
-      background: #a0a0a0; border-radius: 50%;
-    }
-    .resource-icon--pop::before { left: 1px; }
-    .resource-icon--pop::after { right: 1px; }
-    .resource-icon--gez { display: inline-block; width: 12px; height: 12px; background: linear-gradient(180deg, #f0d060 20%, #c89030 100%); border-radius: 2px 2px 6px 6px; vertical-align: middle; margin-right: 4px; border: 1px solid rgba(200,144,48,0.5); }
-
-    /* Hero-specific button styles */
-    .cmd-btn--hero {
-      border-color: rgba(255, 215, 0, 0.5);
-      background: rgba(255, 215, 0, 0.08);
-    }
-    .cmd-btn--hero:hover:not(:disabled) {
-      background: rgba(255, 215, 0, 0.2);
-      border-color: rgba(255, 215, 0, 0.7);
-    }
-
-    /* Hero ability panel */
-    .command-panel--hero {
-      flex-wrap: wrap; justify-content: center;
-    }
-    .cmd-btn--ability {
-      width: 56px; height: 48px;
-      border-color: rgba(255, 215, 0, 0.5);
-      background: linear-gradient(180deg, rgba(255,215,0,0.12) 0%, rgba(212,168,83,0.06) 100%);
-      flex-direction: column; gap: 2px;
-    }
-    .cmd-btn--ability:hover:not(:disabled) {
-      background: linear-gradient(180deg, rgba(255,215,0,0.25) 0%, rgba(212,168,83,0.12) 100%);
-      border-color: rgba(255, 215, 0, 0.7);
-    }
-    .cmd-btn--ability:disabled {
-      opacity: 0.4;
-    }
-    .cmd-btn--ability .ability-name {
-      font-size: 0.5rem; color: var(--color-gold-bright);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      max-width: 50px; text-align: center;
-    }
-    .cmd-btn--ability .ability-cd {
-      font-size: 0.45rem; color: var(--color-hp-mid);
-      min-height: 10px;
-    }
-
-    /* Hero revival notification bar */
-    .hero-revival-bar {
-      position: absolute; top: 90px; left: 50%; transform: translateX(-50%);
-      background: rgba(20, 15, 10, 0.92); border: 1px solid rgba(255, 215, 0, 0.4);
-      border-radius: 8px; padding: 5px 14px; font-size: 0.7rem;
-      color: var(--color-gold); pointer-events: none;
-      animation: pulse-gold 2s ease-in-out infinite;
-      z-index: 18;
-    }
-    @keyframes pulse-gold {
-      0%, 100% { border-color: rgba(255, 215, 0, 0.3); }
-      50% { border-color: rgba(255, 215, 0, 0.7); }
-    }
-
-    .minimap-container {
-      position: absolute; bottom: 8px; left: 8px; width: 180px; height: 180px;
-      border: 2px solid rgba(212, 168, 83, 0.5);
-      border-radius: 4px;
-      background: rgba(20, 15, 10, 0.85);
-      z-index: 15; overflow: hidden;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-    }
-    #minimap-canvas { width: 100%; height: 100%; image-rendering: pixelated; }
-
-    #game-over {
-      position: absolute; inset: 0; display: none; flex-direction: column;
-      align-items: center; justify-content: center;
-      background: rgba(0,0,0,0.88); z-index: 50;
-      backdrop-filter: blur(4px);
-    }
-    #game-over:not([hidden]) { display: flex; }
-    #game-over.is-victory #game-over-title { color: var(--color-gold); text-shadow: 0 0 30px rgba(212,168,83,0.6), 0 0 60px rgba(212,168,83,0.2); }
-    #game-over.is-defeat #game-over-title { color: var(--color-hp-low); text-shadow: 0 0 30px rgba(244,67,54,0.6), 0 0 60px rgba(244,67,54,0.2); }
-    #game-over-title { font-family: var(--font-heading); font-size: 3rem; font-weight: 900; margin-bottom: 8px; letter-spacing: 0.05em; }
-    #game-over-subtitle { font-size: 1.2rem; color: var(--color-text-dim); margin-bottom: 24px; font-style: italic; }
-    .game-over-stats {
-      display: grid; grid-template-columns: repeat(2,1fr); gap: 8px 32px; font-size: 0.9rem;
-      margin-bottom: 32px; background: rgba(20, 15, 10, 0.6); padding: 16px 24px; border-radius: 10px;
-      border: 1px solid rgba(212, 168, 83, 0.2);
-    }
-    .stat-row { display: flex; justify-content: space-between; gap: 16px; }
-    .stat-row .stat-key { color: var(--color-text-dim); }
-    .stat-row .stat-val { font-weight: 700; color: var(--color-gold-bright); }
-    .game-over-buttons { display: flex; gap: 16px; }
-    .go-btn {
-      padding: 12px 32px; border: 2px solid var(--color-gold); border-radius: 8px;
-      background: transparent; color: var(--color-gold); font-family: var(--font-heading);
-      font-size: 1rem; font-weight: 700; cursor: pointer;
-      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-    }
-    .go-btn:hover { background: rgba(212,168,83,0.2); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(212,168,83,0.2); }
-
-    /* ================================================================ TUTORIAL OVERLAY */
-    #tutorial-overlay {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      pointer-events: none; z-index: 20;
-    }
-    .tutorial-panel {
-      position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
-      background: var(--color-panel-bg); border: 2px solid var(--color-gold);
-      border-radius: 10px; padding: 16px 24px; max-width: 500px; width: 90vw;
-      pointer-events: auto; animation: fadeSlideUp 0.3s ease-out;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.5);
-    }
-    .tutorial-header {
-      display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
-      font-family: var(--font-heading); color: var(--color-gold); font-size: 0.9rem;
-    }
-    .tutorial-icon { font-size: 1.2rem; }
-    .tutorial-title { font-weight: 700; }
-    .tutorial-step-counter {
-      margin-left: auto; font-family: var(--font-body); font-size: 0.75rem;
-      color: var(--color-text-dim);
-    }
-    .tutorial-message { font-size: 0.95rem; line-height: 1.5; color: var(--color-text); margin-bottom: 12px; }
-    .tutorial-skip-btn {
-      background: none; border: 1px solid var(--color-panel-border); color: var(--color-text-dim);
-      padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 0.8rem;
-      transition: color 0.15s, border-color 0.15s; pointer-events: auto;
-    }
-    .tutorial-skip-btn:hover { color: var(--color-text); border-color: var(--color-gold); }
-    .tutorial-arrow {
-      position: absolute; z-index: 21; animation: tutorialBounce 1s ease-in-out infinite;
-      pointer-events: none;
-    }
-    @keyframes tutorialBounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
-
-    /* ================================================================ CAMERA INTRO */
-    #camera-intro-overlay {
-      position: absolute; inset: 0; background: #000; z-index: 55;
-      pointer-events: none; transition: opacity 1s ease-out;
-    }
-    #camera-intro-overlay.is-fading { opacity: 0; }
-    #camera-intro-overlay.is-hidden { display: none; }
-
-    /* ================================================================ PAUSE OVERLAY */
-    #pause-overlay {
-      position: absolute; inset: 0; display: flex;
-      align-items: center; justify-content: center;
-      background: rgba(0, 0, 0, 0.75); z-index: 45;
-      backdrop-filter: blur(4px);
-    }
-    #pause-overlay[hidden] { display: none; }
-    .pause-content {
-      text-align: center; padding: 40px 60px;
-      background: rgba(20, 15, 10, 0.95);
-      border: 2px solid rgba(212, 168, 83, 0.5);
-      border-radius: 12px;
-      box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
-    }
-    .pause-title {
-      font-family: var(--font-heading); font-size: 2rem;
-      color: var(--color-gold); margin-bottom: 24px;
-    }
-    .pause-buttons { display: flex; flex-direction: column; gap: 12px; }
-    .pause-buttons .go-btn { min-width: 200px; }
-
-    /* ================================================================ SETTINGS PANEL */
-    #settings-panel {
-      position: fixed;
-      inset: 0;
-      z-index: 65;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(10, 8, 6, 0.9);
-    }
-    #settings-panel[hidden] { display: none; }
-    .settings-content {
-      width: 400px;
-      max-height: 80vh;
-      overflow-y: auto;
-      padding: 32px;
-      background: rgba(20, 15, 10, 0.95);
-      border: 2px solid rgba(212, 168, 83, 0.5);
-      border-radius: 12px;
-      color: #e8e6e3;
-    }
-    .settings-content h2 {
-      font-family: 'Cinzel', serif;
-      color: #d4a853;
-      margin-bottom: 24px;
-      text-align: center;
-    }
-    .settings-content h3 {
-      font-family: 'Cinzel', serif;
-      color: #b89840;
-      font-size: 0.95rem;
-      margin: 16px 0 8px;
-      border-bottom: 1px solid rgba(212, 168, 83, 0.2);
-      padding-bottom: 4px;
-    }
-    .settings-group label {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 0;
-      font-size: 0.9rem;
-    }
-    .settings-group input[type="range"] {
-      width: 120px;
-      accent-color: #d4a853;
-    }
-    .settings-group input[type="checkbox"] {
-      accent-color: #d4a853;
-      width: 18px;
-      height: 18px;
-    }
-    .setting-value {
-      min-width: 36px;
-      text-align: right;
-      color: #a0a0a0;
-      font-size: 0.8rem;
-    }
-    #settings-back {
-      margin-top: 24px;
-      width: 100%;
-    }
-    .fullscreen-tip {
-      position: absolute; top: 50px; left: 50%; transform: translateX(-50%);
-      display: flex; align-items: center; gap: 12px;
-      padding: 10px 20px; z-index: 25;
-      background: rgba(20, 15, 10, 0.95);
-      border: 1px solid rgba(212, 168, 83, 0.5);
-      border-radius: 8px; font-size: 0.85rem;
-      color: var(--color-parchment);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-      animation: slideDown 0.4s ease-out;
-    }
-    .fullscreen-tip[hidden] { display: none; }
-    .fullscreen-tip-btn {
-      padding: 5px 14px; border: 1px solid var(--color-gold);
-      border-radius: 6px; background: rgba(212, 168, 83, 0.15);
-      color: var(--color-gold); font-family: var(--font-heading);
-      font-size: 0.75rem; cursor: pointer; white-space: nowrap;
-      transition: background 0.15s;
-    }
-    .fullscreen-tip-btn:hover { background: rgba(212, 168, 83, 0.3); }
-    .fullscreen-tip-close {
-      background: none; border: none; color: var(--color-text-dim);
-      font-size: 1.2rem; cursor: pointer; padding: 0 4px; line-height: 1;
-    }
-    .fullscreen-tip-close:hover { color: var(--color-text); }
+    :root{
+      --bg:#0a0806;
+      --panel:rgba(20,15,10,0.92);
+      --border:rgba(212,168,83,0.35);
+      --gold:#d4a853;
+      --gold2:#e8c065;
+      --text:#e8e6e3;
+      --dim:#a0a0a0;
+      --fontH:'Cinzel',serif;
+      --fontB:'Inter','Segoe UI',system-ui,sans-serif;
+    }
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:var(--fontB);}
+    a{color:var(--gold2);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .wrap{max-width:1100px;margin:0 auto;padding:28px 18px 70px}
+    .hero{
+      display:grid;
+      grid-template-columns:1.15fr 0.85fr;
+      gap:16px;
+      align-items:start;
+    }
+    @media (max-width: 920px){.hero{grid-template-columns:1fr}}
+    .card{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:18px 18px;
+      box-shadow:0 16px 44px rgba(0,0,0,0.55);
+    }
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand img{width:56px;height:56px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(212,168,83,0.18))}
+    .brand-title{font-family:var(--fontH);font-weight:900;letter-spacing:0.06em}
+    .brand-sub{color:var(--dim);font-size:0.92rem}
+    h1{font-family:var(--fontH);margin:0 0 8px;color:var(--gold);font-weight:900}
+    h2{font-family:var(--fontH);margin:16px 0 8px;color:var(--gold2);font-weight:900;font-size:1.05rem}
+    p{margin:8px 0;line-height:1.65}
+    .small{color:var(--dim);font-size:0.92rem}
+    .btnRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:10px 14px;border-radius:10px;border:1px solid var(--border);
+      background:rgba(212,168,83,0.10);color:var(--text);cursor:pointer;
+      font-family:var(--fontH);font-weight:800;letter-spacing:0.03em;
+    }
+    .btn:hover{border-color:var(--gold);background:rgba(212,168,83,0.18)}
+    .btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+    .btnPrimary{background:rgba(212,168,83,0.18);border-color:rgba(212,168,83,0.55)}
+    .pill{display:inline-block;font-size:0.78rem;color:var(--dim);border:1px solid rgba(255,255,255,0.14);padding:2px 10px;border-radius:999px}
+    .list{margin:10px 0 0 18px;line-height:1.7}
+    .notice{padding:10px 12px;border-left:3px solid rgba(212,168,83,0.65);background:rgba(212,168,83,0.08);border-radius:10px}
   </style>
 </head>
 <body>
-  <div id="app">
-    <canvas id="game-canvas"></canvas>
-
-    <div id="ui-overlay">
-
-      <!-- ============ FULLSCREEN TIP (outside game-hud so always accessible) ============ -->
-      <div id="fullscreen-tip" class="fullscreen-tip" hidden>
-        <span>Speel in volledig scherm voor de beste ervaring</span>
-        <button id="fullscreen-tip-btn" class="fullscreen-tip-btn">Volledig Scherm</button>
-        <button id="fullscreen-tip-close" class="fullscreen-tip-close">&times;</button>
-      </div>
-
-      <!-- ============ MAIN MENU ============ -->
-      <div id="main-menu">
-        <div class="menu-logo">
-          <img src="assets/ui/logo.png" alt="Reign of Brabant" />
-        </div>
-        <h1 class="menu-title">Reign of Brabant</h1>
-        <p class="menu-subtitle">Een Brabants RTS Avontuur</p>
-
-        <nav class="menu-buttons" role="navigation" aria-label="Hoofdmenu">
-          <button class="menu-btn" id="btn-campaign">
-            <span class="btn-icon btn-icon--hero">I</span>
-            <span>Campagne</span>
-          </button>
-          <button class="menu-btn" id="btn-play">
-            <span class="btn-icon btn-icon--attack">II</span>
-            <span>Schermutsel</span>
-          </button>
-          <button class="menu-btn" id="btn-tutorial">
-            <span class="btn-icon btn-icon--move">?</span>
-            <span>Hoe Te Spelen</span>
-          </button>
-          <button class="menu-btn" id="btn-settings">
-            <span class="btn-icon btn-icon--research">*</span>
-            <span>Instellingen</span>
-          </button>
-          <button class="menu-btn" disabled>
-            <span class="btn-icon btn-icon--move">III</span>
-            <span>Slagveld Online</span>
-            <span class="btn-badge">v2.0</span>
-          </button>
-          <a href="het-verhaal/" class="menu-btn" style="text-decoration:none;color:inherit;">
-            <span class="btn-icon btn-icon--research">V</span>
-            <span>Het Verhaal</span>
-          </a>
-        </nav>
-
-        <span class="menu-version">v0.17.0</span>
-      </div>
-
-      <!-- ============ SETTINGS PANEL ============ -->
-      <div id="settings-panel" class="menu-overlay" hidden>
-        <div class="settings-content">
-          <h2>Instellingen</h2>
-
-          <div class="settings-group">
-            <h3>Audio</h3>
-            <label>
-              <span>Muziek</span>
-              <input type="range" id="setting-music" min="0" max="100" value="40">
-              <span class="setting-value" id="setting-music-val">40%</span>
-            </label>
-            <label>
-              <span>Geluidseffecten</span>
-              <input type="range" id="setting-sfx" min="0" max="100" value="70">
-              <span class="setting-value" id="setting-sfx-val">70%</span>
-            </label>
-            <label>
-              <span>Omgeving</span>
-              <input type="range" id="setting-ambient" min="0" max="100" value="30">
-              <span class="setting-value" id="setting-ambient-val">30%</span>
-            </label>
-          </div>
-
-          <div class="settings-group">
-            <h3>Grafisch</h3>
-            <label>
-              <span>Schaduwen</span>
-              <input type="checkbox" id="setting-shadows" checked>
-            </label>
-            <label>
-              <span>Bloom effect</span>
-              <input type="checkbox" id="setting-bloom" checked>
-            </label>
-            <label>
-              <span>Deeltjeseffecten</span>
-              <input type="checkbox" id="setting-particles" checked>
-            </label>
-          </div>
-
-          <div class="settings-group">
-            <h3>Gameplay</h3>
-            <label>
-              <span>Edge scrolling</span>
-              <input type="checkbox" id="setting-edge-scroll" checked>
-            </label>
-            <label>
-              <span>Raster tonen (G)</span>
-              <input type="checkbox" id="setting-grid">
-            </label>
-          </div>
-
-          <button id="settings-back" class="menu-btn">Terug</button>
+  <div class="wrap">
+    <header class="topbar">
+      <div class="brand">
+        <img src="/assets/ui/logo.png" alt="Reign of Brabant logo" />
+        <div>
+          <div class="brand-title">Reign of Brabant</div>
+          <div class="brand-sub">Browser-based 3D RTS — gebouwd in het openbaar</div>
         </div>
       </div>
+      <nav class="btnRow" aria-label="Navigatie">
+        <a class="btn btnPrimary" href="/play/">Speel</a>
+        <a class="btn" href="/doneer">Doneer</a>
+        <a class="btn" href="/het-verhaal/">Het Verhaal</a>
+        <a class="btn" href="/roadmap">Roadmap</a>
+        <a class="btn" href="/press">Press</a>
+      </nav>
+    </header>
 
-      <!-- ============ FACTION SELECT ============ -->
-      <div id="faction-select" style="display: none;">
-        <div class="faction-header">
-          <button class="faction-back-btn" id="faction-back-btn">&lt; Terug</button>
-          <h2 class="faction-header-title">Kies Je Factie</h2>
-          <div style="width: 80px;"></div>
+    <section class="hero">
+      <div class="card">
+        <h1>Een supervette RTS met Warcraft vibes</h1>
+        <p>
+          Reign of Brabant is een browser-based 3D RTS (Three.js + TypeScript) met 4 facties, campagnemissies en schermutsel.
+          Alles groeit iteratief: elke update maakt de game strakker, sneller en leuker.
+        </p>
+        <div class="notice small">
+          Crowdfunding loopt via <strong>vrijwillige donaties</strong> (geen tegenprestatie). Zie <a href="/doneer">/doneer</a>.
         </div>
 
-        <div class="faction-cards-row">
-          <div class="faction-card" id="faction-card-brabanders" data-faction="brabanders">
-            <span class="faction-card-icon" style="color:#E67E22;font-family:Cinzel,serif;font-weight:900;">B</span>
-            <div class="faction-card-name">Brabanders</div>
-          </div>
-          <div class="faction-card" id="faction-card-randstad" data-faction="randstad">
-            <span class="faction-card-icon" style="color:#4A4A5A;font-family:Cinzel,serif;font-weight:900;">R</span>
-            <div class="faction-card-name">Randstad</div>
-          </div>
-          <div class="faction-card" id="faction-card-limburgers" data-faction="limburgers">
-            <span class="faction-card-icon" style="color:#8B6914;font-family:Cinzel,serif;font-weight:900;">L</span>
-            <div class="faction-card-name">Limburgers</div>
-          </div>
-          <div class="faction-card" id="faction-card-belgen" data-faction="belgen">
-            <span class="faction-card-icon" style="color:#C0392B;font-family:Cinzel,serif;font-weight:900;">V</span>
-            <div class="faction-card-name">Belgen</div>
-          </div>
+        <h2>Wat kun je nu doen?</h2>
+        <div class="btnRow">
+          <a class="btn btnPrimary" href="/play/">Start de game</a>
+          <a class="btn" href="/doneer">Steun de ontwikkeling</a>
+          <a class="btn" href="https://github.com/RichardTheuws/reign-of-brabant">Bekijk de GitHub repo</a>
         </div>
 
-        <div id="faction-preview">
-          <p class="faction-preview-placeholder">Kies een factie om details te zien</p>
-        </div>
-
-        <div class="faction-confirm-area">
-          <div style="margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px;">
-            <label style="font-family: 'Cinzel', serif; font-size: 0.85rem; color: var(--color-text-dim);">Slagveld:</label>
-            <select id="map-template-select" style="background: rgba(20,15,10,0.9); color: var(--color-text); border: 1px solid rgba(212,168,83,0.3); border-radius: 6px; padding: 6px 12px; font-family: 'Cinzel', serif; font-size: 0.85rem; cursor: pointer;">
-              <option value="classic">Klassiek</option>
-              <option value="crossroads">Kruispunt</option>
-              <option value="islands">Eilanden</option>
-              <option value="arena">Arena</option>
-            </select>
-          </div>
-          <button class="faction-confirm-btn" id="faction-confirm-btn" disabled>
-            Start Gevecht &gt;
-          </button>
-        </div>
+        <h2>Waarom dit werkt</h2>
+        <ul class="list">
+          <li><strong>Open development</strong>: roadmap en code zijn publiek.</li>
+          <li><strong>Snelle iteraties</strong>: duidelijke milestones gekoppeld aan donaties.</li>
+          <li><strong>Brabantse identiteit</strong>: humor + herkenning, maar met echte RTS diepgang.</li>
+        </ul>
       </div>
 
-      <!-- ============ GAME HUD (shown during gameplay) ============ -->
-      <div id="game-hud" style="display: none;">
-        <!-- Resource Bar -->
-        <div class="resource-bar">
-          <div class="resource-item" data-resource="gold">
-            <span class="resource-icon resource-icon--gold"></span>
-            <span class="resource-value" id="res-gold">0</span>
-          </div>
-          <div class="resource-item" data-resource="wood">
-            <span class="resource-icon resource-icon--wood"></span>
-            <span class="resource-value" id="res-wood">0</span>
-          </div>
-          <div class="resource-item" data-resource="population">
-            <span class="resource-icon resource-icon--pop"></span>
-            <span><span class="resource-value" id="res-pop">0</span> / <span id="res-pop-max">10</span></span>
-          </div>
-          <div class="resource-item tertiary-resource-item" id="tertiary-resource" style="display: none; border-left: 1px solid rgba(212, 168, 83, 0.25); padding-left: 16px;">
-            <span class="resource-icon resource-icon--gold" id="res-tertiary-icon"></span>
-            <span class="resource-value" id="res-tertiary">0</span>
-          </div>
-          <div class="resource-item gezelligheid-item" data-resource="gezelligheid">
-            <span class="resource-icon resource-icon--gez"></span>
-            <span class="resource-value" id="res-gezelligheid">0</span>
-            <button class="rage-btn" id="rage-btn" disabled title="Carnavalsrage (R) - Kost 100 Gezelligheid">
-              Rage
-              <span class="hotkey">R</span>
-            </button>
-            <span class="rage-duration" id="rage-duration" hidden>0s</span>
-            <span class="rage-cooldown" id="rage-cooldown" hidden>0s</span>
-          </div>
-        </div>
+      <aside class="card">
+        <h2>Snelle links</h2>
+        <p class="small">
+          <span class="pill">site</span> <a href="/doneer">Doneer</a><br />
+          <span class="pill">lore</span> <a href="/het-verhaal/">Het Verhaal</a><br />
+          <span class="pill">updates</span> <a href="/roadmap">Roadmap</a><br />
+          <span class="pill">media</span> <a href="/press">Press</a>
+        </p>
 
-        <!-- FPS Counter + Version -->
-        <div id="fps-counter">
-          FPS: <span id="fps-value">0</span> | v0.17.0
-        </div>
+        <h2>Status</h2>
+        <p class="small">
+          Versie: <strong>v0.17.0</strong> (zie changelog in repo).<br />
+          Platform: browser (desktop aanbevolen).<br />
+        </p>
 
-        <!-- Audio Mute Button -->
-        <button id="audio-mute-btn" title="Geluid aan/uit (M)">SND</button>
-
-        <!-- Pause Button -->
-        <button id="pause-btn" title="Pauzeren (Esc)" style="position: absolute; top: 8px; right: 140px; font-size: 0.7rem; font-weight: 700; cursor: pointer; background: rgba(20,15,10,0.85); border: 1px solid rgba(212,168,83,0.25); color: var(--color-text); padding: 3px 10px; border-radius: 6px; z-index: 20; line-height: 1; transition: background 0.15s, border-color 0.15s;">II</button>
-
-        <!-- Alert Container -->
-        <div id="alert-container"></div>
-
-        <!-- Minimap -->
-        <div class="minimap-container">
-          <canvas id="minimap-canvas" width="160" height="160"></canvas>
-        </div>
-
-        <!-- Selection Panel -->
-        <div id="selection-panel" hidden>
-          <div id="unit-single" hidden>
-            <div class="unit-info">
-              <div class="unit-portrait" id="unit-portrait">
-                <span class="portrait-placeholder"></span>
-                <span class="unit-level" id="unit-level">1</span>
-              </div>
-              <div class="unit-details">
-                <div class="unit-name" id="unit-name">Unit</div>
-                <div class="hp-bar-bg">
-                  <div class="unit-hp-bar hp-high" id="unit-hp-bar"></div>
-                </div>
-                <div class="unit-hp-text" id="unit-hp-text">0 / 0</div>
-                <div class="unit-stats">
-                  <span><span class="stat-label">ATK</span> <span id="stat-atk">0</span></span>
-                  <span><span class="stat-label">ARM</span> <span id="stat-arm">0</span></span>
-                  <span><span class="stat-label">SPD</span> <span id="stat-spd">0</span></span>
-                </div>
-                <div class="unit-status" id="unit-status">Idle</div>
-              </div>
-            </div>
-          </div>
-          <div id="unit-multi" hidden>
-            <div class="multi-header"><span id="multi-count">0</span> units geselecteerd</div>
-            <div class="multi-grid" id="multi-grid"></div>
-          </div>
-          <div id="building-panel" hidden>
-            <div class="building-info">
-              <div class="unit-portrait" id="building-portrait">
-                <span class="portrait-placeholder" style="font-size:12px;font-weight:700;color:var(--color-gold);">BLD</span>
-              </div>
-              <div class="unit-details">
-                <div class="unit-name" id="building-name">Gebouw</div>
-                <div class="hp-bar-bg">
-                  <div class="unit-hp-bar hp-high" id="building-hp-bar"></div>
-                </div>
-                <div class="unit-hp-text" id="building-hp-text">0 / 0</div>
-              </div>
-            </div>
-            <div class="queue-progress" hidden>
-              <span>Training: <span id="queue-label">-</span></span>
-              <div class="queue-bar-bg">
-                <div class="queue-bar" id="queue-bar" style="width: 0%"></div>
-              </div>
-              <div class="queue-time" id="queue-time">0s</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="command-panel" id="cmd-unit" hidden>
-          <button class="cmd-btn" data-action="move" data-hotkey="Q"><span class="btn-icon btn-icon--move">MOV</span><span class="hotkey">Q</span></button>
-          <button class="cmd-btn" data-action="attack" data-hotkey="W"><span class="btn-icon btn-icon--attack">ATK</span><span class="hotkey">W</span></button>
-          <button class="cmd-btn" data-action="stop" data-hotkey="E"><span class="btn-icon btn-icon--stop">STP</span><span class="hotkey">E</span></button>
-          <button class="cmd-btn" data-action="hold" data-hotkey="R"><span class="btn-icon btn-icon--hold">HLD</span><span class="hotkey">R</span></button>
-        </div>
-        <div class="command-panel" id="cmd-multi" hidden>
-          <button class="cmd-btn" data-action="move" data-hotkey="Q"><span class="btn-icon btn-icon--move">MOV</span><span class="hotkey">Q</span></button>
-          <button class="cmd-btn" data-action="attack" data-hotkey="W"><span class="btn-icon btn-icon--attack">ATK</span><span class="hotkey">W</span></button>
-          <button class="cmd-btn" data-action="stop" data-hotkey="E"><span class="btn-icon btn-icon--stop">STP</span><span class="hotkey">E</span></button>
-        </div>
-        <div class="command-panel" id="cmd-worker" hidden>
-          <!-- Dynamically populated by HUD.rebuildWorkerCommands() based on faction -->
-        </div>
-        <div class="command-panel" id="cmd-building" hidden>
-          <button class="cmd-btn" data-action="train-worker" data-hotkey="Q"><span class="btn-icon btn-icon--train">WRK</span><span>Boer</span><span class="hotkey">Q</span></button>
-          <button class="cmd-btn" data-action="train-infantry" data-hotkey="W"><span class="btn-icon btn-icon--attack">INF</span><span>Infanterie</span><span class="hotkey">W</span></button>
-          <button class="cmd-btn" data-action="train-ranged" data-hotkey="E"><span class="btn-icon btn-icon--attack">RNG</span><span>Sluiper</span><span class="hotkey">E</span></button>
-          <button class="cmd-btn cmd-btn--hero" data-action="train-hero-prins" data-hotkey="T"><span class="btn-icon btn-icon--hero">H1</span><span>Prins</span><span class="hotkey">T</span></button>
-          <button class="cmd-btn cmd-btn--hero" data-action="train-hero-boer" data-hotkey="Y"><span class="btn-icon btn-icon--hero">H2</span><span>Boer Hero</span><span class="hotkey">Y</span></button>
-          <button class="cmd-btn cmd-btn--rally" data-action="rally-point" data-hotkey="R"><span class="btn-icon btn-icon--rally">RLY</span><span>Rally</span><span class="hotkey">R</span></button>
-        </div>
-        <!-- Blacksmith research panel (dynamically populated by HUD.showBlacksmithPanel) -->
-        <div class="command-panel command-panel--blacksmith" id="cmd-blacksmith" hidden></div>
-        <!-- Hero ability panel (shown when a hero is selected) -->
-        <div class="command-panel command-panel--hero" id="cmd-hero" hidden>
-          <button class="cmd-btn cmd-btn--ability" data-action="hero-ability-q" data-slot="0" data-hotkey="1">
-            <span class="btn-icon btn-icon--ability">AB1</span>
-            <span class="ability-name">Q</span>
-            <span class="ability-cd"></span>
-            <span class="hotkey">1</span>
-          </button>
-          <button class="cmd-btn cmd-btn--ability" data-action="hero-ability-w" data-slot="1" data-hotkey="2">
-            <span class="btn-icon btn-icon--ability">AB2</span>
-            <span class="ability-name">W</span>
-            <span class="ability-cd"></span>
-            <span class="hotkey">2</span>
-          </button>
-          <button class="cmd-btn cmd-btn--ability" data-action="hero-ability-e" data-slot="2" data-hotkey="3">
-            <span class="btn-icon btn-icon--ability">AB3</span>
-            <span class="ability-name">E</span>
-            <span class="ability-cd"></span>
-            <span class="hotkey">3</span>
-          </button>
-          <button class="cmd-btn" data-action="move"><span class="btn-icon btn-icon--move">MOV</span><span class="hotkey">M</span></button>
-          <button class="cmd-btn" data-action="attack"><span class="btn-icon btn-icon--attack">ATK</span><span class="hotkey">A</span></button>
-          <button class="cmd-btn" data-action="stop"><span class="btn-icon btn-icon--stop">STP</span><span class="hotkey">S</span></button>
-        </div>
-
-        <!-- Pause Menu -->
-        <div id="pause-overlay" hidden>
-          <div class="pause-content">
-            <h2 class="pause-title">Gepauzeerd</h2>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;margin-bottom:20px;font-size:0.8rem;padding:12px 16px;background:rgba(0,0,0,0.3);border-radius:8px;border:1px solid rgba(212,168,83,0.2)">
-              <div style="grid-column:1/-1;font-family:Cinzel,serif;color:#d4a853;font-size:0.85rem;margin-bottom:4px">Sneltoetsen</div>
-              <span style="color:#a0a0a0">Links klik</span><span>Selecteer</span>
-              <span style="color:#a0a0a0">Rechts klik</span><span>Commando</span>
-              <span style="color:#a0a0a0">WASD / Pijltjes</span><span>Camera bewegen</span>
-              <span style="color:#a0a0a0">Scroll</span><span>Zoom in/uit</span>
-              <span style="color:#a0a0a0">Q</span><span>Verplaats</span>
-              <span style="color:#a0a0a0">W</span><span>Aanval / Train Infanterie</span>
-              <span style="color:#a0a0a0">E</span><span>Stop / Train Sluiper</span>
-              <span style="color:#a0a0a0">B</span><span>Bouw Kazerne</span>
-              <span style="color:#a0a0a0">R</span><span>Carnavalsrage</span>
-              <span style="color:#a0a0a0">T</span><span>Train Held (Prins)</span>
-              <span style="color:#a0a0a0">1 / 2 / 3</span><span>Held abilities</span>
-              <span style="color:#a0a0a0">G</span><span>Raster aan/uit</span>
-              <span style="color:#a0a0a0">M</span><span>Geluid aan/uit</span>
-              <span style="color:#a0a0a0">Esc</span><span>Pauze</span>
-            </div>
-            <div class="pause-buttons">
-              <button class="go-btn" id="btn-resume">Hervatten</button>
-              <button class="go-btn" id="btn-pause-settings">Instellingen</button>
-              <button class="go-btn" id="btn-pause-menu">Naar Menu</button>
-            </div>
-          </div>
-        </div>
-
-        <div id="game-over" hidden>
-          <div id="game-over-title">OVERWINNING!</div>
-          <div id="game-over-subtitle">Brabant is veilig!</div>
-          <div class="game-over-stats">
-            <div class="stat-row"><span class="stat-key">Duur</span><span class="stat-val" id="stat-duration">0:00</span></div>
-            <div class="stat-row"><span class="stat-key">Getraind</span><span class="stat-val" id="stat-produced">0</span></div>
-            <div class="stat-row"><span class="stat-key">Verloren</span><span class="stat-val" id="stat-lost">0</span></div>
-            <div class="stat-row"><span class="stat-key">Gedood</span><span class="stat-val" id="stat-killed">0</span></div>
-            <div class="stat-row"><span class="stat-key">Gebouwen</span><span class="stat-val" id="stat-buildings">0</span></div>
-            <div class="stat-row"><span class="stat-key">Goud</span><span class="stat-val" id="stat-resources">0</span></div>
-          </div>
-          <div class="game-over-buttons">
-            <button class="go-btn" id="btn-retry">Opnieuw</button>
-            <button class="go-btn" id="btn-menu">Menu</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Camera Intro Overlay -->
-      <div id="camera-intro-overlay" class="is-hidden"></div>
-    </div>
-
-    <!-- ============ LOADING SCREEN ============ -->
-    <div id="loading-screen">
-      <div class="loading-logo">
-        <img src="assets/ui/logo.png" alt="Reign of Brabant" />
-      </div>
-      <h1 class="loading-title">Reign of Brabant</h1>
-      <div class="loading-bar-container">
-        <div class="loading-bar-track">
-          <div class="loading-bar-fill" id="loading-bar-fill"></div>
-        </div>
-      </div>
-      <div class="loading-meta">
-        <span id="loading-label">Even geduld...</span>
-        <span id="loading-percentage">0%</span>
-      </div>
-      <div class="loading-tip-container">
-        <p class="loading-tip" id="loading-tip">Wist je dat? Gebouwen blokkeren het pad van je eenheden. Plan je basis-layout!</p>
-      </div>
-      <span class="loading-version">v0.17.0</span>
-    </div>
+        <h2>Tip voor makers/press</h2>
+        <p class="small">
+          Voor footage, factsheet en contact: ga naar <a href="/press">/press</a>.
+        </p>
+      </aside>
+    </section>
   </div>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const tip = document.getElementById('fullscreen-tip');
-      const btn = document.getElementById('fullscreen-tip-btn');
-      const close = document.getElementById('fullscreen-tip-close');
-      if (tip && btn && close) {
-        btn.addEventListener('click', () => {
-          document.documentElement.requestFullscreen?.() || document.documentElement.webkitRequestFullscreen?.();
-          tip.hidden = true;
-        });
-        close.addEventListener('click', () => { tip.hidden = true; });
-      }
-    });
-  </script>
-  <script type="module" src="/src/main.ts"></script>
 </body>
 </html>
+

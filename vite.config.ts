@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 export default defineConfig(({ mode }) => ({
-  base: mode === 'production' ? '/games/reign-of-brabant/' : '/',
+  base: '/',
 
   resolve: {
     alias: {
@@ -31,6 +31,12 @@ export default defineConfig(({ mode }) => ({
     outDir: 'dist',
     sourcemap: false,
     minify: 'terser',
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        play: resolve(__dirname, 'play/index.html'),
+      },
+    },
   },
 
   assetsInclude: ['**/*.glb', '**/*.gltf', '**/*.ogg', '**/*.mp3', '**/*.wasm'],
