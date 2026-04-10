@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.19.0] - 2026-04-10
+
+### Added
+- **Umami Analytics** — Self-hosted op analytics.reign-of-brabant.nl (M4 Docker)
+- **Mollie Payment Server** — iDEAL, Creditcard, Bancontact, PayPal via /api/payment
+- **Live donatie-teller** — /api/donations/stats endpoint, worstenbroodjes counter op steun pagina
+- **Crypto wallets** — BTC + ETH Kraken deposit adressen met QR codes op /steun/
+- **robots.txt + sitemap.xml** — 10 URLs, Disallow /api/ en /assets/audio|models/
+- **Structured data (JSON-LD)** — VideoGame, Organization, BreadcrumbList schema
+- **8 OG images** — Unieke 1200x630 images per pagina via fal.ai Flux Pro
+- **Twitter cards** — summary_large_image op alle pagina's
+- **Canonical URLs + hreflang** — nl op alle pagina's
+- **Floating CTA** — Sticky "Doe mee" bar op /steun/ na 30% scroll
+- **Custom tracking events** — play_click, steun_page_visit, donate_click
+
+### Changed
+- **Loading 50% sneller** — Selective faction loading (2 ipv 4 facties, ~150MB ipv 400MB+)
+- **Echte loading progress** — Bar toont daadwerkelijke model download voortgang, geen fake fases
+- **og:image absolute URLs** — Relatieve paden gefixt naar https://reign-of-brabant.nl/...
+- **Payment buttons** — Van placeholder links naar echte Mollie API checkout calls
+
+### Fixed
+- **Payment minimum** — Server accepteert nu EUR 1.00+ (was 2.50, maar 1 broodje = EUR 2)
+
 ## [0.18.0] - 2026-04-10
 
 ### Added
