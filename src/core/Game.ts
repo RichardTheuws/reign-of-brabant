@@ -1765,8 +1765,12 @@ export class Game {
             this.clearRallyPoint(bEid);
             return;
           }
-          // Set rally point to clicked position
-          this.setRallyPoint(bEid, point.x, point.z);
+          // If right-clicking a resource, set rally point with resource target
+          if (targetEid !== null && hasComponent(world, targetEid, IsResource)) {
+            this.setRallyPoint(bEid, point.x, point.z, targetEid);
+          } else {
+            this.setRallyPoint(bEid, point.x, point.z);
+          }
           return;
         }
       }
@@ -1803,9 +1807,10 @@ export class Game {
    * Set a rally point on a production building.
    * Updates the ECS RallyPoint component and shows a visual flag marker.
    */
-  private setRallyPoint(buildingEid: number, x: number, z: number): void {
+  private setRallyPoint(buildingEid: number, x: number, z: number, resourceEid: number = NO_ENTITY): void {
     RallyPoint.x[buildingEid] = x;
     RallyPoint.z[buildingEid] = z;
+    RallyPoint.resourceEid[buildingEid] = resourceEid;
     const factionId = Faction.id[buildingEid];
     this.buildingRenderer.setRallyPoint(buildingEid, x, z, factionId);
     audioManager.playSound('click');
@@ -1818,6 +1823,7 @@ export class Game {
     // Reset to default position: offset from building
     RallyPoint.x[buildingEid] = Position.x[buildingEid] + 3;
     RallyPoint.z[buildingEid] = Position.z[buildingEid];
+    RallyPoint.resourceEid[buildingEid] = NO_ENTITY;
     this.buildingRenderer.removeRallyPoint(buildingEid);
     this.hud?.showAlert('Rally point gewist', 'info');
   }
@@ -1836,7 +1842,12 @@ export class Game {
 
     if (hits.length > 0 && this.rallyPointBuildingEid >= 0) {
       const point = hits[0].point;
-      this.setRallyPoint(this.rallyPointBuildingEid, point.x, point.z);
+      const targetEid = this.findEntityAtPosition(point.x, point.z);
+      if (targetEid !== null && hasComponent(world, targetEid, IsResource)) {
+        this.setRallyPoint(this.rallyPointBuildingEid, point.x, point.z, targetEid);
+      } else {
+        this.setRallyPoint(this.rallyPointBuildingEid, point.x, point.z);
+      }
     }
 
     this.exitRallyPointMode();
@@ -2489,31 +2500,38 @@ export class Game {
     const toMiniX = (wx: number) => ((wx + halfMap) / MAP_SIZE) * w;
     const toMiniY = (wz: number) => ((wz + halfMap) / MAP_SIZE) * h;
 
-    // Draw resources (gold = yellow, wood = green, only if explored)
+    // Draw resources (gold = yellow, wood = green, fog-filtered)
     for (const [eid] of this.entityMeshMap) {
       if (hasComponent(world, eid, IsResource)) {
         const wx = Position.x[eid];
         const wz = Position.z[eid];
         if (!this.fogOfWarRenderer.isExplored(wx, wz)) continue;
         if (Resource.amount[eid] <= 0) continue;
+        const visible = this.fogOfWarRenderer.isVisible(wx, wz);
+        ctx.globalAlpha = visible ? 1.0 : 0.4;
         const mx = toMiniX(wx);
         const my = toMiniY(wz);
         ctx.fillStyle = Resource.type[eid] === ResourceType.Wood ? '#228B22' : '#FFD700';
         ctx.fillRect(mx - 2, my - 2, 5, 5);
       }
     }
+    ctx.globalAlpha = 1.0;
 
-    // Draw buildings (larger dots, only if explored)
+    // Draw buildings (larger dots, fog-filtered)
     for (const eid of this.knownBuildingEntities) {
       if (!entityExists(world, eid)) continue;
       const wx = Position.x[eid];
       const wz = Position.z[eid];
-      if (!this.fogOfWarRenderer.isExplored(wx, wz)) continue;
+      const isOwn = Faction.id[eid] === this.playerFactionId;
+      if (!isOwn && !this.fogOfWarRenderer.isExplored(wx, wz)) continue;
+      const visible = isOwn || this.fogOfWarRenderer.isVisible(wx, wz);
+      ctx.globalAlpha = visible ? 1.0 : 0.4;
       const mx = toMiniX(wx);
       const my = toMiniY(wz);
       ctx.fillStyle = MINIMAP_COLORS[Faction.id[eid]] ?? '#888888';
       ctx.fillRect(mx - 3, my - 3, 7, 7);
     }
+    ctx.globalAlpha = 1.0;
 
     // Draw units (only if visible or own faction)
     for (const eid of this.knownUnitEntities) {
@@ -2522,7 +2540,6 @@ export class Game {
       const wx = Position.x[eid];
       const wz = Position.z[eid];
       const isOwn = Faction.id[eid] === this.playerFactionId;
-      // Only show enemy units if they're currently visible
       if (!isOwn && !this.fogOfWarRenderer.isVisible(wx, wz)) continue;
       const mx = toMiniX(wx);
       const my = toMiniY(wz);

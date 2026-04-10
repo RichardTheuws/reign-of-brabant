@@ -8,7 +8,7 @@
  * Note: Gold is deducted at command time (in CommandSystem), not here.
  */
 
-import { query, addEntity, addComponent, hasComponent } from 'bitecs';
+import { query, addEntity, addComponent, hasComponent, entityExists } from 'bitecs';
 import {
   Position,
   Production,
@@ -26,8 +26,9 @@ import {
   Selected,
   GezeligheidBonus,
   RallyPoint,
+  Resource,
 } from '../ecs/components';
-import { IsBuilding, IsUnit, IsWorker, IsDead } from '../ecs/tags';
+import { IsBuilding, IsUnit, IsWorker, IsResource, IsDead, NeedsPathfinding } from '../ecs/tags';
 import { playerState } from '../core/PlayerState';
 import { eventBus } from '../core/EventBus';
 import {
@@ -293,11 +294,27 @@ function spawnUnit(
     Gatherer.previousTarget[eid] = NO_ENTITY;
   }
 
-  // Send unit to rally point if building has a custom rally point set
-  if (hasComponent(world, buildingEid, RallyPoint)) {
+  // Worker auto-assign: send newly trained workers to gather resources
+  if (template.isWorker) {
+    const assigned = assignWorkerToResource(world, eid, buildingEid);
+    if (!assigned && hasComponent(world, buildingEid, RallyPoint)) {
+      // No resource found -- fall back to rally point position if custom
+      const rx = RallyPoint.x[buildingEid];
+      const rz = RallyPoint.z[buildingEid];
+      const defaultRallyX = Position.x[buildingEid] + 3;
+      const defaultRallyZ = Position.z[buildingEid];
+      const isCustomRally = Math.abs(rx - defaultRallyX) > 0.5 || Math.abs(rz - defaultRallyZ) > 0.5;
+      if (isCustomRally) {
+        Movement.targetX[eid] = rx;
+        Movement.targetZ[eid] = rz;
+        Movement.hasTarget[eid] = 1;
+        UnitAI.state[eid] = UnitAIState.Moving;
+      }
+    }
+  } else if (hasComponent(world, buildingEid, RallyPoint)) {
+    // Non-worker: send to rally point position if custom
     const rx = RallyPoint.x[buildingEid];
     const rz = RallyPoint.z[buildingEid];
-    // Check if rally point differs from the default offset position
     const defaultRallyX = Position.x[buildingEid] + 3;
     const defaultRallyZ = Position.z[buildingEid];
     const isCustomRally = Math.abs(rx - defaultRallyX) > 0.5 || Math.abs(rz - defaultRallyZ) > 0.5;
@@ -361,4 +378,92 @@ function shiftQueue(bEid: number, factionId: number): void {
     Production.unitType[bEid] = NO_PRODUCTION;
     Production.progress[bEid] = 0;
   }
+}
+
+// ---------------------------------------------------------------------------
+// Worker auto-assign to resources
+// ---------------------------------------------------------------------------
+
+/**
+ * Assign a newly trained worker to gather resources.
+ *
+ * Priority:
+ * 1. Rally point resource (if building rally is set on a valid resource)
+ * 2. Nearest resource to the building (gold mine or tree)
+ *
+ * Returns true if the worker was assigned, false otherwise.
+ */
+function assignWorkerToResource(
+  world: GameWorld,
+  workerEid: number,
+  buildingEid: number,
+): boolean {
+  // 1. Check if building has a rally point targeting a specific resource
+  if (hasComponent(world, buildingEid, RallyPoint)) {
+    const rallyResEid = RallyPoint.resourceEid[buildingEid];
+    if (
+      rallyResEid !== NO_ENTITY &&
+      entityExists(world, rallyResEid) &&
+      !hasComponent(world, rallyResEid, IsDead) &&
+      Resource.amount[rallyResEid] > 0
+    ) {
+      sendWorkerToGather(world, workerEid, rallyResEid);
+      return true;
+    }
+  }
+
+  // 2. Find nearest resource (gold mine or tree) to the building
+  const nearestRes = findNearestResource(world, buildingEid);
+  if (nearestRes !== NO_ENTITY) {
+    sendWorkerToGather(world, workerEid, nearestRes);
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Issue a gather command on a worker, sending it to the target resource.
+ */
+function sendWorkerToGather(world: GameWorld, workerEid: number, resourceEid: number): void {
+  Gatherer.state[workerEid] = 1; // MOVING_TO_RESOURCE
+  Gatherer.targetEid[workerEid] = resourceEid;
+  Gatherer.carrying[workerEid] = 0;
+  Gatherer.resourceType[workerEid] = Resource.type[resourceEid];
+
+  Movement.targetX[workerEid] = Position.x[resourceEid];
+  Movement.targetZ[workerEid] = Position.z[resourceEid];
+  Movement.hasTarget[workerEid] = 1;
+
+  UnitAI.state[workerEid] = UnitAIState.MovingToResource;
+  UnitAI.targetEid[workerEid] = resourceEid;
+
+  addComponent(world, workerEid, NeedsPathfinding);
+}
+
+/**
+ * Find the nearest resource node (gold or wood) to a building.
+ */
+function findNearestResource(world: GameWorld, buildingEid: number): number {
+  const resources = query(world, [Position, Resource, IsResource]);
+  const bx = Position.x[buildingEid];
+  const bz = Position.z[buildingEid];
+  let closestEid = NO_ENTITY;
+  let closestDistSq = Infinity;
+
+  for (const rEid of resources) {
+    if (Resource.amount[rEid] <= 0) continue;
+    if (hasComponent(world, rEid, IsDead)) continue;
+
+    const dx = Position.x[rEid] - bx;
+    const dz = Position.z[rEid] - bz;
+    const distSq = dx * dx + dz * dz;
+
+    if (distSq < closestDistSq) {
+      closestDistSq = distSq;
+      closestEid = rEid;
+    }
+  }
+
+  return closestEid;
 }

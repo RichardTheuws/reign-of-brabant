@@ -151,6 +151,7 @@ export const Production = {
 export const RallyPoint = {
   x: f32(),
   z: f32(),
+  resourceEid: u32(),  // target resource entity for worker auto-gather (NO_ENTITY = none)
 };
 
 // ---------------------------------------------------------------------------

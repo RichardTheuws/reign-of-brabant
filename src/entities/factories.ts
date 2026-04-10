@@ -447,6 +447,7 @@ export function createTownHall(
   // Rally point: slightly in front of building
   RallyPoint.x[eid] = x + 4;
   RallyPoint.z[eid] = z;
+  RallyPoint.resourceEid[eid] = NO_ENTITY;
 
   return eid;
 }
@@ -482,6 +483,7 @@ export function createBarracks(
   // Rally point: slightly in front of building
   RallyPoint.x[eid] = x + 3;
   RallyPoint.z[eid] = z;
+  RallyPoint.resourceEid[eid] = NO_ENTITY;
 
   return eid;
 }
@@ -674,6 +676,7 @@ export function createBuilding(
 
     RallyPoint.x[eid] = x + 3;
     RallyPoint.z[eid] = z;
+    RallyPoint.resourceEid[eid] = NO_ENTITY;
   }
 
   return eid;
