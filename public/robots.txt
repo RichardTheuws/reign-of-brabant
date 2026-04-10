@@ -1,0 +1,15 @@
+# Reign of Brabant — robots.txt
+# https://reign-of-brabant.nl/
+
+User-agent: *
+Allow: /
+
+# Blokkeer interne tooling en API endpoints
+Disallow: /api/
+Disallow: /assets/audio/
+Disallow: /assets/models/
+Disallow: /animation-preview.html
+Disallow: /voice-preview.html
+
+# Sitemap
+Sitemap: https://reign-of-brabant.nl/sitemap.xml

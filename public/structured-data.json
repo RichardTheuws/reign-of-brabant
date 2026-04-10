@@ -1,0 +1,95 @@
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Reign of Brabant",
+    "alternateName": "RoB",
+    "description": "Een satirische WarCraft-style RTS browser game met 4 facties, Brabants dialect en 3D graphics. Gebouwd door 1 persoon met AI.",
+    "url": "https://reign-of-brabant.nl/",
+    "applicationCategory": "Game",
+    "applicationSubCategory": "Real-Time Strategy",
+    "operatingSystem": "Web Browser",
+    "browserRequirements": "Requires WebGL 2.0 and modern browser (Chrome, Firefox, Safari, Edge)",
+    "inLanguage": "nl",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "EUR"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "Richard Theuws",
+      "url": "https://theuws.com"
+    },
+    "genre": ["Real-Time Strategy", "Browser Game", "Indie Game"],
+    "gamePlatform": "Web Browser",
+    "screenshot": "https://reign-of-brabant.nl/assets/steun/hero-banner.webp",
+    "image": "https://reign-of-brabant.nl/assets/ui/og-image.png"
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Theuws",
+    "url": "https://theuws.com",
+    "logo": "https://reign-of-brabant.nl/assets/ui/logo.png",
+    "sameAs": [],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "url": "https://reign-of-brabant.nl/community/"
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://reign-of-brabant.nl/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Speel",
+        "item": "https://reign-of-brabant.nl/play/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Steun",
+        "item": "https://reign-of-brabant.nl/steun/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "name": "Het Verhaal",
+        "item": "https://reign-of-brabant.nl/het-verhaal/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 5,
+        "name": "Roadmap",
+        "item": "https://reign-of-brabant.nl/roadmap/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 6,
+        "name": "Community",
+        "item": "https://reign-of-brabant.nl/community/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 7,
+        "name": "Doneer",
+        "item": "https://reign-of-brabant.nl/doneer/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 8,
+        "name": "Press",
+        "item": "https://reign-of-brabant.nl/press/"
+      }
+    ]
+  }
+]

@@ -7,10 +7,51 @@
     <meta name="description" content="Een satirische WarCraft-style RTS in je browser. 4 facties, Brabants dialect, 33.559 regels code. Gebouwd door 1 persoon met AI.">
     <meta property="og:title" content="Reign of Brabant — Nie Fokke Mee Brabant">
     <meta property="og:description" content="Een satirische WarCraft-style RTS in je browser. 4 facties, Brabants dialect, 33.559 regels code. Gebouwd door 1 persoon met AI.">
-    <meta property="og:image" content="/assets/steun/hero-banner.webp">
+    <meta property="og:image" content="https://reign-of-brabant.nl/assets/og/og-landing.png">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://reign-of-brabant.nl/">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Reign of Brabant — Nie Fokke Mee Brabant">
+    <meta name="twitter:description" content="Een satirische WarCraft-style RTS in je browser. 4 facties, Brabants dialect, 33.559 regels code. Gebouwd door 1 persoon met AI.">
+    <meta name="twitter:image" content="https://reign-of-brabant.nl/assets/og/og-landing.png">
+    <link rel="canonical" href="https://reign-of-brabant.nl/">
+    <link rel="alternate" hreflang="nl" href="https://reign-of-brabant.nl/">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Richard Theuws">
+    <meta name="theme-color" content="#0a0806">
     <link rel="icon" href="/assets/ui/logo.png" type="image/png">
+    <script type="application/ld+json">
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "VideoGame",
+        "name": "Reign of Brabant",
+        "alternateName": "RoB",
+        "description": "Een satirische WarCraft-style RTS browser game met 4 facties, Brabants dialect en 3D graphics. Gebouwd door 1 persoon met AI.",
+        "url": "https://reign-of-brabant.nl/",
+        "applicationCategory": "Game",
+        "applicationSubCategory": "Real-Time Strategy",
+        "operatingSystem": "Web Browser",
+        "browserRequirements": "WebGL 2.0, modern browser (Chrome, Firefox, Safari, Edge)",
+        "inLanguage": "nl",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+        "author": { "@type": "Person", "name": "Richard Theuws", "url": "https://theuws.com" },
+        "genre": ["Real-Time Strategy", "Browser Game", "Indie Game"],
+        "gamePlatform": "Web Browser",
+        "screenshot": "https://reign-of-brabant.nl/assets/steun/hero-banner.webp",
+        "image": "https://reign-of-brabant.nl/assets/ui/og-image.png"
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://reign-of-brabant.nl/" }
+        ]
+      }
+    ]
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -828,6 +869,8 @@
     }
 
     </style>
+    <!-- Umami Analytics -->
+    <script defer src="https://analytics.reign-of-brabant.nl/script.js" data-website-id="8c91d569-5945-45d6-b407-ffe6749b9cbc"></script>
 </head>
 <body>
 
@@ -870,7 +913,7 @@
                 Gebouwd door 1 persoon. Met AI.
             </p>
             <div class="hero__cta-group">
-                <a href="/play/" class="btn btn--primary">Speel Nu</a>
+                <a href="/play/" class="btn btn--primary" data-umami-event="play_click">Speel Nu</a>
                 <a href="/het-verhaal/" class="btn">Het Verhaal</a>
                 <a href="/steun/" class="btn btn--ghost">Steun het Project</a>
             </div>

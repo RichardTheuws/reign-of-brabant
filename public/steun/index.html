@@ -7,9 +7,21 @@
     <meta name="description" content="33.559 regels code. 127 3D modellen. 525 stemmen. 3 dagen. 1 persoon. Reign of Brabant is een WarCraft-achtige RTS in je browser. Steun het experiment.">
     <meta property="og:title" content="Steun Reign of Brabant — Brabant staat op">
     <meta property="og:description" content="Een RTS met vier facties, Brabants dialect en meer ambitie dan verstand. Gebouwd door een mens en een AI in 3 dagen. Steun het en word deel van het verhaal.">
-    <meta property="og:image" content="/assets/steun/hero-banner.webp">
+    <meta property="og:image" content="https://reign-of-brabant.nl/assets/og/og-steun.png">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://reign-of-brabant.nl/steun/">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Steun Reign of Brabant — Brabant staat op">
+    <meta name="twitter:description" content="Een RTS met vier facties, Brabants dialect en meer ambitie dan verstand. Gebouwd door een mens en een AI in 3 dagen.">
+    <meta name="twitter:image" content="https://reign-of-brabant.nl/assets/og/og-steun.png">
+    <link rel="canonical" href="https://reign-of-brabant.nl/steun/">
+    <link rel="alternate" hreflang="nl" href="https://reign-of-brabant.nl/steun/">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Richard Theuws">
+    <meta name="theme-color" content="#0a0806">
+    <link rel="icon" href="/assets/ui/logo.png" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -1161,7 +1173,40 @@
     .hero__bg, .hero__glow, .compare__before, .compare__handle, .sticky-nav {
         will-change: transform;
     }
+
+    /* Floating CTA */
+    .floating-cta {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 9999;
+        background: linear-gradient(135deg, rgba(10, 8, 6, 0.95), rgba(18, 16, 13, 0.95));
+        border-top: 1px solid var(--border);
+        padding: 0.75rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        backdrop-filter: blur(12px);
+        transition: transform 0.4s var(--ease-out-expo);
+    }
+    .floating-cta.hidden { transform: translateY(100%); }
+    .floating-cta__text { color: var(--text-secondary); font-size: 0.9rem; }
+    .floating-cta__btn {
+        background: linear-gradient(135deg, var(--gold), var(--gold-light));
+        color: var(--bg-dark);
+        padding: 0.5rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-family: var(--font-heading);
+        text-decoration: none;
+        font-size: 0.85rem;
+        letter-spacing: 0.02em;
+        white-space: nowrap;
+    }
     </style>
+    <!-- Umami Analytics -->
+    <script defer src="https://analytics.reign-of-brabant.nl/script.js" data-website-id="8c91d569-5945-45d6-b407-ffe6749b9cbc"></script>
 </head>
 <body>
 
@@ -1675,10 +1720,10 @@
                     <div class="donate__payment-section">
                         <div class="donate__payment-section-title">Betaalmethode kiezen</div>
                         <div class="donate__payment-methods">
-                            <a href="#" class="donate__payment-method" id="payIdeal" data-method="ideal">iDEAL</a>
-                            <a href="#" class="donate__payment-method" id="payCreditcard" data-method="creditcard">Creditcard</a>
-                            <a href="#" class="donate__payment-method" id="payBancontact" data-method="bancontact">Bancontact</a>
-                            <a href="#" class="donate__payment-method" id="payPaypal" data-method="paypal">PayPal</a>
+                            <button class="donate__payment-method" id="payIdeal" data-method="ideal">iDEAL</button>
+                            <button class="donate__payment-method" id="payCreditcard" data-method="creditcard">Creditcard</button>
+                            <button class="donate__payment-method" id="payBancontact" data-method="bancontact">Bancontact</button>
+                            <button class="donate__payment-method" id="payPaypal" data-method="paypal">PayPal</button>
                         </div>
                     </div>
 
@@ -2214,14 +2259,40 @@
         }
 
         function updatePaymentLinks(total) {
-            // Placeholder URLs — will be replaced with actual Mollie payment links
-            const baseUrl = 'https://reign-of-brabant.nl/api/payment';
-            const params = `?amount=${total}&description=Steun+Reign+of+Brabant+-+${selectedAmount}+worstenbroodjes`;
-
-            document.getElementById('payIdeal').href = baseUrl + params + '&method=ideal';
-            document.getElementById('payCreditcard').href = baseUrl + params + '&method=creditcard';
-            document.getElementById('payBancontact').href = baseUrl + params + '&method=bancontact';
-            document.getElementById('payPaypal').href = baseUrl + params + '&method=paypal';
+            const methods = ['ideal', 'creditcard', 'bancontact', 'paypal'];
+            const labels = { ideal: 'iDEAL', creditcard: 'Creditcard', bancontact: 'Bancontact', paypal: 'PayPal' };
+            methods.forEach(method => {
+                const el = document.getElementById('pay' + method.charAt(0).toUpperCase() + method.slice(1));
+                if (!el) return;
+                el.onclick = async (e) => {
+                    e.preventDefault();
+                    el.style.opacity = '0.5';
+                    el.textContent = 'Even geduld...';
+                    trackEvent('donate_click', { method: method, amount: total, broodjes: selectedAmount });
+                    try {
+                        const res = await fetch('/api/payment', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                amount: total.toFixed(2),
+                                method: method,
+                                broodjes: selectedAmount,
+                                naam: 'Supporter'
+                            })
+                        });
+                        const data = await res.json();
+                        if (data.checkoutUrl) {
+                            window.location.href = data.checkoutUrl;
+                        } else {
+                            throw new Error(data.error || 'Betaling mislukt');
+                        }
+                    } catch (err) {
+                        el.style.opacity = '1';
+                        el.textContent = labels[method];
+                        console.error('Payment error:', err);
+                    }
+                };
+            });
         }
 
         // Quick-select buttons
@@ -2418,8 +2489,53 @@
             }, 4000);
         }
 
+        // Umami tracking events
+        function trackEvent(name, data) {
+            if (typeof umami !== 'undefined') umami.track(name, data || {});
+        }
+
+        // Track steun page visit
+        trackEvent('steun_page_visit', { referrer: document.referrer || 'direct' });
+
+        // Live donatie teller
+        (async function loadDonationStats() {
+            try {
+                const res = await fetch('/api/donations/stats');
+                const stats = await res.json();
+                const counter = document.getElementById('communityCounter');
+                if (counter && stats.totalBroodjes > 0) {
+                    counter.textContent = stats.totalBroodjes + ' worstenbroodjes gedoneerd door ' + stats.totalDonations + ' supporters';
+                }
+            } catch (e) { /* stats not available yet */ }
+        })();
+
+        // Floating CTA - verschijnt na 30% scroll, verbergt bij #steun sectie
+        (function() {
+            const cta = document.getElementById('floatingCta');
+            const steunSection = document.getElementById('steun');
+            if (!cta || !steunSection) return;
+
+            let shown = false;
+            window.addEventListener('scroll', function() {
+                const scrollPercent = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+                const steunTop = steunSection.getBoundingClientRect().top;
+
+                if (scrollPercent > 0.3 && steunTop > window.innerHeight) {
+                    if (!shown) { cta.style.display = 'flex'; shown = true; }
+                    cta.classList.remove('hidden');
+                } else {
+                    cta.classList.add('hidden');
+                }
+            }, { passive: true });
+        })();
+
     })();
     </script>
+
+<div class="floating-cta" id="floatingCta" style="display:none;">
+    <span class="floating-cta__text" id="floatingText">Steun Reign of Brabant</span>
+    <a href="#steun" class="floating-cta__btn">Doe mee</a>
+</div>
 
 </body>
 </html>

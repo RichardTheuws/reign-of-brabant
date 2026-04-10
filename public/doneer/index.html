@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Doneer — Reign of Brabant</title>
+  <meta name="description" content="Steun de ontwikkeling van Reign of Brabant met een vrijwillige bijdrage." />
+  <meta property="og:title" content="Doneer — Reign of Brabant" />
+  <meta property="og:description" content="Steun de ontwikkeling van Reign of Brabant met een vrijwillige bijdrage." />
+  <meta property="og:image" content="https://reign-of-brabant.nl/assets/og/og-steun.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://reign-of-brabant.nl/doneer/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Doneer — Reign of Brabant" />
+  <meta name="twitter:description" content="Steun de ontwikkeling van Reign of Brabant met een vrijwillige bijdrage." />
+  <meta name="twitter:image" content="https://reign-of-brabant.nl/assets/og/og-steun.png" />
+  <link rel="canonical" href="https://reign-of-brabant.nl/doneer/" />
+  <link rel="alternate" hreflang="nl" href="https://reign-of-brabant.nl/doneer/" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="Richard Theuws" />
+  <meta name="theme-color" content="#0a0806" />
+  <link rel="icon" href="/assets/ui/logo.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --bg:#0a0806;
+      --panel:rgba(20,15,10,0.92);
+      --border:rgba(212,168,83,0.35);
+      --gold:#d4a853;
+      --gold2:#e8c065;
+      --text:#e8e6e3;
+      --dim:#a0a0a0;
+      --fontH:'Cinzel',serif;
+      --fontB:'Inter','Segoe UI',system-ui,sans-serif;
+    }
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:var(--fontB);}
+    a{color:var(--gold2);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .wrap{max-width:980px;margin:0 auto;padding:28px 18px 60px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand img{width:48px;height:48px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(212,168,83,0.18))}
+    .brand-title{font-family:var(--fontH);font-weight:900;letter-spacing:0.06em}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:10px 14px;border-radius:8px;border:1px solid var(--border);
+      background:rgba(212,168,83,0.10);color:var(--text);cursor:pointer;
+      font-family:var(--fontH);font-weight:700;letter-spacing:0.03em;
+    }
+    .btn:hover{border-color:var(--gold);background:rgba(212,168,83,0.18)}
+    .btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+    .btn[aria-disabled="true"]{opacity:0.45;cursor:not-allowed}
+    .grid{display:grid;grid-template-columns:1.25fr 0.75fr;gap:16px}
+    @media (max-width: 900px){.grid{grid-template-columns:1fr}}
+    .card{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:18px 18px;
+      box-shadow:0 12px 30px rgba(0,0,0,0.45);
+    }
+    h1{font-family:var(--fontH);margin:0 0 8px;color:var(--gold);font-weight:900}
+    h2{font-family:var(--fontH);margin:18px 0 8px;color:var(--gold2);font-weight:900;font-size:1.05rem}
+    p{margin:8px 0;line-height:1.6;color:var(--text)}
+    .small{color:var(--dim);font-size:0.92rem}
+    .amounts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+    @media (max-width: 520px){.amounts{grid-template-columns:1fr}}
+    .amount{
+      display:flex;flex-direction:column;gap:6px;align-items:stretch;
+      padding:12px;border-radius:10px;border:1px solid rgba(212,168,83,0.25);
+      background:rgba(0,0,0,0.18);
+    }
+    .amount strong{font-family:var(--fontH);letter-spacing:0.02em}
+    .amount .btn{width:100%}
+    .pill{display:inline-block;font-size:0.78rem;color:var(--dim);border:1px solid rgba(255,255,255,0.14);padding:2px 10px;border-radius:999px}
+    ul{margin:10px 0 0 18px;color:var(--text);line-height:1.6}
+    .footer{margin-top:18px;color:var(--dim);font-size:0.9rem}
+    .notice{padding:10px 12px;border-left:3px solid rgba(212,168,83,0.65);background:rgba(212,168,83,0.08);border-radius:10px}
+  </style>
+  <!-- Umami Analytics -->
+  <script defer src="https://analytics.reign-of-brabant.nl/script.js" data-website-id="8c91d569-5945-45d6-b407-ffe6749b9cbc"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <img src="/assets/ui/logo.png" alt="Reign of Brabant logo" />
+        <div>
+          <div class="brand-title">Reign of Brabant</div>
+          <div class="small">Doneer / steun de ontwikkeling</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+        <a class="btn" href="/play">Spelen</a>
+        <a class="btn" href="/het-verhaal">Het Verhaal</a>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h1>Doneer</h1>
+        <p>
+          Wil je <strong>Reign of Brabant</strong> steunen? Met een vrijwillige bijdrage help je me om meer tijd in ontwikkeling,
+          assets en polish te stoppen.
+        </p>
+
+        <div class="notice small">
+          Dit is een <strong>vrijwillige bijdrage/fooi</strong>. Je ontvangt <strong>geen goederen of diensten</strong> in ruil.
+        </div>
+
+        <h2>Kies een bedrag</h2>
+        <p class="small">
+          De knoppen hieronder zijn bedoeld voor Stripe/Mollie hosted checkout links. Zet de echte links erin zodra ze live staan.
+        </p>
+
+        <div class="amounts" role="list" aria-label="Donatiebedragen">
+          <div class="amount" role="listitem">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+              <strong>€5</strong><span class="pill">Koffie</span>
+            </div>
+            <a class="btn" aria-disabled="true" href="#">Binnenkort</a>
+          </div>
+          <div class="amount" role="listitem">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+              <strong>€10</strong><span class="pill">Support</span>
+            </div>
+            <a class="btn" aria-disabled="true" href="#">Binnenkort</a>
+          </div>
+          <div class="amount" role="listitem">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+              <strong>€25</strong><span class="pill">Boost</span>
+            </div>
+            <a class="btn" aria-disabled="true" href="#">Binnenkort</a>
+          </div>
+        </div>
+
+        <h2>Waar gaat het naartoe?</h2>
+        <ul>
+          <li>Performance & laadtijd (assets/streaming)</li>
+          <li>AI, combat readability en balans</li>
+          <li>Meer polish in UI/UX, audio feedback en tutorial</li>
+          <li>Pipeline: models/animaties/voices consistenter en sneller itereren</li>
+        </ul>
+
+        <div class="footer">
+          Liever geen betaling via checkout? Stuur me een bericht via GitHub of Discord (zie “Community”).
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Privacy (kort)</h2>
+        <p class="small">
+          Voor het afhandelen van betalingen gebruiken we een payment provider (bijv. Stripe of Mollie). Zij verwerken de
+          betalingsgegevens. Ik probeer de hoeveelheid data die ik zelf opsla minimaal te houden.
+        </p>
+        <ul class="small">
+          <li><strong>Doel</strong>: betaling verwerken en (optioneel) bevestiging mogelijk maken.</li>
+          <li><strong>Marketing</strong>: alleen als je zelf expliciet opt-in geeft (zie hieronder).</li>
+          <li><strong>Bewaartermijn</strong>: volgens boekhoudplicht waar van toepassing.</li>
+        </ul>
+
+        <h2>Nieuwsbrief (optioneel)</h2>
+        <p class="small">
+          Ik wil e-mail alleen gebruiken als jij dat expliciet wil. Er is (nog) geen automatische mailinglist op deze site.
+        </p>
+        <p class="small">
+          Opt-in via e-mail:
+          <a href="mailto:richard@theuws.com?subject=Reign%20of%20Brabant%20%E2%80%94%20Nieuwsbrief%20opt-in&body=Hoi%20Richard%2C%0A%0AIk%20wil%20graag%20updates%20ontvangen%20over%20Reign%20of%20Brabant.%0A%0AMijn%20naam%3A%20%0A%0A(Je%20mag%20mijn%20e-mailadres%20gebruiken%20voor%20de%20nieuwsbrief%20en%20niet%20voor%20andere%20doeleinden.)%0A">
+            Klik hier om je aan te melden
+          </a>
+        </p>
+
+        <h2>Community</h2>
+        <p class="small">
+          Volg de voortgang en praat mee:
+        </p>
+        <ul class="small">
+          <li><a href="https://github.com/RichardTheuws/reign-of-brabant">GitHub repo</a></li>
+          <li><a href="/press">Press</a> (presskit & links)</li>
+          <li><a href="/roadmap">Roadmap</a> (milestones)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+

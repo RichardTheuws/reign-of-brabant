@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roadmap — Reign of Brabant</title>
+  <meta name="description" content="Publieke roadmap en milestones voor Reign of Brabant." />
+  <meta property="og:title" content="Roadmap — Reign of Brabant" />
+  <meta property="og:description" content="Publieke roadmap en milestones voor Reign of Brabant." />
+  <meta property="og:image" content="https://reign-of-brabant.nl/assets/og/og-roadmap.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://reign-of-brabant.nl/roadmap/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Roadmap — Reign of Brabant" />
+  <meta name="twitter:description" content="Publieke roadmap en milestones voor Reign of Brabant." />
+  <meta name="twitter:image" content="https://reign-of-brabant.nl/assets/og/og-roadmap.png" />
+  <link rel="canonical" href="https://reign-of-brabant.nl/roadmap/" />
+  <link rel="alternate" hreflang="nl" href="https://reign-of-brabant.nl/roadmap/" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="Richard Theuws" />
+  <meta name="theme-color" content="#0a0806" />
+  <link rel="icon" href="/assets/ui/logo.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root{--bg:#0a0806;--panel:rgba(20,15,10,0.92);--border:rgba(212,168,83,0.35);--gold:#d4a853;--gold2:#e8c065;--text:#e8e6e3;--dim:#a0a0a0;--fontH:'Cinzel',serif;--fontB:'Inter','Segoe UI',system-ui,sans-serif;}
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:var(--fontB);}
+    a{color:var(--gold2);text-decoration:none} a:hover{text-decoration:underline}
+    .wrap{max-width:980px;margin:0 auto;padding:28px 18px 60px}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:0 16px 44px rgba(0,0,0,0.55)}
+    h1{font-family:var(--fontH);margin:0 0 8px;color:var(--gold);font-weight:900}
+    h2{font-family:var(--fontH);margin:16px 0 8px;color:var(--gold2);font-weight:900;font-size:1.05rem}
+    p{margin:8px 0;line-height:1.65}
+    .small{color:var(--dim);font-size:0.92rem}
+    .nav{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:rgba(212,168,83,0.10);color:var(--text);font-family:var(--fontH);font-weight:800;letter-spacing:0.03em}
+    .btn:hover{border-color:var(--gold);background:rgba(212,168,83,0.18);text-decoration:none}
+    .milestone{padding:12px;border:1px solid rgba(212,168,83,0.22);border-radius:12px;background:rgba(0,0,0,0.18);margin-top:10px}
+    .milestoneTitle{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+    .pill{display:inline-block;font-size:0.78rem;color:var(--dim);border:1px solid rgba(255,255,255,0.14);padding:2px 10px;border-radius:999px}
+    ul{margin:8px 0 0 18px;line-height:1.7}
+  </style>
+  <!-- Umami Analytics -->
+  <script defer src="https://analytics.reign-of-brabant.nl/script.js" data-website-id="8c91d569-5945-45d6-b407-ffe6749b9cbc"></script>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="nav" aria-label="Navigatie">
+      <a class="btn" href="/">Home</a>
+      <a class="btn" href="/play/">Speel</a>
+      <a class="btn" href="/doneer">Doneer</a>
+      <a class="btn" href="/press">Press</a>
+    </nav>
+
+    <div class="card">
+      <h1>Roadmap</h1>
+      <p class="small">
+        Dit is de publieke milestone-pagina. De uitgebreide werkdocumenten staan in de repo onder <code>research/roadmap/</code>.
+      </p>
+
+      <h2>Milestones (concept)</h2>
+      <div class="milestone">
+        <div class="milestoneTitle">
+          <strong>€1k</strong>
+          <span class="pill">core polish</span>
+        </div>
+        <ul class="small">
+          <li>Polish + stability pass</li>
+          <li>Performance pass + meetbare baseline</li>
+          <li>Top 10 bugfixes</li>
+        </ul>
+      </div>
+      <div class="milestone">
+        <div class="milestoneTitle">
+          <strong>€5k</strong>
+          <span class="pill">skirmish foundation</span>
+        </div>
+        <ul class="small">
+          <li>AI basics + minder “stuck units”</li>
+          <li>UI/hotkeys pass</li>
+          <li>Skirmish start-to-finish zonder softlocks</li>
+        </ul>
+      </div>
+      <div class="milestone">
+        <div class="milestoneTitle">
+          <strong>€10k</strong>
+          <span class="pill">depth & perf</span>
+        </div>
+        <ul class="small">
+          <li>Combat readability + feedback (VFX/audio/UI)</li>
+          <li>Pathfinding robustness (navmesh + fallback)</li>
+          <li>Documented performance targets</li>
+        </ul>
+      </div>
+      <div class="milestone">
+        <div class="milestoneTitle">
+          <strong>€25k</strong>
+          <span class="pill">pipeline & tooling</span>
+        </div>
+        <ul class="small">
+          <li>Asset pipeline checks (models/animations/audio)</li>
+          <li>Tooling scripts voor validatie</li>
+          <li>Nieuwe map templates + variatie</li>
+        </ul>
+      </div>
+      <div class="milestone">
+        <div class="milestoneTitle">
+          <strong>€50k</strong>
+          <span class="pill">campaign slice</span>
+        </div>
+        <ul class="small">
+          <li>1 korte campaign slice (tutorial + 1 missie)</li>
+          <li>Narrative UI polish</li>
+        </ul>
+      </div>
+
+      <h2>Transparantie</h2>
+      <p class="small">
+        Elke milestone heeft deliverables, non-goals, acceptance criteria en risico’s. Donaties zijn vrijwillige bijdragen (geen tegenprestatie); milestones zijn best-effort en timeboxed.
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+
