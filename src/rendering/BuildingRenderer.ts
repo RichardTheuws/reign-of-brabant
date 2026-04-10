@@ -15,47 +15,47 @@ import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 export type BuildingTypeName = 'townhall' | 'barracks' | 'blacksmith' | 'lumbercamp';
 
 const BUILDING_MODEL_PATHS: Record<string, string> = {
-  townhall_0: 'assets/models/v02/brabanders/townhall.glb',
-  townhall_1: 'assets/models/v02/randstad/townhall.glb',
-  barracks_0: 'assets/models/v02/brabanders/barracks.glb',
-  barracks_1: 'assets/models/v02/randstad/barracks.glb',
+  townhall_0: '/assets/models/v02/brabanders/townhall.glb',
+  townhall_1: '/assets/models/v02/randstad/townhall.glb',
+  barracks_0: '/assets/models/v02/brabanders/barracks.glb',
+  barracks_1: '/assets/models/v02/randstad/barracks.glb',
   // LumberCamp reuses barracks model until dedicated model is created
-  lumbercamp_0: 'assets/models/v02/brabanders/barracks.glb',
-  lumbercamp_1: 'assets/models/v02/randstad/barracks.glb',
+  lumbercamp_0: '/assets/models/v02/brabanders/barracks.glb',
+  lumbercamp_1: '/assets/models/v02/randstad/barracks.glb',
   // Blacksmith reuses barracks model until dedicated model is created
-  blacksmith_0: 'assets/models/v02/brabanders/barracks.glb',
-  blacksmith_1: 'assets/models/v02/randstad/barracks.glb',
+  blacksmith_0: '/assets/models/v02/brabanders/barracks.glb',
+  blacksmith_1: '/assets/models/v02/randstad/barracks.glb',
   // Limburgers
-  townhall_2: 'assets/models/v02/limburgers/townhall.glb',
-  barracks_2: 'assets/models/v02/limburgers/barracks.glb',
-  lumbercamp_2: 'assets/models/v02/limburgers/barracks.glb',
-  blacksmith_2: 'assets/models/v02/limburgers/barracks.glb',
+  townhall_2: '/assets/models/v02/limburgers/townhall.glb',
+  barracks_2: '/assets/models/v02/limburgers/barracks.glb',
+  lumbercamp_2: '/assets/models/v02/limburgers/barracks.glb',
+  blacksmith_2: '/assets/models/v02/limburgers/barracks.glb',
   // Belgen
-  townhall_3: 'assets/models/v02/belgen/townhall.glb',
-  barracks_3: 'assets/models/v02/belgen/barracks.glb',
-  lumbercamp_3: 'assets/models/v02/belgen/barracks.glb',
-  blacksmith_3: 'assets/models/v02/belgen/barracks.glb',
+  townhall_3: '/assets/models/v02/belgen/townhall.glb',
+  barracks_3: '/assets/models/v02/belgen/barracks.glb',
+  lumbercamp_3: '/assets/models/v02/belgen/barracks.glb',
+  blacksmith_3: '/assets/models/v02/belgen/barracks.glb',
 };
 
 const BUILDING_MODEL_FALLBACKS: Record<string, string> = {
-  townhall_0: 'assets/models/v01/brabanders/townhall.glb',
-  townhall_1: 'assets/models/v01/randstad/townhall.glb',
-  barracks_0: 'assets/models/v01/brabanders/barracks.glb',
-  barracks_1: 'assets/models/v01/randstad/barracks.glb',
-  lumbercamp_0: 'assets/models/v01/brabanders/barracks.glb',
-  lumbercamp_1: 'assets/models/v01/randstad/barracks.glb',
-  blacksmith_0: 'assets/models/v01/brabanders/barracks.glb',
-  blacksmith_1: 'assets/models/v01/randstad/barracks.glb',
+  townhall_0: '/assets/models/v01/brabanders/townhall.glb',
+  townhall_1: '/assets/models/v01/randstad/townhall.glb',
+  barracks_0: '/assets/models/v01/brabanders/barracks.glb',
+  barracks_1: '/assets/models/v01/randstad/barracks.glb',
+  lumbercamp_0: '/assets/models/v01/brabanders/barracks.glb',
+  lumbercamp_1: '/assets/models/v01/randstad/barracks.glb',
+  blacksmith_0: '/assets/models/v01/brabanders/barracks.glb',
+  blacksmith_1: '/assets/models/v01/randstad/barracks.glb',
   // Limburgers (reuse Brabanders v01 models as fallback)
-  townhall_2: 'assets/models/v01/brabanders/townhall.glb',
-  barracks_2: 'assets/models/v01/brabanders/barracks.glb',
-  lumbercamp_2: 'assets/models/v01/brabanders/barracks.glb',
-  blacksmith_2: 'assets/models/v01/brabanders/barracks.glb',
+  townhall_2: '/assets/models/v01/brabanders/townhall.glb',
+  barracks_2: '/assets/models/v01/brabanders/barracks.glb',
+  lumbercamp_2: '/assets/models/v01/brabanders/barracks.glb',
+  blacksmith_2: '/assets/models/v01/brabanders/barracks.glb',
   // Belgen (reuse Brabanders v01 models as fallback)
-  townhall_3: 'assets/models/v01/brabanders/townhall.glb',
-  barracks_3: 'assets/models/v01/brabanders/barracks.glb',
-  lumbercamp_3: 'assets/models/v01/brabanders/barracks.glb',
-  blacksmith_3: 'assets/models/v01/brabanders/barracks.glb',
+  townhall_3: '/assets/models/v01/brabanders/townhall.glb',
+  barracks_3: '/assets/models/v01/brabanders/barracks.glb',
+  lumbercamp_3: '/assets/models/v01/brabanders/barracks.glb',
+  blacksmith_3: '/assets/models/v01/brabanders/barracks.glb',
 };
 
 type ModelCacheKey = `${BuildingTypeName}_${number}`;

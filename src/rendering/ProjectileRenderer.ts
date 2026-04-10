@@ -14,7 +14,7 @@ import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 // Constants
 // ---------------------------------------------------------------------------
 
-const ARROW_MODEL_PATH = 'assets/models/poc/gameplay/arrow.glb';
+const ARROW_MODEL_PATH = '/assets/models/poc/gameplay/arrow.glb';
 const MAX_PROJECTILES = 50;
 /** Gravity for parabolic arc (world units/s^2). */
 const ARC_GRAVITY = 15;

@@ -108,7 +108,7 @@ const FACTION_UNIT_NAMES: Record<number, Record<UnitTypeName, string>> = {
 // Voice line definitions — per faction, per unit type
 // ---------------------------------------------------------------------------
 
-const VOICE_BASE = 'assets/audio/voices/';
+const VOICE_BASE = '/assets/audio/voices/';
 
 function unitLines(faction: string, unitName: string, action: VoiceAction, count: number): string[] {
   const paths: string[] = [];

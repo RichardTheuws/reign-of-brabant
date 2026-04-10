@@ -11,7 +11,7 @@ import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 // Constants
 // ---------------------------------------------------------------------------
 
-const SELECTION_CIRCLE_PATH = 'assets/models/poc/gameplay/selection_circle.glb';
+const SELECTION_CIRCLE_PATH = '/assets/models/poc/gameplay/selection_circle.glb';
 const MAX_SELECTION_CIRCLES = 50;
 const MAX_HEALTH_BARS = 64;
 

@@ -27,57 +27,57 @@ type ModelCacheKey = `${UnitTypeName}_${number}`;
 
 /** Map of model GLB asset paths — v02 (Meshy v6 production) with v01 fallback. */
 const UNIT_MODEL_PATHS: Record<string, string> = {
-  worker_0: 'assets/models/v02/brabanders/worker.glb',
-  worker_1: 'assets/models/v02/randstad/worker.glb',
-  infantry_0: 'assets/models/v02/brabanders/infantry.glb',
-  infantry_1: 'assets/models/v02/randstad/infantry.glb',
-  ranged_0: 'assets/models/v02/brabanders/ranged.glb',
-  ranged_1: 'assets/models/v02/randstad/ranged.glb',
+  worker_0: '/assets/models/v02/brabanders/worker.glb',
+  worker_1: '/assets/models/v02/randstad/worker.glb',
+  infantry_0: '/assets/models/v02/brabanders/infantry.glb',
+  infantry_1: '/assets/models/v02/randstad/infantry.glb',
+  ranged_0: '/assets/models/v02/brabanders/ranged.glb',
+  ranged_1: '/assets/models/v02/randstad/ranged.glb',
   // Limburgers
-  worker_2: 'assets/models/v02/limburgers/worker.glb',
-  infantry_2: 'assets/models/v02/limburgers/infantry.glb',
-  ranged_2: 'assets/models/v02/limburgers/ranged.glb',
+  worker_2: '/assets/models/v02/limburgers/worker.glb',
+  infantry_2: '/assets/models/v02/limburgers/infantry.glb',
+  ranged_2: '/assets/models/v02/limburgers/ranged.glb',
   // Belgen
-  worker_3: 'assets/models/v02/belgen/worker.glb',
-  infantry_3: 'assets/models/v02/belgen/infantry.glb',
-  ranged_3: 'assets/models/v02/belgen/ranged.glb',
+  worker_3: '/assets/models/v02/belgen/worker.glb',
+  infantry_3: '/assets/models/v02/belgen/infantry.glb',
+  ranged_3: '/assets/models/v02/belgen/ranged.glb',
 };
 
 const UNIT_MODEL_FALLBACKS: Record<string, string> = {
-  worker_0: 'assets/models/v01/brabanders/worker.glb',
-  worker_1: 'assets/models/v01/randstad/worker.glb',
-  infantry_0: 'assets/models/v01/brabanders/infantry.glb',
-  infantry_1: 'assets/models/v01/randstad/infantry.glb',
-  ranged_0: 'assets/models/v01/brabanders/ranged.glb',
-  ranged_1: 'assets/models/v01/randstad/ranged.glb',
+  worker_0: '/assets/models/v01/brabanders/worker.glb',
+  worker_1: '/assets/models/v01/randstad/worker.glb',
+  infantry_0: '/assets/models/v01/brabanders/infantry.glb',
+  infantry_1: '/assets/models/v01/randstad/infantry.glb',
+  ranged_0: '/assets/models/v01/brabanders/ranged.glb',
+  ranged_1: '/assets/models/v01/randstad/ranged.glb',
   // Limburgers (fallback to Brabanders v01)
-  worker_2: 'assets/models/v01/brabanders/worker.glb',
-  infantry_2: 'assets/models/v01/brabanders/infantry.glb',
-  ranged_2: 'assets/models/v01/brabanders/ranged.glb',
+  worker_2: '/assets/models/v01/brabanders/worker.glb',
+  infantry_2: '/assets/models/v01/brabanders/infantry.glb',
+  ranged_2: '/assets/models/v01/brabanders/ranged.glb',
   // Belgen (fallback to Brabanders v01)
-  worker_3: 'assets/models/v01/brabanders/worker.glb',
-  infantry_3: 'assets/models/v01/brabanders/infantry.glb',
-  ranged_3: 'assets/models/v01/brabanders/ranged.glb',
+  worker_3: '/assets/models/v01/brabanders/worker.glb',
+  infantry_3: '/assets/models/v01/brabanders/infantry.glb',
+  ranged_3: '/assets/models/v01/brabanders/ranged.glb',
 };
 
 /** Animated model paths — only for (unitType, faction) combos that have skeletal animation. */
 const ANIMATED_MODEL_PATHS: Record<string, string> = {
   // Brabanders
-  worker_0: 'assets/models/v03/brabanders/worker.glb',
-  infantry_0: 'assets/models/v03/brabanders/infantry.glb',
-  ranged_0: 'assets/models/v03/brabanders/ranged.glb',
+  worker_0: '/assets/models/v03/brabanders/worker.glb',
+  infantry_0: '/assets/models/v03/brabanders/infantry.glb',
+  ranged_0: '/assets/models/v03/brabanders/ranged.glb',
   // Randstad
-  worker_1: 'assets/models/v03/randstad/worker.glb',
-  infantry_1: 'assets/models/v03/randstad/infantry.glb',
-  ranged_1: 'assets/models/v03/randstad/ranged.glb',
+  worker_1: '/assets/models/v03/randstad/worker.glb',
+  infantry_1: '/assets/models/v03/randstad/infantry.glb',
+  ranged_1: '/assets/models/v03/randstad/ranged.glb',
   // Limburgers
-  worker_2: 'assets/models/v03/limburgers/worker.glb',
-  infantry_2: 'assets/models/v03/limburgers/infantry.glb',
-  ranged_2: 'assets/models/v03/limburgers/ranged.glb',
+  worker_2: '/assets/models/v03/limburgers/worker.glb',
+  infantry_2: '/assets/models/v03/limburgers/infantry.glb',
+  ranged_2: '/assets/models/v03/limburgers/ranged.glb',
   // Belgen
-  worker_3: 'assets/models/v03/belgen/worker.glb',
-  infantry_3: 'assets/models/v03/belgen/infantry.glb',
-  ranged_3: 'assets/models/v03/belgen/ranged.glb',
+  worker_3: '/assets/models/v03/belgen/worker.glb',
+  infantry_3: '/assets/models/v03/belgen/infantry.glb',
+  ranged_3: '/assets/models/v03/belgen/ranged.glb',
 };
 
 /** UnitAIState values (mirrored from types/index.ts to avoid circular imports). */

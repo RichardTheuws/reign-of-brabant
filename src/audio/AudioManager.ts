@@ -48,8 +48,8 @@ interface MusicTrack {
 // SFX path helper -- resolves to correct path in both dev and production
 // ---------------------------------------------------------------------------
 
-const SFX_BASE = 'assets/audio/sfx/';
-const MUSIC_BASE = 'assets/audio/music/';
+const SFX_BASE = '/assets/audio/sfx/';
+const MUSIC_BASE = '/assets/audio/music/';
 
 function sfxPath(filename: string): string {
   return `${SFX_BASE}${filename}`;
