@@ -366,9 +366,26 @@ export class UnitRenderer {
   // Asset loading
   // -----------------------------------------------------------------------
 
-  /** Pre-load all unit GLB models (v02 with v01 fallback) and create InstancedMeshes. */
-  async preload(): Promise<void> {
-    const entries = Object.entries(UNIT_MODEL_PATHS);
+  /** Pre-load unit GLB models (v02 with v01 fallback) and create InstancedMeshes.
+   *  @param factions  Optional set of faction IDs to load. If omitted, loads all factions.
+   *  @param onProgress  Called after each model finishes loading with (loaded, total) counts.
+   */
+  async preload(factions?: Set<number>, onProgress?: (loaded: number, total: number) => void): Promise<void> {
+    const entries = Object.entries(UNIT_MODEL_PATHS).filter(([key]) => {
+      if (!factions) return true;
+      const factionId = parseInt(key.split('_')[1], 10);
+      return factions.has(factionId);
+    });
+
+    const animEntries = Object.entries(ANIMATED_MODEL_PATHS).filter(([key]) => {
+      if (!factions) return true;
+      const factionId = parseInt(key.split('_')[1], 10);
+      return factions.has(factionId);
+    });
+
+    let loaded = 0;
+    const total = entries.length + animEntries.length;
+
     const promises = entries.map(([key, path]) =>
       this.loader.loadAsync(path).catch(() => {
         const fallback = UNIT_MODEL_FALLBACKS[key];
@@ -381,6 +398,8 @@ export class UnitRenderer {
         if (!gltf) {
           console.warn(`[UnitRenderer] Model load failed for "${key}", using fallback box`);
           this.createFallbackBucket(cacheKey, factionId);
+          loaded++;
+          onProgress?.(loaded, total);
           return;
         }
 
@@ -407,12 +426,14 @@ export class UnitRenderer {
           console.warn(`[UnitRenderer] No mesh extracted for "${key}", using fallback box`);
           this.createFallbackBucket(cacheKey, factionId);
         }
+
+        loaded++;
+        onProgress?.(loaded, total);
       }),
     );
     await Promise.all(promises);
 
     // Load animated models (skeletal animation GLBs)
-    const animEntries = Object.entries(ANIMATED_MODEL_PATHS);
     const animPromises = animEntries.map(([key, path]) =>
       this.loader.loadAsync(path).then((gltf: GLTF) => {
         const cacheKey = key as ModelCacheKey;
@@ -439,8 +460,13 @@ export class UnitRenderer {
           `[UnitRenderer] Loaded animated model "${key}" with ${gltf.animations.length} clips:`,
           gltf.animations.map((c) => c.name),
         );
+
+        loaded++;
+        onProgress?.(loaded, total);
       }).catch((err) => {
         console.warn(`[UnitRenderer] Failed to load animated model "${key}":`, err);
+        loaded++;
+        onProgress?.(loaded, total);
       }),
     );
     await Promise.all(animPromises);

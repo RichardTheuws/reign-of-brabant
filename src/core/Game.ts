@@ -195,15 +195,28 @@ export class Game {
     gameConfig.setPlayerFaction(this.playerFactionId);
     AISystem.setFaction(this.getAIFactionId());
 
-    // 2. Load all GLB models
+    // 2. Load GLB models (only active factions for performance)
+    const activeFactions = new Set<number>([this.playerFactionId, this.getAIFactionId()]);
+
+    window.dispatchEvent(new CustomEvent('loading-progress', {
+      detail: { progress: 0.1, label: 'Modellen laden...' },
+    }));
+
     await Promise.all([
-      this.unitRenderer.preload(),
-      this.buildingRenderer.preload(),
+      this.unitRenderer.preload(activeFactions, (_loaded, _total) => {
+        window.dispatchEvent(new CustomEvent('loading-progress', {
+          detail: { progress: 0.1 + (_loaded / _total) * 0.5, label: `Modellen laden... (${_loaded}/${_total})` },
+        }));
+      }),
+      this.buildingRenderer.preload(activeFactions),
       this.propRenderer.preload(),
       this.selectionRenderer.preload(),
     ]);
 
     // 3. Init navmesh (with fallback)
+    window.dispatchEvent(new CustomEvent('loading-progress', {
+      detail: { progress: 0.7, label: 'Navigatie berekenen...' },
+    }));
     try {
       await this.navMesh.init(this.terrain.mesh);
       console.log('[Game] NavMesh initialized');
@@ -212,6 +225,9 @@ export class Game {
     }
 
     // 4. Spawn all entities from map definition
+    window.dispatchEvent(new CustomEvent('loading-progress', {
+      detail: { progress: 0.85, label: 'Eenheden plaatsen...' },
+    }));
     this.spawnMapEntities();
 
     // 5. Place decoration props
@@ -230,6 +246,9 @@ export class Game {
     this.setupEventListeners();
 
     // 10. Init audio system + ambient sounds + faction music
+    window.dispatchEvent(new CustomEvent('loading-progress', {
+      detail: { progress: 0.95, label: 'Audio laden...' },
+    }));
     audioManager.init();
     audioManager.startAmbient('ambient_birds');
     audioManager.startAmbient('ambient_wind');
@@ -257,12 +276,28 @@ export class Game {
 
     this.activeMission = mission;
     this.map = generateMap(42, (x, z) => this.terrain.getHeightAt(x, z));
+
+    // Only load models for active factions (player + AI) for performance
+    const activeFactions = new Set<number>([mission.playerFactionId, ...mission.aiFactionIds]);
+
+    window.dispatchEvent(new CustomEvent('loading-progress', {
+      detail: { progress: 0.1, label: 'Modellen laden...' },
+    }));
+
     await Promise.all([
-      this.unitRenderer.preload(),
-      this.buildingRenderer.preload(),
+      this.unitRenderer.preload(activeFactions, (_loaded, _total) => {
+        window.dispatchEvent(new CustomEvent('loading-progress', {
+          detail: { progress: 0.1 + (_loaded / _total) * 0.5, label: `Modellen laden... (${_loaded}/${_total})` },
+        }));
+      }),
+      this.buildingRenderer.preload(activeFactions),
       this.propRenderer.preload(),
       this.selectionRenderer.preload(),
     ]);
+
+    window.dispatchEvent(new CustomEvent('loading-progress', {
+      detail: { progress: 0.7, label: 'Navigatie berekenen...' },
+    }));
     try { await this.navMesh.init(this.terrain.mesh); } catch { /* fallback */ }
 
     // Use explicit faction fields from mission definition
@@ -279,6 +314,9 @@ export class Game {
       this.playerState.addGold(aiFaction, mission.startingGoldAI);
     }
 
+    window.dispatchEvent(new CustomEvent('loading-progress', {
+      detail: { progress: 0.85, label: 'Eenheden plaatsen...' },
+    }));
     this._spawnMissionEntities(mission);
     this.spawnProps();
 
@@ -290,6 +328,9 @@ export class Game {
     if (mission.hasAIProduction) this.configureAI();
 
     // Setup input, event listeners, HUD, and mission events (cleanup cleared all flags)
+    window.dispatchEvent(new CustomEvent('loading-progress', {
+      detail: { progress: 0.95, label: 'Audio laden...' },
+    }));
     this.initHUD();
     this.setupInput();
     this.setupEventListeners();

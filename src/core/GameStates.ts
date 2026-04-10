@@ -145,35 +145,33 @@ export class LoadingState implements IGameState {
     const tutorial = ctx.transitionData['tutorial'] === true;
     const missionId = ctx.transitionData['missionId'] as string | undefined;
 
-    // Simulate phased loading with progress
-    const loadPhases: Array<{ label: string; progress: number }> = [
-      { label: 'Terrein genereren...', progress: 0.1 },
-      { label: 'Modellen laden...', progress: 0.3 },
-      { label: 'Facties mobiliseren...', progress: 0.5 },
-      { label: 'Worstenbroodjes bakken...', progress: 0.7 },
-      { label: 'Bier tappen...', progress: 0.85 },
-      { label: 'Vergaderagenda\'s invullen...', progress: 0.95 },
-    ];
-
-    // Run loading with progress updates
+    // Run loading with real progress events dispatched from Game.init / Game.initMission
     const runLoad = async () => {
       this.loadStarted = true;
 
-      for (const phase of loadPhases) {
-        d().updateLoadingProgress(phase.progress, phase.label);
-        // Small delay between phases for visual feedback
-        await new Promise(r => setTimeout(r, 200));
-      }
+      // Show initial progress
+      d().updateLoadingProgress(0.05, 'Terrein genereren...');
 
-      // Initialize the game -- either campaign mission or skirmish
-      if (missionId) {
-        await d().startMission(missionId);
-      } else {
-        await d().startGame(tutorial);
+      // Listen for real progress events from Game.init / Game.initMission
+      const progressHandler = (e: Event) => {
+        const { progress, label } = (e as CustomEvent).detail;
+        d().updateLoadingProgress(progress, label);
+      };
+      window.addEventListener('loading-progress', progressHandler);
+
+      try {
+        // Initialize the game -- either campaign mission or skirmish
+        if (missionId) {
+          await d().startMission(missionId);
+        } else {
+          await d().startGame(tutorial);
+        }
+      } finally {
+        window.removeEventListener('loading-progress', progressHandler);
       }
 
       d().updateLoadingProgress(1.0, 'Gereed!');
-      await new Promise(r => setTimeout(r, 500));
+      await new Promise(r => setTimeout(r, 400));
 
       // Transition to playing or tutorial
       if (tutorial) {

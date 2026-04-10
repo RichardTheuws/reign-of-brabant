@@ -185,8 +185,21 @@ export class BuildingRenderer {
   // Asset loading
   // -----------------------------------------------------------------------
 
-  async preload(): Promise<void> {
-    const entries = Object.entries(BUILDING_MODEL_PATHS);
+  /**
+   * Pre-load building GLB models.
+   * @param factions  Optional set of faction IDs to load. If omitted, loads all factions.
+   * @param onProgress  Called after each model finishes loading with (loaded, total) counts.
+   */
+  async preload(factions?: Set<number>, onProgress?: (loaded: number, total: number) => void): Promise<void> {
+    const entries = Object.entries(BUILDING_MODEL_PATHS).filter(([key]) => {
+      if (!factions) return true;
+      const factionId = parseInt(key.split('_')[1], 10);
+      return factions.has(factionId);
+    });
+
+    let loaded = 0;
+    const total = entries.length;
+
     const promises = entries.map(([key, path]) =>
       this.loader.loadAsync(path).catch(() => {
         const fallback = BUILDING_MODEL_FALLBACKS[key];
@@ -206,6 +219,9 @@ export class BuildingRenderer {
           }
         });
         this.modelCache.set(key as ModelCacheKey, root);
+
+        loaded++;
+        onProgress?.(loaded, total);
       }),
     );
     await Promise.all(promises);
