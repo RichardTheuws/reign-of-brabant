@@ -90,6 +90,15 @@ export function activateCarnavalsrage(): boolean {
 }
 
 /**
+ * Reset all ability system state (for new game/mission).
+ */
+export function resetAbilitySystem(): void {
+  rageState.active = false;
+  rageState.remainingDuration = 0;
+  rageState.cooldownRemaining = 0;
+}
+
+/**
  * Get the current Carnavalsrage state for HUD display.
  */
 export function getCarnavalsrageState(): Readonly<CarnavalsrageState> {

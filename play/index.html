@@ -118,55 +118,253 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, rgba(10,8,6,0.92) 0%, rgba(20,15,10,0.85) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba(10, 8, 6, 0.72) 0%,
+        rgba(20, 15, 10, 0.6) 50%,
+        rgba(10, 8, 6, 0.72) 100%
+      );
       overflow-y: auto;
-      padding: 24px;
+      padding: 24px 24px 48px;
       max-height: 100vh;
       max-height: 100dvh;
+      animation: menuFadeIn 0.8s ease-out;
     }
-    .menu-logo { margin-bottom: 8px; }
+    @keyframes menuFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* ---- Menu panel — glass card behind content ---- */
+    .menu-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: clamp(20px, 4vh, 40px) clamp(24px, 5vw, 48px);
+      background: rgba(15, 12, 8, 0.55);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(212, 168, 83, 0.25);
+      border-radius: 16px;
+      box-shadow:
+        0 0 40px rgba(212, 168, 83, 0.06),
+        0 0 80px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(212, 168, 83, 0.12);
+      animation: panelSlideIn 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+      max-width: min(420px, 88vw);
+      width: 100%;
+      position: relative;
+    }
+    @keyframes panelSlideIn {
+      from { opacity: 0; transform: translateY(24px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    /* Glowing gold border effect */
+    .menu-panel::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 17px;
+      background: linear-gradient(
+        135deg,
+        rgba(212, 168, 83, 0.35) 0%,
+        rgba(212, 168, 83, 0.08) 40%,
+        rgba(212, 168, 83, 0.35) 100%
+      );
+      z-index: -1;
+      animation: borderGlow 4s ease-in-out infinite;
+    }
+    @keyframes borderGlow {
+      0%, 100% { opacity: 0.6; }
+      50%      { opacity: 1; }
+    }
+
+    /* ---- Logo container — living logo ---- */
+    .menu-logo {
+      position: relative;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
     .menu-logo img {
-      max-width: 360px; width: 80vw; height: auto;
-      filter: drop-shadow(0 0 30px rgba(212,168,83,0.3));
+      max-width: min(360px, 70vw);
+      width: 100%;
+      height: auto;
+      filter: drop-shadow(0 0 30px rgba(212, 168, 83, 0.35))
+              drop-shadow(0 0 60px rgba(212, 168, 83, 0.12));
+      animation: logoBreathe 4s ease-in-out infinite;
     }
+    @keyframes logoBreathe {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 30px rgba(212,168,83,0.35)) drop-shadow(0 0 60px rgba(212,168,83,0.12)); }
+      50%      { transform: scale(1.02); filter: drop-shadow(0 0 40px rgba(212,168,83,0.5)) drop-shadow(0 0 80px rgba(212,168,83,0.2)); }
+    }
+
+    /* Shimmer sweep across logo */
+    .logo-shimmer {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      border-radius: 8px;
+    }
+    .logo-shimmer::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(
+        105deg,
+        transparent 35%,
+        rgba(212, 168, 83, 0.25) 45%,
+        rgba(232, 192, 101, 0.35) 50%,
+        rgba(212, 168, 83, 0.25) 55%,
+        transparent 65%
+      );
+      animation: shimmerSweep 5s ease-in-out infinite;
+      animation-delay: 1s;
+    }
+    @keyframes shimmerSweep {
+      0%   { transform: translateX(-120%); }
+      40%  { transform: translateX(120%); }
+      100% { transform: translateX(120%); }
+    }
+
+    /* Ember particles */
+    .logo-embers {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: visible;
+    }
+    .logo-ember {
+      position: absolute;
+      bottom: 10%;
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #e8c065, rgba(212, 168, 83, 0.6));
+      box-shadow: 0 0 6px 1px rgba(212, 168, 83, 0.5);
+      animation: emberRise var(--ember-dur, 3s) ease-out infinite;
+      animation-delay: var(--ember-delay, 0s);
+      opacity: 0;
+    }
+    .logo-ember:nth-child(1)  { left: 12%; --ember-dur: 2.8s; --ember-delay: 0s; }
+    .logo-ember:nth-child(2)  { left: 28%; --ember-dur: 3.4s; --ember-delay: 0.6s; width: 2px; height: 2px; }
+    .logo-ember:nth-child(3)  { left: 45%; --ember-dur: 2.5s; --ember-delay: 1.2s; }
+    .logo-ember:nth-child(4)  { left: 60%; --ember-dur: 3.0s; --ember-delay: 0.3s; width: 4px; height: 4px; }
+    .logo-ember:nth-child(5)  { left: 75%; --ember-dur: 3.6s; --ember-delay: 0.9s; width: 2px; height: 2px; }
+    .logo-ember:nth-child(6)  { left: 88%; --ember-dur: 2.9s; --ember-delay: 1.5s; }
+    .logo-ember:nth-child(7)  { left: 35%; --ember-dur: 3.2s; --ember-delay: 2.0s; width: 2px; height: 2px; }
+    .logo-ember:nth-child(8)  { left: 52%; --ember-dur: 2.6s; --ember-delay: 0.8s; }
+    .logo-ember:nth-child(9)  { left: 20%; --ember-dur: 3.5s; --ember-delay: 1.8s; width: 3px; height: 3px; }
+    .logo-ember:nth-child(10) { left: 68%; --ember-dur: 2.7s; --ember-delay: 1.1s; }
+    .logo-ember:nth-child(11) { left: 82%; --ember-dur: 3.1s; --ember-delay: 0.4s; width: 2px; height: 2px; }
+    .logo-ember:nth-child(12) { left: 40%; --ember-dur: 3.3s; --ember-delay: 2.2s; }
+    @keyframes emberRise {
+      0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+      10%  { opacity: 0.9; }
+      60%  { opacity: 0.5; }
+      100% { transform: translateY(-70px) translateX(calc(var(--ember-drift, 12px))) scale(0.2); opacity: 0; }
+    }
+    .logo-ember:nth-child(odd)  { --ember-drift: 15px; }
+    .logo-ember:nth-child(even) { --ember-drift: -12px; }
+    .logo-ember:nth-child(3n)   { --ember-drift: 20px; }
+
+    /* ---- Title & subtitle ---- */
     .menu-title {
       font-family: var(--font-heading); font-weight: 900;
-      font-size: clamp(2rem,5vw,3.5rem); color: var(--color-gold);
-      text-shadow: 0 2px 20px rgba(212,168,83,0.4), 0 0 60px rgba(212,168,83,0.15);
-      letter-spacing: 0.08em; text-align: center; margin-bottom: 4px;
+      font-size: clamp(1.8rem, 5vw, 3.2rem); color: var(--color-gold);
+      text-shadow:
+        0 2px 20px rgba(212, 168, 83, 0.4),
+        0 0 60px rgba(212, 168, 83, 0.15),
+        0 0 2px rgba(212, 168, 83, 0.6);
+      letter-spacing: 0.08em; text-align: center; margin-bottom: 2px;
+      line-height: 1.1;
     }
     .menu-subtitle {
-      font-family: var(--font-heading); font-size: clamp(0.75rem,1.5vw,1rem);
-      color: var(--color-text-dim); letter-spacing: 0.2em;
-      text-transform: uppercase; margin-bottom: 40px;
+      font-family: var(--font-heading); font-size: clamp(0.65rem, 1.4vw, 0.9rem);
+      color: var(--color-text-dim); letter-spacing: 0.25em;
+      text-transform: uppercase; margin-bottom: clamp(16px, 3vh, 36px);
+      opacity: 0.8;
     }
+
+    /* ---- Menu buttons ---- */
     .menu-buttons {
-      display: flex; flex-direction: column; gap: 12px;
-      min-width: 280px; max-width: 340px; width: 100%;
+      display: flex; flex-direction: column;
+      gap: clamp(8px, 1.2vh, 12px);
+      width: 100%;
+      max-width: 340px;
     }
     .menu-btn {
-      display: flex; align-items: center; gap: 14px; padding: 14px 24px;
-      border: 2px solid var(--color-panel-border); border-radius: 8px;
-      background: var(--color-panel-bg); color: var(--color-text);
-      font-family: var(--font-heading); font-size: 1.1rem; font-weight: 500;
-      cursor: pointer; transition: background 0.2s, border-color 0.2s, transform 0.15s;
+      display: flex; align-items: center; gap: 14px;
+      padding: clamp(10px, 1.5vh, 14px) clamp(16px, 2vw, 24px);
+      border: 1px solid rgba(212, 168, 83, 0.25);
+      border-radius: 8px;
+      background: rgba(20, 15, 10, 0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: var(--color-text);
+      font-family: var(--font-heading);
+      font-size: clamp(0.85rem, 1.1vw, 1.05rem);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
       text-align: left;
+      min-height: min(48px, 8vh);
     }
     .menu-btn:hover:not(:disabled) {
-      background: var(--color-btn-hover); border-color: var(--color-gold);
-      transform: translateX(4px);
+      background: rgba(212, 168, 83, 0.15);
+      border-color: var(--color-gold);
+      transform: translateX(6px);
+      box-shadow: 0 0 16px rgba(212, 168, 83, 0.12);
     }
     .menu-btn:focus-visible { outline: 2px solid var(--color-gold); outline-offset: 2px; }
-    .menu-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .menu-btn .btn-icon { font-size: 1.3rem; width: 28px; text-align: center; }
+    .menu-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .menu-btn .btn-icon { font-size: 1.2rem; width: 28px; text-align: center; flex-shrink: 0; }
     .menu-btn .btn-badge {
-      margin-left: auto; font-size: 0.65rem; padding: 2px 8px; border-radius: 10px;
+      margin-left: auto; font-size: 0.6rem; padding: 2px 8px; border-radius: 10px;
       background: var(--color-brabant-red); color: var(--color-parchment);
       font-family: var(--font-body); letter-spacing: 0.05em;
     }
+    /* Staggered button entrance — use backwards fill so hover transform works after animation */
+    .menu-buttons .menu-btn { animation: btnSlideIn 0.45s ease-out backwards; }
+    .menu-buttons .menu-btn:nth-child(1) { animation-delay: 0.15s; }
+    .menu-buttons .menu-btn:nth-child(2) { animation-delay: 0.22s; }
+    .menu-buttons .menu-btn:nth-child(3) { animation-delay: 0.29s; }
+    .menu-buttons .menu-btn:nth-child(4) { animation-delay: 0.36s; }
+    .menu-buttons .menu-btn:nth-child(5) { animation-delay: 0.43s; }
+    .menu-buttons .menu-btn:nth-child(6) { animation-delay: 0.50s; }
+    @keyframes btnSlideIn {
+      from { opacity: 0; transform: translateX(-16px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ---- Version badge ---- */
     .menu-version {
-      position: absolute; bottom: 12px; right: 16px;
-      font-size: 0.75rem; color: var(--color-text-dim); opacity: 0.6;
+      margin-top: clamp(12px, 2vh, 24px);
+      font-size: 0.7rem;
+      color: var(--color-text-dim);
+      opacity: 0.45;
+      letter-spacing: 0.1em;
+      text-align: center;
+    }
+
+    /* ---- Responsive: very small screens ---- */
+    @media (max-width: 400px) {
+      .menu-panel { padding: 16px 14px; }
+      .menu-btn { padding: 8px 12px; gap: 10px; font-size: 0.8rem; min-height: 40px; }
+      .menu-btn .btn-icon { font-size: 1rem; width: 22px; }
+    }
+    /* ---- Responsive: landscape mobile ---- */
+    @media (max-height: 500px) and (orientation: landscape) {
+      .menu-panel { padding: 12px 28px; flex-direction: row; flex-wrap: wrap; gap: 12px; align-items: flex-start; justify-content: center; max-width: 90vw; }
+      .menu-logo { margin-bottom: 0; }
+      .menu-logo img { max-width: 120px; }
+      .menu-title { font-size: 1.3rem; margin-bottom: 0; width: 100%; }
+      .menu-subtitle { margin-bottom: 4px; width: 100%; }
+      .menu-buttons { flex-direction: row; flex-wrap: wrap; gap: 6px; max-width: 100%; }
+      .menu-btn { flex: 1 1 calc(50% - 6px); min-width: 140px; padding: 6px 12px; font-size: 0.75rem; min-height: 36px; }
+      .menu-version { width: 100%; }
     }
 
     /* ================================================================ FACTION SELECT */
@@ -256,12 +454,14 @@
       .faction-card { width: 120px; padding: 12px; }
     }
     @media (max-height: 600px) {
-      #main-menu { padding: 12px; gap: 8px; }
-      .menu-logo img { max-width: 200px; }
-      .menu-title { font-size: 1.5rem; margin-bottom: 2px; }
-      .menu-subtitle { margin-bottom: 16px; font-size: 0.7rem; }
-      .menu-buttons { gap: 8px; min-width: 240px; }
-      .menu-btn { padding: 10px 16px; font-size: 0.9rem; }
+      #main-menu { padding: 12px; }
+      .menu-panel { padding: 12px 20px; }
+      .menu-logo img { max-width: min(200px, 50vw); }
+      .menu-title { font-size: 1.4rem; margin-bottom: 0; }
+      .menu-subtitle { margin-bottom: 10px; font-size: 0.65rem; }
+      .menu-buttons { gap: 6px; }
+      .menu-btn { padding: 8px 14px; font-size: 0.8rem; min-height: 36px; }
+      .logo-ember { display: none; }
     }
 
     /* ================================================================ LOADING SCREEN */
@@ -459,6 +659,179 @@
     }
     .queue-bar { height: 100%; background: linear-gradient(90deg, var(--color-gold-dark), var(--color-gold)); border-radius: 3px; transition: width 0.3s; }
     .queue-time { font-size: 0.6rem; color: var(--color-text-dim); margin-top: 2px; }
+
+    /* ---- Building Info Card ---- */
+    #building-card {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 310px;
+      background: rgba(20, 15, 10, 0.94);
+      border: 1px solid rgba(212, 168, 83, 0.4);
+      border-radius: 10px;
+      z-index: 16;
+      color: #e8e6e3;
+      font-size: 0.8rem;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+      animation: bcard-in 200ms ease forwards;
+      pointer-events: auto;
+    }
+    #building-card[hidden] { display: none !important; }
+    @keyframes bcard-in {
+      from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+    .bcard-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px 6px;
+    }
+    .bcard-portrait {
+      width: 44px; height: 44px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 2px solid rgba(212, 168, 83, 0.5);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .bcard-portrait-text {
+      font-size: 13px; font-weight: 700;
+      color: rgba(212, 168, 83, 0.7);
+      letter-spacing: 0.03em;
+    }
+    .bcard-title-group { flex: 1; min-width: 0; }
+    .bcard-name {
+      font-family: 'Cinzel', serif;
+      font-weight: 700; font-size: 0.9rem;
+      color: var(--color-gold-bright);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .bcard-faction {
+      font-size: 0.65rem; color: var(--color-text-dim);
+      margin-top: 1px;
+    }
+    .bcard-divider {
+      height: 1px;
+      background: rgba(212, 168, 83, 0.2);
+      margin: 0 12px;
+    }
+    .bcard-stats { padding: 8px 12px; }
+    .bcard-hp-row {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .bcard-hp-label {
+      font-size: 0.6rem; font-weight: 700;
+      color: rgba(212, 168, 83, 0.6);
+      flex-shrink: 0; min-width: 18px;
+    }
+    .bcard-hp-bar-bg {
+      flex: 1;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .bcard-hp-bar {
+      height: 100%;
+      border-radius: 5px;
+      transition: width 0.2s, background-color 0.2s;
+    }
+    .bcard-hp-text {
+      font-size: 0.65rem;
+      color: var(--color-text-dim);
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+      min-width: 52px;
+      text-align: right;
+    }
+    .bcard-status {
+      font-size: 0.65rem;
+      color: var(--color-gold);
+      font-style: italic;
+      margin-top: 4px;
+    }
+    .bcard-actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      padding: 8px 12px 10px;
+    }
+    .bcard-action-btn {
+      position: relative;
+      width: 100%; aspect-ratio: 1;
+      min-height: 48px;
+      background: rgba(40, 35, 25, 0.9);
+      border: 1px solid rgba(212, 168, 83, 0.3);
+      border-radius: 6px;
+      color: #e8e6e3;
+      cursor: pointer;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 2px;
+      transition: all 0.15s;
+      padding: 4px;
+    }
+    .bcard-action-btn:hover:not(:disabled) {
+      background: rgba(212, 168, 83, 0.2);
+      border-color: rgba(212, 168, 83, 0.6);
+      transform: scale(1.05);
+    }
+    .bcard-action-btn:active:not(:disabled) {
+      transform: scale(0.95);
+      background: rgba(212, 168, 83, 0.3);
+    }
+    .bcard-action-btn:disabled {
+      opacity: 0.35; cursor: not-allowed;
+    }
+    .bcard-action-icon {
+      font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase;
+      line-height: 1; letter-spacing: -0.02em;
+    }
+    .bcard-action-label {
+      font-size: 0.5rem;
+      color: var(--color-text-dim);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      max-width: 100%;
+      line-height: 1;
+    }
+    .bcard-action-hotkey {
+      position: absolute;
+      bottom: 3px; right: 5px;
+      font-size: 0.55rem;
+      font-weight: 600;
+      color: rgba(212, 168, 83, 0.6);
+      font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+      line-height: 1;
+      pointer-events: none;
+    }
+    .bcard-action-btn--hero {
+      border-color: rgba(255, 215, 0, 0.5);
+      background: rgba(255, 215, 0, 0.08);
+    }
+    .bcard-action-btn--hero:hover:not(:disabled) {
+      background: rgba(255, 215, 0, 0.2);
+      border-color: rgba(255, 215, 0, 0.7);
+    }
+    .bcard-action-btn--rally {
+      border-color: rgba(126, 200, 227, 0.4);
+    }
+    @media (max-width: 768px) {
+      #building-card {
+        width: 260px;
+      }
+      .bcard-actions {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 3px;
+      }
+      .bcard-action-btn { min-height: 40px; }
+    }
+
+    /* When building card is visible (blacksmith), position research panel above it */
+    #building-card:not([hidden]) ~ #cmd-blacksmith:not([hidden]),
+    #building-card:not([hidden]) ~ .command-panel#cmd-blacksmith:not([hidden]) {
+      bottom: 130px;
+    }
 
     .command-panel {
       position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
@@ -842,41 +1215,58 @@
 
       <!-- ============ MAIN MENU ============ -->
       <div id="main-menu">
-        <div class="menu-logo">
-          <img src="/assets/ui/logo.png" alt="Reign of Brabant" />
+        <div class="menu-panel">
+          <div class="menu-logo">
+            <img src="/assets/ui/logo.png" alt="Reign of Brabant" />
+            <div class="logo-shimmer"></div>
+            <div class="logo-embers">
+              <span class="logo-ember"></span>
+              <span class="logo-ember"></span>
+              <span class="logo-ember"></span>
+              <span class="logo-ember"></span>
+              <span class="logo-ember"></span>
+              <span class="logo-ember"></span>
+              <span class="logo-ember"></span>
+              <span class="logo-ember"></span>
+              <span class="logo-ember"></span>
+              <span class="logo-ember"></span>
+              <span class="logo-ember"></span>
+              <span class="logo-ember"></span>
+            </div>
+          </div>
+          <h1 class="menu-title">Reign of Brabant</h1>
+          <p class="menu-subtitle">Een Brabants RTS Avontuur</p>
+
+          <nav class="menu-buttons" role="navigation" aria-label="Hoofdmenu">
+            <button class="menu-btn" id="btn-campaign">
+              <span class="btn-icon btn-icon--hero">I</span>
+              <span>Campagne</span>
+            </button>
+            <button class="menu-btn" id="btn-play">
+              <span class="btn-icon btn-icon--attack">II</span>
+              <span>Schermutsel</span>
+            </button>
+            <button class="menu-btn" id="btn-tutorial">
+              <span class="btn-icon btn-icon--move">?</span>
+              <span>Hoe Te Spelen</span>
+            </button>
+            <button class="menu-btn" id="btn-settings">
+              <span class="btn-icon btn-icon--research">*</span>
+              <span>Instellingen</span>
+            </button>
+            <button class="menu-btn" disabled>
+              <span class="btn-icon btn-icon--move">III</span>
+              <span>Slagveld Online</span>
+              <span class="btn-badge">v2.0</span>
+            </button>
+            <a href="/het-verhaal/" class="menu-btn" style="text-decoration:none;color:inherit;">
+              <span class="btn-icon btn-icon--research">V</span>
+              <span>Het Verhaal</span>
+            </a>
+          </nav>
+
+          <span class="menu-version">v__VERSION__</span>
         </div>
-        <h1 class="menu-title">Reign of Brabant</h1>
-        <p class="menu-subtitle">Een Brabants RTS Avontuur</p>
-
-        <nav class="menu-buttons" role="navigation" aria-label="Hoofdmenu">
-          <button class="menu-btn" id="btn-campaign">
-            <span class="btn-icon btn-icon--hero">I</span>
-            <span>Campagne</span>
-          </button>
-          <button class="menu-btn" id="btn-play">
-            <span class="btn-icon btn-icon--attack">II</span>
-            <span>Schermutsel</span>
-          </button>
-          <button class="menu-btn" id="btn-tutorial">
-            <span class="btn-icon btn-icon--move">?</span>
-            <span>Hoe Te Spelen</span>
-          </button>
-          <button class="menu-btn" id="btn-settings">
-            <span class="btn-icon btn-icon--research">*</span>
-            <span>Instellingen</span>
-          </button>
-          <button class="menu-btn" disabled>
-            <span class="btn-icon btn-icon--move">III</span>
-            <span>Slagveld Online</span>
-            <span class="btn-badge">v2.0</span>
-          </button>
-          <a href="/het-verhaal/" class="menu-btn" style="text-decoration:none;color:inherit;">
-            <span class="btn-icon btn-icon--research">V</span>
-            <span>Het Verhaal</span>
-          </a>
-        </nav>
-
-        <span class="menu-version">v__VERSION__</span>
       </div>
 
       <!-- ============ SETTINGS PANEL ============ -->
@@ -1005,9 +1395,9 @@
           <div class="resource-item gezelligheid-item" data-resource="gezelligheid">
             <span class="resource-icon resource-icon--gez"></span>
             <span class="resource-value" id="res-gezelligheid">0</span>
-            <button class="rage-btn" id="rage-btn" disabled title="Carnavalsrage (R) - Kost 100 Gezelligheid">
+            <button class="rage-btn" id="rage-btn" disabled title="Carnavalsrage (V) - Kost 100 Gezelligheid">
               Rage
-              <span class="hotkey">R</span>
+              <span class="hotkey">V</span>
             </button>
             <span class="rage-duration" id="rage-duration" hidden>0s</span>
             <span class="rage-cooldown" id="rage-cooldown" hidden>0s</span>
@@ -1080,6 +1470,34 @@
               </div>
               <div class="queue-time" id="queue-time">0s</div>
             </div>
+          </div>
+        </div>
+
+        <!-- Building Info Card (replaces old building panel + cmd-building for buildings) -->
+        <div id="building-card" hidden>
+          <div class="bcard-header">
+            <div class="bcard-portrait" id="bcard-portrait">
+              <span class="bcard-portrait-text">BLD</span>
+            </div>
+            <div class="bcard-title-group">
+              <div class="bcard-name" id="bcard-name">Building</div>
+              <div class="bcard-faction" id="bcard-faction">Faction</div>
+            </div>
+          </div>
+          <div class="bcard-divider"></div>
+          <div class="bcard-stats">
+            <div class="bcard-hp-row">
+              <span class="bcard-hp-label">HP</span>
+              <div class="bcard-hp-bar-bg">
+                <div class="bcard-hp-bar" id="bcard-hp-bar"></div>
+              </div>
+              <span class="bcard-hp-text" id="bcard-hp-text">0/0</span>
+            </div>
+            <div class="bcard-status" id="bcard-status">Idle</div>
+          </div>
+          <div class="bcard-divider"></div>
+          <div class="bcard-actions" id="bcard-actions">
+            <!-- Dynamically populated by HUD.showBuildingCard() -->
           </div>
         </div>
 
@@ -1169,8 +1587,9 @@
               <span style="color:#a0a0a0">Q</span><span>Verplaats</span>
               <span style="color:#a0a0a0">W</span><span>Aanval / Train Infanterie</span>
               <span style="color:#a0a0a0">E</span><span>Stop / Train Sluiper</span>
+              <span style="color:#a0a0a0">R</span><span>Hold / Smederij / Rally (context)</span>
               <span style="color:#a0a0a0">B</span><span>Bouw Kazerne</span>
-              <span style="color:#a0a0a0">R</span><span>Carnavalsrage</span>
+              <span style="color:#a0a0a0">V</span><span>Carnavalsrage</span>
               <span style="color:#a0a0a0">T</span><span>Train Held (Prins)</span>
               <span style="color:#a0a0a0">1 / 2 / 3</span><span>Held abilities</span>
               <span style="color:#a0a0a0">G</span><span>Raster aan/uit</span>

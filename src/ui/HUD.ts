@@ -57,6 +57,27 @@ export interface SelectedBuilding {
   queue: ProductionQueueItem[];
 }
 
+export interface BuildingCardAction {
+  action: CommandAction;
+  icon: string;       // Short abbreviation (WRK, INF, RNG, etc.)
+  label: string;      // Full unit/action name
+  hotkey: string;      // Keyboard shortcut letter
+  iconClass?: string;  // Optional color class (btn-icon--train, etc.)
+  isHero?: boolean;    // Hero training button
+  isRally?: boolean;   // Rally point button
+}
+
+export interface BuildingCardData {
+  id: number;
+  name: string;
+  factionName: string;
+  hp: number;
+  maxHp: number;
+  status: string;       // 'Idle', 'Training Infantry (12s)', etc.
+  portraitAbbrev: string; // Short building type abbreviation (TH, BRK, etc.)
+  actions: BuildingCardAction[];
+}
+
 export interface ProductionQueueItem {
   unitName: string;
   progress: number;
@@ -237,6 +258,16 @@ export class HUD {
   private queueBar!: HTMLElement;
   private queueTime!: HTMLElement;
 
+  // Building card elements
+  private buildingCard!: HTMLElement;
+  private bcardPortrait!: HTMLElement;
+  private bcardName!: HTMLElement;
+  private bcardFaction!: HTMLElement;
+  private bcardHpBar!: HTMLElement;
+  private bcardHpText!: HTMLElement;
+  private bcardStatus!: HTMLElement;
+  private bcardActions!: HTMLElement;
+
   // Multi-select elements
   private multiCount!: HTMLElement;
   private multiGrid!: HTMLElement;
@@ -307,7 +338,7 @@ export class HUD {
     this.statSpd = this.el('stat-spd');
     this.unitStatus = this.el('unit-status');
 
-    // Building
+    // Building (legacy panel)
     this.buildingPortrait = this.el('building-portrait');
     this.buildingName = this.el('building-name');
     this.buildingHpBar = this.el('building-hp-bar');
@@ -316,6 +347,16 @@ export class HUD {
     this.queueLabel = this.el('queue-label');
     this.queueBar = this.el('queue-bar');
     this.queueTime = this.el('queue-time');
+
+    // Building card (new unified card)
+    this.buildingCard = this.el('building-card');
+    this.bcardPortrait = this.el('bcard-portrait');
+    this.bcardName = this.el('bcard-name');
+    this.bcardFaction = this.el('bcard-faction');
+    this.bcardHpBar = this.el('bcard-hp-bar');
+    this.bcardHpText = this.el('bcard-hp-text');
+    this.bcardStatus = this.el('bcard-status');
+    this.bcardActions = this.el('bcard-actions');
 
     // Multi
     this.multiCount = this.el('multi-count');
@@ -471,6 +512,7 @@ export class HUD {
 
   showUnitPanel(units: SelectedUnit[]): void {
     this.hideAllCommandPanels();
+    this.hideBuildingCard();
     this.selectionPanel.hidden = false;
     this.buildingPanel.hidden = true;
 
@@ -631,6 +673,122 @@ export class HUD {
   }
 
   // -----------------------------------------------------------------------
+  // Building Card (unified info card with actions)
+  // -----------------------------------------------------------------------
+
+  /**
+   * Show the new building info card with health, status, and action grid.
+   * This replaces the old building-panel + cmd-building for building selection.
+   */
+  showBuildingCard(data: BuildingCardData): void {
+    this.hideAllCommandPanels();
+    this.selectionPanel.hidden = true;
+    this.buildingPanel.hidden = true;
+    this.buildingCard.hidden = false;
+
+    // Portrait abbreviation
+    const portraitText = this.bcardPortrait.querySelector('.bcard-portrait-text');
+    if (portraitText) portraitText.textContent = data.portraitAbbrev;
+
+    // Name and faction
+    this.bcardName.textContent = data.name;
+    this.bcardFaction.textContent = data.factionName;
+
+    // HP bar
+    this.updateBuildingCardHp(data.hp, data.maxHp);
+
+    // Status
+    this.bcardStatus.textContent = data.status;
+
+    // Build action buttons (hide grid + preceding divider when no actions)
+    this.bcardActions.innerHTML = '';
+    const actionDivider = this.bcardActions.previousElementSibling;
+    if (data.actions.length === 0) {
+      this.bcardActions.hidden = true;
+      if (actionDivider?.classList.contains('bcard-divider')) {
+        (actionDivider as HTMLElement).hidden = true;
+      }
+    } else {
+      this.bcardActions.hidden = false;
+      if (actionDivider?.classList.contains('bcard-divider')) {
+        (actionDivider as HTMLElement).hidden = false;
+      }
+    }
+    for (const act of data.actions) {
+      const btn = document.createElement('button');
+      btn.className = 'bcard-action-btn';
+      if (act.isHero) btn.classList.add('bcard-action-btn--hero');
+      if (act.isRally) btn.classList.add('bcard-action-btn--rally');
+      btn.dataset.action = act.action;
+      btn.dataset.hotkey = act.hotkey;
+
+      const iconSpan = document.createElement('span');
+      iconSpan.className = 'bcard-action-icon';
+      if (act.iconClass) iconSpan.classList.add(act.iconClass);
+      iconSpan.textContent = act.icon;
+      btn.appendChild(iconSpan);
+
+      const labelSpan = document.createElement('span');
+      labelSpan.className = 'bcard-action-label';
+      labelSpan.textContent = act.label;
+      btn.appendChild(labelSpan);
+
+      const hotkeySpan = document.createElement('span');
+      hotkeySpan.className = 'bcard-action-hotkey';
+      hotkeySpan.textContent = act.hotkey;
+      btn.appendChild(hotkeySpan);
+
+      // Wire click to command handler
+      btn.addEventListener('click', () => {
+        audioManager.playSound('click');
+        this.events?.onCommand(act.action);
+      });
+
+      this.bcardActions.appendChild(btn);
+    }
+  }
+
+  /**
+   * Update only the HP portion of the building card (called each frame).
+   */
+  updateBuildingCardHp(hp: number, maxHp: number): void {
+    const ratio = maxHp > 0 ? hp / maxHp : 0;
+    this.bcardHpBar.style.width = `${ratio * 100}%`;
+
+    // Color based on HP ratio
+    if (ratio > 0.6) {
+      this.bcardHpBar.style.backgroundColor = 'var(--color-hp-high)';
+    } else if (ratio > 0.3) {
+      this.bcardHpBar.style.backgroundColor = 'var(--color-hp-mid)';
+    } else {
+      this.bcardHpBar.style.backgroundColor = 'var(--color-hp-low)';
+    }
+
+    this.bcardHpText.textContent = `${Math.ceil(hp)}/${maxHp}`;
+  }
+
+  /**
+   * Update the status text on the building card (called each frame).
+   */
+  updateBuildingCardStatus(status: string): void {
+    this.bcardStatus.textContent = status;
+  }
+
+  /**
+   * Hide the building card.
+   */
+  hideBuildingCard(): void {
+    this.buildingCard.hidden = true;
+  }
+
+  /**
+   * Check if the building card is currently visible.
+   */
+  isBuildingCardVisible(): boolean {
+    return !this.buildingCard.hidden;
+  }
+
+  // -----------------------------------------------------------------------
   // Blacksmith research panel
   // -----------------------------------------------------------------------
 
@@ -683,7 +841,8 @@ export class HUD {
         btn.classList.add('is-researched');
       }
       if (!upg.canResearch && !upg.isResearched) {
-        btn.classList.add('is-locked');
+        btn.hidden = true; // Hide locked research — prerequisites not met
+        continue;
       }
 
       btn.innerHTML = `
@@ -722,6 +881,7 @@ export class HUD {
     this.unitSingle.hidden = true;
     this.unitMulti.hidden = true;
     this.buildingPanel.hidden = true;
+    this.hideBuildingCard();
     this.hideAllCommandPanels();
   }
 
@@ -1088,13 +1248,29 @@ export class HUD {
   }
 
   // -----------------------------------------------------------------------
-  // Command enable/disable
+  // Command enable/disable (hide instead of gray out)
   // -----------------------------------------------------------------------
 
   setCommandEnabled(action: CommandAction, enabled: boolean): void {
     const buttons = document.querySelectorAll<HTMLButtonElement>(`[data-action="${action}"]`);
     for (const btn of buttons) {
-      btn.disabled = !enabled;
+      btn.hidden = !enabled;
+    }
+  }
+
+  /**
+   * Show only the specified actions in a command panel, hiding all others.
+   * This ensures unavailable actions are hidden instead of grayed out.
+   */
+  setVisibleActions(panelId: string, visibleActions: Set<CommandAction>): void {
+    const panel = document.getElementById(panelId);
+    if (!panel) return;
+    const buttons = panel.querySelectorAll<HTMLButtonElement>('.cmd-btn');
+    for (const btn of buttons) {
+      const action = btn.dataset.action as CommandAction | undefined;
+      if (action) {
+        btn.hidden = !visibleActions.has(action);
+      }
     }
   }
 
@@ -1131,8 +1307,8 @@ export class HUD {
   private bindRageButton(): void {
     if (this.rageBtn) {
       const handler = () => {
-        // Simulate pressing R key -- Game.ts handles the actual activation
-        const event = new KeyboardEvent('keydown', { code: 'KeyR', bubbles: true });
+        // Simulate pressing V key -- Game.ts handles the actual activation
+        const event = new KeyboardEvent('keydown', { code: 'KeyV', bubbles: true });
         window.dispatchEvent(event);
       };
       this.rageBtn.addEventListener('click', handler);
@@ -1180,21 +1356,21 @@ export class HUD {
   }
 
   private bindHotkeys(): void {
-    // Note: Q/W/E/R conflict with WASD camera controls.
-    // We only bind non-conflicting keys.
-    const hotkeyMap: Record<string, CommandAction> = {
-      KeyQ: this.getHotkeyAction('Q'),
-      KeyE: this.getHotkeyAction('E'),
-      // KeyR now reserved for Carnavalsrage ability (handled by Game.ts)
-      // KeyW intentionally excluded -- conflicts with camera forward
-    };
+    // Hotkeys are resolved dynamically based on which command panel is visible.
+    // Q/E/R are context-sensitive: unit, worker, or building panel.
+    // W is excluded — conflicts with WASD camera forward.
+    // V is handled by Game.ts for Carnavalsrage.
+    const hotkeyCodes = ['KeyQ', 'KeyE', 'KeyR'];
 
     const handler = (e: Event) => {
       const ke = e as KeyboardEvent;
       // Only fire hotkeys when not in a text input
       if ((e.target as HTMLElement)?.tagName === 'INPUT') return;
 
-      const action = hotkeyMap[ke.code];
+      if (!hotkeyCodes.includes(ke.code)) return;
+
+      const hotkeyChar = ke.code.replace('Key', '');
+      const action = this.getHotkeyAction(hotkeyChar);
       if (action) {
         this.events?.onCommand(action);
         // Visual feedback: briefly highlight the button
@@ -1206,23 +1382,33 @@ export class HUD {
   }
 
   /**
-   * Map keyboard code to the currently-visible command action.
-   * The hotkey depends on which command panel is visible.
+   * Map hotkey character to the currently-visible command action.
+   * The action depends on which command panel is active:
+   *   - Unit panel (cmd-unit): Q=move, E=stop, R=hold
+   *   - Worker panel (cmd-worker): Q=build-barracks, R=build-blacksmith (faction-specific)
+   *   - Building panel (cmd-building): Q=train-worker, E=train-ranged, R=rally-point
+   *   - Multi-unit panel (cmd-multi): Q=move, E=stop (no R action)
    */
-  private getHotkeyAction(hotkey: string): CommandAction {
-    // Default mapping (unit context)
-    const map: Record<string, CommandAction> = {
-      Q: 'move',
-      W: 'attack',
-      E: 'stop',
-      R: 'hold',
-    };
-    return map[hotkey] ?? 'stop';
+  private getHotkeyAction(hotkey: string): CommandAction | null {
+    // Find the visible button with this hotkey in any visible command panel.
+    // NOTE: Building card hotkeys are NOT resolved here -- they are handled
+    // directly by Game.ts's keyboard handler to avoid double-firing.
+    const btn = document.querySelector<HTMLButtonElement>(
+      `.command-panel:not([hidden]) .cmd-btn[data-hotkey="${hotkey}"]:not([hidden])`,
+    );
+    if (btn) {
+      return (btn.dataset.action as CommandAction) ?? null;
+    }
+    return null;
   }
 
   private flashHotkeyButton(keyCode: string): void {
     const hotkeyChar = keyCode.replace('Key', '');
-    const btn = document.querySelector<HTMLButtonElement>(`.cmd-btn[data-hotkey="${hotkeyChar}"]`);
+    // Flash in building card buttons if visible, otherwise command panel buttons
+    const bcardBtn = document.querySelector<HTMLButtonElement>(
+      `#building-card:not([hidden]) .bcard-action-btn[data-hotkey="${hotkeyChar}"]`,
+    );
+    const btn = bcardBtn ?? document.querySelector<HTMLButtonElement>(`.cmd-btn[data-hotkey="${hotkeyChar}"]`);
     if (btn && !btn.hidden) {
       btn.style.background = 'rgba(212, 168, 83, 0.25)';
       window.setTimeout(() => {

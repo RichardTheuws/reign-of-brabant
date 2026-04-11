@@ -31,9 +31,11 @@ import { FogOfWarRenderer } from '../rendering/FogOfWarRenderer';
 import { visionData } from '../systems/VisionSystem';
 import { playerState } from '../core/PlayerState';
 import { eventBus } from '../core/EventBus';
-import { HUD, type SelectedUnit, type CommandAction, type HeroAbilityData } from '../ui/HUD';
-import { activateCarnavalsrage, getCarnavalsrageState, getCarnavalsrageConfig } from '../systems/AbilitySystem';
-import { activateHeroAbility } from '../systems/HeroSystem';
+import { HUD, type SelectedUnit, type CommandAction, type HeroAbilityData, type BuildingCardData, type BuildingCardAction } from '../ui/HUD';
+import { activateCarnavalsrage, getCarnavalsrageState, getCarnavalsrageConfig, resetAbilitySystem } from '../systems/AbilitySystem';
+import { activateHeroAbility, resetHeroSystem } from '../systems/HeroSystem';
+import { resetBureaucracy } from '../systems/BureaucracySystem';
+import { resetDiplomacy } from '../systems/DiplomacySystem';
 import { audioManager } from '../audio/AudioManager';
 import { playUnitVoice } from '../audio/UnitVoices';
 import { techTreeSystem, UPGRADE_DEFINITIONS, getUpgradeDefinition } from '../systems/TechTreeSystem';
@@ -652,6 +654,9 @@ export class Game {
       case 'stop':
         queueCommand({ type: 'stop' });
         break;
+      case 'hold':
+        queueCommand({ type: 'hold' });
+        break;
       case 'build-barracks':
         this.enterBuildMode('barracks');
         break;
@@ -1249,8 +1254,8 @@ export class Game {
           this.enterBuildMode('barracks');
         }
       }
-      // R key for Carnavalsrage ability
-      if (e.code === 'KeyR') {
+      // V key for Carnavalsrage ability ("Vuur los!")
+      if (e.code === 'KeyV') {
         const success = activateCarnavalsrage();
         if (success) {
           this.hud?.showAlert('CARNAVALSRAGE! Alle units +50% attack, +25% speed, +25% armor!', 'info');
@@ -1601,17 +1606,7 @@ export class Game {
       if (hasComponent(world, firstEid, IsBuilding) && Faction.id[firstEid] === this.playerFactionId) {
         const buildingType = Building.typeId[firstEid];
         const buildingName = this.getBuildingName(buildingType);
-        const buildingHudType = this.getBuildingHudType(buildingType);
         const queueItems = this.getBuildingQueue(firstEid);
-
-        this.hud.showBuildingPanel({
-          id: firstEid,
-          name: buildingName,
-          hp: Health.current[firstEid],
-          maxHp: Health.max[firstEid],
-          type: buildingHudType,
-          queue: queueItems,
-        });
 
         // Hide hero panel -- buildings don't have hero abilities
         const heroPanel = document.getElementById('cmd-hero');
@@ -1621,53 +1616,14 @@ export class Game {
         this.hud.hideBlacksmithPanel();
 
         if (buildingType === BuildingTypeId.Blacksmith && Building.complete[firstEid] === 1) {
-          // Show Blacksmith research panel instead of building commands
-          const cmdBuilding = document.getElementById('cmd-building');
-          if (cmdBuilding) cmdBuilding.hidden = true;
+          // Blacksmith: show building card WITHOUT training actions + show research panel
+          const cardData = this.buildBuildingCardData(firstEid, buildingType, buildingName, queueItems, true);
+          this.hud.showBuildingCard(cardData);
           this.showBlacksmithResearchUI(firstEid);
         } else {
-          // Show building command panel for production buildings
-          const cmdBuildingEl = document.getElementById('cmd-building');
-          if (cmdBuildingEl) cmdBuildingEl.hidden = false;
-
-          // Update production button labels for current faction
-          const unitNames: Record<number, Record<string, string>> = {
-            0: { worker: 'Boer', infantry: 'Carnavalvierder', ranged: 'Sluiper' },
-            1: { worker: 'Stagiair', infantry: 'Manager', ranged: 'Consultant' },
-            2: { worker: 'Mijnwerker', infantry: 'Schutterij', ranged: 'Vlaaienwerper' },
-            3: { worker: 'Frietkraamhouder', infantry: 'Bierbouwer', ranged: 'Chocolatier' },
-          };
-          const factionNames = unitNames[this.playerFactionId] ?? unitNames[0];
-          if (cmdBuildingEl) {
-            const buttons = cmdBuildingEl.querySelectorAll<HTMLButtonElement>('.cmd-btn');
-            for (const btn of buttons) {
-              const action = btn.dataset.action;
-              if (action === 'train-worker') {
-                const label = btn.querySelector('span:not(.hotkey):not(.btn-icon)');
-                if (label) label.textContent = factionNames.worker;
-              } else if (action === 'train-infantry') {
-                const label = btn.querySelector('span:not(.hotkey):not(.btn-icon)');
-                if (label) label.textContent = factionNames.infantry;
-              } else if (action === 'train-ranged') {
-                const label = btn.querySelector('span:not(.hotkey):not(.btn-icon)');
-                if (label) label.textContent = factionNames.ranged;
-              }
-            }
-          }
-
-          // Only show buttons for units this building can actually produce
-          const arch = BUILDING_ARCHETYPES[buildingType];
-          const canProduce = new Set(arch.produces);
-          if (cmdBuildingEl) {
-            const buttons = cmdBuildingEl.querySelectorAll<HTMLButtonElement>('.cmd-btn');
-            for (const btn of buttons) {
-              const action = btn.dataset.action;
-              if (action === 'train-worker') btn.hidden = !canProduce.has(UnitTypeId.Worker);
-              else if (action === 'train-infantry') btn.hidden = !canProduce.has(UnitTypeId.Infantry);
-              else if (action === 'train-ranged') btn.hidden = !canProduce.has(UnitTypeId.Ranged);
-              else if (action === 'train-hero-prins' || action === 'train-hero-boer') btn.hidden = true;
-            }
-          }
+          // Normal production building: show building card with training actions
+          const cardData = this.buildBuildingCardData(firstEid, buildingType, buildingName, queueItems, false);
+          this.hud.showBuildingCard(cardData);
         }
       } else if (hasComponent(world, firstEid, IsUnit)) {
         // Unit(s) selected
@@ -1997,6 +1953,142 @@ export class Game {
       case BuildingTypeId.Blacksmith: return 'blacksmith';
       default: return 'barracks';
     }
+  }
+
+  /**
+   * Build the BuildingCardData for the new building info card.
+   * Gathers building name, faction, HP, status, and available actions.
+   */
+  private buildBuildingCardData(
+    eid: number,
+    buildingType: number,
+    buildingName: string,
+    queueItems: Array<{ unitName: string; progress: number; remainingSeconds: number }>,
+    isBlacksmith: boolean,
+  ): BuildingCardData {
+    // Faction display names
+    const factionDisplayNames: Record<number, string> = {
+      [FactionId.Brabanders]: 'Brabanders',
+      [FactionId.Randstad]: 'Randstad',
+      [FactionId.Limburgers]: 'Limburgers',
+      [FactionId.Belgen]: 'Belgen',
+    };
+
+    // Building portrait abbreviations
+    const portraitAbbrevs: Record<number, string> = {
+      [BuildingTypeId.TownHall]: 'TH',
+      [BuildingTypeId.Barracks]: 'BRK',
+      [BuildingTypeId.LumberCamp]: 'LMB',
+      [BuildingTypeId.Blacksmith]: 'BSM',
+    };
+
+    // Build status string
+    let status = 'Idle';
+    if (Building.complete[eid] !== 1) {
+      status = 'Under construction';
+    } else if (queueItems.length > 0) {
+      const current = queueItems[0];
+      const queueCount = queueItems.length - 1;
+      const timeStr = current.remainingSeconds > 0 ? ` (${Math.ceil(current.remainingSeconds)}s)` : '';
+      status = queueCount > 0
+        ? `Training ${current.unitName}${timeStr} +${queueCount}`
+        : `Training ${current.unitName}${timeStr}`;
+    }
+
+    // Build actions (only for non-blacksmith production buildings)
+    const actions: BuildingCardAction[] = [];
+
+    if (!isBlacksmith) {
+      // Faction-specific unit names
+      const unitNames: Record<number, Record<string, string>> = {
+        0: { worker: 'Boer', infantry: 'Carnavalvierder', ranged: 'Sluiper' },
+        1: { worker: 'Stagiair', infantry: 'Manager', ranged: 'Consultant' },
+        2: { worker: 'Mijnwerker', infantry: 'Schutterij', ranged: 'Vlaaienwerper' },
+        3: { worker: 'Frietkraamhouder', infantry: 'Bierbouwer', ranged: 'Chocolatier' },
+      };
+      const names = unitNames[this.playerFactionId] ?? unitNames[0];
+
+      // Determine what this building can produce
+      const arch = BUILDING_ARCHETYPES[buildingType];
+      const canProduce = arch ? new Set(arch.produces) : new Set<number>();
+      const isBarracks = buildingType === BuildingTypeId.Barracks;
+
+      if (canProduce.has(UnitTypeId.Worker)) {
+        actions.push({
+          action: 'train-worker',
+          icon: 'WRK',
+          label: names.worker,
+          hotkey: 'Q',
+          iconClass: 'btn-icon--train',
+        });
+      }
+
+      if (canProduce.has(UnitTypeId.Infantry)) {
+        actions.push({
+          action: 'train-infantry',
+          icon: 'INF',
+          label: names.infantry,
+          hotkey: 'W',
+          iconClass: 'btn-icon--attack',
+        });
+      }
+
+      if (canProduce.has(UnitTypeId.Ranged)) {
+        actions.push({
+          action: 'train-ranged',
+          icon: 'RNG',
+          label: names.ranged,
+          hotkey: 'E',
+          iconClass: 'btn-icon--attack',
+        });
+      }
+
+      // Hero training (only barracks)
+      if (isBarracks && !isHeroActive(this.playerFactionId, HeroTypeId.PrinsVanBrabant)) {
+        actions.push({
+          action: 'train-hero-prins',
+          icon: 'H1',
+          label: 'Held',
+          hotkey: 'T',
+          iconClass: 'btn-icon--hero',
+          isHero: true,
+        });
+      }
+
+      if (isBarracks && !isHeroActive(this.playerFactionId, HeroTypeId.BoerVanBrabant)) {
+        actions.push({
+          action: 'train-hero-boer',
+          icon: 'H2',
+          label: 'Held 2',
+          hotkey: 'Y',
+          iconClass: 'btn-icon--hero',
+          isHero: true,
+        });
+      }
+
+      // Rally point (for any production building)
+      if (canProduce.size > 0 || isBarracks) {
+        actions.push({
+          action: 'rally-point',
+          icon: 'RLY',
+          label: 'Rally',
+          hotkey: 'R',
+          iconClass: 'btn-icon--rally',
+          isRally: true,
+        });
+      }
+    }
+
+    return {
+      id: eid,
+      name: buildingName,
+      factionName: factionDisplayNames[this.playerFactionId] ?? 'Onbekend',
+      hp: Health.current[eid],
+      maxHp: Health.max[eid],
+      status,
+      portraitAbbrev: portraitAbbrevs[buildingType] ?? 'BLD',
+      actions,
+    };
   }
 
   /**
@@ -2412,7 +2504,31 @@ export class Game {
       const firstEid = this.selectedEntities[0];
       if (entityExists(world, firstEid)) {
         if (hasComponent(world, firstEid, IsBuilding)) {
-          // Update building production progress
+          // Update building card HP and status in real-time
+          if (this.hud.isBuildingCardVisible()) {
+            this.hud.updateBuildingCardHp(Health.current[firstEid], Health.max[firstEid]);
+
+            // Update status text
+            let status = 'Idle';
+            if (Building.complete[firstEid] !== 1) {
+              status = 'Under construction';
+            } else if (hasComponent(world, firstEid, Production) && Production.unitType[firstEid] !== NO_PRODUCTION) {
+              const progress = Production.progress[firstEid];
+              const duration = Production.duration[firstEid];
+              const remaining = Math.max(0, duration * (1 - progress));
+              const fid = Faction.id[firstEid];
+              const unitName = this.getUnitNameByType(Production.unitType[firstEid], fid);
+              const queueSlots = [Production.queue0, Production.queue1, Production.queue2, Production.queue3, Production.queue4];
+              const queueCount = queueSlots.filter(s => s[firstEid] !== NO_PRODUCTION).length;
+              const timeStr = remaining > 0 ? ` (${Math.ceil(remaining)}s)` : '';
+              status = queueCount > 0
+                ? `Training ${unitName}${timeStr} +${queueCount}`
+                : `Training ${unitName}${timeStr}`;
+            }
+            this.hud.updateBuildingCardStatus(status);
+          }
+
+          // Update legacy production queue (backward compat)
           if (hasComponent(world, firstEid, Production) && Production.unitType[firstEid] !== NO_PRODUCTION) {
             const progress = Production.progress[firstEid];
             const duration = Production.duration[firstEid];
@@ -2927,11 +3043,20 @@ export class Game {
     // Reset ECS world (removes all entities and components)
     resetGameWorld();
 
+    // Reset player state (gold, population, resources)
+    this.playerState.reset();
+
     // Reset tech tree research state
     techTreeSystem.reset();
 
     // Reset upkeep timers
     resetUpkeepTimers();
+
+    // Reset faction-specific systems
+    resetAbilitySystem();
+    resetHeroSystem();
+    resetBureaucracy();
+    resetDiplomacy();
 
     // Stop music system
     this.musicSystem.stop(500);

@@ -72,7 +72,11 @@ interface StopCommand {
   type: 'stop';
 }
 
-type Command = MoveCommand | AttackCommand | GatherCommand | BuildCommand | TrainCommand | AttackMoveCommand | StopCommand;
+interface HoldCommand {
+  type: 'hold';
+}
+
+type Command = MoveCommand | AttackCommand | GatherCommand | BuildCommand | TrainCommand | AttackMoveCommand | StopCommand | HoldCommand;
 
 // Internal command buffer -- flushed each frame
 const commandBuffer: Command[] = [];
@@ -149,6 +153,9 @@ export function createCommandSystem() {
           break;
         case 'stop':
           handleStop(world, selectedUnits);
+          break;
+        case 'hold':
+          handleHold(world, selectedUnits);
           break;
       }
     }
@@ -389,6 +396,22 @@ function handleStop(world: GameWorld, units: number[]): void {
   for (const eid of units) {
     Movement.hasTarget[eid] = 0;
     UnitAI.state[eid] = UnitAIState.Idle;
+    UnitAI.targetEid[eid] = NO_ENTITY;
+
+    if (hasComponent(world, eid, IsWorker)) {
+      Gatherer.state[eid] = 0; // NONE
+    }
+  }
+}
+
+/**
+ * Hold position: units stop moving but will attack enemies that come within
+ * weapon range. They will NOT chase enemies that move away.
+ */
+function handleHold(world: GameWorld, units: number[]): void {
+  for (const eid of units) {
+    Movement.hasTarget[eid] = 0;
+    UnitAI.state[eid] = UnitAIState.HoldPosition;
     UnitAI.targetEid[eid] = NO_ENTITY;
 
     if (hasComponent(world, eid, IsWorker)) {

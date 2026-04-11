@@ -77,6 +77,8 @@ export function createCombatSystem() {
         processAttacking(world, eid, dt);
       } else if (UnitAI.state[eid] === UnitAIState.Idle) {
         processAutoAggro(world, eid, units);
+      } else if (UnitAI.state[eid] === UnitAIState.HoldPosition) {
+        processHoldPosition(world, eid, units, dt);
       } else if (
         UnitAI.state[eid] === UnitAIState.Gathering ||
         UnitAI.state[eid] === UnitAIState.MovingToResource ||
@@ -258,6 +260,128 @@ function processAutoAggro(
   if (closestEid !== NO_ENTITY) {
     UnitAI.state[eid] = UnitAIState.Attacking;
     UnitAI.targetEid[eid] = closestEid;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Hold position: attack enemies in weapon range, but never move/chase
+// ---------------------------------------------------------------------------
+
+/**
+ * Hold position behavior: scan for enemies within ATTACK range (not aggro range).
+ * If an enemy is in range, attack it in-place. Never move toward or chase enemies.
+ */
+function processHoldPosition(
+  world: GameWorld,
+  eid: number,
+  allUnits: ReturnType<typeof query>,
+  dt: number,
+): void {
+  const myFaction = Faction.id[eid];
+  const px = Position.x[eid];
+  const pz = Position.z[eid];
+  const range = Attack.range[eid];
+  const rangeSq = range * range;
+
+  // If we have an active target, check if it's still valid and in range
+  const currentTarget = UnitAI.targetEid[eid];
+  if (currentTarget !== NO_ENTITY) {
+    if (
+      !entityExists(world, currentTarget) ||
+      hasComponent(world, currentTarget, IsDead) ||
+      Health.current[currentTarget] <= 0
+    ) {
+      // Target gone -- clear and scan for new target
+      UnitAI.targetEid[eid] = NO_ENTITY;
+    } else {
+      _dx = Position.x[currentTarget] - px;
+      _dz = Position.z[currentTarget] - pz;
+      _distSq = _dx * _dx + _dz * _dz;
+
+      if (_distSq <= rangeSq) {
+        // Target still in range -- tick attack timer and fire
+        Attack.timer[eid] -= dt;
+        if (Attack.timer[eid] <= 0) {
+          // Check invincibility
+          if (hasComponent(world, currentTarget, Invincible) && Invincible.duration[currentTarget] > 0) {
+            Attack.timer[eid] = Attack.speed[eid];
+            return;
+          }
+
+          let attackerDamage = Attack.damage[eid] * (GezeligheidBonus.attackMult[eid] || 1.0);
+          const targetArmor = Armor.value[currentTarget] * (GezeligheidBonus.armorMult[currentTarget] || 1.0);
+
+          if (playerState.isInUpkeepDebt(myFaction)) {
+            attackerDamage *= UPKEEP_DEBT_EFFECTIVENESS;
+          }
+          if (!gameConfig.isPlayerFaction(myFaction)) {
+            const elapsed = world.meta.elapsed;
+            const aiScaling = getAIScalingMult(elapsed);
+            if (aiScaling > 1.0) attackerDamage *= aiScaling;
+          }
+
+          const rawDamage = attackerDamage - targetArmor * ARMOR_FACTOR;
+          const effectiveDamage = Math.max(MIN_DAMAGE, rawDamage);
+          Health.current[currentTarget] = Math.max(0, Health.current[currentTarget] - effectiveDamage);
+          Attack.timer[eid] = Attack.speed[eid];
+
+          const isRangedHold = Attack.range[eid] > MINIMUM_MELEE_RANGE;
+          eventBus.emit('combat-hit', {
+            attackerEid: eid,
+            targetEid: currentTarget,
+            isRanged: isRangedHold,
+            x: Position.x[currentTarget],
+            z: Position.z[currentTarget],
+          });
+        }
+        return;
+      } else {
+        // Target moved out of range -- do NOT chase, clear target
+        UnitAI.targetEid[eid] = NO_ENTITY;
+      }
+    }
+  }
+
+  // No active target -- scan for closest enemy within weapon range
+  let closestEid = NO_ENTITY;
+  let closestDistSq = rangeSq;
+
+  for (const other of allUnits) {
+    if (other === eid) continue;
+    if (Faction.id[other] === myFaction) continue;
+    if (hasComponent(world, other, IsDead)) continue;
+    if (Health.current[other] <= 0) continue;
+
+    _dx = Position.x[other] - px;
+    _dz = Position.z[other] - pz;
+    _distSq = _dx * _dx + _dz * _dz;
+
+    if (_distSq < closestDistSq) {
+      closestDistSq = _distSq;
+      closestEid = other;
+    }
+  }
+
+  // Also check enemy buildings in weapon range
+  const buildings = query(world, [Position, Health, IsBuilding]);
+  for (const other of buildings) {
+    if (Faction.id[other] === myFaction) continue;
+    if (hasComponent(world, other, IsDead)) continue;
+    if (Health.current[other] <= 0) continue;
+
+    _dx = Position.x[other] - px;
+    _dz = Position.z[other] - pz;
+    _distSq = _dx * _dx + _dz * _dz;
+
+    if (_distSq < closestDistSq) {
+      closestDistSq = _distSq;
+      closestEid = other;
+    }
+  }
+
+  if (closestEid !== NO_ENTITY) {
+    UnitAI.targetEid[eid] = closestEid;
+    // Stay in HoldPosition state -- do NOT transition to Attacking (which would chase)
   }
 }
 

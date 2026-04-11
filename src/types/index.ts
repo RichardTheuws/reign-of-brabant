@@ -194,6 +194,8 @@ export enum UnitAIState {
   Dead = 6,
   Stunned = 7,
   Reviving = 8,
+  /** Hold position: attack enemies in weapon range but never chase/move. */
+  HoldPosition = 9,
 }
 
 /** Hero ability slot identifiers (Q, W, E). */

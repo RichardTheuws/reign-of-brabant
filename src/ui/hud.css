@@ -567,16 +567,21 @@ body {
 
 .command-panel {
   flex-shrink: 0;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(2, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   gap: 4px;
   padding: 10px;
   border-left: 1px solid var(--hud-border);
   align-self: center;
+  align-content: center;
+  max-width: calc(var(--btn-size) * 2 + 4px + 20px); /* 2 columns + gap + padding */
 }
 
 .command-panel[hidden] {
+  display: none;
+}
+
+.cmd-btn[hidden] {
   display: none;
 }
 
@@ -1043,10 +1048,10 @@ body {
    ----------------------------------------------------------------------- */
 
 .command-panel--blacksmith {
-  grid-template-columns: 1fr;
-  grid-template-rows: auto;
+  flex-direction: column;
   gap: 3px;
   max-height: 180px;
+  max-width: none;
   overflow-y: auto;
 }
 
