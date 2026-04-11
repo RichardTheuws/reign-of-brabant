@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.24.0] - 2026-04-11
+
+### Added
+- **Heavy unit 3D modellen** -- 4 unieke Meshy v6 GLBs (image-to-3D, rigged):
+  - Tractorrijder (Brabanders, 11MB) -- gepantserde boer op tractor
+  - CorporateAdvocaat (Randstad, 6.8MB) -- advocaat in pak met stalen pantserplaten
+  - Mergelridder (Limburgers, 8.1MB) -- ridder in mergelsteen-armor
+  - Frituurridder (Belgen, 9.1MB) -- ridder met frituur-thema armor
+
+### Changed
+- **UnitRenderer model mappings** -- heavy_0-3 wijzen nu naar dedicated heavy.glb per factie (alle quality tiers)
+
 ## [0.23.0] - 2026-04-11
 
 ### Added
