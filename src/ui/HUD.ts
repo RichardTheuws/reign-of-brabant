@@ -6,6 +6,11 @@
  */
 
 import { audioManager } from '../audio/AudioManager';
+import {
+  UNIT_ARCHETYPES,
+  BUILDING_ARCHETYPES,
+} from '../entities/archetypes';
+import { UnitTypeId, BuildingTypeId } from '../types/index';
 
 // ---------------------------------------------------------------------------
 // Types (from POC-UI.md section 5)
@@ -285,6 +290,9 @@ export class HUD {
   private cmdMulti!: HTMLElement;
   private cmdBuilding!: HTMLElement;
   private cmdWorker!: HTMLElement;
+
+  // Tooltip element
+  private tooltipEl: HTMLDivElement | null = null;
 
   // Callbacks
   private events: HUDEvents | null = null;
@@ -744,6 +752,22 @@ export class HUD {
         this.events?.onCommand(act.action);
       });
 
+      // Attach tooltip for unit training / rally actions
+      const actAction = act.action;
+      const actLabel = act.label;
+      const actHotkey = act.hotkey;
+      this.attachTooltipHandlers(btn, () => {
+        // Rally point has no archetype data
+        if (act.isRally) {
+          return { name: 'Rally Point', desc: 'Stel een verzamelpunt in voor nieuwe eenheden.', hotkey: actHotkey };
+        }
+        // Unit training buttons
+        const unitTT = this.getUnitTooltipData(actAction, actLabel, actHotkey);
+        if (unitTT) return unitTT;
+        // Hero or unknown -- minimal tooltip
+        return { name: actLabel, hotkey: actHotkey };
+      });
+
       this.bcardActions.appendChild(btn);
     }
   }
@@ -1026,6 +1050,22 @@ export class HUD {
   }
 
   // -----------------------------------------------------------------------
+  // Mode Indicator
+  // -----------------------------------------------------------------------
+
+  showModeIndicator(text: string): void {
+    this.hideModeIndicator();
+    const indicator = document.createElement('div');
+    indicator.id = 'mode-indicator';
+    indicator.innerHTML = `<span class="mode-indicator__text">${this.escapeHtml(text)}</span><span class="mode-indicator__hint">ESC om te annuleren</span>`;
+    document.getElementById('hud')?.appendChild(indicator);
+  }
+
+  hideModeIndicator(): void {
+    document.getElementById('mode-indicator')?.remove();
+  }
+
+  // -----------------------------------------------------------------------
   // Minimap
   // -----------------------------------------------------------------------
 
@@ -1244,6 +1284,12 @@ export class HUD {
     btn.addEventListener('click', handler);
     this.boundHandlers.push({ el: btn, event: 'click', handler: handler as EventListener });
 
+    // Attach tooltip for building commands
+    const cmdAction = cmd.action;
+    const cmdLabel = cmd.label;
+    const cmdHotkey = cmd.hotkey;
+    this.attachTooltipHandlers(btn, () => this.getBuildingTooltipData(cmdAction, cmdLabel, cmdHotkey));
+
     return btn;
   }
 
@@ -1289,6 +1335,20 @@ export class HUD {
       };
       btn.addEventListener('click', handler);
       this.boundHandlers.push({ el: btn, event: 'click', handler: handler as EventListener });
+
+      // Attach tooltips to static training / building command buttons
+      const btnAction = action;
+      const btnLabel = btn.querySelector('span:nth-child(2)')?.textContent ?? '';
+      const btnHotkey = btn.dataset.hotkey;
+      if (btnAction.startsWith('train-')) {
+        this.attachTooltipHandlers(btn, () => this.getUnitTooltipData(btnAction, btnLabel, btnHotkey));
+      } else if (btnAction === 'rally-point') {
+        this.attachTooltipHandlers(btn, () => ({
+          name: 'Rally Point',
+          desc: 'Stel een verzamelpunt in voor nieuwe eenheden.',
+          hotkey: btnHotkey,
+        }));
+      }
     }
   }
 
@@ -1485,6 +1545,164 @@ export class HUD {
   }
 
   // -----------------------------------------------------------------------
+  // Tooltip system
+  // -----------------------------------------------------------------------
+
+  private createTooltipElement(): HTMLDivElement {
+    if (this.tooltipEl) return this.tooltipEl;
+    const el = document.createElement('div');
+    el.className = 'game-tooltip';
+    document.getElementById('hud')?.appendChild(el);
+    this.tooltipEl = el;
+    return el;
+  }
+
+  private showTooltip(
+    x: number,
+    y: number,
+    data: {
+      name: string;
+      cost?: string;
+      stats?: Array<[string, string]>;
+      desc?: string;
+      hotkey?: string;
+    },
+  ): void {
+    const el = this.createTooltipElement();
+    let html = `<div class="game-tooltip__name">${this.escapeHtml(data.name)}</div>`;
+    if (data.cost) html += `<div class="game-tooltip__cost">${this.escapeHtml(data.cost)}</div>`;
+    if (data.stats && data.stats.length > 0) {
+      html += '<div class="game-tooltip__stats">';
+      for (const [label, val] of data.stats) {
+        html += `<span class="game-tooltip__stat-label">${this.escapeHtml(label)}</span><span>${this.escapeHtml(val)}</span>`;
+      }
+      html += '</div>';
+    }
+    if (data.desc) html += `<div class="game-tooltip__desc">${this.escapeHtml(data.desc)}</div>`;
+    if (data.hotkey) html += `<div class="game-tooltip__hotkey">[${this.escapeHtml(data.hotkey)}]</div>`;
+    el.innerHTML = html;
+
+    // Position: prefer above-right of cursor, shift if off-screen
+    let left = x + 12;
+    let top = y - 12;
+    if (left + 260 > window.innerWidth) left = x - 270;
+    if (top < 0) top = y + 20;
+    el.style.left = left + 'px';
+    el.style.top = top + 'px';
+    el.classList.add('is-visible');
+  }
+
+  private hideTooltip(): void {
+    this.tooltipEl?.classList.remove('is-visible');
+  }
+
+  /**
+   * Build tooltip data for a unit training action (train-worker, train-infantry, etc.).
+   * Looks up the unit archetype to display stats.
+   */
+  private getUnitTooltipData(action: string, label: string, hotkey?: string): {
+    name: string; cost?: string; stats?: Array<[string, string]>; desc?: string; hotkey?: string;
+  } | null {
+    let typeId: UnitTypeId | null = null;
+    if (action === 'train-worker') typeId = UnitTypeId.Worker;
+    else if (action === 'train-infantry') typeId = UnitTypeId.Infantry;
+    else if (action === 'train-ranged') typeId = UnitTypeId.Ranged;
+
+    if (typeId === null) return null;
+
+    const arch = UNIT_ARCHETYPES[typeId];
+    if (!arch) return null;
+
+    const dps = (arch.attack / arch.attackSpeed).toFixed(1);
+    return {
+      name: label || arch.brabantName,
+      cost: `${arch.costGold} goud`,
+      stats: [
+        ['HP', String(arch.hp)],
+        ['Aanval', String(arch.attack)],
+        ['DPS', dps],
+        ['Pantser', String(arch.armor)],
+        ['Snelheid', String(arch.speed)],
+        ['Bouw', `${arch.buildTime}s`],
+      ],
+      desc: typeId === UnitTypeId.Worker
+        ? 'Verzamelt grondstoffen en bouwt gebouwen.'
+        : typeId === UnitTypeId.Infantry
+          ? 'Melee gevechtsunit. Sterk tegen schutters.'
+          : 'Afstandsunit. Sterk op afstand, zwak in melee.',
+      hotkey,
+    };
+  }
+
+  /**
+   * Build tooltip data for a building construction action.
+   */
+  private getBuildingTooltipData(action: string, label: string, hotkey?: string): {
+    name: string; cost?: string; stats?: Array<[string, string]>; desc?: string; hotkey?: string;
+  } | null {
+    let typeId: BuildingTypeId | null = null;
+    if (action === 'build-barracks') typeId = BuildingTypeId.Barracks;
+    else if (action === 'build-lumbercamp') typeId = BuildingTypeId.LumberCamp;
+    else if (action === 'build-blacksmith') typeId = BuildingTypeId.Blacksmith;
+    else if (action === 'build-townhall') typeId = BuildingTypeId.TownHall;
+
+    if (typeId === null) return null;
+
+    const arch = BUILDING_ARCHETYPES[typeId];
+    if (!arch) return null;
+
+    const producesNames: string[] = [];
+    for (const unitType of arch.produces) {
+      const uArch = UNIT_ARCHETYPES[unitType];
+      if (uArch) producesNames.push(uArch.brabantName);
+    }
+
+    const desc = producesNames.length > 0
+      ? `Traint: ${producesNames.join(', ')}.`
+      : typeId === BuildingTypeId.Blacksmith
+        ? 'Onderzoekt upgrades voor je leger.'
+        : typeId === BuildingTypeId.LumberCamp
+          ? 'Hout afzetpunt. Versnelt hout verzamelen.'
+          : '';
+
+    return {
+      name: label || arch.brabantName,
+      cost: arch.costGold > 0 ? `${arch.costGold} goud` : 'Gratis',
+      stats: [
+        ['HP', String(arch.hp)],
+        ['Bouw', `${arch.buildTime}s`],
+      ],
+      desc: desc || undefined,
+      hotkey,
+    };
+  }
+
+  /**
+   * Attach tooltip mouseenter/mouseleave/mousemove handlers to a button element.
+   * The tooltipDataFn is called on mouseenter to get the current tooltip data.
+   */
+  private attachTooltipHandlers(
+    btn: HTMLElement,
+    tooltipDataFn: () => { name: string; cost?: string; stats?: Array<[string, string]>; desc?: string; hotkey?: string } | null,
+  ): void {
+    const onEnter = (e: MouseEvent) => {
+      const data = tooltipDataFn();
+      if (data) this.showTooltip(e.clientX, e.clientY, data);
+    };
+    const onMove = (e: MouseEvent) => {
+      if (this.tooltipEl?.classList.contains('is-visible')) {
+        const data = tooltipDataFn();
+        if (data) this.showTooltip(e.clientX, e.clientY, data);
+      }
+    };
+    const onLeave = () => this.hideTooltip();
+
+    btn.addEventListener('mouseenter', onEnter as EventListener);
+    btn.addEventListener('mousemove', onMove as EventListener);
+    btn.addEventListener('mouseleave', onLeave as EventListener);
+  }
+
+  // -----------------------------------------------------------------------
   // Cleanup
   // -----------------------------------------------------------------------
 
@@ -1498,6 +1716,10 @@ export class HUD {
       window.clearTimeout(timer);
     }
     this.alertTimers.length = 0;
+
+    // Remove tooltip element
+    this.tooltipEl?.remove();
+    this.tooltipEl = null;
 
     this.events = null;
   }

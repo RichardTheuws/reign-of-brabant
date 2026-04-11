@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.23.0] - 2026-04-11
+
+### Added
+- **HUD mode indicators** -- Persistent top-center bar toont actieve modus (Bouw/Rally Point/Attack-Move) met ESC-hint
+- **Tooltip system** -- Hover tooltips op bouw- en trainingsknoppen met archetype stats (HP, Attack, DPS, Armor, kosten)
+- **Mission surrender** -- "Opgeven" knop tijdens campaign missies met bevestigingsdialoog, voorkomt softlocks
+- **Heavy base archetype** -- UNIT_ARCHETYPES en RANDSTAD_UNIT_ARCHETYPES uitgebreid met Heavy (Tractorrijder/CorporateAdvocaat)
+- **Discord + Reddit share buttons** -- Toegevoegd aan steun pagina share sectie
+- **Mollie badge** -- "Betaling via Mollie -- veilig en vertrouwd" onder payment methods
+
+### Fixed
+- **Hero revive indexOf bug** -- Fragiele `=== 1` check vervangen door `hero${index}` template literal (Game.ts:1035+2322)
+- **AudioManager duckTimer leak** -- `clearTimeout(duckTimer)` toegevoegd aan `dispose()`
+- **Stale public/index.html** -- Overschreef Vite-processed landing page bij builds, hernoemd naar .bak
+- **Steun FAQ GitHub link** -- "GitHub" en "roadmap" nu echte hyperlinks i.p.v. plain text
+- **URL trailing slashes** -- 11 inconsistente links (/doneer, /roadmap, /press) gefixt in 5 bestanden
+- **Community Discord placeholder** -- Professionelere "binnenkort" tekst met roadmap link
+
+### Changed
+- **Donation flow vereenvoudigd** -- 2-stap checkout (Afrekenen → methode) → 1-stap (methodes direct zichtbaar)
+- **Perk tiers verduidelijkt** -- Subtitle "elke tier bevat alles van de vorige" + "+ alles van vorige tiers" per card
+- **Mobile donation buttons** -- 3-kolom grid layout op mobile i.p.v. wrapping row
+- **Infantry/Ranged DPS rebalance** -- Infantry 10atk/1.2s→9/1.3s, Ranged 12atk→14atk, Consultant 3atk→5atk
+- **OG images opgeschoond** -- 9 ongebruikte PNG backups verwijderd (~9MB bespaard)
+
 ## [0.22.0] - 2026-04-11
 
 ### Added

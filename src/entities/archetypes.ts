@@ -49,8 +49,8 @@ export const UNIT_ARCHETYPES: readonly UnitArchetype[] = [
     name: 'Infantry',
     brabantName: 'Carnavalvierder',
     hp: 80,
-    attack: 10,
-    attackSpeed: 1.2,     // 1.2s between attacks
+    attack: 9,
+    attackSpeed: 1.3,     // 1.3s between attacks (DPS 6.92, was 8.33)
     armor: 1,
     armorType: ArmorType.Light,
     speed: 5.5,
@@ -69,8 +69,8 @@ export const UNIT_ARCHETYPES: readonly UnitArchetype[] = [
     name: 'Ranged',
     brabantName: 'Sluiper',
     hp: 55,
-    attack: 12,
-    attackSpeed: 1.8,     // 1.8s between attacks
+    attack: 14,
+    attackSpeed: 1.8,     // 1.8s between attacks (DPS 7.78, was 6.67)
     armor: 0,
     armorType: ArmorType.Light,
     speed: 6.0,
@@ -80,6 +80,26 @@ export const UNIT_ARCHETYPES: readonly UnitArchetype[] = [
     costSecondary: 40,
     population: 1,
     sightRange: 10,       // ranged units see further
+    carryCapacity: 0,
+  },
+
+  // UnitTypeId.Heavy = 3 -- Tractorrijder
+  {
+    typeId: UnitTypeId.Heavy,
+    name: 'Heavy',
+    brabantName: 'Tractorrijder',
+    hp: 200,
+    attack: 20,
+    attackSpeed: 2.0,     // 2.0s between attacks — slow but hard-hitting
+    armor: 3,
+    armorType: ArmorType.Heavy,
+    speed: 4.0,
+    range: MINIMUM_MELEE_RANGE,
+    buildTime: 35,
+    costGold: 150,
+    costSecondary: 100,
+    population: 2,
+    sightRange: 8,
     carryCapacity: 0,
   },
 ] as const;
@@ -130,13 +150,13 @@ export const RANDSTAD_UNIT_ARCHETYPES: readonly UnitArchetype[] = [
     carryCapacity: 0,
   },
 
-  // UnitTypeId.Ranged = 2 -- Consultant (debuff specialist, minimal direct damage)
+  // UnitTypeId.Ranged = 2 -- Consultant (debuff specialist, modest direct damage)
   {
     typeId: UnitTypeId.Ranged,
     name: 'Ranged',
     brabantName: 'Consultant',
     hp: 55,
-    attack: 3,
+    attack: 5,
     attackSpeed: 1.8,
     armor: 0,
     armorType: ArmorType.Light,
@@ -147,6 +167,26 @@ export const RANDSTAD_UNIT_ARCHETYPES: readonly UnitArchetype[] = [
     costSecondary: 50,
     population: 1,
     sightRange: 11,
+    carryCapacity: 0,
+  },
+
+  // UnitTypeId.Heavy = 3 -- CorporateAdvocaat
+  {
+    typeId: UnitTypeId.Heavy,
+    name: 'Heavy',
+    brabantName: 'CorporateAdvocaat',
+    hp: 220,
+    attack: 18,
+    attackSpeed: 2.2,
+    armor: 4,
+    armorType: ArmorType.Heavy,
+    speed: 3.5,
+    range: MINIMUM_MELEE_RANGE,
+    buildTime: 38,
+    costGold: 170,
+    costSecondary: 120,
+    population: 2,
+    sightRange: 8,
     carryCapacity: 0,
   },
 ] as const;

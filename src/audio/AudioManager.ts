@@ -482,6 +482,7 @@ class AudioManager {
    * Stop all sounds and unload. Call on game cleanup.
    */
   dispose(): void {
+    clearTimeout(this.duckTimer);
     Howler.unload();
     this.sounds.clear();
     this.ambientLoops.clear();

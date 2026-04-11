@@ -380,6 +380,7 @@ export class Game {
     this.missionSystem.start(mission, cb, wc);
     this._createMsgOverlay();
     this._createObjHUD();
+    this._createSurrenderBtn();
 
     // Start ambient audio + faction music
     audioManager.init();
@@ -529,6 +530,59 @@ export class Game {
     if (wp.total > 0) h += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(212,168,83,.15);color:#d4a853;font-size:.75rem">Golven: ' + wp.defeated + '/' + wp.total + '</div>';
     el.innerHTML = h;
   }
+  // -----------------------------------------------------------------------
+  // Surrender button (campaign missions only)
+  // -----------------------------------------------------------------------
+
+  private _createSurrenderBtn(): void {
+    if (document.getElementById('surrender-btn')) return;
+    const ov = document.getElementById('ui-overlay'); if (!ov) return;
+
+    // Button
+    const btn = document.createElement('button');
+    btn.id = 'surrender-btn';
+    btn.className = 'surrender-btn';
+    btn.textContent = 'Opgeven';
+    btn.addEventListener('click', () => this._showSurrenderConfirm());
+    ov.appendChild(btn);
+  }
+
+  private _removeSurrenderBtn(): void {
+    document.getElementById('surrender-btn')?.remove();
+    document.getElementById('surrender-confirm')?.remove();
+  }
+
+  private _showSurrenderConfirm(): void {
+    if (document.getElementById('surrender-confirm')) return;
+    const ov = document.getElementById('ui-overlay'); if (!ov) return;
+
+    const dialog = document.createElement('div');
+    dialog.id = 'surrender-confirm';
+    dialog.className = 'surrender-confirm';
+    dialog.innerHTML =
+      '<div class="surrender-confirm__title">Missie opgeven?</div>' +
+      '<div class="surrender-confirm__buttons">' +
+        '<button class="surrender-confirm__btn surrender-confirm__btn--yes" id="surrender-yes">Ja, opnieuw</button>' +
+        '<button class="surrender-confirm__btn surrender-confirm__btn--no" id="surrender-no">Annuleer</button>' +
+      '</div>';
+    ov.appendChild(dialog);
+
+    document.getElementById('surrender-yes')?.addEventListener('click', () => {
+      dialog.remove();
+      this.surrenderMission();
+    });
+    document.getElementById('surrender-no')?.addEventListener('click', () => {
+      dialog.remove();
+    });
+  }
+
+  /** Called when the player surrenders: triggers defeat through MissionSystem. */
+  surrenderMission(): void {
+    if (!this.missionSystem?.isActive) return;
+    this._removeSurrenderBtn();
+    this.missionSystem.surrender();
+  }
+
   getActiveMission(): MissionDefinition | null { return this.activeMission; }
   isMissionActive(): boolean { return this.missionSystem?.isActive ?? false; }
 
@@ -755,6 +809,7 @@ export class Game {
     }
     this.buildMode = true;
     this.buildGhostType = type;
+    this.hud?.showModeIndicator(`Bouw: ${this.getBuildingLabel(type)}`);
     const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
     if (canvas) canvas.style.cursor = 'crosshair';
   }
@@ -786,6 +841,7 @@ export class Game {
     this.buildMode = false;
     this.buildGhostType = null;
     this.buildingRenderer.hideGhost();
+    this.hud?.hideModeIndicator();
     const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
     if (canvas) canvas.style.cursor = 'default';
   }
@@ -808,6 +864,7 @@ export class Game {
     }
     this.rallyPointMode = true;
     this.rallyPointBuildingEid = bEid;
+    this.hud?.showModeIndicator('Rally Point plaatsen');
     const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
     if (canvas) canvas.style.cursor = 'crosshair';
     this.hud?.showAlert('Klik op het terrein om rally point te plaatsen', 'info');
@@ -816,6 +873,7 @@ export class Game {
   private exitRallyPointMode(): void {
     this.rallyPointMode = false;
     this.rallyPointBuildingEid = -1;
+    this.hud?.hideModeIndicator();
     const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
     if (canvas) canvas.style.cursor = 'default';
   }
@@ -829,10 +887,12 @@ export class Game {
     const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
     if (canvas) canvas.style.cursor = 'crosshair';
     this.hud?.showAlert('Attack-move: klik op terrein of vijand', 'info');
+    this.hud?.showModeIndicator('Attack-Move');
   }
 
   private exitAttackMoveMode(): void {
     this.attackMoveMode = false;
+    this.hud?.hideModeIndicator();
     const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
     if (canvas) canvas.style.cursor = 'default';
   }
@@ -1033,7 +1093,7 @@ export class Game {
       // Determine hero index within faction (0 = primary, 1 = secondary)
       const factionHeroes = getHeroTypesForFaction(this.playerFactionId);
       const heroIndex = factionHeroes.indexOf(heroTypeId);
-      const heroTypeName = heroIndex === 1 ? 'hero1' : 'hero0';
+      const heroTypeName = heroIndex > 0 ? `hero${heroIndex}` : 'hero0';
       const mesh = this.unitRenderer.addUnit(heroEid, heroTypeName as any, this.playerFactionId);
       if (mesh) {
         const y = this.terrain.getHeightAt(spawnX, spawnZ);
@@ -2320,7 +2380,7 @@ export class Game {
         const heroTypeId = Hero.heroTypeId[eid] as HeroTypeId;
         const factionHeroes = getHeroTypesForFaction(factionIdx as FactionId);
         const heroIdx = factionHeroes.indexOf(heroTypeId);
-        typeName = heroIdx === 1 ? 'hero1' : 'hero0';
+        typeName = heroIdx > 0 ? `hero${heroIdx}` : 'hero0';
       }
       const mesh = this.unitRenderer.addUnit(eid, typeName as any, factionIdx);
       if (mesh) {
@@ -3127,6 +3187,7 @@ export class Game {
     if (msgEl) msgEl.remove();
     const objEl = document.getElementById('mission-objectives');
     if (objEl) objEl.remove();
+    this._removeSurrenderBtn();
   }
 
   private createGoldMineEntity(x: number, z: number, amount: number): number {

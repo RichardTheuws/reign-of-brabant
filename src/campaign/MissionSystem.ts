@@ -144,6 +144,17 @@ export class MissionSystem {
     console.log(`[MissionSystem] Started mission: ${mission.title}`);
   }
 
+  /** Player surrenders -- triggers defeat via normal defeat path. */
+  surrender(): void {
+    if (!this.active || !this.callbacks) return;
+    if (this.defeatTriggered || this.victoryTriggered) return;
+
+    this.defeatTriggered = true;
+    this.victoryPendingSince = -1;
+    this.callbacks.triggerDefeat();
+    this.active = false;
+  }
+
   /** Stop tracking (cleanup). */
   stop(): void {
     this.active = false;

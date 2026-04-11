@@ -1200,6 +1200,160 @@
       font-size: 1.2rem; cursor: pointer; padding: 0 4px; line-height: 1;
     }
     .fullscreen-tip-close:hover { color: var(--color-text); }
+
+    /* Mode indicator (build / rally / attack-move) */
+    #mode-indicator {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 20px;
+      background: rgba(20, 15, 10, 0.92);
+      border: 1px solid rgba(212, 168, 83, 0.5);
+      border-radius: 8px;
+      animation: modeSlideIn 0.2s ease-out;
+      pointer-events: none;
+    }
+    .mode-indicator__text {
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #e8c065;
+      letter-spacing: 0.05em;
+    }
+    .mode-indicator__hint {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      color: #a0a0a0;
+      border-left: 1px solid rgba(212, 168, 83, 0.3);
+      padding-left: 12px;
+    }
+    @keyframes modeSlideIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    /* Surrender button (campaign missions) */
+    .surrender-btn {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 900;
+      padding: 6px 14px;
+      background: rgba(20, 15, 10, 0.85);
+      border: 1px solid rgba(244, 67, 54, 0.4);
+      border-radius: 6px;
+      color: #F44336;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .surrender-btn:hover {
+      background: rgba(244, 67, 54, 0.15);
+      border-color: #F44336;
+    }
+    .surrender-confirm {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1100;
+      background: rgba(20, 15, 10, 0.95);
+      border: 1px solid rgba(212, 168, 83, 0.5);
+      border-radius: 12px;
+      padding: 24px 32px;
+      text-align: center;
+    }
+    .surrender-confirm__title {
+      font-family: 'Cinzel', serif;
+      color: #F44336;
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+    }
+    .surrender-confirm__buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    .surrender-confirm__btn {
+      padding: 8px 20px;
+      border-radius: 8px;
+      border: 1px solid;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      background: transparent;
+    }
+    .surrender-confirm__btn--yes {
+      background: rgba(244, 67, 54, 0.15);
+      border-color: #F44336;
+      color: #F44336;
+    }
+    .surrender-confirm__btn--no {
+      background: rgba(212, 168, 83, 0.1);
+      border-color: rgba(212, 168, 83, 0.4);
+      color: #e8e6e3;
+    }
+
+    /* ================================================================ TOOLTIP SYSTEM */
+    .game-tooltip {
+      position: fixed;
+      z-index: 1200;
+      pointer-events: none;
+      background: rgba(15, 12, 8, 0.95);
+      border: 1px solid rgba(212, 168, 83, 0.5);
+      border-radius: 8px;
+      padding: 10px 14px;
+      max-width: 260px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+    .game-tooltip.is-visible { opacity: 1; }
+    .game-tooltip__name {
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #e8c065;
+      margin-bottom: 4px;
+    }
+    .game-tooltip__cost {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      color: #d4a853;
+      margin-bottom: 6px;
+    }
+    .game-tooltip__stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: #a0a0a0;
+    }
+    .game-tooltip__stat-label { color: #777; }
+    .game-tooltip__desc {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      color: #a0a0a0;
+      margin-top: 6px;
+      line-height: 1.4;
+      border-top: 1px solid rgba(212,168,83,0.2);
+      padding-top: 6px;
+    }
+    .game-tooltip__hotkey {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      color: #777;
+      margin-top: 4px;
+    }
   </style>
 </head>
 <body>
