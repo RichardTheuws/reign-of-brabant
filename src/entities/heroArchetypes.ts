@@ -239,14 +239,238 @@ const DE_POLITICUS: HeroArchetype = {
 };
 
 // ---------------------------------------------------------------------------
+// Limburgers Heroes
+// ---------------------------------------------------------------------------
+
+const DE_MIJNBAAS: HeroArchetype = {
+  heroTypeId: HeroTypeId.DeMijnwerker,
+  name: 'De Mijnbaas',
+  factionId: FactionId.Limburgers,
+  hp: 650,
+  attack: 28,
+  attackSpeed: 2.0,
+  armor: 8,
+  armorType: ArmorType.Heavy,
+  speed: 4.0,
+  range: MINIMUM_MELEE_RANGE,
+  costGold: 450,
+  costSecondary: 300,
+  population: 5,
+  sightRange: 9,
+  buildTime: 35,
+  abilities: [
+    {
+      id: 'mijnbaas-mergelstorm',
+      name: 'Mergelstorm',
+      slot: AbilitySlot.Q,
+      cooldown: 30,
+      targetType: AbilityTargetType.SelfAoE,
+      radius: 8,
+      range: 0,
+      duration: 3,
+      description: 'AoE ground slam, 40 dmg + 3s stun, radius 8',
+    },
+    {
+      id: 'mijnbaas-tunnelnetwerk',
+      name: 'Tunnelnetwerk',
+      slot: AbilitySlot.W,
+      cooldown: 60,
+      targetType: AbilityTargetType.Self,
+      radius: 3,
+      range: 0,
+      duration: 25,
+      description: 'Roept 4 mijnwerkers op (80 HP, 10 ATK, 25s levensduur)',
+    },
+    {
+      id: 'mijnbaas-instorting',
+      name: 'Instorting',
+      slot: AbilitySlot.E,
+      cooldown: 180,
+      targetType: AbilityTargetType.SelfAoE,
+      radius: 6,
+      range: 0,
+      duration: 15,
+      description: 'AoE terrein collapse, 120 dmg + terrein impassable 15s, radius 6',
+    },
+  ],
+};
+
+const DE_MAASMEESTER: HeroArchetype = {
+  heroTypeId: HeroTypeId.DeVlaaibaas,
+  name: 'De Maasmeester',
+  factionId: FactionId.Limburgers,
+  hp: 380,
+  attack: 14,
+  attackSpeed: 2.2,
+  armor: 3,
+  armorType: ArmorType.Medium,
+  speed: 5.0,
+  range: 10,
+  costGold: 350,
+  costSecondary: 350,
+  population: 5,
+  sightRange: 14,
+  buildTime: 30,
+  abilities: [
+    {
+      id: 'maasmeester-mergelgenezing',
+      name: 'Mergelgenezing',
+      slot: AbilitySlot.Q,
+      cooldown: 25,
+      targetType: AbilityTargetType.SelfAoE,
+      radius: 10,
+      range: 0,
+      duration: 8,
+      description: 'Heal allies in radius 10, 80 HP over 8s',
+    },
+    {
+      id: 'maasmeester-maasvloek',
+      name: 'Maasvloek',
+      slot: AbilitySlot.W,
+      cooldown: 45,
+      targetType: AbilityTargetType.TargetEnemy,
+      radius: 0,
+      range: 12,
+      duration: 10,
+      description: 'Target enemy -50% speed + -30% ATK 10s',
+    },
+    {
+      id: 'maasmeester-rivier',
+      name: 'De Rivier Herinnert',
+      slot: AbilitySlot.E,
+      cooldown: 120,
+      targetType: AbilityTargetType.Line,
+      radius: 4,
+      range: 20,
+      duration: 0,
+      description: 'AoE water surge, 60 dmg + knockback, line 20 range width 4',
+    },
+  ],
+};
+
+// ---------------------------------------------------------------------------
+// Belgen Heroes
+// ---------------------------------------------------------------------------
+
+const DE_FRIETKONING: HeroArchetype = {
+  heroTypeId: HeroTypeId.DeChocolatier,
+  name: 'De Frietkoning',
+  factionId: FactionId.Belgen,
+  hp: 480,
+  attack: 22,
+  attackSpeed: 1.6,
+  armor: 5,
+  armorType: ArmorType.Heavy,
+  speed: 4.8,
+  range: MINIMUM_MELEE_RANGE,
+  costGold: 400,
+  costSecondary: 280,
+  population: 5,
+  sightRange: 11,
+  buildTime: 30,
+  abilities: [
+    {
+      id: 'frietkoning-frietenregen',
+      name: 'Frietenregen',
+      slot: AbilitySlot.Q,
+      cooldown: 35,
+      targetType: AbilityTargetType.SelfAoE,
+      radius: 8,
+      range: 0,
+      duration: 0,
+      description: 'AoE 50 dmg + heal allies 30 HP, radius 8',
+    },
+    {
+      id: 'frietkoning-compromis',
+      name: 'Diplomatiek Compromis',
+      slot: AbilitySlot.W,
+      cooldown: 90,
+      targetType: AbilityTargetType.TargetEnemy,
+      radius: 0,
+      range: 8,
+      duration: 30,
+      description: 'Convert enemy non-hero unit to ally 30s',
+    },
+    {
+      id: 'frietkoning-frietkot',
+      name: 'Frietkot Supreme',
+      slot: AbilitySlot.E,
+      cooldown: 180,
+      targetType: AbilityTargetType.Self,
+      radius: 3,
+      range: 0,
+      duration: 60,
+      description: 'Summon frietkot building 60s, generates 3 chocolatiers',
+    },
+  ],
+};
+
+const DE_ABDIJBROUWER: HeroArchetype = {
+  heroTypeId: HeroTypeId.DeFrituur,
+  name: 'De Abdijbrouwer',
+  factionId: FactionId.Belgen,
+  hp: 400,
+  attack: 12,
+  attackSpeed: 2.0,
+  armor: 3,
+  armorType: ArmorType.Light,
+  speed: 4.5,
+  range: 9,
+  costGold: 380,
+  costSecondary: 320,
+  population: 5,
+  sightRange: 12,
+  buildTime: 35,
+  abilities: [
+    {
+      id: 'abdijbrouwer-trappistenzegen',
+      name: 'Trappistenzegen',
+      slot: AbilitySlot.Q,
+      cooldown: 40,
+      targetType: AbilityTargetType.SelfAoE,
+      radius: 10,
+      range: 0,
+      duration: 15,
+      description: 'Buff allies radius 10, +25% ATK + heal 5 HP/s 15s',
+    },
+    {
+      id: 'abdijbrouwer-dubbelbock',
+      name: 'Dubbelbock',
+      slot: AbilitySlot.W,
+      cooldown: 60,
+      targetType: AbilityTargetType.TargetAlly,
+      radius: 0,
+      range: 8,
+      duration: 10,
+      description: 'Target friendly hero +100% ATK -50% speed 10s',
+    },
+    {
+      id: 'abdijbrouwer-wapenstilstand',
+      name: 'Abdijwapenstilstand',
+      slot: AbilitySlot.E,
+      cooldown: 180,
+      targetType: AbilityTargetType.SelfAoE,
+      radius: 15,
+      range: 0,
+      duration: 10,
+      description: 'ALL units in radius 15 cannot attack 10s, allies regen 50 HP',
+    },
+  ],
+};
+
+// ---------------------------------------------------------------------------
 // Hero Archetype Array -- indexed by HeroTypeId
 // ---------------------------------------------------------------------------
 
 export const HERO_ARCHETYPES: readonly HeroArchetype[] = [
   PRINS_VAN_BRABANT,    // HeroTypeId.PrinsVanBrabant = 0
   BOER_VAN_BRABANT,     // HeroTypeId.BoerVanBrabant = 1
-  DE_CEO,                 // HeroTypeId.DeCEO = 2
-  DE_POLITICUS,           // HeroTypeId.DePoliticus = 3
+  DE_CEO,               // HeroTypeId.DeCEO = 2
+  DE_POLITICUS,         // HeroTypeId.DePoliticus = 3
+  DE_MIJNBAAS,          // HeroTypeId.DeMijnwerker = 4
+  DE_MAASMEESTER,       // HeroTypeId.DeVlaaibaas = 5
+  DE_FRIETKONING,       // HeroTypeId.DeChocolatier = 6
+  DE_ABDIJBROUWER,      // HeroTypeId.DeFrituur = 7
 ] as const;
 
 /**

@@ -9,7 +9,7 @@ import { query, hasComponent } from 'bitecs';
 import { Position, Movement, Rotation, GezeligheidBonus, Stunned, Faction } from '../ecs/components';
 import { IsUnit } from '../ecs/tags';
 import { playerState } from '../core/PlayerState';
-import { UPKEEP_DEBT_EFFECTIVENESS } from '../types/index';
+import { UPKEEP_DEBT_EFFECTIVENESS, ROAD_SPEED_BONUS } from '../types/index';
 import type { Terrain } from '../world/Terrain';
 import type { GameWorld } from '../ecs/world';
 
@@ -48,9 +48,14 @@ export function createMovementSystem(terrain: Terrain) {
         continue;
       }
 
-      // Normalize direction and scale by speed * dt (with Gezelligheid bonus + upkeep debt)
+      // Normalize direction and scale by speed * dt (with Gezelligheid bonus + road bonus + upkeep debt)
       _invDist = 1 / Math.max(_dist, 0.001);
       let effectiveSpeed = Movement.speed[eid] * (GezeligheidBonus.speedMult[eid] || 1.0);
+
+      // Road speed bonus: units on roads move faster
+      if (terrain.isOnRoad(Position.x[eid], Position.z[eid])) {
+        effectiveSpeed *= ROAD_SPEED_BONUS;
+      }
 
       // Upkeep debt: reduce movement speed
       if (playerState.isInUpkeepDebt(Faction.id[eid])) {

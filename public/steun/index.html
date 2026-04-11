@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Steun Reign of Brabant — Het Gouden Worstenbroodje</title>
-    <meta name="description" content="33.559 regels code. 127 3D modellen. 525 stemmen. 3 dagen. 1 persoon. Reign of Brabant is een WarCraft-achtige RTS in je browser. Steun het experiment.">
+    <meta name="description" content="Een WarCraft-achtige 3D RTS in je browser. 4 facties, Brabants dialect, 127 3D modellen, 525 stemmen. Gebouwd door een mens met AI-tools. Steun het en word deel van het verhaal.">
     <meta property="og:title" content="Steun Reign of Brabant — Brabant staat op">
-    <meta property="og:description" content="Een RTS met vier facties, Brabants dialect en meer ambitie dan verstand. Gebouwd door een mens en een AI in 3 dagen. Steun het en word deel van het verhaal.">
+    <meta property="og:description" content="Een WarCraft-achtige 3D RTS met vier facties, Brabants dialect en meer ambitie dan verstand. Steun het en word deel van het verhaal.">
     <meta property="og:image" content="https://reign-of-brabant.nl/assets/og/og-steun.png">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://reign-of-brabant.nl/steun/">
@@ -14,7 +14,7 @@
     <meta property="og:image:height" content="630">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Steun Reign of Brabant — Brabant staat op">
-    <meta name="twitter:description" content="Een RTS met vier facties, Brabants dialect en meer ambitie dan verstand. Gebouwd door een mens en een AI in 3 dagen.">
+    <meta name="twitter:description" content="Een WarCraft-achtige 3D RTS met vier facties, Brabants dialect en meer ambitie dan verstand. Steun het en word deel van het verhaal.">
     <meta name="twitter:image" content="https://reign-of-brabant.nl/assets/og/og-steun.png">
     <link rel="canonical" href="https://reign-of-brabant.nl/steun/">
     <link rel="alternate" hreflang="nl" href="https://reign-of-brabant.nl/steun/">
@@ -516,21 +516,6 @@
     .gallery__card[data-faction="limburg"] { border-top: 3px solid var(--limburg); }
     .gallery__card[data-faction="belgen"] { border-top: 3px solid var(--belgen); }
 
-    /* Placeholder faction card */
-    .gallery__card-placeholder {
-        width: 100%; aspect-ratio: 4 / 5;
-        display: flex; align-items: center; justify-content: center;
-        font-family: var(--font-heading); font-size: 3rem;
-        font-weight: 900; color: rgba(255,255,255,0.15);
-        letter-spacing: 0.05em;
-    }
-    .gallery__card[data-faction="limburg"] .gallery__card-placeholder {
-        background: linear-gradient(135deg, rgba(39,174,96,0.15), rgba(39,174,96,0.05));
-    }
-    .gallery__card[data-faction="belgen"] .gallery__card-placeholder {
-        background: linear-gradient(135deg, rgba(231,76,60,0.15), rgba(231,76,60,0.05));
-    }
-
 
     /* ============================================================
        AI PIPELINE
@@ -1004,18 +989,6 @@
         width: 6px; height: 6px; border-radius: 50%;
         background: var(--gold-dim); border: 1px solid var(--gold);
     }
-    .milestone__bar {
-        grid-column: 1 / -1;
-        height: 4px; background: rgba(255,255,255,0.06);
-        border-radius: 4px; overflow: hidden;
-        margin-top: 0.5rem;
-    }
-    .milestone__bar-fill {
-        height: 100%;
-        background: linear-gradient(to right, var(--gold), var(--gold-light));
-        border-radius: 4px; width: 0%;
-        transition: width 1.5s var(--ease-out-expo);
-    }
 
 
     /* ============================================================
@@ -1072,19 +1045,6 @@
         font-size: 0.75rem; color: var(--text-muted);
         margin-top: var(--space-sm); font-style: italic;
         max-width: 600px; margin-left: auto; margin-right: auto;
-    }
-
-
-    /* ============================================================
-       LAZY LOADING
-       ============================================================ */
-    .lazy-img {
-        opacity: 0;
-        transition: opacity var(--duration-slow) var(--ease-out-expo);
-    }
-    .lazy-img.is-loaded { opacity: 1; }
-    .img-placeholder {
-        position: relative; overflow: hidden; background: var(--bg-elevated);
     }
 
 
@@ -1220,7 +1180,7 @@
         </div>
         <div class="sticky-nav__links">
             <a href="/play/">Spelen</a>
-            <a href="#het-verhaal">Het Verhaal</a>
+            <a href="/het-verhaal/">Het Verhaal</a>
             <a href="#pipeline">AI Pipeline</a>
             <a href="#steun" class="btn btn--primary" style="padding:0.4rem 1rem;font-size:0.85rem">Steun nu</a>
         </div>
@@ -1253,13 +1213,13 @@
                 <span class="stat-sep">|</span>
                 <span>525 stemmen</span>
                 <span class="stat-sep">|</span>
-                <span>3 dagen</span>
+                <span>192 tests</span>
                 <span class="stat-sep">|</span>
                 <span>1 persoon</span>
             </div>
 
             <div class="hero__cta-group">
-                <a href="#steun" class="btn btn--primary btn--large">Steun het experiment</a>
+                <a href="#steun" class="btn btn--primary btn--large">Steun het project</a>
                 <a href="/play/" class="btn btn--ghost btn--large">Eerst zelf spelen</a>
             </div>
         </div>
@@ -1276,20 +1236,21 @@
             <div class="split">
                 <div class="split__visual" data-reveal="left">
                     <img src="/assets/steun/world-map.webp"
-                         alt="Reign of Brabant wereldkaart — vier facties, een continent"
+                         alt="Reign of Brabant wereldkaart -- vier facties, een continent"
                          width="800" height="600"
                          loading="lazy">
                 </div>
                 <div class="split__text" data-reveal="right">
                     <div class="section__label">Het verhaal</div>
-                    <h3>Een proof of concept. In 3 dagen gebouwd. En nu gaan we het goed doen.</h3>
+                    <h3>Een ongoing proof of concept. Begonnen als experiment. Nu de meest ambitieuze browser-RTS van Nederland.</h3>
                     <p>
-                        Een WarCraft-achtige RTS in je browser. Vier facties, Brabants dialect, 127 3D modellen
-                        en 525 voice lines. Gebouwd door 1 persoon met AI in 3 dagen. Het is ruw, ongepolijst
-                        en soms ronduit gebroken -- maar het werkt. En nu gaan we het goed doen.
+                        Een WarCraft-achtige 3D RTS in je browser. Vier facties gebaseerd op echte Nederlandse
+                        en Belgische cultuurverschillen, Brabants dialect, 127 3D modellen en 525 voice lines.
+                        Gebouwd door 1 persoon met AI-tools. Het groeit elke week -- nieuwe missies, betere modellen,
+                        meer stemmen. Geen vaste deadline, geen publisher. Gewoon een Brabander met een tattoo en een plan.
                     </p>
                     <p>
-                        <a href="/het-verhaal/" style="color:var(--gold-light)">Lees het complete verhaal op reign-of-brabant.nl/het-verhaal/</a>
+                        <a href="/het-verhaal/" style="color:var(--gold-light)">Lees het complete verhaal</a>
                     </p>
                     <div class="inline-cta">
                         <span class="inline-cta__text"><strong>Geloof je 't nie?</strong> Speel het zelf. Kost niks.</span>
@@ -1318,7 +1279,7 @@
                 <div class="gallery__track">
                     <div class="gallery__card" data-faction="brabant">
                         <img class="gallery__card-img" src="/assets/steun/faction-brabant.webp"
-                             alt="De Brabanders — Carnaval meets slagveld"
+                             alt="De Brabanders -- Carnaval meets slagveld"
                              width="320" height="180" loading="lazy">
                         <div class="gallery__card-body">
                             <div class="gallery__card-title">De Brabanders</div>
@@ -1330,7 +1291,7 @@
                     </div>
                     <div class="gallery__card" data-faction="randstad">
                         <img class="gallery__card-img" src="/assets/steun/faction-randstad.webp"
-                             alt="De Randstad — Corporate warfare"
+                             alt="De Randstad -- Corporate warfare"
                              width="320" height="180" loading="lazy">
                         <div class="gallery__card-body">
                             <div class="gallery__card-title">De Randstad</div>
@@ -1375,8 +1336,8 @@
             <h2 class="section__title" data-reveal>Hoe bouw je een koninkrijk met AI?</h2>
             <p class="section__intro" data-reveal>
                 Het begint met een zin. "Brabantse boer met hooivork, medieval fantasy."
-                60 seconden later staat er een geript, geanimeerd, gestemd 3D model in je game.
-                Geen 3D-artist. Geen stemacteur. Geen maanden wachten.
+                Twee minuten later staat er een geript, geanimeerd, gestemd 3D model in je game.
+                Geen 3D-artist. Geen stemacteur. Geen maanden wachten. Wel honderden euro's per maand aan tools.
             </p>
 
             <!-- 5-step pipeline -->
@@ -1390,13 +1351,13 @@
                 <div class="pipeline__step">
                     <div class="pipeline__step-num">02</div>
                     <div class="pipeline__step-title">Flux / Meshy</div>
-                    <div class="pipeline__step-desc">2D sprites, concept art, 3D modellen</div>
+                    <div class="pipeline__step-desc">2D concept art, 3D modellen</div>
                     <div class="pipeline__arrow"></div>
                 </div>
                 <div class="pipeline__step">
                     <div class="pipeline__step-num">03</div>
                     <div class="pipeline__step-title">Blender</div>
-                    <div class="pipeline__step-desc">Auto-rig, animatie, export naar game</div>
+                    <div class="pipeline__step-desc">Auto-rig, animatie, export</div>
                     <div class="pipeline__arrow"></div>
                 </div>
                 <div class="pipeline__step">
@@ -1427,8 +1388,8 @@
                     <div class="stat__label">Voice lines</div>
                 </div>
                 <div class="stat">
-                    <div class="stat__number" data-count-to="3">0</div>
-                    <div class="stat__label">Dagen</div>
+                    <div class="stat__number" data-count-to="192">0</div>
+                    <div class="stat__label">Tests</div>
                 </div>
                 <div class="stat">
                     <div class="stat__number" data-count-to="1">0</div>
@@ -1440,7 +1401,7 @@
             <div style="margin-top: var(--space-lg);">
                 <div class="split split--reverse">
                     <div class="split__text" data-reveal="left">
-                        <h3>Van wireframe naar vechtklaar in 60 seconden</h3>
+                        <h3>Van wireframe naar vechtklaar in twee minuten</h3>
                         <p>
                             127 modellen. Allemaal via dezelfde pipeline. Meshy v6 maakt het model,
                             Blender rigt en animeert automatisch, ElevenLabs geeft het een stem.
@@ -1448,7 +1409,7 @@
                         </p>
                         <p style="color: var(--text-muted); font-style: italic;">
                             De AI-tools kosten samen honderden euro's per maand. Claude Code, ElevenLabs,
-                            Meshy, fal.ai, Suno, hosting. Dat is waar jouw steun voor nodig is.
+                            Meshy, fal.ai, Suno, hosting op een eigen server. Daar is jouw steun voor nodig.
                         </p>
                     </div>
                     <div class="split__visual" data-reveal="right">
@@ -1491,7 +1452,7 @@
                     <source src="/assets/steun/cinematic-preview.mp4" type="video/mp4">
                 </video>
                 <p style="text-align:center; color:var(--text-secondary); margin-top:var(--space-sm); font-size:0.85rem;">
-                    Kling 3.0 Pro via fal.ai — image-to-video, 5 seconden, gegenereerd in 58 seconden
+                    Kling 3.0 Pro via fal.ai -- image-to-video, 5 seconden, gegenereerd in 58 seconden
                 </p>
             </div>
         </div>
@@ -1506,10 +1467,10 @@
             <div class="section__label" data-reveal>525 stemmen en dat is pas het begin</div>
             <h2 class="section__title" data-reveal>Ze praten. In dialect.</h2>
             <p class="section__intro" data-reveal>
-                De huidige stemmen zijn AI-gegenereerd. Ze zijn een goed begin, maar vaak onduidelijk
-                en soms ronduit verkeerd. De nuances van een Tilburgse boer, het zangerige van een
-                Limburger, de arrogantie van een Randstedelijke consultant -- dat kun je niet faken.
-                Daarvoor heb je echte native speakers nodig. En daar is de Voice Studio voor.
+                De huidige stemmen zijn AI-gegenereerd via ElevenLabs. Een goed begin, maar de nuances
+                van een Tilburgse boer, het zangerige van een Limburger, de arrogantie van een
+                Randstedelijke consultant -- dat kun je niet faken. Daarvoor heb je echte native speakers
+                nodig. En daar is de Voice Studio voor.
             </p>
 
             <div class="voice-player" data-reveal-stagger>
@@ -1586,8 +1547,8 @@
             <h2 class="section__title" data-reveal>Stel je voor...</h2>
             <p class="section__intro" data-reveal>
                 Dit is wat er al is -- ruw, ongepolijst, maar werkend. En dit is wat er mogelijk wordt
-                als de community meedoet. De gouden nodes zijn wat we in 3 dagen hebben gebouwd.
-                De gesloten nodes? Dat zijn de zes systemen die jouw steun mogelijk maakt.
+                als de community meedoet. De gouden nodes zijn wat we al gebouwd hebben.
+                De gesloten nodes? Dat zijn de systemen die jouw steun mogelijk maakt.
             </p>
 
             <div class="tech-tree" data-reveal-stagger>
@@ -1604,8 +1565,8 @@
                 </div>
                 <div class="tech-node tech-node--unlocked">
                     <div class="tech-node__status">Ontgrendeld</div>
-                    <div class="tech-node__title">12 Campagne missies</div>
-                    <div class="tech-node__desc">Met voice-acted cutscenes</div>
+                    <div class="tech-node__title">25 Campagne missies</div>
+                    <div class="tech-node__desc">4 verhaalllijnen, 15-20 uur speelduur</div>
                 </div>
                 <div class="tech-node tech-node--unlocked">
                     <div class="tech-node__status">Ontgrendeld</div>
@@ -1615,7 +1576,7 @@
                 <div class="tech-node tech-node--unlocked">
                     <div class="tech-node__status">Ontgrendeld</div>
                     <div class="tech-node__title">Base building</div>
-                    <div class="tech-node__desc">Resources, gebouwen, upgrades</div>
+                    <div class="tech-node__desc">Resources, gebouwen, tech trees, upgrades</div>
                 </div>
 
                 <!-- LOCKED nodes — the 6 automation systems -->
@@ -1647,7 +1608,7 @@
                     <div class="tech-node__lock"></div>
                     <div class="tech-node__status">Met jouw steun</div>
                     <div class="tech-node__title">AI Cinematics</div>
-                    <div class="tech-node__desc">AI-gegenereerde cutscenes via Kling. Tussen missies, story moments, epische veldslag</div>
+                    <div class="tech-node__desc">AI-gegenereerde cutscenes via Kling. Tussen missies, story moments, epische veldslagen</div>
                 </div>
                 <div class="tech-node tech-node--locked">
                     <div class="tech-node__lock"></div>
@@ -1675,7 +1636,7 @@
                 <div class="section__label">Doe mee</div>
                 <h2 class="section__title" style="text-align:center; margin-bottom: 0.3rem;">Gooi er een worstenbroodje bij</h2>
                 <p style="color: var(--text-secondary); margin-bottom: var(--space-md); font-size: 1.05rem;">
-                    1 worstenbroodje = EUR 2. Kies er zoveel als je wilt.
+                    1 worstenbroodje = EUR 2. Kies er zoveel als je wilt. Elke bijdrage gaat direct naar de game.
                 </p>
 
                 <!-- Worstenbroodje display -->
@@ -1707,7 +1668,7 @@
 
                 <!-- Title indicator -->
                 <div class="donate__title-indicator" id="titleIndicator">
-                    Jouw perk: Aftiteling — Naam in credits
+                    Jouw perk: Aftiteling -- Naam in credits
                 </div>
 
                 <br>
@@ -1750,8 +1711,8 @@
 
                 <p style="color:var(--text-muted);font-size:0.8rem;margin-top:var(--space-md)">
                     De game blijft gratis voor iedereen. Geen tier-locked content. Geen pay-to-win.
-                    Donaties zijn vrijwillige bijdragen aan een passieproject. Milestones zijn best-effort.
-                    Alle voortgang is publiek op GitHub.
+                    Bijdragen zijn vrijwillige steun voor een passieproject met serieuze lopende kosten.
+                    Milestones zijn best-effort. Alle voortgang is publiek op GitHub.
                 </p>
             </div>
         </div>
@@ -1824,11 +1785,10 @@
                         <h4>Building Adoption</h4>
                         <ul>
                             <li>Adopteer een gebouw in de game</li>
-                            <li>Een erkende Vlaamse meesterfriturist adopteert een frietkot</li>
-                            <li>Een Limburgse vlaaienbakker adopteert de vlaaienbakkerij</li>
+                            <li>Lokale bedrijven en leuke namen -- niet McDonald's</li>
                             <li>Een Brabantse cafebaas adopteert de herberg</li>
-                            <li>Een Randstad-consultant adopteert de vergaderzaal (de ironie!)</li>
-                            <li>Leuk en lokaal -- niet McDonald's</li>
+                            <li>Een Limburgse vlaaienbakker adopteert de bakkerij</li>
+                            <li>Een Randstad-consultant adopteert de vergaderzaal (de ironie)</li>
                         </ul>
                     </div>
                 </div>
@@ -1870,11 +1830,33 @@
          ======================================================== -->
     <section class="section section--elevated" id="faq">
         <div class="section__inner">
-            <div class="section__label" data-reveal>Veelgestelde vragen die niemand stelde</div>
+            <div class="section__label" data-reveal>Veelgestelde vragen</div>
             <h2 class="section__title" data-reveal>FAQ</h2>
             <div class="section__divider" data-reveal></div>
 
             <div class="faq-list" data-reveal-stagger>
+                <div class="faq-item">
+                    <button class="faq-question">"Is dit een echte game of een prototype?"</button>
+                    <div class="faq-answer">
+                        <p>
+                            Het is een ongoing proof of concept. Je kunt het nu spelen: 25 campaign missies,
+                            4 facties, AI tegenstander, skirmish modus. Het is geen afgerond product en dat
+                            pretenderen we ook niet. Het is een project dat continu groeit -- elke week een
+                            beetje beter, een beetje groter, een beetje gekker.
+                        </p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">"Waar gaat het geld naartoe?"</button>
+                    <div class="faq-answer">
+                        <p>
+                            De AI-tools kosten honderden euro's per maand: Claude Code tokens, ElevenLabs
+                            voor stemmen, Meshy voor 3D modellen, fal.ai voor concept art, Suno voor muziek,
+                            en server hosting. Elke euro gaat direct naar het project. Geen marketing, geen
+                            kantoor, geen team lunches.
+                        </p>
+                    </div>
+                </div>
                 <div class="faq-item">
                     <button class="faq-question">"Is dit een WarCraft-kloon?"</button>
                     <div class="faq-answer">
@@ -1889,8 +1871,7 @@
                     <button class="faq-question">"Kan ik met crypto betalen?"</button>
                     <div class="faq-answer">
                         <p>
-                            Ja. Bitcoin, Ethereum. We zijn geen boomers.
-                            Scroll naar boven, klik op 'Afrekenen', en kies je coin.
+                            Ja. Bitcoin, Ethereum. Scroll naar boven, klik op 'Afrekenen', en kies je coin.
                         </p>
                     </div>
                 </div>
@@ -1900,17 +1881,8 @@
                         <p>
                             Dan heb je een worstenbroodje gekocht voor een Brabander. Slechtere deals bestaan.
                             Maar serieus: de code is open source op GitHub, er zitten 33.559 regels in,
-                            en dit ding gaat nergens heen.
-                        </p>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <button class="faq-question">"Waarom geen Kickstarter?"</button>
-                    <div class="faq-answer">
-                        <p>
-                            Te veel regels. Te weinig worstenbroodjes. Kickstarter neemt een flinke fee
-                            en vereist een heel circus aan rewards. Wij houden het simpel: direct steunen,
-                            geen gedoe, al het geld naar de game.
+                            en dit ding gaat nergens heen. Richard werkt eraan als hij tijd heeft of als hij
+                            niet kan slapen. En die man slaapt slecht.
                         </p>
                     </div>
                 </div>
@@ -1918,13 +1890,9 @@
                     <button class="faq-question">"Hoe weet ik dat m'n geld goed besteed wordt?"</button>
                     <div class="faq-answer">
                         <p>
-                            Je koopt worstenbroodjes. Er zijn weinig betere manieren om je geld te besteden.
-                        </p>
-                        <p>
-                            Maar serieus: alles is openbaar. Elke commit, elke milestone, elke beslissing.
-                            Met je bijdrage kopen we stabiliteit en eventueel een betere server voor multiplayer
-                            — als we al zover komen dat dat nodig gaat zijn.
-                            Volg de voortgang op GitHub of via de roadmap op de site.
+                            Alles is openbaar. Elke commit, elke milestone, elke beslissing. Volg de
+                            voortgang op GitHub of via de roadmap op de site. Geen beloftes die we niet
+                            kunnen waarmaken -- alleen een eerlijk beeld van wat we bouwen en wat het kost.
                         </p>
                     </div>
                 </div>
@@ -1932,10 +1900,9 @@
                     <button class="faq-question">"Mag ik ook meebouwen aan de game?"</button>
                     <div class="faq-answer">
                         <p>
-                            Graag! Dat zou ik heel tof vinden. De code is open source op GitHub.
-                            Spreek je Brabants, Limburgs of Belgisch-Nederlands? Stuur een voice sample.
-                            Kun je 3D modellen maken? Pull request. Kun je bugs vinden? Dat helpt ook.
-                            Of deel de link gewoon met iemand die dit vet zou vinden.
+                            Graag. De code is open source op GitHub. Spreek je Brabants, Limburgs of Vlaams?
+                            Stuur een voice sample. Kun je 3D modellen maken? Pull request. Kun je bugs
+                            vinden? Dat helpt ook. Of deel de link gewoon met iemand die dit vet zou vinden.
                         </p>
                     </div>
                 </div>
@@ -1950,6 +1917,7 @@
     <footer class="page-footer">
         <div class="page-footer__links">
             <a href="/play/">Spelen</a>
+            <a href="/het-verhaal/">Het Verhaal</a>
             <a href="https://github.com/RichardTheuws/reign-of-brabant">GitHub</a>
             <a href="mailto:richard@theuws.com">Contact</a>
         </div>
@@ -1961,8 +1929,8 @@
 
 
     <!-- ========================================================
-         JAVASCRIPT
-         ======================================================== -->
+       JAVASCRIPT
+       ======================================================== -->
     <script>
     (function() {
         'use strict';
@@ -2125,26 +2093,7 @@
 
 
         // ========================================================
-        // 7. MILESTONE PROGRESS BARS
-        // ========================================================
-        const milestoneBars = document.querySelectorAll('.milestone__bar-fill');
-
-        const barObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const bar = entry.target;
-                    const width = bar.dataset.width || '0';
-                    setTimeout(() => { bar.style.width = width + '%'; }, 300);
-                    barObserver.unobserve(bar);
-                }
-            });
-        }, { threshold: 0.3 });
-
-        milestoneBars.forEach(bar => barObserver.observe(bar));
-
-
-        // ========================================================
-        // 8. FAQ TOGGLE
+        // 7. FAQ TOGGLE
         // ========================================================
         document.querySelectorAll('.faq-question').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -2157,7 +2106,7 @@
 
 
         // ========================================================
-        // 9. WAVEFORM VISUALIZATION
+        // 8. WAVEFORM VISUALIZATION
         // ========================================================
         const waveformEl = document.getElementById('voiceWaveform');
 
@@ -2208,15 +2157,15 @@
 
 
         // ========================================================
-        // 10. WORSTENBROODJES DONATIE INTERFACE
+        // 9. WORSTENBROODJES DONATIE INTERFACE
         // ========================================================
         const PRICE_PER_WB = 2;
         const TITLES = [
-            { min: 1, title: 'Aftiteling — Naam in credits' },
-            { min: 10, title: 'Voice Studio — Jouw stem in de game' },
-            { min: 25, title: 'Custom Hero — Jouw avatar als karakter' },
-            { min: 50, title: 'Building Adoption — Adopteer een gebouw' },
-            { min: 100, title: 'Factie Sponsor — Bouw mee aan een factie' },
+            { min: 1, title: 'Aftiteling -- Naam in credits' },
+            { min: 10, title: 'Voice Studio -- Jouw stem in de game' },
+            { min: 25, title: 'Custom Hero -- Jouw avatar als karakter' },
+            { min: 50, title: 'Building Adoption -- Adopteer een gebouw' },
+            { min: 100, title: 'Factie Sponsor -- Bouw mee aan een factie' },
         ];
 
         let selectedAmount = 5;
@@ -2396,7 +2345,7 @@
 
 
         // ========================================================
-        // 11. SMOOTH SCROLL
+        // 10. SMOOTH SCROLL
         // ========================================================
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
@@ -2410,7 +2359,7 @@
 
 
         // ========================================================
-        // 12. KONAMI CODE EASTER EGG
+        // 11. KONAMI CODE EASTER EGG
         // ========================================================
         const konamiSequence = [
             'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',

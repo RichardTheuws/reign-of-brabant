@@ -14,11 +14,13 @@ import { Position, Faction, Health, Attack, Armor, Movement, UnitType, UnitAI, G
 import { IsUnit, IsBuilding, IsResource, IsWorker, IsDead, IsHero } from '../ecs/tags';
 import { FactionId, UnitTypeId, BuildingTypeId, HeroTypeId, UpgradeId, ResourceType, MAP_SIZE, UnitAIState, NO_PRODUCTION, NO_ENTITY, HERO_POPULATION_COST } from '../types/index';
 import { UNIT_ARCHETYPES, BUILDING_ARCHETYPES } from '../entities/archetypes';
-import { HERO_ARCHETYPES } from '../entities/heroArchetypes';
+import { HERO_ARCHETYPES, getHeroTypesForFaction, getHeroArchetype } from '../entities/heroArchetypes';
 import { getFactionUnitArchetype } from '../data/factionData';
+import { getPortraitUrl } from '../data/portraitMap';
 import { createHero, isHeroActive } from '../entities/heroFactory';
 import { createGamePipeline, type SystemPipeline } from '../systems/SystemPipeline';
 import { generateMap, type GeneratedMap, DecoType } from '../world/MapGenerator';
+import { createMapTunnelSystem } from '../systems/MapTunnelSystem';
 import { queueCommand } from '../systems/CommandSystem';
 import { NavMeshManager } from '../pathfinding/NavMeshManager';
 import { AISystem } from '../ai/AISystem';
@@ -188,6 +190,16 @@ export class Game {
     // 1. Generate map layout (2 players for skirmish: player + 1 AI)
     this.map = generateMap(42, (x, z) => this.terrain.getHeightAt(x, z), 2, mapTemplate as any);
 
+    // 1b. Rebuild terrain with map-specific features (biome, rivers, bridges, roads, tunnels)
+    if (this.map.terrainFeatures) {
+      this.terrain.rebuild(this.map.terrainFeatures);
+    }
+
+    // 1c. Register map tunnel system if the map has tunnels
+    if (this.map.terrainFeatures?.tunnels.length > 0) {
+      this.pipeline.add('MapTunnelSystem', createMapTunnelSystem(this.map.terrainFeatures.tunnels), 'movement');
+    }
+
     // Remap slot 0 to player's chosen faction (swap if needed)
     if (this.playerFactionId !== FactionId.Brabanders) {
       this.remapFactions();
@@ -278,6 +290,11 @@ export class Game {
 
     this.activeMission = mission;
     this.map = generateMap(42, (x, z) => this.terrain.getHeightAt(x, z));
+
+    // Rebuild terrain with map-specific features
+    if (this.map.terrainFeatures) {
+      this.terrain.rebuild(this.map.terrainFeatures);
+    }
 
     // Only load models for active factions (player + AI) for performance
     const activeFactions = new Set<number>([mission.playerFactionId, ...mission.aiFactionIds]);
@@ -597,6 +614,11 @@ export class Game {
 
     this.propRenderer.placeTrees(trees);
     this.propRenderer.placeRocks(rocks);
+
+    // Add terrain feature visuals (bridges, tunnel entrances) to the scene
+    for (const featureMesh of this.terrain.featureMeshes) {
+      this.scene.add(featureMesh);
+    }
   }
 
   private configureAI(): void {
@@ -683,11 +705,11 @@ export class Game {
       case 'train-ranged':
         this.trainFromSelectedBuilding(UnitTypeId.Ranged);
         break;
-      case 'train-hero-prins':
-        this.trainHero(HeroTypeId.PrinsVanBrabant);
+      case 'train-hero-0':
+        this.trainFactionHero(0);
         break;
-      case 'train-hero-boer':
-        this.trainHero(HeroTypeId.BoerVanBrabant);
+      case 'train-hero-1':
+        this.trainFactionHero(1);
         break;
       case 'hero-ability-q':
         this.useHeroAbility(0);
@@ -1007,7 +1029,11 @@ export class Game {
     const heroEid = createHero(world, heroTypeId, this.playerFactionId, spawnX, spawnZ, thX, thZ);
     if (heroEid >= 0) {
       this.playerState.addPopulation(this.playerFactionId, HERO_POPULATION_COST);
-      const mesh = this.unitRenderer.addUnit(heroEid, 'infantry', this.playerFactionId);
+      // Determine hero index within faction (0 = primary, 1 = secondary)
+      const factionHeroes = getHeroTypesForFaction(this.playerFactionId);
+      const heroIndex = factionHeroes.indexOf(heroTypeId);
+      const heroTypeName = heroIndex === 1 ? 'hero1' : 'hero0';
+      const mesh = this.unitRenderer.addUnit(heroEid, heroTypeName as any, this.playerFactionId);
       if (mesh) {
         const y = this.terrain.getHeightAt(spawnX, spawnZ);
         mesh.position.set(spawnX, y, spawnZ);
@@ -1018,6 +1044,12 @@ export class Game {
       this.knownUnitEntities.add(heroEid);
       this.hud?.showAlert(`${arch.name} is verschenen! ALAAF!`, 'info');
     }
+  }
+
+  private trainFactionHero(index: number): void {
+    const heroTypes = getHeroTypesForFaction(this.playerFactionId);
+    if (index < 0 || index >= heroTypes.length) return;
+    this.trainHero(heroTypes[index]);
   }
 
   private useHeroAbility(slot: number): void {
@@ -1227,7 +1259,8 @@ export class Game {
         if (e.code === 'KeyQ') { this.trainFromSelectedBuilding(UnitTypeId.Worker); return; }
         if (e.code === 'KeyW') { this.trainFromSelectedBuilding(UnitTypeId.Infantry); return; }
         if (e.code === 'KeyE') { this.trainFromSelectedBuilding(UnitTypeId.Ranged); return; }
-        if (e.code === 'KeyT') { this.trainHero(HeroTypeId.PrinsVanBrabant); return; }
+        if (e.code === 'KeyT') { this.trainFactionHero(0); return; }
+        if (e.code === 'KeyY') { this.trainFactionHero(1); return; }
         if (e.code === 'KeyR' && hasComponent(world, selectedBuilding, RallyPoint)) {
           this.enterRallyPointMode();
           return;
@@ -1627,18 +1660,24 @@ export class Game {
         }
       } else if (hasComponent(world, firstEid, IsUnit)) {
         // Unit(s) selected
-        const units: SelectedUnit[] = entityIds.map(eid => ({
-          id: eid,
-          name: this.getUnitName(eid),
-          hp: Health.current[eid],
-          maxHp: Health.max[eid],
-          atk: Attack.damage[eid],
-          arm: Armor.value[eid],
-          spd: Movement.speed[eid],
-          level: 1,
-          status: this.getUnitStatus(eid),
-          portrait: null,
-        }));
+        const units: SelectedUnit[] = entityIds.map(eid => {
+          const fid = Faction.id[eid] as FactionId;
+          const utid = UnitType.id[eid] as UnitTypeId;
+          const isHeroUnit = hasComponent(world, eid, IsHero);
+          const heroTypeId = isHeroUnit ? Hero.heroTypeId[eid] as HeroTypeId : undefined;
+          return {
+            id: eid,
+            name: this.getUnitName(eid),
+            hp: Health.current[eid],
+            maxHp: Health.max[eid],
+            atk: Attack.damage[eid],
+            arm: Armor.value[eid],
+            spd: Movement.speed[eid],
+            level: 1,
+            status: this.getUnitStatus(eid),
+            portrait: getPortraitUrl(fid, utid, isHeroUnit, heroTypeId),
+          };
+        });
         this.hud.showUnitPanel(units);
 
         // Show worker commands if a worker is selected
@@ -2043,27 +2082,23 @@ export class Game {
         });
       }
 
-      // Hero training (only barracks)
-      if (isBarracks && !isHeroActive(this.playerFactionId, HeroTypeId.PrinsVanBrabant)) {
-        actions.push({
-          action: 'train-hero-prins',
-          icon: 'H1',
-          label: 'Held',
-          hotkey: 'T',
-          iconClass: 'btn-icon--hero',
-          isHero: true,
-        });
-      }
-
-      if (isBarracks && !isHeroActive(this.playerFactionId, HeroTypeId.BoerVanBrabant)) {
-        actions.push({
-          action: 'train-hero-boer',
-          icon: 'H2',
-          label: 'Held 2',
-          hotkey: 'Y',
-          iconClass: 'btn-icon--hero',
-          isHero: true,
-        });
+      // Hero training (only barracks) -- dynamic per faction
+      if (isBarracks) {
+        const factionHeroTypes = getHeroTypesForFaction(this.playerFactionId);
+        for (let i = 0; i < factionHeroTypes.length; i++) {
+          const ht = factionHeroTypes[i];
+          if (!isHeroActive(this.playerFactionId, ht)) {
+            const arch = getHeroArchetype(ht);
+            actions.push({
+              action: `train-hero-${i}` as CommandAction,
+              icon: `H${i + 1}`,
+              label: arch.name,
+              hotkey: i === 0 ? 'T' : 'Y',
+              iconClass: 'btn-icon--hero',
+              isHero: true,
+            });
+          }
+        }
       }
 
       // Rally point (for any production building)
@@ -2278,12 +2313,18 @@ export class Game {
       // New unit without a mesh -- create one
       const factionIdx = Faction.id[eid];
       const unitType = UnitType.id[eid];
-      const typeName = unitTypeName(unitType);
-      const mesh = this.unitRenderer.addUnit(eid, typeName, factionIdx);
+      const isHeroUnit = hasComponent(world, eid, IsHero);
+      let typeName: string = unitTypeName(unitType);
+      if (isHeroUnit) {
+        const heroTypeId = Hero.heroTypeId[eid] as HeroTypeId;
+        const factionHeroes = getHeroTypesForFaction(factionIdx as FactionId);
+        const heroIdx = factionHeroes.indexOf(heroTypeId);
+        typeName = heroIdx === 1 ? 'hero1' : 'hero0';
+      }
+      const mesh = this.unitRenderer.addUnit(eid, typeName as any, factionIdx);
       if (mesh) {
         mesh.position.set(Position.x[eid], Position.y[eid], Position.z[eid]);
-        // Scale heroes larger so they're VISIBLY stronger
-        if (hasComponent(world, eid, IsHero)) {
+        if (isHeroUnit) {
           mesh.scale.setScalar(1.8);
         }
         mesh.userData.eid = eid;

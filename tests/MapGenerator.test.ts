@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateMap } from '../src/world/MapGenerator';
+import { generateMap, type MapTemplate } from '../src/world/MapGenerator';
 import { FactionId } from '../src/types/index';
 
 describe('MapGenerator', () => {
@@ -90,6 +90,105 @@ describe('MapGenerator', () => {
       expect(map.spawns).toHaveLength(2);
       expect(map.buildings).toHaveLength(2);
       expect(map.units).toHaveLength(6);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Terrain features tests
+  // ---------------------------------------------------------------------------
+
+  describe('terrain features', () => {
+    it('classic template includes terrainFeatures with meadow biome', () => {
+      const map = generateMap(42, () => 0, 2, 'classic');
+      expect(map.terrainFeatures).toBeDefined();
+      expect(map.terrainFeatures.biome).toBe('meadow');
+    });
+
+    it('crossroads template has urban biome', () => {
+      const map = generateMap(42, () => 0, 2, 'crossroads');
+      expect(map.terrainFeatures.biome).toBe('urban');
+    });
+
+    it('islands template has aquatic biome', () => {
+      const map = generateMap(42, () => 0, 2, 'islands');
+      expect(map.terrainFeatures.biome).toBe('aquatic');
+    });
+
+    it('arena template has arid biome', () => {
+      const map = generateMap(42, () => 0, 2, 'arena');
+      expect(map.terrainFeatures.biome).toBe('arid');
+    });
+
+    it('classic template has at least 1 river', () => {
+      const map = generateMap(42, () => 0, 2, 'classic');
+      expect(map.terrainFeatures.rivers.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('classic template has at least 2 bridges', () => {
+      const map = generateMap(42, () => 0, 2, 'classic');
+      expect(map.terrainFeatures.bridges.length).toBeGreaterThanOrEqual(2);
+    });
+
+    it('classic template has at least 2 tunnels', () => {
+      const map = generateMap(42, () => 0, 2, 'classic');
+      expect(map.terrainFeatures.tunnels.length).toBeGreaterThanOrEqual(2);
+    });
+
+    it('islands template has multiple rivers creating channels', () => {
+      const map = generateMap(42, () => 0, 2, 'islands');
+      expect(map.terrainFeatures.rivers.length).toBeGreaterThanOrEqual(2);
+    });
+
+    it('arena template has no rivers (dry arena)', () => {
+      const map = generateMap(42, () => 0, 2, 'arena');
+      expect(map.terrainFeatures.rivers).toHaveLength(0);
+    });
+
+    it('all templates have roads', () => {
+      const templates: MapTemplate[] = ['classic', 'crossroads', 'islands', 'arena'];
+      for (const template of templates) {
+        const map = generateMap(42, () => 0, 2, template);
+        expect(map.terrainFeatures.roads.length).toBeGreaterThan(0);
+      }
+    });
+
+    it('tunnels have valid entrance/exit positions within map bounds', () => {
+      const map = generateMap(42, () => 0, 2, 'classic');
+      const halfMap = map.size / 2;
+      for (const tunnel of map.terrainFeatures.tunnels) {
+        expect(tunnel.entrance.x).toBeGreaterThanOrEqual(-halfMap);
+        expect(tunnel.entrance.x).toBeLessThanOrEqual(halfMap);
+        expect(tunnel.entrance.z).toBeGreaterThanOrEqual(-halfMap);
+        expect(tunnel.entrance.z).toBeLessThanOrEqual(halfMap);
+        expect(tunnel.exit.x).toBeGreaterThanOrEqual(-halfMap);
+        expect(tunnel.exit.x).toBeLessThanOrEqual(halfMap);
+        expect(tunnel.exit.z).toBeGreaterThanOrEqual(-halfMap);
+        expect(tunnel.exit.z).toBeLessThanOrEqual(halfMap);
+        expect(tunnel.travelTime).toBeGreaterThan(0);
+      }
+    });
+
+    it('tunnels have unique IDs', () => {
+      const map = generateMap(42, () => 0, 2, 'classic');
+      const ids = map.terrainFeatures.tunnels.map(t => t.id);
+      const uniqueIds = new Set(ids);
+      expect(uniqueIds.size).toBe(ids.length);
+    });
+
+    it('river paths have at least 2 points', () => {
+      const map = generateMap(42, () => 0, 2, 'classic');
+      for (const river of map.terrainFeatures.rivers) {
+        expect(river.path.length).toBeGreaterThanOrEqual(2);
+        expect(river.width).toBeGreaterThan(0);
+      }
+    });
+
+    it('rock walls have at least 2 path points', () => {
+      const map = generateMap(42, () => 0, 2, 'classic');
+      for (const wall of map.terrainFeatures.rockWalls) {
+        expect(wall.path.length).toBeGreaterThanOrEqual(2);
+        expect(wall.thickness).toBeGreaterThan(0);
+      }
     });
   });
 });

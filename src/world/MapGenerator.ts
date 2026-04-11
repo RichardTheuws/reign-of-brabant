@@ -27,7 +27,15 @@ import {
   type SpawnPoint,
   type GoldMineSpawn,
   type TreeResourceSpawn,
+  type RiverSpawn,
+  type BridgeSpawn,
+  type RockWallSpawn,
+  type RoadSpawn,
+  type TunnelSpawn,
+  type PathPoint,
+  type BiomeType,
 } from '../types/index';
+import type { TerrainFeatures } from './Terrain';
 
 // ---------------------------------------------------------------------------
 // Configuration
@@ -127,6 +135,8 @@ export interface GeneratedMap extends MapDefinition {
   readonly units: readonly UnitSpawn[];
   readonly decorations: readonly DecoSpawn[];
   readonly treeResources: readonly TreeResourceSpawn[];
+  /** Terrain features for this map (rivers, bridges, walls, roads, tunnels). */
+  readonly terrainFeatures: TerrainFeatures;
 }
 
 // ---------------------------------------------------------------------------
@@ -378,7 +388,13 @@ function generateClassic(
   }
 
   // -----------------------------------------------------------------------
-  // 6. Decoration props (trees and rocks)
+  // 6. Terrain features: rivers, bridges, rock walls, roads, tunnels
+  // -----------------------------------------------------------------------
+
+  const terrainFeatures = generateClassicFeatures(rng, halfMap, spawns);
+
+  // -----------------------------------------------------------------------
+  // 7. Decoration props (trees and rocks)
   // -----------------------------------------------------------------------
 
   const { decorations } = generateDecorations(
@@ -399,6 +415,7 @@ function generateClassic(
     buildings,
     units,
     decorations,
+    terrainFeatures,
   };
 }
 
@@ -590,7 +607,13 @@ function generateCrossroads(
   }
 
   // -----------------------------------------------------------------------
-  // 6. Decorations -- more trees (denser map)
+  // 6. Terrain features
+  // -----------------------------------------------------------------------
+
+  const terrainFeatures = generateCrossroadsFeatures(rng, halfMap, spawns);
+
+  // -----------------------------------------------------------------------
+  // 7. Decorations -- more trees (denser map)
   // -----------------------------------------------------------------------
 
   const { decorations } = generateDecorations(
@@ -607,6 +630,7 @@ function generateCrossroads(
     buildings,
     units,
     decorations,
+    terrainFeatures,
   };
 }
 
@@ -759,7 +783,13 @@ function generateIslands(
   }
 
   // -----------------------------------------------------------------------
-  // 6. Decorations -- fewer trees (open centre), normal rocks
+  // 6. Terrain features
+  // -----------------------------------------------------------------------
+
+  const terrainFeatures = generateIslandsFeatures(rng, halfMap, spawns);
+
+  // -----------------------------------------------------------------------
+  // 7. Decorations -- fewer trees (open centre), normal rocks
   // -----------------------------------------------------------------------
 
   const { decorations } = generateDecorations(
@@ -776,6 +806,7 @@ function generateIslands(
     buildings,
     units,
     decorations,
+    terrainFeatures,
   };
 }
 
@@ -931,7 +962,13 @@ function generateArena(
   }
 
   // -----------------------------------------------------------------------
-  // 6. Decorations -- normal amount
+  // 6. Terrain features
+  // -----------------------------------------------------------------------
+
+  const terrainFeatures = generateArenaFeatures(rng, halfMap, spawns);
+
+  // -----------------------------------------------------------------------
+  // 7. Decorations -- normal amount
   // -----------------------------------------------------------------------
 
   const { decorations } = generateDecorations(
@@ -948,6 +985,7 @@ function generateArena(
     buildings,
     units,
     decorations,
+    terrainFeatures,
   };
 }
 
@@ -1045,6 +1083,591 @@ function findValidDecoPosition(
   }
 
   return null;
+}
+
+// ---------------------------------------------------------------------------
+// Terrain feature generators (per-template)
+// ---------------------------------------------------------------------------
+
+/**
+ * Generate a sinuous river path between two points using randomized control points.
+ */
+function generateRiverPath(
+  rng: () => number,
+  startX: number,
+  startZ: number,
+  endX: number,
+  endZ: number,
+  segments: number = 8,
+): PathPoint[] {
+  const path: PathPoint[] = [];
+  for (let i = 0; i <= segments; i++) {
+    const t = i / segments;
+    // Base line interpolation
+    const baseX = startX + (endX - startX) * t;
+    const baseZ = startZ + (endZ - startZ) * t;
+    // Perpendicular wiggle (sinusoidal + random offset)
+    const perpX = -(endZ - startZ);
+    const perpZ = endX - startX;
+    const perpLen = Math.sqrt(perpX * perpX + perpZ * perpZ);
+    const normalizedPerpX = perpLen > 0 ? perpX / perpLen : 0;
+    const normalizedPerpZ = perpLen > 0 ? perpZ / perpLen : 0;
+    const wiggle = Math.sin(t * Math.PI * 2.5) * 8 + (rng() - 0.5) * 6;
+    path.push({
+      x: baseX + normalizedPerpX * wiggle,
+      z: baseZ + normalizedPerpZ * wiggle,
+    });
+  }
+  return path;
+}
+
+/**
+ * Generate road path between two points with mild curves.
+ */
+function generateRoadPath(
+  rng: () => number,
+  startX: number,
+  startZ: number,
+  endX: number,
+  endZ: number,
+  segments: number = 6,
+): PathPoint[] {
+  const path: PathPoint[] = [];
+  for (let i = 0; i <= segments; i++) {
+    const t = i / segments;
+    const baseX = startX + (endX - startX) * t;
+    const baseZ = startZ + (endZ - startZ) * t;
+    // Mild curves (less than rivers)
+    const perpX = -(endZ - startZ);
+    const perpZ = endX - startX;
+    const perpLen = Math.sqrt(perpX * perpX + perpZ * perpZ);
+    const nx = perpLen > 0 ? perpX / perpLen : 0;
+    const nz = perpLen > 0 ? perpZ / perpLen : 0;
+    const curve = Math.sin(t * Math.PI) * 3 + (rng() - 0.5) * 2;
+    // Don't curve start and end points
+    const curveFactor = Math.sin(t * Math.PI); // 0 at ends, 1 at middle
+    path.push({
+      x: baseX + nx * curve * curveFactor,
+      z: baseZ + nz * curve * curveFactor,
+    });
+  }
+  return path;
+}
+
+/**
+ * Classic template features:
+ * - 1 river cutting diagonally across the map
+ * - 2 bridges across the river
+ * - 2 rock wall clusters near the center
+ * - Roads connecting bases to center
+ * - 2 neutral tunnels
+ */
+function generateClassicFeatures(
+  rng: () => number,
+  halfMap: number,
+  spawns: readonly SpawnPoint[],
+): TerrainFeatures {
+  // River: flows from NW edge to SE edge (diagonal across map)
+  const riverPath = generateRiverPath(
+    rng,
+    -halfMap + 10, -halfMap * 0.3,
+    halfMap - 10, halfMap * 0.3,
+    10,
+  );
+
+  const rivers: RiverSpawn[] = [{
+    path: riverPath,
+    width: 5,
+  }];
+
+  // Bridges: place 2 bridges across the river at strategic points
+  // Bridge 1: near center-left
+  const bridge1X = -halfMap * 0.2;
+  const bridge1Z = interpolatePathZ(riverPath, bridge1X);
+  // Bridge 2: near center-right
+  const bridge2X = halfMap * 0.25;
+  const bridge2Z = interpolatePathZ(riverPath, bridge2X);
+
+  const riverAngle1 = getPathAngle(riverPath, bridge1X);
+  const riverAngle2 = getPathAngle(riverPath, bridge2X);
+
+  const bridges: BridgeSpawn[] = [
+    {
+      x: bridge1X,
+      z: bridge1Z,
+      rotation: riverAngle1 + Math.PI / 2,
+      width: 5,
+      length: 7,
+    },
+    {
+      x: bridge2X,
+      z: bridge2Z,
+      rotation: riverAngle2 + Math.PI / 2,
+      width: 5,
+      length: 7,
+    },
+  ];
+
+  // Rock walls: two formations flanking the center to create chokepoints
+  const rockWalls: RockWallSpawn[] = [
+    {
+      path: [
+        { x: -15, z: 15 },
+        { x: -10, z: 18 },
+        { x: -5, z: 20 },
+      ],
+      thickness: 3,
+    },
+    {
+      path: [
+        { x: 5, z: -20 },
+        { x: 10, z: -18 },
+        { x: 15, z: -15 },
+      ],
+      thickness: 3,
+    },
+  ];
+
+  // Roads: connect each base towards the nearest bridge
+  const roads: RoadSpawn[] = [];
+  if (spawns.length >= 2) {
+    // Road from player 0 base to bridge 1
+    roads.push({
+      path: generateRoadPath(rng, spawns[0].x, spawns[0].z, bridge1X, bridge1Z),
+      width: 2.5,
+    });
+    // Road from player 1 base to bridge 2
+    roads.push({
+      path: generateRoadPath(rng, spawns[1].x, spawns[1].z, bridge2X, bridge2Z),
+      width: 2.5,
+    });
+    // Road connecting the two bridges through center
+    roads.push({
+      path: generateRoadPath(rng, bridge1X, bridge1Z, bridge2X, bridge2Z, 4),
+      width: 2.5,
+    });
+  }
+
+  // Tunnels: 2 neutral tunnels that bypass the river
+  const tunnels: TunnelSpawn[] = [
+    {
+      id: 1,
+      entrance: { x: -halfMap * 0.5, z: -halfMap * 0.4 },
+      exit: { x: -halfMap * 0.3, z: halfMap * 0.3 },
+      travelTime: 4,
+      factionOwner: null,
+    },
+    {
+      id: 2,
+      entrance: { x: halfMap * 0.3, z: -halfMap * 0.3 },
+      exit: { x: halfMap * 0.5, z: halfMap * 0.4 },
+      travelTime: 4,
+      factionOwner: null,
+    },
+  ];
+
+  return {
+    biome: 'meadow',
+    rivers,
+    bridges,
+    rockWalls,
+    roads,
+    tunnels,
+    flattenPositions: [
+      // Flatten around bridge locations
+      { x: bridge1X, z: bridge1Z },
+      { x: bridge2X, z: bridge2Z },
+      // Flatten around tunnel entrances/exits
+      ...tunnels.flatMap(t => [t.entrance, t.exit]),
+    ],
+  };
+}
+
+/**
+ * Crossroads template features:
+ * - No river (urban environment)
+ * - Many rock wall formations (industrial ruins)
+ * - Cross-shaped road network
+ * - 3 tunnels connecting edges
+ */
+function generateCrossroadsFeatures(
+  rng: () => number,
+  halfMap: number,
+  spawns: readonly SpawnPoint[],
+): TerrainFeatures {
+  const rivers: RiverSpawn[] = []; // No rivers in urban
+
+  const bridges: BridgeSpawn[] = []; // No bridges needed
+
+  // Rock walls: scattered industrial ruins and rubble
+  const rockWalls: RockWallSpawn[] = [
+    {
+      path: [
+        { x: -halfMap * 0.3, z: -halfMap * 0.3 },
+        { x: -halfMap * 0.2, z: -halfMap * 0.25 },
+        { x: -halfMap * 0.15, z: -halfMap * 0.15 },
+      ],
+      thickness: 2.5,
+    },
+    {
+      path: [
+        { x: halfMap * 0.15, z: halfMap * 0.15 },
+        { x: halfMap * 0.2, z: halfMap * 0.25 },
+        { x: halfMap * 0.3, z: halfMap * 0.3 },
+      ],
+      thickness: 2.5,
+    },
+    {
+      path: [
+        { x: halfMap * 0.3, z: -halfMap * 0.2 },
+        { x: halfMap * 0.35, z: -halfMap * 0.3 },
+      ],
+      thickness: 2,
+    },
+    {
+      path: [
+        { x: -halfMap * 0.3, z: halfMap * 0.2 },
+        { x: -halfMap * 0.35, z: halfMap * 0.3 },
+      ],
+      thickness: 2,
+    },
+  ];
+
+  // Cross-shaped road network through center
+  const roads: RoadSpawn[] = [
+    // Vertical road (N-S)
+    {
+      path: [
+        { x: 0, z: -halfMap + 10 },
+        { x: 0 + (rng() - 0.5) * 3, z: -halfMap * 0.3 },
+        { x: 0, z: 0 },
+        { x: 0 + (rng() - 0.5) * 3, z: halfMap * 0.3 },
+        { x: 0, z: halfMap - 10 },
+      ],
+      width: 3,
+    },
+    // Horizontal road (E-W)
+    {
+      path: [
+        { x: -halfMap + 10, z: 0 },
+        { x: -halfMap * 0.3, z: 0 + (rng() - 0.5) * 3 },
+        { x: 0, z: 0 },
+        { x: halfMap * 0.3, z: 0 + (rng() - 0.5) * 3 },
+        { x: halfMap - 10, z: 0 },
+      ],
+      width: 3,
+    },
+  ];
+
+  // Connect each spawn to the road network
+  for (const spawn of spawns) {
+    const closestRoadX = Math.abs(spawn.x) < Math.abs(spawn.z) ? spawn.x : 0;
+    const closestRoadZ = Math.abs(spawn.z) < Math.abs(spawn.x) ? spawn.z : 0;
+    roads.push({
+      path: generateRoadPath(rng, spawn.x, spawn.z, closestRoadX, closestRoadZ, 4),
+      width: 2.5,
+    });
+  }
+
+  // Tunnels: 3 tunnels connecting quadrants
+  const tunnels: TunnelSpawn[] = [
+    {
+      id: 1,
+      entrance: { x: -halfMap * 0.4, z: -halfMap * 0.1 },
+      exit: { x: halfMap * 0.1, z: -halfMap * 0.4 },
+      travelTime: 3,
+      factionOwner: null,
+    },
+    {
+      id: 2,
+      entrance: { x: halfMap * 0.4, z: halfMap * 0.1 },
+      exit: { x: -halfMap * 0.1, z: halfMap * 0.4 },
+      travelTime: 3,
+      factionOwner: null,
+    },
+    {
+      id: 3,
+      entrance: { x: -halfMap * 0.35, z: halfMap * 0.35 },
+      exit: { x: halfMap * 0.35, z: -halfMap * 0.35 },
+      travelTime: 5,
+      factionOwner: null,
+    },
+  ];
+
+  return {
+    biome: 'urban',
+    rivers,
+    bridges,
+    rockWalls,
+    roads,
+    tunnels,
+    flattenPositions: tunnels.flatMap(t => [t.entrance, t.exit]),
+  };
+}
+
+/**
+ * Islands template features:
+ * - Multiple river channels creating island landmasses
+ * - Bridges connecting the islands
+ * - Minimal rock walls
+ * - Roads on each island
+ * - 4 tunnels (island-to-island shortcuts)
+ */
+function generateIslandsFeatures(
+  rng: () => number,
+  halfMap: number,
+  spawns: readonly SpawnPoint[],
+): TerrainFeatures {
+  // Two rivers creating island channels
+  const river1 = generateRiverPath(
+    rng,
+    -halfMap + 5, 0,
+    halfMap - 5, 0,
+    12,
+  );
+  const river2 = generateRiverPath(
+    rng,
+    0, -halfMap + 5,
+    0, halfMap - 5,
+    12,
+  );
+
+  const rivers: RiverSpawn[] = [
+    { path: river1, width: 6 },
+    { path: river2, width: 6 },
+  ];
+
+  // 4 bridges -- one in each quadrant connecting the islands
+  const bridges: BridgeSpawn[] = [
+    { x: -halfMap * 0.3, z: interpolatePathZ(river1, -halfMap * 0.3), rotation: getPathAngle(river1, -halfMap * 0.3) + Math.PI / 2, width: 5, length: 8 },
+    { x: halfMap * 0.3, z: interpolatePathZ(river1, halfMap * 0.3), rotation: getPathAngle(river1, halfMap * 0.3) + Math.PI / 2, width: 5, length: 8 },
+    { x: interpolatePathX(river2, -halfMap * 0.3), z: -halfMap * 0.3, rotation: getPathAngleAtZ(river2, -halfMap * 0.3) + Math.PI / 2, width: 5, length: 8 },
+    { x: interpolatePathX(river2, halfMap * 0.3), z: halfMap * 0.3, rotation: getPathAngleAtZ(river2, halfMap * 0.3) + Math.PI / 2, width: 5, length: 8 },
+  ];
+
+  const rockWalls: RockWallSpawn[] = []; // Open terrain on islands
+
+  // Short roads on each island connecting to bridges
+  const roads: RoadSpawn[] = [];
+  for (const spawn of spawns) {
+    // Find nearest bridge
+    let nearestBridge = bridges[0];
+    let nearestDist = Infinity;
+    for (const bridge of bridges) {
+      const dx = spawn.x - bridge.x;
+      const dz = spawn.z - bridge.z;
+      const d = Math.sqrt(dx * dx + dz * dz);
+      if (d < nearestDist) {
+        nearestDist = d;
+        nearestBridge = bridge;
+      }
+    }
+    roads.push({
+      path: generateRoadPath(rng, spawn.x, spawn.z, nearestBridge.x, nearestBridge.z, 4),
+      width: 2.5,
+    });
+  }
+
+  // 4 tunnels: shortcuts under the water channels
+  const tunnels: TunnelSpawn[] = [
+    {
+      id: 1,
+      entrance: { x: -halfMap * 0.35, z: -halfMap * 0.35 },
+      exit: { x: halfMap * 0.35, z: halfMap * 0.35 },
+      travelTime: 5,
+      factionOwner: null,
+    },
+    {
+      id: 2,
+      entrance: { x: halfMap * 0.35, z: -halfMap * 0.35 },
+      exit: { x: -halfMap * 0.35, z: halfMap * 0.35 },
+      travelTime: 5,
+      factionOwner: null,
+    },
+    {
+      id: 3,
+      entrance: { x: -halfMap * 0.15, z: -halfMap * 0.15 },
+      exit: { x: halfMap * 0.15, z: halfMap * 0.15 },
+      travelTime: 3,
+      factionOwner: null,
+    },
+    {
+      id: 4,
+      entrance: { x: halfMap * 0.15, z: -halfMap * 0.15 },
+      exit: { x: -halfMap * 0.15, z: halfMap * 0.15 },
+      travelTime: 3,
+      factionOwner: null,
+    },
+  ];
+
+  return {
+    biome: 'aquatic',
+    rivers,
+    bridges,
+    rockWalls,
+    roads,
+    tunnels,
+    flattenPositions: [
+      ...bridges.map(b => ({ x: b.x, z: b.z })),
+      ...tunnels.flatMap(t => [t.entrance, t.exit]),
+    ],
+  };
+}
+
+/**
+ * Arena template features:
+ * - No rivers (dry arena)
+ * - Ring of rock walls around center arena
+ * - Radial roads from spawn positions to center
+ * - 2 tunnels (opposite sides of the arena)
+ */
+function generateArenaFeatures(
+  rng: () => number,
+  halfMap: number,
+  spawns: readonly SpawnPoint[],
+): TerrainFeatures {
+  const rivers: RiverSpawn[] = [];
+  const bridges: BridgeSpawn[] = [];
+
+  // Rock wall segments forming a broken ring around center
+  const ringRadius = halfMap * 0.55;
+  const rockWalls: RockWallSpawn[] = [];
+  const gapAngles = spawns.map((_s, i) => (i / spawns.length) * Math.PI * 2 - Math.PI / 2);
+
+  for (let i = 0; i < 8; i++) {
+    const startAngle = (i / 8) * Math.PI * 2;
+    const endAngle = ((i + 0.6) / 8) * Math.PI * 2;
+
+    // Skip wall segments near spawn approach angles
+    let nearGap = false;
+    for (const gapAngle of gapAngles) {
+      const midAngle = (startAngle + endAngle) / 2;
+      const diff = Math.abs(((midAngle - gapAngle + Math.PI) % (Math.PI * 2)) - Math.PI);
+      if (diff < 0.5) {
+        nearGap = true;
+        break;
+      }
+    }
+    if (nearGap) continue;
+
+    const segments = 4;
+    const path: PathPoint[] = [];
+    for (let s = 0; s <= segments; s++) {
+      const angle = startAngle + (endAngle - startAngle) * (s / segments);
+      const r = ringRadius + (rng() - 0.5) * 3;
+      path.push({
+        x: Math.cos(angle) * r,
+        z: Math.sin(angle) * r,
+      });
+    }
+    rockWalls.push({ path, thickness: 2 });
+  }
+
+  // Radial roads from each spawn to center
+  const roads: RoadSpawn[] = [];
+  for (const spawn of spawns) {
+    roads.push({
+      path: generateRoadPath(rng, spawn.x, spawn.z, 0, 0, 5),
+      width: 3,
+    });
+  }
+
+  // 2 tunnels: opposite sides of the arena ring
+  const tunnels: TunnelSpawn[] = [
+    {
+      id: 1,
+      entrance: { x: -ringRadius * 0.9, z: 0 },
+      exit: { x: ringRadius * 0.9, z: 0 },
+      travelTime: 3,
+      factionOwner: null,
+    },
+    {
+      id: 2,
+      entrance: { x: 0, z: -ringRadius * 0.9 },
+      exit: { x: 0, z: ringRadius * 0.9 },
+      travelTime: 3,
+      factionOwner: null,
+    },
+  ];
+
+  return {
+    biome: 'arid',
+    rivers,
+    bridges,
+    rockWalls,
+    roads,
+    tunnels,
+    flattenPositions: tunnels.flatMap(t => [t.entrance, t.exit]),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Path interpolation helpers
+// ---------------------------------------------------------------------------
+
+/** Interpolate Z coordinate along a path at a given X position. */
+function interpolatePathZ(path: readonly PathPoint[], targetX: number): number {
+  for (let i = 0; i < path.length - 1; i++) {
+    const p0 = path[i];
+    const p1 = path[i + 1];
+    if ((p0.x <= targetX && p1.x >= targetX) || (p0.x >= targetX && p1.x <= targetX)) {
+      const range = p1.x - p0.x;
+      if (Math.abs(range) < 0.001) return (p0.z + p1.z) / 2;
+      const t = (targetX - p0.x) / range;
+      return p0.z + t * (p1.z - p0.z);
+    }
+  }
+  // Fallback: closest endpoint
+  const first = path[0];
+  const last = path[path.length - 1];
+  return Math.abs(first.x - targetX) < Math.abs(last.x - targetX) ? first.z : last.z;
+}
+
+/** Interpolate X coordinate along a path at a given Z position. */
+function interpolatePathX(path: readonly PathPoint[], targetZ: number): number {
+  for (let i = 0; i < path.length - 1; i++) {
+    const p0 = path[i];
+    const p1 = path[i + 1];
+    if ((p0.z <= targetZ && p1.z >= targetZ) || (p0.z >= targetZ && p1.z <= targetZ)) {
+      const range = p1.z - p0.z;
+      if (Math.abs(range) < 0.001) return (p0.x + p1.x) / 2;
+      const t = (targetZ - p0.z) / range;
+      return p0.x + t * (p1.x - p0.x);
+    }
+  }
+  const first = path[0];
+  const last = path[path.length - 1];
+  return Math.abs(first.z - targetZ) < Math.abs(last.z - targetZ) ? first.x : last.x;
+}
+
+/** Get the angle of the path at a given X position (for bridge rotation). */
+function getPathAngle(path: readonly PathPoint[], targetX: number): number {
+  for (let i = 0; i < path.length - 1; i++) {
+    const p0 = path[i];
+    const p1 = path[i + 1];
+    if ((p0.x <= targetX && p1.x >= targetX) || (p0.x >= targetX && p1.x <= targetX)) {
+      return Math.atan2(p1.z - p0.z, p1.x - p0.x);
+    }
+  }
+  if (path.length >= 2) {
+    return Math.atan2(path[1].z - path[0].z, path[1].x - path[0].x);
+  }
+  return 0;
+}
+
+/** Get the angle of the path at a given Z position. */
+function getPathAngleAtZ(path: readonly PathPoint[], targetZ: number): number {
+  for (let i = 0; i < path.length - 1; i++) {
+    const p0 = path[i];
+    const p1 = path[i + 1];
+    if ((p0.z <= targetZ && p1.z >= targetZ) || (p0.z >= targetZ && p1.z <= targetZ)) {
+      return Math.atan2(p1.z - p0.z, p1.x - p0.x);
+    }
+  }
+  if (path.length >= 2) {
+    return Math.atan2(path[1].z - path[0].z, path[1].x - path[0].x);
+  }
+  return 0;
 }
 
 /**

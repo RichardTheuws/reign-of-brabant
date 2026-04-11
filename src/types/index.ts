@@ -777,6 +777,73 @@ export interface MapDefinition {
 }
 
 // ---------------------------------------------------------------------------
+// Terrain Feature Types (rivers, bridges, rock walls, roads, tunnels)
+// ---------------------------------------------------------------------------
+
+/** A point along a river or road path. */
+export interface PathPoint {
+  readonly x: number;
+  readonly z: number;
+}
+
+/** A river that carves through the terrain. Units cannot cross except at bridges. */
+export interface RiverSpawn {
+  /** Ordered points defining the river's center line. */
+  readonly path: readonly PathPoint[];
+  /** Width of the river in world units. */
+  readonly width: number;
+}
+
+/** A bridge spanning a river. Acts as a choke point -- units can cross here. */
+export interface BridgeSpawn {
+  /** Center position of the bridge. */
+  readonly x: number;
+  readonly z: number;
+  /** Rotation in radians (perpendicular to the river). */
+  readonly rotation: number;
+  /** Width of the bridge crossing. */
+  readonly width: number;
+  /** Length of the bridge (how far it spans). */
+  readonly length: number;
+}
+
+/** An impassable rock wall formation. Forces units to path around. */
+export interface RockWallSpawn {
+  /** Ordered points defining the rock wall's center line. */
+  readonly path: readonly PathPoint[];
+  /** Thickness of the wall in world units. */
+  readonly thickness: number;
+}
+
+/** A road/path between key locations. Units on roads get a speed bonus. */
+export interface RoadSpawn {
+  /** Ordered points defining the road's center line. */
+  readonly path: readonly PathPoint[];
+  /** Width of the road in world units. */
+  readonly width: number;
+}
+
+/** A tunnel entrance/exit pair. Units enter one side and emerge at the other. */
+export interface TunnelSpawn {
+  /** Unique tunnel identifier. */
+  readonly id: number;
+  /** Entrance position. */
+  readonly entrance: PathPoint;
+  /** Exit position. */
+  readonly exit: PathPoint;
+  /** Travel time in seconds to traverse the tunnel. */
+  readonly travelTime: number;
+  /** Which faction owns this tunnel (null = neutral, usable by anyone). */
+  readonly factionOwner: FactionId | null;
+}
+
+/** Biome type determines terrain color palette and visual style. */
+export type BiomeType = 'meadow' | 'urban' | 'aquatic' | 'arid';
+
+/** Road speed bonus multiplier for units walking on roads. */
+export const ROAD_SPEED_BONUS = 1.35;
+
+// ---------------------------------------------------------------------------
 // Interfaces -- Events (EventBus payloads)
 // ---------------------------------------------------------------------------
 

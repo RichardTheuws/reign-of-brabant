@@ -1,0 +1,56 @@
+{
+  "generated": "2026-04-11",
+  "purpose": "Hero concept art for Meshy v6 image-to-3D conversion",
+  "model": "fal-ai/flux/dev",
+  "size": "1024x1024",
+  "assets": [
+    {
+      "file": "brabant-prins.png",
+      "hero": "Prins Floris van Oeteldonk",
+      "faction": "Brabant",
+      "prompt": "Full body character concept art of a fantasy prince in a golden carnival costume. He wears an ornate golden crown and holds a royal scepter topped with a decorative pastry-shaped head. Joyful but regal expression, warm smile, dark wavy hair. The costume is richly decorated with gold filigree and embroidery in gold, orange and red tones. Standing in a relaxed heroic pose, facing the viewer. Simple neutral grey gradient background. Digital painting style, semi-realistic fantasy RTS game character design, detailed armor and clothing, clear silhouette, full body from head to feet visible. No text, no frame."
+    },
+    {
+      "file": "brabant-boer.png",
+      "hero": "Henk van de Akker",
+      "faction": "Brabant",
+      "prompt": "Full body character concept art of a strong muscular farmer warrior. He wears rugged overalls and work clothing, leather boots, rolled-up sleeves showing weathered powerful hands. He wields a large pitchfork as a weapon. Broad-shouldered, tough expression, tanned skin, short brown hair. Colors are brown, green and earthy tones. Standing in a confident warrior pose, facing the viewer. Simple neutral grey gradient background. Digital painting style, semi-realistic fantasy RTS game character design, detailed clothing and equipment, clear silhouette, full body from head to feet visible. No text, no frame."
+    },
+    {
+      "file": "randstad-ceo.png",
+      "hero": "De CEO",
+      "faction": "Randstad",
+      "prompt": "Full body character concept art of a corporate CEO warrior. He wears a sharp tailored dark blue and grey business suit with a white shirt, bluetooth headset on his ear. He holds a reinforced briefcase as a shield in one hand. Clean-shaven face, slicked-back hair, cold calculating eyes, intimidating presence. Colors are dark navy blue, grey and silver metallic accents. Standing in a power pose, facing the viewer. Simple neutral grey gradient background. Digital painting style, semi-realistic fantasy RTS game character design, detailed clothing, clear silhouette, full body from head to feet visible. No text, no frame."
+    },
+    {
+      "file": "randstad-politicus.png",
+      "hero": "De Politicus",
+      "faction": "Randstad",
+      "prompt": "Full body character concept art of a charismatic politician warrior. He wears an elegant dark grey suit with an orange necktie, polished shoes. He holds a microphone like a staff or scepter weapon in one hand, making a broad dramatic gesture with the other. Smooth confident appearance, charming smile, well-groomed hair. Colors are dark grey with orange accent on the tie. Standing in an expressive oratory pose, facing the viewer. Simple neutral grey gradient background. Digital painting style, semi-realistic fantasy RTS game character design, detailed clothing, clear silhouette, full body from head to feet visible. No text, no frame."
+    },
+    {
+      "file": "limburg-mijnbaas.png",
+      "hero": "De Mijnbaas",
+      "faction": "Limburg",
+      "prompt": "Full body character concept art of a rugged mine boss warrior. He wears a dusty mining helmet with a headlamp on top, heavy leather work clothes, thick leather gloves. He wields a large pickaxe as his weapon. Muscular build, rough weathered face, prominent rugged mustache, covered in mine dust. Colors are dark brown, grey and yellow on the helmet. Standing in a powerful ready-to-fight stance, facing the viewer. Simple neutral grey gradient background. Digital painting style, semi-realistic fantasy RTS game character design, detailed equipment, clear silhouette, full body from head to feet visible. No text, no frame."
+    },
+    {
+      "file": "limburg-maasmeester.png",
+      "hero": "De Maasmeester",
+      "faction": "Limburg",
+      "prompt": "Full body character concept art of a mysterious river mage monk. He wears a flowing deep blue and turquoise water-themed cloak and robes. He holds a tall staff topped with a glowing water crystal orb. Serene mystical expression, bald head or hooded, magical aura around him. Colors are deep blue, turquoise and green. Standing in a calm mystical pose, facing the viewer. Simple neutral grey gradient background. Digital painting style, semi-realistic fantasy RTS game character design, detailed robes and magical staff, clear silhouette, full body from head to feet visible. No text, no frame."
+    },
+    {
+      "file": "belgen-frietkoning.png",
+      "hero": "De Frietkoning",
+      "faction": "Belgen",
+      "prompt": "Full body character concept art of a jovial fry king warrior. He is a broad stocky man with a large curly mustache, wearing a hybrid chef hat and crown on his head. He wears a regal red and yellow costume with white accents, like a royal chef uniform. He wields a large fry scoop spatula as a weapon. Jolly royal but comical expression, rotund build. Colors are red, yellow and white. Standing in a proud kingly pose, facing the viewer. Simple neutral grey gradient background. Digital painting style, semi-realistic fantasy RTS game character design, detailed costume and weapon, clear silhouette, full body from head to feet visible. No text, no frame."
+    },
+    {
+      "file": "belgen-abdijbrouwer.png",
+      "hero": "De Abdijbrouwer",
+      "faction": "Belgen",
+      "prompt": "Full body character concept art of a powerful abbey brewer monk warrior. He wears a brown monk habit robe with a leather brewing apron over it. Bald head, serene but strong expression. He holds a large wooden beer mug as a weapon in one hand. Muscular build under the robes, powerful presence. Colors are brown, gold and cream. Standing in a calm but powerful stance, facing the viewer. Simple neutral grey gradient background. Digital painting style, semi-realistic fantasy RTS game character design, detailed robes and brewing equipment, clear silhouette, full body from head to feet visible. No text, no frame."
+    }
+  ]
+}

@@ -31,7 +31,7 @@ export type CommandAction =
   | 'train-worker' | 'train-infantry' | 'train-ranged' | 'rally-point'
   | 'build-townhall' | 'build-barracks' | 'build-lumbercamp' | 'build-blacksmith'
   | 'build-mijnschacht' | 'build-chocolaterie'
-  | 'train-hero-prins' | 'train-hero-boer'
+  | 'train-hero-0' | 'train-hero-1'
   | 'hero-ability-q' | 'hero-ability-w' | 'hero-ability-e'
   | 'research-upgrade';
 

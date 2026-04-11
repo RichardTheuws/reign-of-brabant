@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reign of Brabant — Development Bible</title>
-    <meta property="og:title" content="Reign of Brabant — Development Bible">
-    <meta property="og:description" content="Een WarCraft-geïnspireerde RTS met 4 Brabantse facties. Volledige documentatie van concept tot code.">
+    <title>Reign of Brabant — Het Verhaal</title>
+    <meta property="og:title" content="Reign of Brabant — Het Verhaal">
+    <meta property="og:description" content="Hoe een Brabander met een WarCraft-tattoo en een leger AI-tools een 3D RTS bouwt in de browser. Het verhaal achter het project.">
     <meta property="og:image" content="https://reign-of-brabant.nl/assets/og/og-verhaal.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://reign-of-brabant.nl/het-verhaal/">
-    <meta name="description" content="Een WarCraft-geïnspireerde RTS met 4 Brabantse facties. Volledige documentatie van concept tot code.">
+    <meta name="description" content="Hoe een Brabander met een WarCraft-tattoo en een leger AI-tools een 3D RTS bouwt in de browser. Het verhaal achter het project.">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Reign of Brabant — Development Bible">
-    <meta name="twitter:description" content="Een WarCraft-geïnspireerde RTS met 4 Brabantse facties. Volledige documentatie van concept tot code.">
+    <meta name="twitter:title" content="Reign of Brabant — Het Verhaal">
+    <meta name="twitter:description" content="Hoe een Brabander met een WarCraft-tattoo en een leger AI-tools een 3D RTS bouwt in de browser.">
     <meta name="twitter:image" content="https://reign-of-brabant.nl/assets/og/og-verhaal.png">
     <link rel="canonical" href="https://reign-of-brabant.nl/het-verhaal/">
     <link rel="alternate" hreflang="nl" href="https://reign-of-brabant.nl/het-verhaal/">
@@ -336,11 +336,6 @@
         .faction-header.limburg { background: linear-gradient(135deg, rgba(39, 174, 96, 0.15), rgba(127, 140, 141, 0.1)); border: 1px solid rgba(39, 174, 96, 0.3); }
         .faction-header.belgen { background: linear-gradient(135deg, rgba(231, 76, 60, 0.15), rgba(241, 196, 15, 0.1)); border: 1px solid rgba(231, 76, 60, 0.3); }
 
-        .faction-icon {
-            font-size: 3rem;
-            flex-shrink: 0;
-        }
-
         .faction-info h3 {
             margin: 0 0 0.3rem;
             font-size: 1.6rem;
@@ -366,56 +361,24 @@
             color: var(--text-secondary);
         }
 
-        /* ===== VOICE SAMPLES ===== */
-        .voice-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-
-        .voice-sample {
-            background: var(--bg-elevated);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .voice-sample .play-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            border: 2px solid var(--gold);
-            background: transparent;
-            color: var(--gold);
-            font-size: 1.2rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            transition: all 0.2s;
-        }
-
-        .voice-sample .play-btn:hover {
-            background: var(--gold);
-            color: var(--bg-dark);
-        }
-
-        .voice-info { flex: 1; }
-
-        .voice-info .voice-character {
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .voice-info .voice-line {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
+        /* ===== QUOTE ===== */
+        .quote {
+            border-left: 3px solid var(--gold);
+            padding: 1rem 1.5rem;
+            margin: 2rem 0;
+            background: rgba(212, 168, 71, 0.05);
+            border-radius: 0 8px 8px 0;
             font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        .quote .author {
+            display: block;
+            margin-top: 0.5rem;
+            font-style: normal;
+            font-weight: 600;
+            color: var(--gold);
+            font-size: 0.85rem;
         }
 
         /* ===== PROCESS TIMELINE ===== */
@@ -486,173 +449,7 @@
             font-size: 0.9rem;
         }
 
-        /* ===== TABLES ===== */
-        .table-wrap {
-            overflow-x: auto;
-            margin: 1.5rem 0;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-
-        th {
-            background: var(--bg-elevated);
-            padding: 0.75rem 1rem;
-            text-align: left;
-            font-weight: 600;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--gold);
-            white-space: nowrap;
-        }
-
-        td {
-            padding: 0.6rem 1rem;
-            border-top: 1px solid var(--border);
-            color: var(--text-secondary);
-        }
-
-        tr:hover td { background: rgba(255, 255, 255, 0.02); }
-
-        td:first-child {
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
-        /* ===== CODE BLOCKS ===== */
-        .code-block {
-            background: var(--bg-elevated);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.25rem;
-            margin: 1.5rem 0;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            overflow-x: auto;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        .code-block .comment { color: var(--text-muted); }
-        .code-block .cmd { color: var(--brabant-primary); }
-        .code-block .flag { color: var(--randstad-primary); }
-        .code-block .string { color: var(--limburg-primary); }
-
-        /* ===== COST TABLE ===== */
-        .cost-highlight {
-            background: linear-gradient(135deg, rgba(212, 168, 71, 0.1), rgba(46, 204, 113, 0.05));
-            border: 1px solid rgba(212, 168, 71, 0.3);
-            border-radius: 16px;
-            padding: 2rem;
-            text-align: center;
-            margin: 2rem 0;
-        }
-
-        .cost-highlight .big-number {
-            font-family: 'Cinzel', serif;
-            font-size: 4rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, var(--gold), var(--brabant-primary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .cost-highlight .cost-label {
-            color: var(--text-secondary);
-            margin-top: 0.5rem;
-        }
-
-        .cost-highlight .cost-compare {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-top: 0.25rem;
-            text-decoration: line-through;
-        }
-
-        /* ===== MECHANIC SHOWCASE ===== */
-        .mechanic-box {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 2rem;
-            margin: 1.5rem 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .mechanic-box::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-        }
-
-        .mechanic-box.brabant::before { background: linear-gradient(90deg, var(--brabant-primary), transparent); }
-        .mechanic-box.randstad::before { background: linear-gradient(90deg, var(--randstad-primary), transparent); }
-        .mechanic-box.limburg::before { background: linear-gradient(90deg, var(--limburg-primary), transparent); }
-        .mechanic-box.belgen::before { background: linear-gradient(90deg, var(--belgen-primary), transparent); }
-
-        .mechanic-box h4 {
-            font-family: 'Cinzel', serif;
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-        }
-
-        .gezelligheid-meter {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-            margin: 1rem 0;
-        }
-
-        .gezelligheid-bar {
-            flex: 1;
-            height: 24px;
-            background: var(--bg-elevated);
-            border-radius: 12px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .gezelligheid-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--brabant-secondary), var(--brabant-primary), var(--gold));
-            border-radius: 12px;
-            transition: width 1s ease;
-            position: relative;
-        }
-
-        .gezelligheid-fill::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            animation: shimmer 2s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        .gezelligheid-label {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            color: var(--gold);
-            min-width: 4rem;
-            text-align: right;
-        }
-
-        /* ===== PIPELINE VIS ===== */
+        /* ===== PIPELINE ===== */
         .pipeline {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -686,34 +483,134 @@
             color: var(--gold);
         }
 
-        .pipeline-step .step-cost {
-            font-size: 0.8rem;
-            color: var(--limburg-primary);
-            margin-top: 0.3rem;
-        }
-
-        .pipeline-arrow {
-            display: none;
-        }
-
-        /* ===== QUOTE ===== */
-        .quote {
-            border-left: 3px solid var(--gold);
-            padding: 1rem 1.5rem;
+        /* ===== COST HIGHLIGHT ===== */
+        .cost-highlight {
+            background: linear-gradient(135deg, rgba(212, 168, 71, 0.1), rgba(46, 204, 113, 0.05));
+            border: 1px solid rgba(212, 168, 71, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
             margin: 2rem 0;
-            background: rgba(212, 168, 71, 0.05);
-            border-radius: 0 8px 8px 0;
+        }
+
+        .cost-highlight .big-number {
+            font-family: 'Cinzel', serif;
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--gold), var(--brabant-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cost-highlight .cost-label {
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        /* ===== HERO CARD ===== */
+        .hero-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .hero-card.brabant::before { background: linear-gradient(90deg, var(--brabant-primary), transparent); }
+        .hero-card.randstad::before { background: linear-gradient(90deg, var(--randstad-primary), transparent); }
+        .hero-card.limburg::before { background: linear-gradient(90deg, var(--limburg-primary), transparent); }
+        .hero-card.belgen::before { background: linear-gradient(90deg, var(--belgen-primary), transparent); }
+
+        .hero-card h4 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-card .hero-role {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+
+        .hero-card blockquote {
+            border-left: 2px solid var(--gold);
+            padding-left: 1rem;
             font-style: italic;
             color: var(--text-secondary);
+            margin-top: 1rem;
+            font-size: 0.9rem;
         }
 
-        .quote .author {
-            display: block;
-            margin-top: 0.5rem;
-            font-style: normal;
-            font-weight: 600;
+        /* ===== CTA ===== */
+        .cta-box {
+            background: linear-gradient(135deg, rgba(212, 168, 71, 0.15), rgba(230, 126, 34, 0.1));
+            border: 1px solid rgba(212, 168, 71, 0.3);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .cta-box h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.6rem;
+            margin: 0 0 1rem;
             color: var(--gold);
-            font-size: 0.85rem;
+        }
+
+        .cta-box p {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold), #c49840);
+            color: #0a0806;
+            border: 1px solid var(--gold);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px var(--gold-glow);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            margin-left: 1rem;
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--gold);
+            color: var(--gold);
         }
 
         /* ===== FOOTER ===== */
@@ -732,112 +629,13 @@
             margin-bottom: 0.5rem;
         }
 
-        /* ===== CAMPAIGN MISSION CARDS ===== */
-        .mission-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 2rem;
-            margin: 1.5rem 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .mission-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--gold), var(--brabant-primary), transparent);
-        }
-
-        .mission-card h4 {
-            font-family: 'Cinzel', serif;
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .mission-card .mission-meta {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-bottom: 1rem;
-        }
-
-        .mission-card .mission-meta span {
-            font-size: 0.8rem;
-            padding: 0.2rem 0.6rem;
-            border-radius: 4px;
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-secondary);
-        }
-
-        .mission-card blockquote {
-            border-left: 3px solid var(--gold);
-            padding: 0.75rem 1rem;
-            margin: 1rem 0;
-            background: rgba(212, 168, 71, 0.05);
-            border-radius: 0 8px 8px 0;
-            font-style: italic;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .mission-card .objectives {
-            margin: 1rem 0;
-            padding-left: 1.5rem;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            line-height: 1.8;
-        }
-
-        /* ===== UNIT ROSTER ===== */
-        .unit-roster {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-
-        .unit-roster-item {
-            background: var(--bg-elevated);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: center;
-        }
-
-        .unit-roster-item .unit-icon {
-            font-size: 1.5rem;
-            margin-bottom: 0.3rem;
-        }
-
-        .unit-roster-item .unit-name {
-            font-weight: 600;
-            font-size: 0.9rem;
-            margin-bottom: 0.2rem;
-        }
-
-        .unit-roster-item .unit-role {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .unit-roster-item .unit-highlight {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-top: 0.4rem;
-            font-style: italic;
-        }
-
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .card-grid { grid-template-columns: 1fr; }
             section { padding: 3rem 1rem; }
             .faction-header { flex-direction: column; text-align: center; }
             .pipeline { grid-template-columns: 1fr 1fr; }
+            .hero-grid { grid-template-columns: 1fr !important; }
         }
     </style>
     <!-- Umami Analytics -->
@@ -849,14 +647,14 @@
 <header class="hero">
     <div class="hero-content">
         <img src="../assets/ui/logo.png" alt="Reign of Brabant" class="hero-logo" onerror="this.style.display='none'">
-        <h1>Reign of Brabant</h1>
-        <p class="hero-subtitle">Een WarCraft-geinspireerde RTS met Brabantse ziel — van concept tot code</p>
+        <h1>Het Verhaal</h1>
+        <p class="hero-subtitle">Hoe een proof of concept uitgroeide tot de meest ambitieuze browser-RTS van Nederland</p>
         <div class="hero-badges">
-            <span class="badge badge-brabant">Brabanders</span>
-            <span class="badge badge-randstad">Randstad</span>
-            <span class="badge badge-limburg">Limburgers</span>
-            <span class="badge badge-belgen">Belgen</span>
-            <span class="badge badge-gold">v0.17.0</span>
+            <span class="badge badge-brabant">4 facties</span>
+            <span class="badge badge-randstad">525+ stemmen</span>
+            <span class="badge badge-limburg">127 3D modellen</span>
+            <span class="badge badge-belgen">192 tests</span>
+            <span class="badge badge-gold">v0.20.0</span>
         </div>
     </div>
     <div class="scroll-hint">Scroll om te ontdekken</div>
@@ -864,1750 +662,447 @@
 
 <!-- ===== NAV ===== -->
 <nav class="nav" id="nav">
-    <a href="#vision">Visie</a>
-    <a href="#factions">Facties</a>
-    <a href="#mechanics">Mechanics</a>
-    <a href="#pipeline">Pipeline</a>
-    <a href="#process">Proces</a>
-    <a href="#costs">Kosten</a>
-    <a href="#humor">Humor</a>
-    <a href="#voices">Stemmen</a>
-    <a href="#campaign">Campaign</a>
-    <a href="#tech">Technisch</a>
-    <a href="#roadmap">Roadmap</a>
-    <a href="#controls">Controls</a>
-    <a href="#subprds">Sub-PRDs</a>
+    <a href="#oorsprong">Oorsprong</a>
+    <a href="#wereld">De Wereld</a>
+    <a href="#heroes">Heroes</a>
+    <a href="#pipeline">Hoe het werkt</a>
+    <a href="#reis">De Reis</a>
+    <a href="#ambitie">Ambitie</a>
+    <a href="#steun">Steun</a>
 </nav>
 
-<!-- ===== 01: VISION ===== -->
-<section id="vision">
-    <h2><span class="section-number">01</span>De Visie</h2>
-    <p class="section-intro">Het jaar 1473. Het Gouden Worstenbroodje is gestolen. Brabant staat op. Vier facties botsen in een strijd om cultuur, identiteit en het recht op een frikandel speciaal.</p>
+<!-- ===== 01: OORSPRONG ===== -->
+<section id="oorsprong">
+    <h2><span class="section-number">01</span>De Oorsprong</h2>
+    <p class="section-intro">Elk project begint ergens. Dit begon met een typo, een WarCraft-tattoo op een rug, en de vraag: kan een persoon met AI-tools een echte RTS bouwen?</p>
 
     <div class="quote">
-        "Wat als WarCraft: Reign of Chaos zich afspeelde in Brabant, met worstenbroodjes als resources en managers die spreadsheets gooien?"
-        <span class="author">— Het idee dat alles startte</span>
+        "Wat als WarCraft: Reign of Chaos zich afspeelde in Brabant? Met worstenbroodjes als resources en managers die spreadsheets gooien?"
+        <span class="author">-- De vraag die alles startte, 5 april 2026</span>
     </div>
 
-    <h3>Wat maakt dit uniek?</h3>
-    <div class="card-grid">
-        <div class="card">
-            <div class="card-body">
-                <h4>Gezelligheid als Mechanic</h4>
-                <p>Brabandse units worden sterker naarmate ze dichter bij elkaar staan. +50% stats bij 20+ units. Nergens anders.</p>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h4>4 Asymmetrische Facties</h4>
-                <p>Gebaseerd op echte cultuurverschillen. Brabanders feesten, Randstad vergadert, Limburg graaft tunnels, Belgen diplomatiseren. 39 unit types, 25 campaign missies.</p>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h4>WarCraft-style Controls</h4>
-                <p>Control groups (Ctrl+1-9), attack-move (A), Ctrl+click same-type selectie, rally points, drag-select. De volledige RTS-ervaring in de browser.</p>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h4>Skeletal Animatie</h4>
-                <p>17-bone humanoid armature, distance-based weight painting, 7 animatiesets (Idle, Walk, Attack, Death, Gather, Build, Heal). Blender CLI auto-rig pipeline.</p>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h4>Dialect Voice Acting</h4>
-                <p>525+ voice lines via ElevenLabs met echt dialect: Brabants (Joost), Limburgs (Luk Balcer), Vlaams (Hans Claesen), ABN (Serge de Beer). 4 unieke factiestemmen.</p>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h4>100% Browser</h4>
-                <p>Three.js + TypeScript + bitECS. Geen install, direct speelbaar. Desktop-first, mobile secondary. 60fps target bij 200+ units.</p>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h4>AI-Powered Pipeline</h4>
-                <p>Meshy Studio v6 voor 3D modellen, Blender CLI auto-rig, ElevenLabs dialect voices, Suno muziek. Totale kosten: ~$75.</p>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h4>Persoonlijk Passieproject</h4>
-                <p>Gemaakt door iemand met een WarCraft: Reign of Chaos tattoo. Dit is geen clone — het is een liefdeverklaring. 67 bronbestanden, 33.000 LOC, 166 tests.</p>
-            </div>
-        </div>
+    <p style="color: var(--text-secondary); font-size: 1rem; margin-bottom: 1.5rem;">
+        Richard Theuws -- ontwikkelaar, vader, Brabander -- zat thuis achter zijn laptop. Hij was bezig met iets anders, typte "Zu" per ongeluk, en het gesprek met Claude Code ging een onverwachte kant op. Twee game-ideeen kwamen op tafel: een GTA-achtige game met tractors, en een WarCraft-clone met Brabantse facties.
+    </p>
+    <p style="color: var(--text-secondary); font-size: 1rem; margin-bottom: 1.5rem;">
+        Het moest de WarCraft-clone worden. Niet omdat het makkelijker was -- maar omdat Richard een WarCraft: Reign of Chaos tattoo op zijn rug heeft staan. Sommige dingen zijn voorbestemd.
+    </p>
+    <p style="color: var(--text-secondary); font-size: 1rem; margin-bottom: 1.5rem;">
+        De eerste versie was ruw. Gekleurde dozen op een groen vlak. Maar het werkte: je kon eenheden selecteren, ze bewegen, een basis bouwen, gevechten voeren. Dat was genoeg om te weten dat hier iets groters in zat.
+    </p>
+    <p style="color: var(--text-secondary); font-size: 1rem; margin-bottom: 2rem;">
+        Sindsdien is het een ongoing proof of concept. Geen deadline, geen publisher, geen investeerders. Gewoon iemand die eraan werkt als hij tijd heeft -- of als hij niet kan slapen. Stap voor stap groeit het van experiment naar iets dat steeds meer op een echte game begint te lijken.
+    </p>
+
+    <div class="cost-highlight">
+        <div class="big-number">v0.20.0</div>
+        <div class="cost-label">33.559 regels code -- 192 tests -- 4 facties -- 25 campaign missies</div>
+        <div style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">Ongoing proof of concept -- continu in ontwikkeling</div>
     </div>
 </section>
 
-<!-- ===== 02: FACTIONS ===== -->
-<section id="factions">
-    <h2><span class="section-number">02</span>De Facties</h2>
-    <p class="section-intro">Vier facties, elk met een unieke mechanic, playstyle en persoonlijkheid. Gebaseerd op echte regionale cultuurverschillen — met een dikke laag humor.</p>
+<!-- ===== 02: DE WERELD ===== -->
+<section id="wereld">
+    <h2><span class="section-number">02</span>De Wereld</h2>
+    <p class="section-intro">Het jaar is 1473. Het Gouden Worstenbroodje -- het symbool van alles waar Brabant voor staat -- is gestolen. Vier facties botsen in een strijd om cultuur, identiteit en het recht op een frikandel speciaal.</p>
 
     <!-- BRABANDERS -->
     <div class="faction-header brabant">
-        <div class="faction-icon">🧑‍🌾</div>
         <div class="faction-info">
             <h3 style="color: var(--brabant-primary)">De Brabanders</h3>
-            <p class="faction-tagline">"Samen staan we sterk — en we staan altijd samen"</p>
+            <p class="faction-tagline">"Samen staan we sterk -- en we staan altijd samen"</p>
             <div class="faction-traits">
-                <span class="trait">Deathball</span>
-                <span class="trait">Gezelligheid-mechanic</span>
-                <span class="trait">Sterk in groepen</span>
+                <span class="trait">Gezelligheid als mechanic</span>
+                <span class="trait">Sterker in groepen</span>
                 <span class="trait">Carnavalsrage</span>
             </div>
         </div>
     </div>
-
-    <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">Warmte, feest, saamhorigheid. De Brabanders winnen door samen te staan — letterlijk. Resources: <strong style="color: var(--brabant-primary)">Worstenbroodjes</strong> (goud), <strong style="color: var(--brabant-primary)">Bier</strong> (hout), <strong style="color: var(--brabant-primary)">Gezelligheid</strong> (tertiair). Stem: <strong>Joost</strong> (primair mannelijk), <strong>Roos</strong> (vrouwelijk).</p>
-
-    <h3 style="color: var(--brabant-primary)">Volledige Unit Roster (10 units)</h3>
-    <div class="unit-roster">
-        <div class="unit-roster-item">
-            <div class="unit-name">Boer</div>
-            <div class="unit-role">Worker (T1)</div>
-            <div class="unit-highlight">60 HP, 5 ATK, 50/0</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-name">Carnavalvierder</div>
-            <div class="unit-role">Infantry Melee (T1)</div>
-            <div class="unit-highlight">80 HP, 10 ATK, 75/25</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-name">Sluiper</div>
-            <div class="unit-role">Ranged / Stealth (T1)</div>
-            <div class="unit-highlight">Hooded crossbow, stealth</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-name">Boerinne</div>
-            <div class="unit-role">Support / Healer (T1)</div>
-            <div class="unit-highlight">healRate 7, AoE heal</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-name">Muzikant</div>
-            <div class="unit-role">Buffer / Debuffer (T2)</div>
-            <div class="unit-highlight">Carnival musician, tuba</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-name">Tractorrijder</div>
-            <div class="unit-role">Heavy / Cavalry (T2)</div>
-            <div class="unit-highlight">Wide silhouette, charge</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-name">Frituurmeester</div>
-            <div class="unit-role">Siege (T3)</div>
-            <div class="unit-highlight">Mobile deep-fryer cannon</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-name">Praalwagen</div>
-            <div class="unit-role">Super Siege (T3)</div>
-            <div class="unit-highlight">Carnival float, catapult</div>
-        </div>
-    </div>
-
-    <div class="card-grid">
-        <div class="card">
-            <img src="../assets/factions/brabanders-prins.png" alt="Prins van Brabant" class="card-image" onerror="this.style.display='none'">
-            <div class="card-body">
-                <h4>Prins van Brabant <span style="color: var(--gold); font-size: 0.8rem">-- HERO (Tank/Buffer)</span></h4>
-                <p>"De Prins is hier!" / Ultimate: "ALAAF!" -- alle units 8s invincible</p>
-                <div class="card-stats">
-                    <div class="stat"><div class="stat-value">500</div><div class="stat-label">HP</div></div>
-                    <div class="stat"><div class="stat-value">25</div><div class="stat-label">ATK</div></div>
-                    <div class="stat"><div class="stat-value">350/200</div><div class="stat-label">Cost</div></div>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <img src="../assets/factions/brabanders-boer-hero.png" alt="Boer van Brabant" class="card-image" onerror="this.style.display='none'">
-            <div class="card-body">
-                <h4>Boer van Brabant <span style="color: var(--gold); font-size: 0.8rem">-- HERO (Tank/Summoner)</span></h4>
-                <p>Burly master farmer, oversized pitchfork, straw hat. 1.5x scale.</p>
-                <div class="card-stats">
-                    <div class="stat"><div class="stat-value">550</div><div class="stat-label">HP</div></div>
-                    <div class="stat"><div class="stat-value">22</div><div class="stat-label">ATK</div></div>
-                    <div class="stat"><div class="stat-value">400/200</div><div class="stat-label">Cost</div></div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.95rem;">
+        Boeren, cafebazen en carnavalvierders. De Brabanders worden letterlijk sterker naarmate ze dichter bij elkaar staan -- hun unieke Gezelligheid-mechanic beloont saamhorigheid met +50% stats. Resources? Worstenbroodjes en bier, uiteraard. Hun Carnavalsrage verandert een aanval in een optocht die niet te stoppen is.
+    </p>
 
     <!-- RANDSTAD -->
-    <div class="faction-header randstad" style="margin-top: 4rem;">
-        <div class="faction-icon">💼</div>
+    <div class="faction-header randstad" style="margin-top: 3rem;">
         <div class="faction-info">
             <h3 style="color: var(--randstad-primary)">De Randstad</h3>
             <p class="faction-tagline">"Dit staat niet in de planning"</p>
             <div class="faction-traits">
-                <span class="trait">Late-game powerhouse</span>
                 <span class="trait">Bureaucratie-mechanic</span>
-                <span class="trait">Debuff specialists</span>
+                <span class="trait">Late-game powerhouse</span>
                 <span class="trait">Eindeloze Vergadering</span>
             </div>
         </div>
     </div>
+    <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.95rem;">
+        Consultants, managers en hipsters met havermelk. De Randstad begint elke actie 20% trager -- bureaucratie -- maar wordt na genoeg voltooide acties sneller dan iedereen. Resources: PowerPoints en LinkedIn Connections. En elke vijf minuten pauzeren al hun gebouwen acht seconden voor werkoverleg. Herkenbaar?
+    </p>
 
-    <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">Bureaucratie, efficienty, corporate power. De Randstad is traag aan de start maar wordt de snelste factie na genoeg acties. Resources: <strong style="color: var(--randstad-primary)">PowerPoints</strong> (goud), <strong style="color: var(--randstad-primary)">LinkedIn Connections</strong> (hout), <strong style="color: var(--randstad-primary)">Havermoutmelk</strong> (tertiair). Stemmen: <strong>Serge de Beer</strong> (primair), <strong>Daniel Wichers</strong> (alternatief), <strong>Tijs</strong> (CEO), <strong>Emma</strong> (HR).</p>
-
-    <h3 style="color: var(--randstad-primary)">Volledige Unit Roster (10 units)</h3>
-    <div class="unit-roster">
-        <div class="unit-roster-item">
-            <div class="unit-name">Stagiair</div>
-            <div class="unit-role">Worker (T1)</div>
-            <div class="unit-highlight">45 HP, 3 ATK, 35/0</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-name">Manager</div>
-            <div class="unit-role">Ranged / Debuff (T1)</div>
-            <div class="unit-highlight">70 HP, 9 ATK, spreadsheets</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-name">Consultant</div>
-            <div class="unit-role">Debuff Specialist (T1)</div>
-            <div class="unit-highlight">Laptop/tablet ranged</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-name">Hipster</div>
-            <div class="unit-role">Scout (T2)</div>
-            <div class="unit-highlight">E-scooter, speed 8.0</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-name">HR-Medewerker</div>
-            <div class="unit-role">Support / Healer (T2)</div>
-            <div class="unit-highlight">healRate 8, motivational</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-name">Corporate Advocaat</div>
-            <div class="unit-role">Heavy Melee (T2)</div>
-            <div class="unit-highlight">Briefcase shield, gavel</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-name">Influencer</div>
-            <div class="unit-role">Ranged / AoE (T2)</div>
-            <div class="unit-highlight">Ring light, selfie stick</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-name">Vastgoedmakelaar</div>
-            <div class="unit-role">Siege (T3)</div>
-            <div class="unit-highlight">SOLD sign battering ram</div>
+    <!-- LIMBURGERS -->
+    <div class="faction-header limburg" style="margin-top: 3rem;">
+        <div class="faction-info">
+            <h3 style="color: var(--limburg-primary)">De Limburgers</h3>
+            <p class="faction-tagline">"Gluck auf" -- De Mijnwerkers</p>
+            <div class="faction-traits">
+                <span class="trait">Underground tunnels</span>
+                <span class="trait">Guerrilla warfare</span>
+                <span class="trait">Tanky eenheden</span>
+            </div>
         </div>
     </div>
+    <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.95rem;">
+        Mijnwerkers, heuvelbewoners en vlaaienbakkers. De Limburgers hebben een compleet tunnelnetwerk waarmee eenheden onzichtbaar achter vijandelijke linies verschijnen. Resources: Vlaai en Mergel. Hun Mergelridder is de zwaarst gepantserde unit in het spel -- steen breekt niet.
+    </p>
 
-    <div class="card-grid">
+    <!-- BELGEN -->
+    <div class="faction-header belgen" style="margin-top: 3rem;">
+        <div class="faction-info">
+            <h3 style="color: var(--belgen-primary)">De Belgen</h3>
+            <p class="faction-tagline">"Ceci n'est pas une army" -- De Diplomaten</p>
+            <div class="faction-traits">
+                <span class="trait">Diplomatiek Compromis</span>
+                <span class="trait">Unit conversie</span>
+                <span class="trait">Chocolade als wapen</span>
+            </div>
+        </div>
+    </div>
+    <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.95rem;">
+        De Frietkoning en zijn leger van frituurstrijders. De Belgen zijn de enige factie met een actief diplomatie-systeem: ze kunnen vijandelijke eenheden overtuigen met chocolade, wapenstilstanden afdwingen, en gebouwen saboteren via commissies. Resources: Frieten, Trappist en Chocolade. Onderschat ze niet -- hun chaos is hun kracht.
+    </p>
+
+    <div class="quote" style="margin-top: 2rem;">
+        "Vier facties, vier culturen, een slagveld. Gebaseerd op echte regionale verschillen -- maar dan met een dikke laag humor en een worstenbroodje bovenop."
+        <span class="author">-- De Verteller</span>
+    </div>
+</section>
+
+<!-- ===== 03: HEROES ===== -->
+<section id="heroes">
+    <h2><span class="section-number">03</span>De Heroes</h2>
+    <p class="section-intro">Acht karakters met volledige backstories, relaties, motivaties en kwetsbaarheden. Geen poppetjes -- personages met diepgang.</p>
+
+    <div class="card-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+        <div class="card">
+            <img src="../assets/factions/brabanders-prins.png" alt="Prins van Brabant" class="card-image" onerror="this.style.display='none'">
+            <div class="card-body">
+                <h4 style="color: var(--brabant-primary)">Prins Floris van Oeteldonk</h4>
+                <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--gold); margin-bottom: 0.5rem;">BRABANDERS -- TANK / BUFFER</p>
+                <p>Een carnavalsprins die per ongeluk aan het hoofd van een leger staat. Vecht niet voor macht, maar voor het recht om "ge" te zeggen. Inspirerend, impulsief, en stiekem onzeker of hij goed genoeg is.</p>
+                <p style="margin-top: 0.5rem; font-style: italic; color: var(--brabant-primary); font-size: 0.85rem;">"ALAAF! ...en nu gansen we d'r tegenaan."</p>
+            </div>
+        </div>
+        <div class="card">
+            <img src="../assets/factions/brabanders-boer.png" alt="Boer van Brabant" class="card-image" onerror="this.style.display='none'">
+            <div class="card-body">
+                <h4 style="color: var(--brabant-primary)">Henk van de Akker</h4>
+                <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--gold); margin-bottom: 0.5rem;">BRABANDERS -- TANK / SUMMONER</p>
+                <p>Zeven generaties boer. Zijn land werd onteigend voor een Vinex-wijk. Zegt in drie woorden wat anderen in een toespraak gieten. Zijn dochter dacht dat boeren niks voorstelden. Hij bewees het tegendeel.</p>
+                <p style="margin-top: 0.5rem; font-style: italic; color: var(--brabant-primary); font-size: 0.85rem;">"De akker wacht op niemand. En ik ook nie."</p>
+            </div>
+        </div>
         <div class="card">
             <img src="../assets/factions/randstad-ceo.png" alt="De CEO" class="card-image" onerror="this.style.display='none'">
             <div class="card-body">
-                <h4>De CEO <span style="color: var(--gold); font-size: 0.8rem">-- HERO (Commander/Buffer)</span></h4>
-                <p>"Vijandige Overname" -- capture vijandelijk gebouw. Stem: Tijs.</p>
-                <div class="card-stats">
-                    <div class="stat"><div class="stat-value">450</div><div class="stat-label">HP</div></div>
-                    <div class="stat"><div class="stat-value">20</div><div class="stat-label">ATK</div></div>
-                    <div class="stat"><div class="stat-value">400/250</div><div class="stat-label">Cost</div></div>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <img src="../assets/factions/randstad-politicus.png" alt="De Politicus" class="card-image" onerror="this.style.display='none'">
-            <div class="card-body">
-                <h4>De Politicus <span style="color: var(--gold); font-size: 0.8rem">-- HERO (Caster/Manipulator)</span></h4>
-                <p>Mobile podium, microphone staff, Dutch flag pin. Ranged hero.</p>
-                <div class="card-stats">
-                    <div class="stat"><div class="stat-value">300</div><div class="stat-label">HP</div></div>
-                    <div class="stat"><div class="stat-value">15</div><div class="stat-label">ATK</div></div>
-                    <div class="stat"><div class="stat-value">350/300</div><div class="stat-label">Cost</div></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- LIMBURGERS -->
-    <div class="faction-header limburg" style="margin-top: 4rem;">
-        <div class="faction-icon">⛏️</div>
-        <div class="faction-info">
-            <h3 style="color: var(--limburg-primary)">De Limburgers</h3>
-            <p class="faction-tagline">"Gluck auf" — De Mijnwerkers</p>
-            <div class="faction-traits">
-                <span class="trait">Hit-and-run</span>
-                <span class="trait">Underground tunnels</span>
-                <span class="trait">Guerrilla warfare</span>
-                <span class="trait">Vloedgolf van Vlaai</span>
-            </div>
-        </div>
-    </div>
-
-    <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">Mysterie, diepte, veerkracht, zachte kracht. De Limburgers winnen niet door brute force maar door onverwachte tunnelverrassingen en geduldig fort-spel. Resources: <strong style="color: var(--limburg-primary)">Vlaai</strong> (goud), <strong style="color: var(--limburg-primary)">Mergel</strong> (hout), <strong style="color: var(--limburg-primary)">Kolen</strong> (tertiair). Stemmen: <strong>Luk Balcer</strong> (primair), <strong>Nick</strong> (alternatief). Tankiest faction: Mergelridder 280 HP / 6 armor.</p>
-
-    <h3 style="color: var(--limburg-primary)">Units</h3>
-    <div class="unit-roster">
-        <div class="unit-roster-item">
-            <div class="unit-icon">⛏️</div>
-            <div class="unit-name">Mijnwerker</div>
-            <div class="unit-role">Worker</div>
-            <div class="unit-highlight">65 HP, +1 Armor base</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-icon">🔫</div>
-            <div class="unit-name">Schutterij</div>
-            <div class="unit-role">Infantry (Ranged)</div>
-            <div class="unit-highlight">Formatieshot: +15% accuracy</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-icon">🥧</div>
-            <div class="unit-name">Vlaaienwerper</div>
-            <div class="unit-role">Ranged / Specialist</div>
-            <div class="unit-highlight">AoE splash, slow debuff</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-icon">🪨</div>
-            <div class="unit-name">Mergelridder</div>
-            <div class="unit-role">Heavy / Cavalry</div>
-            <div class="unit-highlight">280 HP, 6 Armor, Steenhuid</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-icon">🔥</div>
-            <div class="unit-name">Kolenbrander</div>
-            <div class="unit-role">Siege (Tier 3)</div>
-            <div class="unit-highlight">48 dmg vs buildings, Mijngas</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-icon">🩹</div>
-            <div class="unit-name">Sjpion</div>
-            <div class="unit-role">Support / Healer</div>
-            <div class="unit-highlight">Auto-heal, Mergelzalf AoE</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-icon">🐀</div>
-            <div class="unit-name">Mijnrat</div>
-            <div class="unit-role">Stealth / Sabotage (Tier 3)</div>
-            <div class="unit-highlight">Mines, sabotage, tunnel travel</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-icon">🏃</div>
-            <div class="unit-name">Heuvelwacht</div>
-            <div class="unit-role">Scout (Tier 1)</div>
-            <div class="unit-highlight">Spyglass, signal horn, speed 8.0</div>
-        </div>
-    </div>
-
-    <div class="card-grid">
-        <div class="card">
-            <img src="../assets/factions/limburgers-mijnbaas.png" alt="De Mijnbaas" class="card-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22><rect fill=%22%231a1a2e%22 width=%22400%22 height=%22400%22/><text x=%22200%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%2327AE60%22 font-size=%2260%22>⛏️</text><text x=%22200%22 y=%22260%22 text-anchor=%22middle%22 fill=%22%238a8a9a%22 font-size=%2220%22>De Mijnbaas</text></svg>'">
-            <div class="card-body">
-                <h4>De Mijnbaas <span style="color: var(--limburg-primary); font-size: 0.8rem">— HERO (Tank/Controller)</span></h4>
-                <p>"Gluck auf... veur dich is 't aafgeloupe!" — Mijnschacht Instorten (AoE stun), Tunnelcommando (teleport), Aardbeving (ultimate)</p>
-                <div class="card-stats">
-                    <div class="stat"><div class="stat-value">550</div><div class="stat-label">HP</div></div>
-                    <div class="stat"><div class="stat-value">22</div><div class="stat-label">ATK</div></div>
-                    <div class="stat"><div class="stat-value">400/250</div><div class="stat-label">Cost</div></div>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <img src="../assets/factions/limburgers-maasridder.png" alt="De Maasridder" class="card-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22><rect fill=%22%231a1a2e%22 width=%22400%22 height=%22400%22/><text x=%22200%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%2327AE60%22 font-size=%2260%22>🌊</text><text x=%22200%22 y=%22260%22 text-anchor=%22middle%22 fill=%22%238a8a9a%22 font-size=%2220%22>De Maasridder</text></svg>'">
-            <div class="card-body">
-                <h4>De Maasridder <span style="color: var(--limburg-primary); font-size: 0.8rem">— HERO (Caster/Disruptor)</span></h4>
-                <p>"De vloed komt!" — Maasvloed (line AoE knockback), Nevelgordijn (fog), Watersnood (ultimate AoE)</p>
-                <div class="card-stats">
-                    <div class="stat"><div class="stat-value">300</div><div class="stat-label">HP</div></div>
-                    <div class="stat"><div class="stat-value">12</div><div class="stat-label">ATK</div></div>
-                    <div class="stat"><div class="stat-value">350/300</div><div class="stat-label">Cost</div></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- BELGEN -->
-    <div class="faction-header belgen" style="margin-top: 4rem;">
-        <div class="faction-icon">🍟</div>
-        <div class="faction-info">
-            <h3 style="color: var(--belgen-primary)">De Belgen</h3>
-            <p class="faction-tagline">"Ceci n'est pas une army" — De Diplomaten</p>
-            <div class="faction-traits">
-                <span class="trait">Diplomatie/Compromis</span>
-                <span class="trait">Sterke economie</span>
-                <span class="trait">Verwarring-abilities</span>
-                <span class="trait">Diplomatieke Verwarring</span>
-            </div>
-        </div>
-    </div>
-
-    <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">Chaos, bureaucratische overvloed, surrealistisch genie. De Belgen winnen door niemand te laten begrijpen wat ze eigenlijk aan het doen zijn. Resources: <strong style="color: var(--belgen-primary)">Frieten</strong> (goud), <strong style="color: var(--belgen-primary)">Trappist</strong> (hout), <strong style="color: var(--belgen-primary)">Chocolade</strong> (tertiair). Stemmen: <strong>Hans Claesen</strong> (primair), <strong>Walter</strong> (hero), <strong>Petra Vlaams</strong> (vrouwelijk). Glass cannon: Bierbouwer 0 armor, Chocolatier 40 HP.</p>
-
-    <h3 style="color: var(--belgen-primary)">Units</h3>
-    <div class="unit-roster">
-        <div class="unit-roster-item">
-            <div class="unit-icon">🍟</div>
-            <div class="unit-name">Frietkraamhouder</div>
-            <div class="unit-role">Worker</div>
-            <div class="unit-highlight">Carry 12, Snel Bakken</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-icon">🍺</div>
-            <div class="unit-name">Bierbouwer</div>
-            <div class="unit-role">Infantry (Melee)</div>
-            <div class="unit-highlight">10 DPS, Trappistenfurie</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-icon">🍫</div>
-            <div class="unit-name">Chocolatier</div>
-            <div class="unit-role">Ranged</div>
-            <div class="unit-highlight">Praline Surprise AoE poison</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-icon">🐴</div>
-            <div class="unit-name">Frituurridder</div>
-            <div class="unit-role">Heavy / Cavalry</div>
-            <div class="unit-highlight">220 HP, Frietcharge knockback</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-icon">🚿</div>
-            <div class="unit-name">Manneken Pis-kanon</div>
-            <div class="unit-role">Siege</div>
-            <div class="unit-highlight">55 dmg vs buildings, Overdruk</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-icon">🧇</div>
-            <div class="unit-name">Wafelzuster</div>
-            <div class="unit-role">Support / Healer</div>
-            <div class="unit-highlight">Luikse Wafel AoE heal</div>
-        </div>
-        <div class="unit-roster-item">
-            <div class="unit-icon">🕵️</div>
-            <div class="unit-name">Dubbele Spion</div>
-            <div class="unit-role">Stealth / Sabotage</div>
-            <div class="unit-highlight">Vermomming, Dubbel Paspoort</div>
-        </div>
-    </div>
-
-    <div class="card-grid">
-        <div class="card">
-            <img src="../assets/factions/belgen-frietkoning.png" alt="De Frietkoning" class="card-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22><rect fill=%22%231a1a2e%22 width=%22400%22 height=%22400%22/><text x=%22200%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%23E74C3C%22 font-size=%2260%22>🍟</text><text x=%22200%22 y=%22260%22 text-anchor=%22middle%22 fill=%22%238a8a9a%22 font-size=%2220%22>De Frietkoning</text></svg>'">
-            <div class="card-body">
-                <h4>De Frietkoning <span style="color: var(--belgen-primary); font-size: 0.8rem">— HERO (Tank/Support)</span></h4>
-                <p>"In naam van de Gouden Friet!" — Koninklijke Portie (AoE heal+buff), Belgisch Decreet (unit conversion), Het Belgisch Compromis (ultimate)</p>
-                <div class="card-stats">
-                    <div class="stat"><div class="stat-value">500</div><div class="stat-label">HP</div></div>
-                    <div class="stat"><div class="stat-value">20</div><div class="stat-label">ATK</div></div>
-                    <div class="stat"><div class="stat-value">400/200+30C</div><div class="stat-label">Cost</div></div>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <img src="../assets/factions/belgen-abdijbrouwer.png" alt="De Abdijbrouwer" class="card-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22><rect fill=%22%231a1a2e%22 width=%22400%22 height=%22400%22/><text x=%22200%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%23E74C3C%22 font-size=%2260%22>🍺</text><text x=%22200%22 y=%22260%22 text-anchor=%22middle%22 fill=%22%238a8a9a%22 font-size=%2220%22>De Abdijbrouwer</text></svg>'">
-            <div class="card-body">
-                <h4>De Abdijbrouwer <span style="color: var(--belgen-primary); font-size: 0.8rem">— HERO (Monk/Caster)</span></h4>
-                <p>"De waarheid zit in de tweede gisting" — Stiltegelofte (silence), Trappistenzegen (regen), Laatste Avondbrouwsel (ultimate)</p>
-                <div class="card-stats">
-                    <div class="stat"><div class="stat-value">280</div><div class="stat-label">HP</div></div>
-                    <div class="stat"><div class="stat-value">10</div><div class="stat-label">ATK</div></div>
-                    <div class="stat"><div class="stat-value">350/300+40C</div><div class="stat-label">Cost</div></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ===== 03: MECHANICS ===== -->
-<section id="mechanics">
-    <h2><span class="section-number">03</span>Unieke Mechanics</h2>
-    <p class="section-intro">Elke factie heeft een mechanic die nergens anders bestaat. Gebaseerd op echte culturele stereotypen, vertaald naar strategische diepte.</p>
-
-    <div class="mechanic-box brabant">
-        <h4>🧡 Gezelligheid (Brabanders)</h4>
-        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Brabandse units worden sterker naarmate ze dichter bij elkaar zijn. Dit stimuleert deathball-strategieen maar maakt ze kwetsbaar voor AoE.</p>
-
-        <div style="display: grid; gap: 0.75rem;">
-            <div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
-                    <span style="font-size: 0.85rem;">1 unit (alleen)</span>
-                    <span style="font-size: 0.85rem; color: var(--text-muted);">+0%</span>
-                </div>
-                <div class="gezelligheid-meter">
-                    <div class="gezelligheid-bar"><div class="gezelligheid-fill" style="width: 5%"></div></div>
-                </div>
-            </div>
-            <div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
-                    <span style="font-size: 0.85rem;">6-10 units</span>
-                    <span style="font-size: 0.85rem; color: var(--brabant-primary);">+20% alle stats</span>
-                </div>
-                <div class="gezelligheid-meter">
-                    <div class="gezelligheid-bar"><div class="gezelligheid-fill" style="width: 40%"></div></div>
-                </div>
-            </div>
-            <div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
-                    <span style="font-size: 0.85rem;">20+ units</span>
-                    <span style="font-size: 0.85rem; color: var(--gold);">+50% + damage reduction</span>
-                </div>
-                <div class="gezelligheid-meter">
-                    <div class="gezelligheid-bar"><div class="gezelligheid-fill" style="width: 100%"></div></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="mechanic-box randstad">
-        <h4>📊 Bureaucratie (Randstad)</h4>
-        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Elke actie duurt 20% langer. Maar elke voltooide actie geeft +3% snelheid (stapelbaar). Na 20 acties is de Randstad SNELLER dan iedereen. Plus: elke 5 minuten pauzeren alle gebouwen 8 seconden voor "werkoverleg".</p>
-
-        <div class="table-wrap">
-            <table>
-                <thead><tr><th>Timing</th><th>Snelheid vs baseline</th><th>Werkoverleg</th></tr></thead>
-                <tbody>
-                    <tr><td>Start game</td><td style="color: var(--belgen-primary);">-20% (traag)</td><td>Elke 5 min: 8s pauze</td></tr>
-                    <tr><td>Na 10 acties</td><td>+10% (normaal)</td><td>Elke 5 min: 8s pauze</td></tr>
-                    <tr><td>Na 20 acties</td><td style="color: var(--limburg-primary);">+40% (snel!)</td><td>Uitschakelbaar via Tier 3 tech</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="mechanic-box limburg">
-        <h4>⛏️ Underground Netwerk (Limburgers)</h4>
-        <p style="color: var(--text-secondary); margin-bottom: 1rem;">De signatuur-mechanic van de Limburgers. Grotten en Mijnschachten fungeren als tunnel-endpoints die automatisch met elkaar verbinden. Units reizen onzichtbaar onder de grond voor verrassingsaanvallen.</p>
-
-        <div class="table-wrap">
-            <table>
-                <thead><tr><th>Eigenschap</th><th>Waarde</th></tr></thead>
-                <tbody>
-                    <tr><td>Max tunnel-endpoints</td><td>4 standaard (5 met Geheime Gangen upgrade)</td></tr>
-                    <tr><td>Transporttijd</td><td>3 seconden (1.5s met upgrade)</td></tr>
-                    <tr><td>Capaciteit</td><td>Max 12 units tegelijk in transit</td></tr>
-                    <tr><td>Zichtbaarheid</td><td>Vijand ziet NIETS — geen tunnels, geen indicators</td></tr>
-                    <tr><td>Unit types</td><td>Alle ground units + heroes. Siege units NIET.</td></tr>
-                    <tr><td>Onderhoud</td><td>1 Kolen/30s per Grot. Bij 0 Kolen: tunnels sluiten.</td></tr>
-                    <tr><td>Verrassingsaanval</td><td>+25% attack buff bij uitkomen tunnel</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 1rem;">Counter: scouts met hoge sight range, AoE bij exits, Grot vernietigen (transit-units spawnen kwetsbaar op oppervlak), Mijnschachten vernietigen = geen Kolen = tunnels dicht.</p>
-    </div>
-
-    <div class="mechanic-box belgen">
-        <h4>🤝 Het Compromis (Belgen)</h4>
-        <p style="color: var(--text-secondary); margin-bottom: 1rem;">De Belgen zijn de ENIGE factie met een actief diplomatie-systeem. Via de Diplomatiek Salon (Tier 3) kunnen ze onderhandelen, saboteren en manipuleren. Oorlogen winnen zonder een slag te leveren.</p>
-
-        <div class="table-wrap">
-            <table>
-                <thead><tr><th>Type Compromis</th><th>Kosten (Chocolade)</th><th>Effect</th><th>Duur</th></tr></thead>
-                <tbody>
-                    <tr><td>Wapenstilstand</td><td>30</td><td>Geen aanvallen van/naar vijand</td><td>60s</td></tr>
-                    <tr><td>Handelsovereenkomst</td><td>20</td><td>+25% gathering (zelf) / +15% (vijand)</td><td>90s</td></tr>
-                    <tr><td>Culturele Uitwisseling</td><td>25</td><td>Train 1 vijandelijk unit-type (tijdelijk)</td><td>120s</td></tr>
-                    <tr><td>Niet-aanvalspact</td><td>15</td><td>Wederzijds gebouwen-bescherming</td><td>45s</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 1rem;"><strong>Chocolade-Overtuiging:</strong> De Frietkoning kan vijandelijke units tijdelijk "overtuigen" (20 Chocolade, 10s team switch). <strong>Commissie Oprichten:</strong> Target vijandelijk gebouw produceert 40% langzamer (15 Chocolade, 30s). <strong>Damage Split:</strong> Bij damage >40% max HP wordt 50% van overtollige damage doorgestuurd naar dichtstbijzijnde vijand.</p>
-
-        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">Factie-ability: Diplomatieke Verwarring -- 50% kans commando's genegeerd, 25% friendly fire, 10% "vergadermodus" (unit doet 10s niks), 15% random movement. Visueel: Magritte-wolken en bowler hats uit de lucht.</p>
-    </div>
-
-    <h3 style="margin-top: 3rem;">Nieuwe Mechanics (v0.9-v0.17)</h3>
-
-    <div class="mechanic-box" style="border-color: var(--gold);">
-        <h4>WarCraft-style Controls</h4>
-        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Volledige RTS-besturing gebaseerd op het WarCraft-model. Alle essentials zijn geimplementeerd.</p>
-        <div class="table-wrap">
-            <table>
-                <thead><tr><th>Actie</th><th>Input</th><th>Details</th></tr></thead>
-                <tbody>
-                    <tr><td>Rally Points</td><td>Rechtermuisklik op gebouw</td><td>Nieuw geproduceerde units lopen automatisch naar rally point</td></tr>
-                    <tr><td>Control Groups</td><td>Ctrl+1-9 (assign), 1-9 (recall)</td><td>Sla selecties op, recall met nummertoets, dubbeltap centert camera</td></tr>
-                    <tr><td>Attack-move</td><td>A-toets + klik</td><td>Units bewegen naar locatie en vallen alles aan onderweg</td></tr>
-                    <tr><td>Same-type Select</td><td>Ctrl+klik op unit</td><td>Selecteert alle units van hetzelfde type op het scherm</td></tr>
-                    <tr><td>Drag Box Select</td><td>Klik + sleep</td><td>Rechthoek-selectie over meerdere units</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="mechanic-box" style="border-color: var(--brabant-primary);">
-        <h4>Auto-Defend System (v0.16)</h4>
-        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Drie lagen van automatisch verdedigen zorgen ervoor dat units niet passief sterven.</p>
-        <div class="table-wrap">
-            <table>
-                <thead><tr><th>Laag</th><th>Bereik</th><th>Gedrag</th></tr></thead>
-                <tbody>
-                    <tr><td>Self-Defense</td><td>6 units</td><td>Workers verdedigen zichzelf automatisch als vijanden binnen range komen</td></tr>
-                    <tr><td>Auto-Aggro</td><td>12 units</td><td>Idle units vallen automatisch vijanden aan binnen aggro-range</td></tr>
-                    <tr><td>Retaliation</td><td>Onbeperkt</td><td>Beschadigde units slaan terug tegen hun aanvaller</td></tr>
-                </tbody>
-            </table>
-        </div>
-        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.75rem;">Workers keren automatisch terug naar gathering na een gevecht.</p>
-    </div>
-
-    <div class="mechanic-box" style="border-color: var(--randstad-primary);">
-        <h4>Natural Scatter &amp; Formation</h4>
-        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Units klonteren niet samen op een punt. SeparationSystem met O(n) spatial grid zorgt voor:</p>
-        <div class="table-wrap">
-            <table>
-                <thead><tr><th>Eigenschap</th><th>Details</th></tr></thead>
-                <tbody>
-                    <tr><td>Spawn Scatter</td><td>Units spawnen met kleine random offset rond rally/spawn punt</td></tr>
-                    <tr><td>Formation Scatter</td><td>Bij move-commando: natuurlijke spread rond doellocatie</td></tr>
-                    <tr><td>Separation Force</td><td>Overlappende units duwen elkaar weg (spatial grid, O(n))</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="mechanic-box" style="border-color: var(--limburg-primary);">
-        <h4>Building Progress &amp; Health Bars</h4>
-        <p style="color: var(--text-secondary);">Gebouwen tonen constructie-voortgang als visuele bar. Health bars op alle gebouwen en units. Production queue is zichtbaar in het dynamische productie-paneel per gebouw.</p>
-    </div>
-</section>
-
-<!-- ===== 04: PIPELINE ===== -->
-<section id="pipeline">
-    <h2><span class="section-number">04</span>Asset Pipeline</h2>
-    <p class="section-intro">Een volledige AI-pipeline: Meshy Studio v6 voor 3D modellen, Blender CLI auto-rig voor skeletal animatie, ElevenLabs voor dialect voices, Suno voor muziek.</p>
-
-    <div class="pipeline">
-        <div class="pipeline-step">
-            <div class="step-icon">CONCEPT</div>
-            <div class="step-title">Concept Art</div>
-            <div class="step-tool">Flux Pro / Nano Banana</div>
-            <div class="step-cost">~$0.03/image</div>
-        </div>
-        <div class="pipeline-step">
-            <div class="step-icon">3D</div>
-            <div class="step-title">3D Model</div>
-            <div class="step-tool">Meshy Studio v6 (Direct API)</div>
-            <div class="step-cost">30 credits/model</div>
-        </div>
-        <div class="pipeline-step">
-            <div class="step-icon">RIG</div>
-            <div class="step-title">Auto-Rig</div>
-            <div class="step-tool">Blender 5.1 CLI (17 bones)</div>
-            <div class="step-cost">GRATIS</div>
-        </div>
-        <div class="pipeline-step">
-            <div class="step-icon">ANIM</div>
-            <div class="step-title">Animatie</div>
-            <div class="step-tool">Blender CLI (7 anim sets)</div>
-            <div class="step-cost">GRATIS</div>
-        </div>
-        <div class="pipeline-step">
-            <div class="step-icon">VOICE</div>
-            <div class="step-title">Voices</div>
-            <div class="step-tool">ElevenLabs (4 dialecten)</div>
-            <div class="step-cost">$22/maand</div>
-        </div>
-        <div class="pipeline-step">
-            <div class="step-icon">MUSIC</div>
-            <div class="step-title">Muziek</div>
-            <div class="step-tool">Suno (10 tracks)</div>
-            <div class="step-cost">Bestaand abo</div>
-        </div>
-    </div>
-
-    <h3>Blender Auto-Rig Pipeline (v0.16+)</h3>
-    <div class="mechanic-box" style="border-color: var(--gold);">
-        <h4>17-Bone Humanoid Armature</h4>
-        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Alle unit-modellen worden automatisch gerigged via Blender 5.1 CLI in headless mode. Het systeem creert een 17-bone armature, past distance-based weight painting toe, en genereert animatieclips als NLA tracks.</p>
-        <div class="code-block">
-<span class="comment"># Bone hierarchy (17 bones)</span>
-Head - Neck - Chest - Spine - Hips
-  UpperArm.L/R - LowerArm.L/R - Hand.L/R
-  UpperLeg.L/R - LowerLeg.L/R - Foot.L/R
-
-<span class="comment"># Bone positions (relatief aan mesh bounding box)</span>
-Hips: 45% height | Spine: 55% | Chest: 70%
-Neck: 82% | Head: 90-100% | Shoulders: 35% width
-        </div>
-        <div class="table-wrap">
-            <table>
-                <thead><tr><th>Feature</th><th>Details</th></tr></thead>
-                <tbody>
-                    <tr><td>Weight Painting</td><td>Distance-based, automatisch per vertex</td></tr>
-                    <tr><td>Head Zone Lock</td><td>Alles boven 72% hoogte = Head bone (voorkomt torso-deformatie in gezicht)</td></tr>
-                    <tr><td>Rigid Weapon Pass</td><td>Wapens en props worden rigid gebonden aan Hand bone</td></tr>
-                    <tr><td>Per-category Anims</td><td>Infantry, Worker, Ranged, Healer, Heavy, Siege, Hero -- elk eigen set</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <h3>Animatie Sets per Unit Category</h3>
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>Clip</th><th>Melee</th><th>Ranged</th><th>Worker</th><th>Healer</th><th>Heavy</th><th>Siege</th><th>Hero</th></tr></thead>
-            <tbody>
-                <tr><td>Idle</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>-</td><td>X</td></tr>
-                <tr><td>SiegeIdle</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>X</td><td>-</td></tr>
-                <tr><td>Walk</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
-                <tr><td>Attack</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
-                <tr><td>RangedAttack</td><td>-</td><td>X</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-                <tr><td>HeavyAttack</td><td>-</td><td>-</td><td>-</td><td>-</td><td>X</td><td>-</td><td>X</td></tr>
-                <tr><td>SiegeAttack</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>X</td><td>-</td></tr>
-                <tr><td>Gather</td><td>-</td><td>-</td><td>X</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-                <tr><td>Build</td><td>-</td><td>-</td><td>X</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-                <tr><td>Heal</td><td>-</td><td>-</td><td>-</td><td>X</td><td>-</td><td>-</td><td>X</td></tr>
-                <tr><td>Death</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
-                <tr><td style="color: var(--gold);">Totaal clips</td><td style="color: var(--gold);">4</td><td style="color: var(--gold);">5</td><td style="color: var(--gold);">6</td><td style="color: var(--gold);">5</td><td style="color: var(--gold);">5</td><td style="color: var(--gold);">5</td><td style="color: var(--gold);">6</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <h3>Meshy Studio Direct API (v0.16+)</h3>
-    <div class="mechanic-box" style="border-color: var(--randstad-primary);">
-        <h4>Meshy v6 Production Pipeline</h4>
-        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Directe API-toegang tot Meshy Studio vervangt de fal.ai proxy. 20 concurrent tasks, async polling, apart rigging endpoint.</p>
-        <div class="table-wrap">
-            <table>
-                <thead><tr><th>Eigenschap</th><th>fal.ai (oud)</th><th>Meshy Studio Direct (nieuw)</th></tr></thead>
-                <tbody>
-                    <tr><td>Mode</td><td>Sync (blokkeert 2-5 min)</td><td>Async met polling</td></tr>
-                    <tr><td>Concurrent tasks</td><td>~10</td><td>20</td></tr>
-                    <tr><td>Rigging</td><td>In dezelfde call</td><td>Apart /v1/rigging endpoint</td></tr>
-                    <tr><td>Timeout risico</td><td>Hoog</td><td>Laag (polling)</td></tr>
-                    <tr><td>Parallel generatie</td><td>Gelimiteerd door sync blocking</td><td>20 modellen tegelijk</td></tr>
-                </tbody>
-            </table>
-        </div>
-        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.75rem;">Parameters: ai_model=meshy-6, target_polycount=15000 (units) / 20000 (buildings), enable_pbr=true, origin_at=bottom. 10 unieke Limburgers+Belgen modellen gegenereerd via parallel batch script.</p>
-    </div>
-
-    <h3>3D Model Inventory</h3>
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>Factie</th><th>Bestaand (v02+v03)</th><th>Nieuw nodig</th><th>Uniek nodig</th><th>Totaal</th></tr></thead>
-            <tbody>
-                <tr><td style="color: var(--brabant-primary)">Brabanders</td><td>3</td><td>3</td><td>4</td><td>10</td></tr>
-                <tr><td style="color: var(--randstad-primary)">Randstad</td><td>3</td><td>4</td><td>3</td><td>10</td></tr>
-                <tr><td style="color: var(--limburg-primary)">Limburgers</td><td>3</td><td>4</td><td>3</td><td>10</td></tr>
-                <tr><td style="color: var(--belgen-primary)">Belgen</td><td>3</td><td>3</td><td>3</td><td>9</td></tr>
-                <tr><td style="color: var(--gold); font-weight: 700;">Totaal</td><td style="font-weight: 700;">12</td><td style="font-weight: 700;">14</td><td style="font-weight: 700;">13</td><td style="color: var(--gold); font-weight: 700;">39</td></tr>
-            </tbody>
-        </table>
-    </div>
-    <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">27 nieuwe modellen nodig (14 shareable + 13 unique). Cross-faction sharing is NOOIT toegestaan -- elke factie moet herkenbaar zijn aan silhouet en kleur op RTS-zoomniveau.</p>
-
-    <div class="code-block">
-<span class="comment"># Batch animate: full pipeline static -> rigged + animated</span>
-<span class="cmd">bash</span> scripts/batch-animate.sh <span class="flag">--rig-and-animate</span> worker \
-  assets/models/v02/brabanders/worker.glb \
-  assets/models/v03/brabanders/worker.glb
-
-<span class="comment"># Alle unit types voor een factie (auto-detecteert category)</span>
-<span class="cmd">bash</span> scripts/batch-animate.sh <span class="flag">--all --faction</span> <span class="string">brabanders</span>
-
-<span class="comment"># Parallel Meshy generatie (20 concurrent tasks)</span>
-<span class="cmd">python3</span> scripts/meshy_parallel_generate.py <span class="flag">--faction</span> <span class="string">limburgers</span>
-    </div>
-</section>
-
-<!-- ===== 05: PROCESS ===== -->
-<section id="process">
-    <h2><span class="section-number">05</span>Het Proces</h2>
-    <p class="section-intro">Van een typo ("Zu") tot een volledige PRD met concept art — dit is hoe Game Master en zijn team van AI agents te werk gaan.</p>
-
-    <div class="timeline">
-        <div class="timeline-item completed">
-            <div class="timeline-date">5 april 2026 — 10:00</div>
-            <div class="timeline-title">De Vonk</div>
-            <div class="timeline-desc">Richard typt "Zu" — een typo. Maar het gesprek ontvouwt zich: twee game-ideeen. GTT (Grand Theft Tractor) en een WarCraft-clone met Brabantse facties.</div>
-        </div>
-        <div class="timeline-item completed">
-            <div class="timeline-date">10:05 — Vier agents tegelijk</div>
-            <div class="timeline-title">De Grote Brainstorm</div>
-            <div class="timeline-desc">Game Master lanceert 4 parallelle research agents: GTT haalbaarheid, WarCraft RTS haalbaarheid, API kosten, en een diepe creatieve brainstorm voor Brabantse thema's.</div>
-        </div>
-        <div class="timeline-item completed">
-            <div class="timeline-date">10:15 — Resultaten binnen</div>
-            <div class="timeline-title">De Keuze: Reign of Brabant</div>
-            <div class="timeline-desc">Verdict: WarCraft RTS wint op technische haalbaarheid (8/10 vs 4/10), scope beheersbaarheid, en persoonlijke connectie (die WarCraft tattoo!). GTT wordt bewaard als toekomstig project.</div>
-        </div>
-        <div class="timeline-item completed">
-            <div class="timeline-date">10:30 — PRD schrijven</div>
-            <div class="timeline-title">1200+ Regels Game Design</div>
-            <div class="timeline-desc">Volledige PRD met 4 facties, alle unit stats, gebouwen, tech trees, combat systeem, 12-missie campaign, AI systeem, en development phases. Elk detail vastgelegd.</div>
-        </div>
-        <div class="timeline-item completed">
-            <div class="timeline-date">10:45 — Blender research</div>
-            <div class="timeline-title">$223 Bespaard</div>
-            <div class="timeline-desc">Blender agent ontdekt dat 82% van alle 3D assets procedureel gegenereerd kan worden. 127 modellen in &lt;60 seconden. Kosten dalen van $273 naar ~$50.</div>
-        </div>
-        <div class="timeline-item completed">
-            <div class="timeline-date">11:00 — Tool discovery</div>
-            <div class="timeline-title">16 Nieuwe Tools Ontdekt</div>
-            <div class="timeline-desc">Tripo3D (auto-rig!), bitECS, Yuka.js, AccuRIG, GenPBR, Flux Kontext — een complete uitbreiding van de Game Master toolkit voor RTS development.</div>
-        </div>
-        <div class="timeline-item completed">
-            <div class="timeline-date">11:15 — Concept Art</div>
-            <div class="timeline-title">16 Images via fal.ai</div>
-            <div class="timeline-desc">3 parallelle agents genereren concept art voor alle facties: Boer, Prins, CEO, Hipster, Mijnbaas, Frietkoning, gebouwen, map concept, battle scene, logo.</div>
-        </div>
-        <div class="timeline-item completed">
-            <div class="timeline-date">11:30 — 6 Sub-PRDs parallel</div>
-            <div class="timeline-title">13.915 Regels Specificatie</div>
-            <div class="timeline-desc">Multiplayer & P2P, Campaign (38 missies), UI/UX (39 settings), Audio (516 voice lines), Technische Architectuur (29 ECS systems), Klapper van de Week (Epic Replay, Brabants weer).</div>
-        </div>
-        <div class="timeline-item completed">
-            <div class="timeline-date">12:30 — PoC Planning</div>
-            <div class="timeline-title">6 PoC Documenten</div>
-            <div class="timeline-desc">Scope, tech setup (package.json klaar), file-by-file architectuur (54 bestanden), Blender placeholder assets (19 GLBs in 0.2s), UI wireframes, 79 acceptance criteria.</div>
-        </div>
-        <div class="timeline-item completed">
-            <div class="timeline-date">13:00 — 5 Agents bouwen PoC</div>
-            <div class="timeline-title">10.646 Regels Code</div>
-            <div class="timeline-desc">Core engine + terrein + camera, ECS + components, rendering + selection + HUD, 8 game systems, pathfinding + AI. Parallel gebouwd, geintegreerd, gedebugd tot 0 errors. Terrein verschijnt op 121 FPS!</div>
-        </div>
-        <div class="timeline-item completed">
-            <div class="timeline-date">14:00 — v0.1 Sprint</div>
-            <div class="timeline-title">Van Dozen naar Game</div>
-            <div class="timeline-desc">5 agents parallel: Gezelligheid-mechanic, Bureaucratie-systeem, tutorial + main menu + faction select, 12 Meshy 3D modellen, fog of war + terrain polish + visual feedback. 14.039 LOC.</div>
-        </div>
-        <div class="timeline-item completed">
-            <div class="timeline-date">15:00 — v0.2 Sprint</div>
-            <div class="timeline-title">Heroes, Campaign, Audio</div>
-            <div class="timeline-desc">4 agents: debug integrator (merge-conflicten 5 agents), 15 ElevenLabs SFX + AudioManager, 4 hero units met 12 abilities, 3 campaign missies. 18.404 LOC, 46 assets, 70 modules.</div>
-        </div>
-        <div class="timeline-item completed">
-            <div class="timeline-date">16:00 — Push naar GitHub</div>
-            <div class="timeline-title">github.com/RichardTheuws/reign-of-brabant</div>
-            <div class="timeline-desc">97 bestanden, 49.932 regels toegevoegd. Van een typo tot een speelbare RTS in 1 sessie met ~30 parallelle AI agents.</div>
-        </div>
-        <div class="timeline-item completed">
-            <div class="timeline-date">5 april — v0.5 Sprint</div>
-            <div class="timeline-title">Voices, Campaign 4-6, Bugfixes</div>
-            <div class="timeline-desc">51 ElevenLabs voice lines met per-unit-type persoonlijkheid (Boer/Carnavalvierder/Kansen + Randstad). Campaign missies 4-6: stealth, diplomatie, boerenopstand. Building Y-offset fix, destroy-building objective fix.</div>
-        </div>
-        <div class="timeline-item completed">
-            <div class="timeline-date">6 april — v0.6.0 Sprint</div>
-            <div class="timeline-title">Muziek, Hout, Tech Tree, Campaign 7-9</div>
-            <div class="timeline-desc">12 Suno muziek tracks met dynamic battle intensity systeem. Hout als 2e resource met Lumber Camp. Blacksmith + 7 tech tree upgrades. Campaign missies 7-9: Markt van Brabant, Beleg van Eindhoven, De Brabantse Nacht. 5 parallelle AI agents + 3 audit agents.</div>
-        </div>
-        <div class="timeline-item completed">
-            <div class="timeline-date">6 april — v0.7.0 Sprint</div>
-            <div class="timeline-title">4-Faction Architecture, Campaign 10-12, Limburgers &amp; Belgen Specs</div>
-            <div class="timeline-desc">FactionId enum uitgebreid naar 4 facties. factionData.ts met 1461 LOC (31 units, 41 buildings). Campaign missies 10-12 ontworpen. Instanced rendering (6 draw calls, 768 units@60 FPS). SUB-PRD-LIMBURGERS.md (156 voice lines) en SUB-PRD-BELGEN.md (135 voice lines). Voice lines herschreven: -ansen weg, echt Brabants dialect.</div>
-        </div>
-        <div class="timeline-item completed">
-            <div class="timeline-date">6 april — v0.8.0 Sprint</div>
-            <div class="timeline-title">Underground System, Diplomacy System, Entity Factory</div>
-            <div class="timeline-desc">Entity factory met 4-faction support. Limburgers Underground tunnelnetwerk (max 4 endpoints, 3s transit, 12 unit capacity). Belgen Diplomacy systeem (4 Compromis types, Chocolade-Overtuiging, Commissie Oprichten, Damage Split). Tertiair Resource systeem. 36 any-types vervangen, dead imports opgeruimd.</div>
-        </div>
-        <div class="timeline-item completed">
-            <div class="timeline-date">6 april -- v0.9.0-v0.9.2</div>
-            <div class="timeline-title">4 Speelbare Facties, GameConfig, 53 Tests</div>
-            <div class="timeline-desc">Alle 4 facties selecteerbaar. GameConfig singleton voor dynamic playerFactionId. VisionSystem, CommandSystem, AISystem niet langer hardcoded naar Brabanders. Faction remap, 4-player MapGenerator, faction-aware AI strategieen. 5 critical bugs gefixed (fog of war, commands, AI faction swap). 53 automated tests (MapGenerator, PlayerState, AIController).</div>
-        </div>
-        <div class="timeline-item completed">
-            <div class="timeline-date">6-7 april -- v0.10.0-v0.11.0</div>
-            <div class="timeline-title">Belgen Campaign, Skirmish Maps, Balance Pass</div>
-            <div class="timeline-desc">Belgen campaign "Het Compromis" (3 missies). 3 skirmish map templates (Crossroads, Eilanden, Arena). Map template selector in skirmish menu. Asymmetrische balance pass: Brabanders (group synergy), Randstad (expensive powerhouse), Limburgers (tanky/slow), Belgen (glass cannon). Alle healers + siege units gebalanceerd.</div>
-        </div>
-        <div class="timeline-item completed">
-            <div class="timeline-date">7 april -- v0.16.3</div>
-            <div class="timeline-title">Meshy 3D Modellen, Auto-Defend, Camera, Controls</div>
-            <div class="timeline-desc">10 unieke Meshy 3D modellen voor Limburgers+Belgen (parallel via Studio API). Auto-defend system (3 lagen). Camera intro animatie. Pause menu + hotkey overlay. Drag-select. Dynamic production panel. Terrain overhaul (256 seg). -ansen purge (40+ locaties). Victory/defeat race condition fix. 166 tests.</div>
-        </div>
-        <div class="timeline-item completed">
-            <div class="timeline-date">7 april -- v0.17.0</div>
-            <div class="timeline-title">Randstad Campaign "De Grote Overname"</div>
-            <div class="timeline-desc">5 Randstad campaign missies: De Eerste Vergadering (tutorial), Het Consultancy Rapport (build + train), De Vijandige Overname (two-front attack), Gentrificatie (wave defense), De Boardroom Beslissing (epic 3-faction finale op 256 map). Alle 4 faction campaigns nu speelbaar.</div>
-        </div>
-        <div class="timeline-item active">
-            <div class="timeline-date">Volgende</div>
-            <div class="timeline-title">Heroes, Dashboard, Deploy</div>
-            <div class="timeline-desc">Hero-specifieke 3D modellen. Skeletal animaties uitrollen. Dashboard polish. Remaining audit items. Deploy naar theuws.com. Voice recording sessie (506/551 remaining).</div>
-        </div>
-    </div>
-
-    <h3 style="margin-top: 2rem;">Game Master Orchestratie</h3>
-    <div class="mechanic-box" style="border-color: var(--gold);">
-        <h4>Parallel Agent Workflow</h4>
-        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Het Game Master systeem orkestreert 5+ parallelle agents per sprint. Elke agent heeft een specifieke verantwoordelijkheid, met een integrator die de output samenvoegt.</p>
-        <div class="table-wrap">
-            <table>
-                <thead><tr><th>Agent</th><th>Rol</th></tr></thead>
-                <tbody>
-                    <tr><td>Asset Generator</td><td>Meshy 3D modellen, Flux concept art, fal.ai sprites</td></tr>
-                    <tr><td>Audio Director</td><td>ElevenLabs voices, Suno muziek, Web Audio API</td></tr>
-                    <tr><td>3D Animation Director</td><td>Blender CLI rigging, animatieclips, Three.js integratie</td></tr>
-                    <tr><td>Scenario Writer</td><td>Campaign missies, dialoog, voice line scripts</td></tr>
-                    <tr><td>Game Deployer</td><td>FTP deploy, Cloudflare cache purge, testing</td></tr>
-                    <tr><td>Game Analyzer</td><td>Kwaliteitsscores, verbeterpunten, audit</td></tr>
-                    <tr><td>Game Master Improvement</td><td>Meta-agent: evalueert en verbetert het hele proces</td></tr>
-                </tbody>
-            </table>
-        </div>
-        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.75rem;">Regel: verdeel op output, een integrator, audit na elke ronde. ~30 agents totaal ingezet over het hele project.</p>
-    </div>
-</section>
-
-<!-- ===== 06: COSTS ===== -->
-<section id="costs">
-    <h2><span class="section-number">06</span>Kosten</h2>
-    <p class="section-intro">Dankzij de Blender-first strategie en bestaande abonnementen kost deze game bijna niks aan tooling.</p>
-
-    <div class="cost-highlight">
-        <div class="cost-compare">$273 (oorspronkelijke schatting)</div>
-        <div class="big-number">~$50</div>
-        <div class="cost-label">Totale asset productiekosten — 82% bespaard</div>
-    </div>
-
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>Tool</th><th>Items</th><th>Kosten</th><th>Notes</th></tr></thead>
-            <tbody>
-                <tr><td>Blender procedureel</td><td>127 modellen</td><td style="color: var(--limburg-primary); font-weight: 700;">$0</td><td>&lt;60s generatietijd, alleen CPU</td></tr>
-                <tr><td>Meshy v6 / Tripo3D</td><td>28 modellen</td><td>~$48</td><td>1 maand Max plan</td></tr>
-                <tr><td>fal.ai (Flux)</td><td>30 images</td><td>~$2</td><td>Pay-per-use</td></tr>
-                <tr><td>Nano Banana</td><td>90 images</td><td style="color: var(--limburg-primary); font-weight: 700;">$0</td><td>Free tier (50/dag)</td></tr>
-                <tr><td>ElevenLabs</td><td>216 voices + 41 SFX</td><td style="color: var(--limburg-primary); font-weight: 700;">$0</td><td>Bestaand abonnement</td></tr>
-                <tr><td>Suno</td><td>10 tracks</td><td style="color: var(--limburg-primary); font-weight: 700;">$0</td><td>Bestaand abonnement</td></tr>
-            </tbody>
-        </table>
-    </div>
-</section>
-
-<!-- ===== 07: HUMOR ===== -->
-<section id="humor">
-    <h2><span class="section-number">07</span>De Humor</h2>
-    <p class="section-intro">De gouden regel: humor in de flavor, strategie in de mechanics. Unit responses doen het zware humorwerk. Abilities hebben grappige namen maar serieuze effecten.</p>
-
-    <h3>Resources per Factie</h3>
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>Resource</th><th style="color: var(--brabant-primary)">Brabanders</th><th style="color: var(--randstad-primary)">Randstad</th><th style="color: var(--limburg-primary)">Limburgers</th><th style="color: var(--belgen-primary)">Belgen</th></tr></thead>
-            <tbody>
-                <tr><td>Goud</td><td>Worstenbroodjes</td><td>PowerPoints</td><td>Vlaai</td><td>Frieten</td></tr>
-                <tr><td>Hout</td><td>Bier</td><td>LinkedIn Connections</td><td>Mergel</td><td>Trappist</td></tr>
-                <tr><td>Speciaal</td><td>Gezelligheid</td><td>Havermoutmelk</td><td>Kolen</td><td>Chocolade</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <h3>Beste Voice Lines</h3>
-    <div class="card-grid">
-        <div class="card">
-            <div class="card-body">
-                <h4 style="color: var(--brabant-primary)">Brabanders</h4>
-                <p><strong>Boer (select):</strong> "Ja?" / "Zeg het maar"</p>
-                <p><strong>Carnavalvierder (attack):</strong> "ALAAF!" / "Pansen erop!"</p>
-                <p><strong>Sluiper (move):</strong> "Sssst, ik ga al"</p>
-                <p><strong>Boerinne (select):</strong> "Hedde al gegeten?"</p>
-                <p><strong>Tractorrijder:</strong> "UIT DE WEG!"</p>
+                <h4 style="color: var(--randstad-primary)">Victor van der Berg</h4>
+                <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--gold); margin-bottom: 0.5rem;">RANDSTAD -- COMMANDER / BUFFER</p>
+                <p>CEO van de Randstad Ontwikkelingsmaatschappij. Opgegroeid in Wassenaar met zes badkamers en geen warmte. Stal het Gouden Worstenbroodje als "strategische acquisitie." Begrijpt alles behalve waarom mensen feesten.</p>
+                <p style="margin-top: 0.5rem; font-style: italic; color: var(--randstad-primary); font-size: 0.85rem;">"Niets persoonlijks. Alleen kwartaalcijfers."</p>
             </div>
         </div>
         <div class="card">
             <div class="card-body">
-                <h4 style="color: var(--randstad-primary)">Randstad</h4>
-                <p><strong>Stagiair:</strong> "Kan ik dit op mijn LinkedIn zetten?"</p>
-                <p><strong>Manager (attack):</strong> "Dit eskaleert!"</p>
-                <p><strong>Consultant:</strong> "Vanuit mijn optiek..."</p>
-                <p><strong>Hipster:</strong> "Dit was populairder voordat jullie het ontdekten"</p>
-                <p><strong>CEO (ultimate):</strong> "Vijandige Overname!"</p>
+                <h4 style="color: var(--randstad-primary)">Herman Veerstra</h4>
+                <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--gold); margin-bottom: 0.5rem;">RANDSTAD -- CASTER / MANIPULATOR</p>
+                <p>De Politicus. Record: 47 verkiezingsbeloften in een campagne, nul nagekomen. Geen slecht mens -- een zwak mens. De CEO's handpop die denkt dat hij een partner is. Zijn wapen? Letterlijk retoriek: gloeiende letters die vijanden treffen.</p>
+                <p style="margin-top: 0.5rem; font-style: italic; color: var(--randstad-primary); font-size: 0.85rem;">"Ik beloof u -- en dit meen ik echt deze keer..."</p>
+            </div>
+        </div>
+        <div class="card">
+            <img src="../assets/factions/limburgers-mijnbaas.png" alt="De Mijnbaas" class="card-image" onerror="this.style.display='none'">
+            <div class="card-body">
+                <h4 style="color: var(--limburg-primary)">De Mijnbaas</h4>
+                <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--gold); margin-bottom: 0.5rem;">LIMBURGERS -- TANK / CONTROLLER</p>
+                <p>Heerst over het tunnelnetwerk onder Limburg. Spreekt weinig maar als hij spreekt, beeft de grond. Zag zijn mijnen sluiten. Groef verder. De Mijnbaas vertrouwt alleen de steen en de stilte.</p>
+                <p style="margin-top: 0.5rem; font-style: italic; color: var(--limburg-primary); font-size: 0.85rem;">"Gluck auf... veur dich is 't aafgeloupe!"</p>
             </div>
         </div>
         <div class="card">
             <div class="card-body">
-                <h4 style="color: var(--limburg-primary)">Limburgers</h4>
-                <p><strong>Mijnwerker:</strong> "Jao?" / "Waat is 't?"</p>
-                <p><strong>Vlaaienwerper:</strong> "Kersenvlaai SPECIAAL!"</p>
-                <p><strong>Mergelridder:</strong> "Steen breekt neet"</p>
-                <p><strong>Mijnbaas (ultimate):</strong> "DE GROND BEEFT!"</p>
-                <p><strong>Maasridder:</strong> "Verdrinke in de Maas!"</p>
+                <h4 style="color: var(--limburg-primary)">De Maasmeester</h4>
+                <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--gold); margin-bottom: 0.5rem;">LIMBURGERS -- CASTER / DISRUPTOR</p>
+                <p>Mysterieus als de Maas zelf. Controleert water en mist. Niemand weet precies waar hij vandaan komt of hoe oud hij is. Zelfs de Mijnbaas behandelt hem met voorzichtigheid.</p>
+                <p style="margin-top: 0.5rem; font-style: italic; color: var(--limburg-primary); font-size: 0.85rem;">"De vloed komt!"</p>
+            </div>
+        </div>
+        <div class="card">
+            <img src="../assets/factions/belgen-frietkoning.png" alt="De Frietkoning" class="card-image" onerror="this.style.display='none'">
+            <div class="card-body">
+                <h4 style="color: var(--belgen-primary)">De Frietkoning</h4>
+                <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--gold); margin-bottom: 0.5rem;">BELGEN -- TANK / SUPPORT</p>
+                <p>Zijn Koninklijke Portie geneest en versterkt bondgenoten tegelijk. Kibbelt eindeloos met de Prins over frieten versus worstenbroodjes, maar zou zonder twijfel voor hem sterven.</p>
+                <p style="margin-top: 0.5rem; font-style: italic; color: var(--belgen-primary); font-size: 0.85rem;">"In naam van de Gouden Friet!"</p>
             </div>
         </div>
         <div class="card">
             <div class="card-body">
-                <h4 style="color: var(--belgen-primary)">Belgen</h4>
-                <p><strong>Frietkraamhouder:</strong> "Frieten, niet patat! NOOIT patat!"</p>
-                <p><strong>Bierbouwer:</strong> "Ge hebt mijn bier gemorst!"</p>
-                <p><strong>Chocolatier:</strong> "Proef en sterf!"</p>
-                <p><strong>Dubbele Spion:</strong> "Ceci n'est pas un espion"</p>
-                <p><strong>Frietkoning:</strong> "In naam van de Gouden Friet!"</p>
+                <h4 style="color: var(--belgen-primary)">De Abdijbrouwer</h4>
+                <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--gold); margin-bottom: 0.5rem;">BELGEN -- MONK / CASTER</p>
+                <p>Brouwt bier dat wonderen doet. Spreekt in raadsels. De CEO ziet geen waarde in een monnik die bier brouwt -- en dat is precies waarom de Abdijbrouwer gevaarlijk is. Zijn Laatste Avondbrouwsel is het krachtigste ultimate in het spel.</p>
+                <p style="margin-top: 0.5rem; font-style: italic; color: var(--belgen-primary); font-size: 0.85rem;">"De waarheid zit in de tweede gisting."</p>
             </div>
         </div>
-        <div class="card">
-            <div class="card-body">
-                <h4 style="color: var(--randstad-primary)">Randstad Corporate Humor</h4>
-                <p><strong>Campaign "De Grote Overname":</strong></p>
-                <p>R1: "De Eerste Vergadering" -- gather PowerPoints, survive Brabander protest</p>
-                <p>R2: "Het Consultancy Rapport" -- Vergaderzaal, Managers, Consultants</p>
-                <p>R4: "Gentrificatie" -- survive Belgen counter-attacks in corporate district</p>
-                <p>R5: "De Boardroom Beslissing" -- defeat ALLE 3 facties op 256 map</p>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h4 style="color: var(--gold)">Cheat Codes</h4>
-                <p><strong>VLAAI STORM:</strong> Random vlaaien uit de lucht</p>
-                <p><strong>GUUS MEEUWIS:</strong> Alle muziek = Guus Meeuwis</p>
-                <p><strong>VERGADERING:</strong> Vijanden stoppen permanent</p>
-                <p><strong>SPROOKJESBOS:</strong> Unlock Efteling-factie</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ===== 08: VOICES ===== -->
-<section id="voices">
-    <h2><span class="section-number">08</span>Stemmen &amp; Audio</h2>
-    <p class="section-intro">525+ voice lines met echt dialect via ElevenLabs. Per-factie stemcasting met specifieke voice IDs. 4 unieke dialecten: Brabants, ABN, Limburgs en Vlaams.</p>
-
-    <div class="cost-highlight" style="margin-bottom: 2rem;">
-        <div class="big-number">525+</div>
-        <div class="cost-label">Voice lines gegenereerd via ElevenLabs -- 4 dialecten, 39 unit types</div>
-        <div style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">~632 lines gepland | ~27 al opgenomen | ~605 te genereren | Creator tier $22/maand</div>
-    </div>
-
-    <h3>Voice Casting per Factie</h3>
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>Factie</th><th>Primair</th><th>Alternatief</th><th>Hero</th><th>Vrouwelijk</th><th>Dialect</th></tr></thead>
-            <tbody>
-                <tr>
-                    <td style="color: var(--brabant-primary)">Brabanders</td>
-                    <td>Joost</td>
-                    <td>Richard (cloned)</td>
-                    <td>Richard (dieper)</td>
-                    <td>Roos</td>
-                    <td>Brabants ("ge", "hedde", "nie", "moar")</td>
-                </tr>
-                <tr>
-                    <td style="color: var(--randstad-primary)">Randstad</td>
-                    <td>Serge de Beer</td>
-                    <td>Daniel Wichers</td>
-                    <td>Tijs (CEO)</td>
-                    <td>Emma (HR)</td>
-                    <td>ABN / Standaard Nederlands</td>
-                </tr>
-                <tr>
-                    <td style="color: var(--limburg-primary)">Limburgers</td>
-                    <td>Luk Balcer</td>
-                    <td>Nick</td>
-                    <td>Luk Balcer (Mijnbaas)</td>
-                    <td>Melanie (met dialect)</td>
-                    <td>Limburgs ("ich", "dich", "sjoen", "jao")</td>
-                </tr>
-                <tr>
-                    <td style="color: var(--belgen-primary)">Belgen</td>
-                    <td>Hans Claesen</td>
-                    <td>Bart</td>
-                    <td>Walter (Frietkoning)</td>
-                    <td>Petra Vlaams</td>
-                    <td>Vlaams ("amai", "allez", "goesting")</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <h3 style="margin-top: 2rem;">Dialect Haalbaarheid</h3>
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>Dialect</th><th>Score</th><th>Strategie</th></tr></thead>
-            <tbody>
-                <tr><td>ABN / Randstad</td><td style="color: var(--limburg-primary);">10/10</td><td>60+ standaard NL stemmen, werkt perfect out-of-the-box</td></tr>
-                <tr><td>Vlaams / Belgen</td><td style="color: var(--limburg-primary);">9/10</td><td>18+ Vlaamse stemmen beschikbaar, authentiek accent</td></tr>
-                <tr><td>Brabants</td><td style="color: var(--brabant-primary);">7/10</td><td>Joost (Brabantse stem) + Richard's geclonede stem als basis</td></tr>
-                <tr><td>Limburgs</td><td style="color: var(--brabant-primary);">6/10</td><td>Luk Balcer (Belgisch Limburg, 55 jaar) + Nick. Nasaal karakter aanwezig.</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <h3 style="margin-top: 2rem;">Voice Pipeline</h3>
-    <div class="mechanic-box" style="border-color: var(--gold);">
-        <h4>ElevenLabs API -- Batch Generatie</h4>
-        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Voice lines worden gegenereerd via de ElevenLabs multilingual v2 model. Per unit-type andere voice settings voor unieke persoonlijkheden.</p>
-        <div class="pipeline" style="margin: 1rem 0;">
-            <div class="pipeline-step">
-                <div class="step-icon">TEXT</div>
-                <div class="step-title">Script schrijven</div>
-                <div class="step-tool">Per unit, per dialect</div>
-            </div>
-            <div class="pipeline-step">
-                <div class="step-icon">API</div>
-                <div class="step-title">ElevenLabs TTS</div>
-                <div class="step-tool">multilingual_v2 model</div>
-            </div>
-            <div class="pipeline-step">
-                <div class="step-icon">MP3</div>
-                <div class="step-title">Voice files</div>
-                <div class="step-tool">public/assets/audio/voices/</div>
-            </div>
-            <div class="pipeline-step">
-                <div class="step-icon">GAME</div>
-                <div class="step-title">In-game trigger</div>
-                <div class="step-tool">select / move / attack / gather</div>
-            </div>
-        </div>
-        <div class="code-block">
-<span class="comment"># Pad conventie</span>
-public/assets/audio/voices/{faction}/{unitType}/{action}_{n}.mp3
-
-<span class="comment"># Voorbeeld</span>
-public/assets/audio/voices/brabanders/boer/select_1.mp3
-public/assets/audio/voices/limburgers/mijnwerker/attack_2.mp3
-        </div>
-    </div>
-
-    <h3 style="margin-top: 2rem;">Per-Unit Voice Settings</h3>
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>Unit</th><th>Stability</th><th>Style</th><th>Karakter</th></tr></thead>
-            <tbody>
-                <tr><td>Boer (Brabanders)</td><td>0.50</td><td>0.30</td><td>Kalm, nuchter</td></tr>
-                <tr><td>Carnavalvierder</td><td>0.30</td><td>0.60</td><td>Instabiel, expressief, feestelijk</td></tr>
-                <tr><td>Sluiper</td><td>0.30</td><td>0.20</td><td>Fluisterend, laag, speed 0.9</td></tr>
-                <tr><td>Tractorrijder</td><td>0.55</td><td>0.45</td><td>Luid, krachtig</td></tr>
-                <tr><td>De CEO (Randstad)</td><td>0.60</td><td>0.30</td><td>Autoritair, diep (Tijs)</td></tr>
-                <tr><td>Mijnbaas (Limburgers)</td><td>0.55</td><td>0.30</td><td>Wijs, diep, 55 jaar (Luk Balcer)</td></tr>
-                <tr><td>Frietkoning (Belgen)</td><td>0.50</td><td>0.40</td><td>Warm, storytelling (Walter)</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <h3 style="margin-top: 2rem;">Dialect Update (v0.7.0+)</h3>
-    <div class="mechanic-box" style="border-color: var(--brabant-primary);">
-        <h4>Brabantse Voice Lines Herschreven</h4>
-        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Alle Brabanders voice lines zijn herschreven: het nep-dialect met "-ansen" suffix is vervangen door authentiek Brabants dialect. 40+ locaties opgeschoond in v0.16.3.</p>
-        <div class="table-wrap">
-            <table>
-                <thead><tr><th>Oud (v0.5)</th><th>Nieuw (v0.7+)</th></tr></thead>
-                <tbody>
-                    <tr><td>Kansen</td><td>Sluiper</td></tr>
-                    <tr><td>Muzikansen</td><td>Muzikant</td></tr>
-                    <tr><td>Prins van Brabansen</td><td>Prins van Brabant</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <h3 style="margin-top: 2rem;">Voice Lines per Factie</h3>
-    <div class="voice-grid">
-        <div class="voice-sample">
-            <div class="play-btn" style="border-color: var(--brabant-primary); color: var(--brabant-primary); cursor: default; font-size: 0.7rem;">MP3</div>
-            <div class="voice-info">
-                <div class="voice-character" style="color: var(--brabant-primary)">Boer -- Select (Joost)</div>
-                <div class="voice-line">"Ja?" / "Zeg het maar" / "Ik luister"</div>
-            </div>
-        </div>
-        <div class="voice-sample">
-            <div class="play-btn" style="border-color: var(--brabant-primary); color: var(--brabant-primary); cursor: default; font-size: 0.7rem;">MP3</div>
-            <div class="voice-info">
-                <div class="voice-character" style="color: var(--brabant-primary)">Carnavalvierder -- Attack (Joost)</div>
-                <div class="voice-line">"ALAAF!" / "Brabant vergeet niet!"</div>
-            </div>
-        </div>
-        <div class="voice-sample">
-            <div class="play-btn" style="border-color: var(--randstad-primary); color: var(--randstad-primary); cursor: default; font-size: 0.7rem;">MP3</div>
-            <div class="voice-info">
-                <div class="voice-character" style="color: var(--randstad-primary)">Manager -- Select (Serge de Beer)</div>
-                <div class="voice-line">"Dit staat niet in de planning!" / "Even mijn agenda checken"</div>
-            </div>
-        </div>
-        <div class="voice-sample">
-            <div class="play-btn" style="border-color: var(--limburg-primary); color: var(--limburg-primary); cursor: default; font-size: 0.7rem;">MP3</div>
-            <div class="voice-info">
-                <div class="voice-character" style="color: var(--limburg-primary)">Mijnbaas -- Attack (Luk Balcer)</div>
-                <div class="voice-line">"Gluck auf!" / "Limburg beugt neet!" / "Steen en been!"</div>
-            </div>
-        </div>
-        <div class="voice-sample">
-            <div class="play-btn" style="border-color: var(--belgen-primary); color: var(--belgen-primary); cursor: default; font-size: 0.7rem;">MP3</div>
-            <div class="voice-info">
-                <div class="voice-character" style="color: var(--belgen-primary)">Frietkoning -- Attack (Walter)</div>
-                <div class="voice-line">"In naam van de Gouden Friet!" / "Kniel voor de Frietkoning!"</div>
-            </div>
-        </div>
-        <div class="voice-sample">
-            <div class="play-btn" style="border-color: var(--belgen-primary); color: var(--belgen-primary); cursor: default; font-size: 0.7rem;">MP3</div>
-            <div class="voice-info">
-                <div class="voice-character" style="color: var(--belgen-primary)">Dubbele Spion -- Select (Hans Claesen)</div>
-                <div class="voice-line">"Ceci n'est pas un espion" / "Ik werk voor zes regeringen."</div>
-            </div>
-        </div>
-    </div>
-
-    <h3 style="margin-top: 2rem;">Volume Overzicht</h3>
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>Factie</th><th>Units</th><th>Lijnen/unit</th><th>Generic</th><th>Totaal</th></tr></thead>
-            <tbody>
-                <tr><td style="color: var(--brabant-primary)">Brabanders</td><td>10</td><td>15</td><td>18</td><td>168</td></tr>
-                <tr><td style="color: var(--randstad-primary)">Randstad</td><td>10</td><td>15</td><td>18</td><td>168</td></tr>
-                <tr><td style="color: var(--limburg-primary)">Limburgers</td><td>8</td><td>15</td><td>18</td><td>138</td></tr>
-                <tr><td style="color: var(--belgen-primary)">Belgen</td><td>8</td><td>15</td><td>18</td><td>138</td></tr>
-                <tr><td>Narrator</td><td>-</td><td>-</td><td>-</td><td>~20</td></tr>
-                <tr><td style="color: var(--gold); font-weight: 700;">Totaal</td><td style="font-weight: 700;">36</td><td></td><td></td><td style="color: var(--gold); font-weight: 700;">~632</td></tr>
-            </tbody>
-        </table>
-    </div>
-    <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">Kosten: Creator tier ($22/maand), 100.000 characters = genoeg voor alle lijnen + retakes. Instant Voice Cloning inbegrepen.</p>
-</section>
-
-<!-- ===== 09: CAMPAIGN ===== -->
-<section id="campaign">
-    <h2><span class="section-number">09</span>Campaign -- 25 Missies over 4 Facties</h2>
-    <p class="section-intro">Vier speelbare campaigns met in totaal 25 missies. Van een boer in Reusel tot de Boardroom Beslissing in de Randstad. Elke factie heeft een eigen verhaallijn met unieke mechanics.</p>
-
-    <div class="cost-highlight" style="margin-bottom: 2rem;">
-        <div class="big-number">25</div>
-        <div class="cost-label">Campaign missies -- 4 facties, elk met eigen verhaallijn</div>
-        <div style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">12 Brabanders + 5 Limburgers + 3 Belgen + 5 Randstad</div>
-    </div>
-
-    <h3 style="color: var(--brabant-primary)">Brabanders: "Het Gouden Worstenbroodje" (12 missies)</h3>
-    <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">Van een simpele boer in Reusel tot de Slag om de Randstad. Geschatte speelduur: 7-9 uur.</p>
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>#</th><th>Naam</th><th>Locatie</th><th>Type</th></tr></thead>
-            <tbody>
-                <tr><td>1</td><td>Tutorial</td><td>Reusel</td><td>Introductie</td></tr>
-                <tr><td>2</td><td>Eerste Gevecht</td><td>Tilburg</td><td>Combat intro</td></tr>
-                <tr><td>3</td><td>Verdediging</td><td>Den Bosch</td><td>Defense</td></tr>
-                <tr><td>4</td><td>De Binnendieze</td><td>Den Bosch</td><td>Stealth commando (noPlayerTownHall)</td></tr>
-                <tr><td>5</td><td>Heuvelland Diplomatie</td><td>Limburg</td><td>Survive Limburgse tests</td></tr>
-                <tr><td>6</td><td>De Boerenopstand</td><td>Brabant</td><td>Free tractors, destroy garrison</td></tr>
-                <tr><td>7</td><td>De Markt van Brabant</td><td>Oeteldonk</td><td>Economy + defense</td></tr>
-                <tr><td>8</td><td>Het Beleg van Eindhoven</td><td>Eindhoven</td><td>Siege warfare</td></tr>
-                <tr><td>9</td><td>De Brabantse Nacht</td><td>Brabant</td><td>Epic 2-front finale</td></tr>
-                <tr><td>10</td><td>De Raad van Brabant</td><td>Den Bosch (256x256)</td><td>Alliantie-missie</td></tr>
-                <tr><td>11</td><td>De Slag om de A2</td><td>A2-corridor (384x384)</td><td>Grootste battle, 6 golven</td></tr>
-                <tr><td>12</td><td>Het Gouden Worstenbroodje</td><td>Randstad (320x320)</td><td>3-ring finale, CEO boss fight</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <h3 style="color: var(--limburg-primary); margin-top: 2rem;">Limburgers Campaign (5 missies)</h3>
-    <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">De Limburgers campaign leert de tunnel-mechanic en Kolen-economie progressief aan.</p>
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>#</th><th>Naam</th><th>Type</th></tr></thead>
-            <tbody>
-                <tr><td>L1</td><td>Eerste Mijnschacht</td><td>Tutorial: resources, tunnels</td></tr>
-                <tr><td>L2</td><td>De Mergelgroeve</td><td>Build + defend mijnoperatie</td></tr>
-                <tr><td>L3</td><td>Tunneloffensief</td><td>Surprise attacks via tunnels</td></tr>
-                <tr><td>L4</td><td>De Kolenoorlog</td><td>Resource denial, Kolen-management</td></tr>
-                <tr><td>L5</td><td>Gluck Auf!</td><td>Finale: verdedig de Mijn</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <h3 style="color: var(--belgen-primary); margin-top: 2rem;">Belgen: "Het Compromis" (3 missies)</h3>
-    <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">De Belgen leren diplomatiseren, Chocolade gebruiken en vijanden manipuleren.</p>
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>#</th><th>Naam</th><th>Type</th></tr></thead>
-            <tbody>
-                <tr><td>B1</td><td>De Eerste Frituur</td><td>Tutorial: economy, Frietkraamhouders</td></tr>
-                <tr><td>B2</td><td>Het Chocolade Verdrag</td><td>Diplomatie-mechanic introductie</td></tr>
-                <tr><td>B3</td><td>De Commissievergadering</td><td>Compromis + combat combinatie</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <h3 style="color: var(--randstad-primary); margin-top: 2rem;">Randstad: "De Grote Overname" (5 missies)</h3>
-    <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">De Randstad campaign leert corporate mechanics progressief aan. Van je eerste vergadering tot de ultieme boardroom beslissing.</p>
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>#</th><th>Naam</th><th>Type</th></tr></thead>
-            <tbody>
-                <tr><td>R1</td><td>De Eerste Vergadering</td><td>Tutorial: gather PowerPoints, recruit Stagiairs, survive protest</td></tr>
-                <tr><td>R2</td><td>Het Consultancy Rapport</td><td>Build Vergaderzaal, train Managers/Consultants, destroy outpost</td></tr>
-                <tr><td>R3</td><td>De Vijandige Overname</td><td>Two-front attack op Limburger mining operations, AI enabled</td></tr>
-                <tr><td>R4</td><td>Gentrificatie</td><td>Survive 4 waves Belgen counter-attacks, build corporate district</td></tr>
-                <tr><td>R5</td><td>De Boardroom Beslissing</td><td>Epic finale: defeat 3 facties op 256 map</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <h3 style="margin-top: 3rem;">Brabanders Campaign Finale (Missies 10-12)</h3>
-
-    <div class="mission-card">
-        <h4>Missie 10: De Raad van Brabant</h4>
-        <div class="mission-meta">
-            <span>Den Bosch</span>
-            <span>256x256 map</span>
-            <span>30-50 min</span>
-            <span style="color: var(--gold);">Alliantie-missie</span>
-        </div>
-        <blockquote>
-            In Den Bosch — het kloppende hart van Brabant — roepen we de Raad van Brabant bijeen. Brabanders, Limburgers en Belgen aan dezelfde tafel. Voor het eerst in de geschiedenis.
-        </blockquote>
-        <div class="objectives">
-            <li><strong>Bouw</strong> een Tier 3-basis rond de Sint-Janskathedraal</li>
-            <li><strong>Bescherm</strong> de Sint-Janskathedraal (3000 HP) tegen 3 sabotage-golven</li>
-            <li><strong>Voltooi</strong> 3 Alliantie-taken: Limburgse Eed, Belgisch Verdrag, Receptuur Onthullen</li>
-            <li><strong>Bonus:</strong> Alle taken binnen 15 min = alliantie-units in Missie 11</li>
-        </div>
-        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 1rem;">Nieuwe mechanics: parallelle quest objectives, kanaliseer-mechanic (hero ongestoord bij locatie), verborgen vijanden die zich mid-missie onthullen, diplomatie door resource-giften.</p>
-    </div>
-
-    <div class="mission-card">
-        <h4>Missie 11: De Slag om de A2</h4>
-        <div class="mission-meta">
-            <span>A2-corridor (Den Bosch → Utrecht)</span>
-            <span style="color: var(--gold);">384x384 XL map</span>
-            <span>40-70 min</span>
-            <span style="color: var(--belgen-primary);">Grootste battle</span>
-        </div>
-        <blockquote>
-            Langs de A2, in een eindeloze kolonne van pakken en PowerPoints, marcheerde de Randstad naar het zuiden. Meer dan we ooit gezien hadden. Brabant, Limburg en Belgie — zij aan zij.
-        </blockquote>
-        <div class="objectives">
-            <li><strong>Verdedig</strong> de Brabantse Linie: 3 forten langs de A2 (elk 2500 HP)</li>
-            <li><strong>Overleef</strong> 6 aanvalsgolven (~120 vijandelijke units totaal)</li>
-            <li><strong>Vernietig</strong> het mobiele Randstad Veldkwartier (4000 HP, verplaatst elke 5 min)</li>
-            <li><strong>Versla</strong> minstens 1 vijandelijke hero (CEO of Politicus)</li>
-            <li><strong>Bonus:</strong> Alle forten >50% HP = extra verdediging in Missie 12</li>
-        </div>
-        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 1rem;">Nieuwe mechanics: mobiel vijandelijk Veldkwartier, vernietigbare bruggen, A2 als speed-bonus terrein, 3-factie alliantie-warfare simultaan. Grootste campaign map: 384x384.</p>
-    </div>
-
-    <div class="mission-card">
-        <h4>Missie 12: Het Gouden Worstenbroodje (Finale)</h4>
-        <div class="mission-meta">
-            <span>De Randstad — Metropool</span>
-            <span>320x320 XL map</span>
-            <span>35-65 min</span>
-            <span style="color: var(--gold);">Campaign Finale</span>
-        </div>
-        <blockquote>
-            Dit is het, Brabant. Ergens daarbinnen — in de kluis van het Corporate Tower, veertig verdiepingen hoog — ligt het Gouden Worstenbroodje. VOOR HET WORSTENBROODJE!
-        </blockquote>
-        <div class="objectives">
-            <li><strong>Doorbreek</strong> 3 verdedigingsringen: Buitenwijken, Bedrijventerrein, Centrum</li>
-            <li><strong>Vernietig</strong> het Corporate Tower (5000 HP, kwetsbaar na 3 Kantoor-torens)</li>
-            <li><strong>Versla</strong> De CEO in een 3-fasen boss fight (500 HP totaal)</li>
-            <li><strong>Claim</strong> het Gouden Worstenbroodje (15s kanaliseren met hero)</li>
-            <li><strong>Bonus:</strong> 0 hero deaths = gouden skins + geheime epiloog</li>
-        </div>
-        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 1rem;">CEO Boss Fight: Fase 1 op het dak (Board Room), Fase 2 achtervolging door Ring 2 (Elevator Pitch), Fase 3 laatste stand bij de ruines (De Gouden Handdruk). ~80 vijandelijke units + continue productie.</p>
     </div>
 
     <div class="quote" style="margin-top: 2rem;">
-        "En zo eindigde de reis die begon in Reusel. Een boer die een held werd. Het Gouden Worstenbroodje — het symbool van alles wat Brabant is — was terug waar het hoorde. Maar dit was nooit het verhaal van een worstenbroodje. Het was het verhaal van een volk dat ontdekte dat het samen sterker was dan alleen."
-        <span class="author">— Narrator, Finale Cutscene</span>
+        "Elke hero heeft een backstory, een motivatie, een zwakte. Ze zijn geen poppetjes die schreeuwen als je erop klikt. Het zijn personages die je herkent, om wie je geeft, en die soms iets zeggen waar je even stil van wordt."
+        <span class="author">-- Scenario Writer Agent</span>
+    </div>
+</section>
+
+<!-- ===== 04: HOE HET WERKT ===== -->
+<section id="pipeline">
+    <h2><span class="section-number">04</span>Hoe het werkt</h2>
+    <p class="section-intro">Een persoon. Een leger AI-tools. En een pipeline die van een tekstbeschrijving naar een geript, geanimeerd, gestemd 3D model gaat in minder dan twee minuten.</p>
+
+    <div class="pipeline">
+        <div class="pipeline-step">
+            <div class="step-icon">CODE</div>
+            <div class="step-title">Claude Code</div>
+            <div class="step-tool">Architectuur, game logic, AI</div>
+        </div>
+        <div class="pipeline-step">
+            <div class="step-icon">3D</div>
+            <div class="step-title">Meshy Studio v6</div>
+            <div class="step-tool">127 3D modellen</div>
+        </div>
+        <div class="pipeline-step">
+            <div class="step-icon">RIG</div>
+            <div class="step-title">Blender CLI</div>
+            <div class="step-tool">Auto-rig + animatie</div>
+        </div>
+        <div class="pipeline-step">
+            <div class="step-icon">STEM</div>
+            <div class="step-title">ElevenLabs</div>
+            <div class="step-tool">525+ stemmen in 4 dialecten</div>
+        </div>
+        <div class="pipeline-step">
+            <div class="step-icon">MUZIEK</div>
+            <div class="step-title">Suno</div>
+            <div class="step-tool">Soundtrack per factie</div>
+        </div>
     </div>
 
-    <h3 style="margin-top: 2rem;">Cross-Missie Bonusconnecties</h3>
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>Bonus behaald in</th><th>Effect in latere missie</th></tr></thead>
-            <tbody>
-                <tr><td>Missie 10: Alle taken binnen 15 min</td><td>Missie 11: 6 extra alliantie-units (zelf controleerbaar)</td></tr>
-                <tr><td>Missie 10: 1000/800 oorlogsvoorraad</td><td>Missie 12: +25% startresources</td></tr>
-                <tr><td>Missie 11: Alle forten >50% HP</td><td>Missie 12: 2 extra Kantoor-torens (defense)</td></tr>
-                <tr><td>Missie 11: <20 unit verliezen</td><td>Missie 12: gratis Carnavalsrage bij start</td></tr>
-                <tr><td>Missie 9: Geen Grot verloren</td><td>Missie 12: geheime tunnel naar Ring 3</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <h3 style="margin-top: 2rem;">Campaign Statistieken (alle facties)</h3>
+    <h3>De tools achter het koninkrijk</h3>
     <div class="card-grid">
         <div class="card">
             <div class="card-body">
-                <h4>25 Missies, 4 Campaigns</h4>
-                <p>12 Brabanders + 5 Limburgers + 3 Belgen + 5 Randstad. Geschatte totale speelduur: 15-20 uur.</p>
+                <h4>Claude Code</h4>
+                <p>De ruggengraat. 7 gespecialiseerde agents werken parallel: Asset Generator, Audio Director, 3D Animation Director, Scenario Writer, Game Deployer, Game Analyzer, en een meta-agent die het hele proces evalueert en verbetert.</p>
             </div>
         </div>
         <div class="card">
             <div class="card-body">
-                <h4>20+ Unieke Locaties</h4>
-                <p>Reusel, Tilburg, Den Bosch, Limburg, Eindhoven, A2-corridor, Randstad, Belgische fritkotten, mergelgrotten.</p>
+                <h4>Meshy Studio v6</h4>
+                <p>3D modellen van tekst naar game-ready GLB. 127 modellen -- units, gebouwen, props -- via de directe API met 20 parallelle generatietaken. Elke factie herkenbaar aan silhouet en kleur, zelfs op RTS-zoomniveau.</p>
             </div>
         </div>
         <div class="card">
             <div class="card-body">
-                <h4>3-Fasen Boss Fight</h4>
-                <p>De CEO als memorabele eindbaas: komisch, dreigend, en uiteindelijk tragisch. "IK... BIN... DE... SYNERGIEEEEE!"</p>
+                <h4>Blender CLI Auto-Rig</h4>
+                <p>Een 17-bone humanoid armature, distance-based weight painting, en 7 animatiesets per unit-categorie. Volledig geautomatiseerd via de command line -- geen handmatig werk. Van statisch model naar lopende, vechtende, stervende eenheid.</p>
             </div>
         </div>
         <div class="card">
             <div class="card-body">
-                <h4>Speciale Missie: De Binnendieze</h4>
-                <p>Stealth commando missie met noPlayerTownHall flag -- geen basis, alleen een squad. Uniek in het genre.</p>
+                <h4>ElevenLabs</h4>
+                <p>525+ voice lines in vier dialecten: Brabants ("ge", "hedde", "nie"), Limburgs ("ich", "dich", "jao"), Vlaams ("amai", "allez", "goesting"), en ABN voor de Randstad. Elke unit-type heeft een eigen persoonlijkheid via unieke voice settings.</p>
             </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h4>Suno</h4>
+                <p>Factie-specifieke muziek met een dynamic battle intensity systeem. De muziek reageert op wat er op het slagveld gebeurt -- van rustige economische opbouw tot epische veldslagen.</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h4>Eerlijk over kosten</h4>
+                <p>Dit alles kost honderden euro's per maand. Claude Code tokens, ElevenLabs, Meshy, fal.ai, Suno, hosting op een Mac mini M4 server. Het is een passieproject met serieuze lopende kosten.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="quote">
+        "Het is een experiment in wat een solo developer kan bouwen als je AI als gereedschap behandelt in plaats van als vervanging. De AI genereert modellen, stemmen en muziek. Maar het creatieve DNA -- de humor, de balans, de ziel -- dat komt van een mens."
+        <span class="author">-- Richard Theuws</span>
+    </div>
+</section>
+
+<!-- ===== 05: DE REIS ===== -->
+<section id="reis">
+    <h2><span class="section-number">05</span>De Reis</h2>
+    <p class="section-intro">Van een typo tot een speelbare RTS met vier facties, 25 campaign missies, en meer dan 33.000 regels code. Dit is hoe het groeide.</p>
+
+    <div class="timeline">
+        <div class="timeline-item completed">
+            <div class="timeline-date">5 april 2026</div>
+            <div class="timeline-title">De Vonk</div>
+            <div class="timeline-desc">Een typo. Een brainstorm. Twee game-ideeen op tafel. De keuze valt op een WarCraft-clone in Brabant. Binnen een paar uur staat de eerste PRD: 1200+ regels game design met vier facties, alle units, gebouwen, en een 12-missie campaign.</div>
+        </div>
+        <div class="timeline-item completed">
+            <div class="timeline-date">5 april 2026</div>
+            <div class="timeline-title">De Eerste Proof of Concept</div>
+            <div class="timeline-desc">Vijf parallelle AI agents bouwen de core engine: Three.js renderer, bitECS, terrein, camera, pathfinding. Het terrein verschijnt op 121 FPS. De eerste gekleurde dozen bewegen over het scherm. Het leeft.</div>
+        </div>
+        <div class="timeline-item completed">
+            <div class="timeline-date">5-6 april 2026</div>
+            <div class="timeline-title">Van Dozen naar Game</div>
+            <div class="timeline-desc">Meshy 3D modellen vervangen de dozen. De Gezelligheid-mechanic werkt. De eerste ElevenLabs stemmen klinken door de speakers. Campaign missies 1-9 worden gebouwd. De game push naar GitHub.</div>
+        </div>
+        <div class="timeline-item completed">
+            <div class="timeline-date">6-7 april 2026</div>
+            <div class="timeline-title">Vier Facties, Vier Campaigns</div>
+            <div class="timeline-desc">Limburgers krijgen hun tunnelnetwerk. Belgen hun diplomatie-systeem. Randstad hun corporate campaign "De Grote Overname." Alle vier facties zijn speelbaar met eigen units, gebouwen, tech trees en stemmen.</div>
+        </div>
+        <div class="timeline-item completed">
+            <div class="timeline-date">7-8 april 2026</div>
+            <div class="timeline-title">Polish en Controle</div>
+            <div class="timeline-desc">WarCraft-style controls (control groups, attack-move, drag-select). Auto-defend systeem. Blender auto-rig pipeline voor skeletal animatie. 166 geautomatiseerde tests. 10 Meshy 3D modellen parallel gegenereerd.</div>
+        </div>
+        <div class="timeline-item completed">
+            <div class="timeline-date">8-11 april 2026</div>
+            <div class="timeline-title">Crowdfunding en Community</div>
+            <div class="timeline-desc">Dashboard herontwerp. Building interface cards. 8 Meshy v6 gebouwmodellen. Hero character sheets voor alle 8 personages. Campaign narrative verdieping. Voice Studio met 551 voice lines. Donatie-integratie via Mollie. 192 tests groen.</div>
+        </div>
+        <div class="timeline-item active">
+            <div class="timeline-date">Nu en verder</div>
+            <div class="timeline-title">De Volgende Stap</div>
+            <div class="timeline-desc">Echte stemacteurs voor de factie-leiders. Meer campaign missies. Map variatie met rivieren, bruggen en tunnels. Multiplayer als de community groot genoeg is. Dit is pas het begin.</div>
         </div>
     </div>
 </section>
 
-<!-- ===== 10: TECHNICAL ===== -->
-<section id="tech">
-    <h2><span class="section-number">10</span>Technisch (v0.7-v0.17)</h2>
-    <p class="section-intro">67 bronbestanden, 33.000 LOC TypeScript, 166 geautomatiseerde tests. Hybrid UnitRenderer met SkinnedMesh + InstancedMesh, 4-faction architectuur, en een entity factory met 72 archetypes.</p>
+<!-- ===== 06: AMBITIE ===== -->
+<section id="ambitie">
+    <h2><span class="section-number">06</span>Waar het naartoe gaat</h2>
+    <p class="section-intro">Dit is wat er al staat. Stel je voor wat er nog kan komen.</p>
 
+    <h3>Wat er al is</h3>
     <div class="card-grid">
         <div class="card">
             <div class="card-body">
-                <h4>Hybrid UnitRenderer</h4>
-                <p>Combinatie van SkinnedMesh (voor geanimeerde units) en InstancedMesh (voor statische units). Skeletal animatie met per-unit AnimationMixer, crossfade transitions, one-shot/loop configuratie per clip.</p>
+                <h4>4 speelbare facties</h4>
+                <p>Elk met eigen units, gebouwen, tech tree, stemacteurs, en unieke mechanics. Geen reskins -- vier compleet verschillende speelervaringen.</p>
                 <div class="card-stats">
-                    <div class="stat"><div class="stat-value">6</div><div class="stat-label">Draw calls</div></div>
-                    <div class="stat"><div class="stat-value">768</div><div class="stat-label">Max units</div></div>
-                    <div class="stat"><div class="stat-value">60</div><div class="stat-label">FPS target</div></div>
+                    <div class="stat"><div class="stat-value">39</div><div class="stat-label">Unit types</div></div>
+                    <div class="stat"><div class="stat-value">41</div><div class="stat-label">Gebouwen</div></div>
+                    <div class="stat"><div class="stat-value">8</div><div class="stat-label">Heroes</div></div>
                 </div>
             </div>
         </div>
         <div class="card">
             <div class="card-body">
-                <h4>4-Faction Data Architecture</h4>
-                <p>FactionId enum met Brabanders (0), Randstad (1), Limburgers (2), Belgen (3). GameConfig singleton vervangt alle hardcoded faction references. factionData.ts: 1461 LOC.</p>
+                <h4>25 campaign missies</h4>
+                <p>Vier verhaalllijnen: van een boer in Reusel tot de Slag om de A2, van de eerste Vergadering tot de Boardroom Beslissing. 15-20 uur geschatte speelduur.</p>
                 <div class="card-stats">
-                    <div class="stat"><div class="stat-value">1461</div><div class="stat-label">LOC data</div></div>
-                    <div class="stat"><div class="stat-value">31</div><div class="stat-label">Units</div></div>
-                    <div class="stat"><div class="stat-value">41</div><div class="stat-label">Buildings</div></div>
+                    <div class="stat"><div class="stat-value">12</div><div class="stat-label">Brabanders</div></div>
+                    <div class="stat"><div class="stat-value">5</div><div class="stat-label">Limburgers</div></div>
+                    <div class="stat"><div class="stat-value">8</div><div class="stat-label">Rand+Belg</div></div>
                 </div>
             </div>
         </div>
         <div class="card">
             <div class="card-body">
-                <h4>166 Automated Tests</h4>
-                <p>Vitest test suite: MapGenerator (13), PlayerState (24), AIController (16), en meer. Alle tests groen. 232ms runtime.</p>
-                <div class="card-stats">
-                    <div class="stat"><div class="stat-value">166</div><div class="stat-label">Tests</div></div>
-                    <div class="stat"><div class="stat-value">6</div><div class="stat-label">Test files</div></div>
-                    <div class="stat"><div class="stat-value">232ms</div><div class="stat-label">Runtime</div></div>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h4>SeparationSystem</h4>
-                <p>O(n) spatial grid voor unit separation. Voorkomt unit-stacking. Natural scatter bij spawn en formation move.</p>
-                <div class="card-stats">
-                    <div class="stat"><div class="stat-value">O(n)</div><div class="stat-label">Complexity</div></div>
-                    <div class="stat"><div class="stat-value">Spatial</div><div class="stat-label">Grid</div></div>
-                    <div class="stat"><div class="stat-value">Force</div><div class="stat-label">Separation</div></div>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h4>FactionId.AI Fix</h4>
-                <p>Expliciete playerFactionId/aiFactionIds vervangt hardcoded FactionId.AI. Faction remap systeem zet speler altijd in slot 0. Alle game systems gebruiken GameConfig.</p>
-                <div class="card-stats">
-                    <div class="stat"><div class="stat-value">4</div><div class="stat-label">Player slots</div></div>
-                    <div class="stat"><div class="stat-value">Dynamic</div><div class="stat-label">Faction</div></div>
-                    <div class="stat"><div class="stat-value">Remap</div><div class="stat-label">Systeem</div></div>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h4>Building Progress/Health Bars</h4>
-                <p>Visuele constructie-voortgang per gebouw. Health bars op alle entities. Dynamic production panel met queue display per gebouw/factie.</p>
-                <div class="card-stats">
-                    <div class="stat"><div class="stat-value">Progress</div><div class="stat-label">Bars</div></div>
-                    <div class="stat"><div class="stat-value">Health</div><div class="stat-label">Bars</div></div>
-                    <div class="stat"><div class="stat-value">Queue</div><div class="stat-label">Display</div></div>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h4>Terrain Overhaul</h4>
-                <p>256 segments (was 128), height 2.0, slope-based color blending, spawn area flattening voor building placement. Water depth gradient + 3-wave animation.</p>
-                <div class="card-stats">
-                    <div class="stat"><div class="stat-value">256</div><div class="stat-label">Segments</div></div>
-                    <div class="stat"><div class="stat-value">Slope</div><div class="stat-label">Coloring</div></div>
-                    <div class="stat"><div class="stat-value">Flatten</div><div class="stat-label">Spawn areas</div></div>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h4>Map Templates</h4>
-                <p>4 skirmish map templates: Klassiek, Kruispunt (edge spawns), Eilanden (peninsula bases), Arena (close-quarters). Template selector in skirmish menu.</p>
+                <h4>Skirmish modus</h4>
+                <p>Speel tegen de AI op 4 map templates. Kies je factie, kies je tegenstander, kies je kaart. De AI past zijn strategie aan per factie.</p>
                 <div class="card-stats">
                     <div class="stat"><div class="stat-value">4</div><div class="stat-label">Templates</div></div>
-                    <div class="stat"><div class="stat-value">2-4</div><div class="stat-label">Players</div></div>
-                    <div class="stat"><div class="stat-value">Select</div><div class="stat-label">In menu</div></div>
+                    <div class="stat"><div class="stat-value">4</div><div class="stat-label">AI facties</div></div>
+                    <div class="stat"><div class="stat-value">3</div><div class="stat-label">Moeilijkheid</div></div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h4>525+ voice lines</h4>
+                <p>In vier dialecten via ElevenLabs. Brabants, Limburgs, Vlaams, en Standaard Nederlands. Elke unit heeft een eigen persoonlijkheid.</p>
+                <div class="card-stats">
+                    <div class="stat"><div class="stat-value">4</div><div class="stat-label">Dialecten</div></div>
+                    <div class="stat"><div class="stat-value">525+</div><div class="stat-label">Lijnen</div></div>
+                    <div class="stat"><div class="stat-value">12</div><div class="stat-label">Stemmen</div></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <h3 style="margin-top: 2rem;">Kritieke Bugfixes (v0.9-v0.17)</h3>
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>Prioriteit</th><th>Bug</th><th>Fix</th></tr></thead>
-            <tbody>
-                <tr><td style="color: var(--belgen-primary);">CRITICAL</td><td>VisionSystem hardcoded naar Brabanders</td><td>GameConfig.playerFactionId</td></tr>
-                <tr><td style="color: var(--belgen-primary);">CRITICAL</td><td>CommandSystem hardcoded naar Brabanders</td><td>GameConfig.isPlayerFaction()</td></tr>
-                <tr><td style="color: var(--belgen-primary);">CRITICAL</td><td>AISystem.setFaction() nooit aangeroepen</td><td>Aanroep in Game.init() na remap</td></tr>
-                <tr><td style="color: var(--belgen-primary);">CRITICAL</td><td>Tertiair resource field mismatch</td><td>getTertiary() i.p.v. getGezelligheid()</td></tr>
-                <tr><td style="color: var(--brabant-primary);">HIGH</td><td>AI hero timer += 2 per tick (hero elke 0.08s)</td><td>Frame-based timer</td></tr>
-                <tr><td style="color: var(--brabant-primary);">HIGH</td><td>Victory/defeat race condition</td><td>Guard op required objectives > 0, 0.5s delay</td></tr>
-                <tr><td>MEDIUM</td><td>Attack wave spam (lastArmySize reset)</td><td>Verwijder erroneous reset</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <h3 style="margin-top: 2rem;">Code Kwaliteit</h3>
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>Verbetering</th><th>Details</th></tr></thead>
-            <tbody>
-                <tr><td>36 <code>any</code> types vervangen</td><td>NavMeshManager, ProductionSystem, DeathSystem, BuildSystem</td></tr>
-                <tr><td>Dead imports opgeruimd</td><td>15 source files</td></tr>
-                <tr><td>Unused dependency verwijderd</td><td><code>yuka</code> uit package.json</td></tr>
-                <tr><td>Non-overlapping upgrade ranges</td><td>Brabanders 10-13, Randstad 20-23, Limburgers 30-33, Belgen 40-43</td></tr>
-                <tr><td>cleanup() method</td><td>Proper teardown event listeners, EventBus, HUD, meshes, ECS world</td></tr>
-                <tr><td>Idempotency guards</td><td>setupInput() en setupEventListeners() voorkomen dubbele registratie</td></tr>
-                <tr><td>-ansen purge</td><td>40+ occurrences nep-dialect suffix verwijderd uit 12 bestanden</td></tr>
-            </tbody>
-        </table>
-    </div>
-</section>
-
-<section id="roadmap">
-    <h2><span class="section-number">11</span>Development Roadmap</h2>
-    <p class="section-intro">Van gekleurde dozen tot een volledige RTS met 4 facties, 25 campaign missies, skeletal animatie en WarCraft-style controls.</p>
-
-    <div class="cost-highlight" style="margin-bottom: 2rem;">
-        <div class="big-number">v0.17.0</div>
-        <div class="cost-label">4 facties | 39 unit types | 25 campaign missies | 166 tests | 33.000 LOC</div>
-        <div style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">525+ voice lines | 10 Suno tracks | 22+ Meshy 3D modellen | Blender auto-rig pipeline</div>
-    </div>
-
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>Phase</th><th>Wat</th><th>Status</th></tr></thead>
-            <tbody>
-                <tr><td style="color: var(--gold);">0. PRD</td><td>22.000 regels game design, 6 sub-PRDs, 6 PoC docs</td><td style="color: var(--limburg-primary);">Klaar</td></tr>
-                <tr><td style="color: var(--gold);">1. Core Engine</td><td>Three.js renderer, bitECS, terrein, camera, pathfinding</td><td style="color: var(--limburg-primary);">Klaar</td></tr>
-                <tr><td style="color: var(--gold);">2. Economy</td><td>Resources, bouwen, unit productie, gather loop</td><td style="color: var(--limburg-primary);">Klaar</td></tr>
-                <tr><td style="color: var(--gold);">3. Combat</td><td>Damage, projectiles, auto-aggro, auto-defend, death system</td><td style="color: var(--limburg-primary);">Klaar</td></tr>
-                <tr><td style="color: var(--gold);">4. AI</td><td>Per-faction AI strategies, faction-aware build orders, hero training</td><td style="color: var(--limburg-primary);">Klaar</td></tr>
-                <tr><td style="color: var(--gold);">5. Factions</td><td>4 facties: Gezelligheid, Bureaucratie, Underground, Compromis</td><td style="color: var(--limburg-primary);">Klaar</td></tr>
-                <tr><td style="color: var(--gold);">6. Assets</td><td>22+ Meshy modellen (4 facties), concept art, faction-specific models</td><td style="color: var(--limburg-primary);">Klaar</td></tr>
-                <tr><td style="color: var(--gold);">7. Heroes</td><td>8 heroes (2 per factie), 12+ abilities, hero revival, AI hero training</td><td style="color: var(--limburg-primary);">Klaar</td></tr>
-                <tr><td style="color: var(--gold);">8. Campaign 1-12</td><td>Brabanders: 12 missies, van Reusel tot Het Gouden Worstenbroodje</td><td style="color: var(--limburg-primary);">Klaar</td></tr>
-                <tr><td style="color: var(--gold);">9. UI/Flow</td><td>Main menu, faction select, tutorial, pause menu, drag-select, hotkeys</td><td style="color: var(--limburg-primary);">Klaar</td></tr>
-                <tr><td style="color: var(--gold);">10. Visuals</td><td>Fog of war, shadows, particles, camera intro, post-processing</td><td style="color: var(--limburg-primary);">Klaar</td></tr>
-                <tr><td style="color: var(--gold);">11. Muziek</td><td>10 Suno tracks, dynamic battle intensity, 4 faction themes</td><td style="color: var(--limburg-primary);">Klaar</td></tr>
-                <tr><td style="color: var(--gold);">12. Voices</td><td>525+ ElevenLabs voice lines, 4 dialecten, per-unit persoonlijkheid</td><td style="color: var(--limburg-primary);">Klaar</td></tr>
-                <tr><td style="color: var(--gold);">13. Hout &amp; Tech Tree</td><td>2e resource (hout), Lumber Camp, Blacksmith, 7 upgrades</td><td style="color: var(--limburg-primary);">Klaar</td></tr>
-                <tr><td style="color: var(--gold);">14. 4-Faction System</td><td>factionData.ts (1461 LOC), GameConfig singleton, faction remap</td><td style="color: var(--limburg-primary);">Klaar</td></tr>
-                <tr><td style="color: var(--gold);">15. Instanced Rendering</td><td>InstancedMesh, 6 draw calls, 768 units@60 FPS</td><td style="color: var(--limburg-primary);">Klaar</td></tr>
-                <tr><td style="color: var(--gold);">16. Underground &amp; Diplomacy</td><td>Tunnel-netwerk (Limburgers), Compromis-systeem (Belgen), Entity Factory</td><td style="color: var(--limburg-primary);">Klaar</td></tr>
-                <tr><td style="color: var(--gold);">17. Balance Pass</td><td>Asymmetrisch: tanky Limburgers, glass cannon Belgen, expensive Randstad</td><td style="color: var(--limburg-primary);">Klaar</td></tr>
-                <tr><td style="color: var(--gold);">18. All 4 Campaigns</td><td>+5 Limburgers, +3 Belgen, +5 Randstad = 25 missies totaal</td><td style="color: var(--limburg-primary);">Klaar</td></tr>
-                <tr><td style="color: var(--gold);">19. Meshy 3D Models</td><td>10 faction-specific modellen (Limburgers+Belgen), parallel batch gen</td><td style="color: var(--limburg-primary);">Klaar</td></tr>
-                <tr><td style="color: var(--gold);">20. Controls &amp; QoL</td><td>Ctrl groups, A-move, drag-select, auto-defend, camera intro, pause menu</td><td style="color: var(--limburg-primary);">Klaar</td></tr>
-                <tr><td style="color: var(--gold);">21. Blender Auto-Rig</td><td>17-bone armature, 7 anim sets, batch processing pipeline</td><td style="color: var(--limburg-primary);">Klaar</td></tr>
-                <tr><td style="color: var(--gold);">22. Testing</td><td>166 automated tests (Vitest), 6 test files, 232ms runtime</td><td style="color: var(--limburg-primary);">Klaar</td></tr>
-                <tr><td style="color: var(--brabant-primary);">23. Hero Models</td><td>Hero-specifieke 3D modellen, 1.5x scale, ornate details</td><td style="color: var(--brabant-primary);">Volgende</td></tr>
-                <tr><td style="color: var(--brabant-primary);">24. Dashboard Polish</td><td>Dashboard UI, remaining audit items, performance optimalisatie</td><td style="color: var(--brabant-primary);">Volgende</td></tr>
-                <tr><td style="color: var(--brabant-primary);">25. Voice Recording</td><td>506/551 remaining voice lines opnemen + sync</td><td style="color: var(--brabant-primary);">Volgende</td></tr>
-                <tr><td style="color: var(--brabant-primary);">26. Deploy</td><td>Deploy naar theuws.com/games/reign-of-brabant/</td><td style="color: var(--brabant-primary);">Volgende</td></tr>
-                <tr><td>27. Skirmish Victory/Defeat</td><td>Skirmish mode victory/defeat condities, post-game stats</td><td style="color: var(--text-muted);">Planned</td></tr>
-                <tr><td>28. Rally Points Visual</td><td>Visuele rally point indicators op gebouwen</td><td style="color: var(--text-muted);">Planned</td></tr>
-                <tr><td>29. Multiplayer</td><td>Colyseus, invite links, ELO, leaderboard</td><td style="color: var(--text-muted);">Planned</td></tr>
-                <tr><td>30. Klapper</td><td>Epic Replay, Brabants weer, AI commentator</td><td style="color: var(--text-muted);">Planned</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <h3>Map Concept: "De Kempen"</h3>
-    <div class="card" style="max-width: 800px;">
-        <img src="../assets/concepts/map-de-kempen.png" alt="Map Concept" class="card-image" style="aspect-ratio: 4/3;" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 800 600%22><rect fill=%22%231a1a2e%22 width=%22800%22 height=%22600%22/><text x=%22400%22 y=%22300%22 text-anchor=%22middle%22 fill=%22%232ECC71%22 font-size=%2240%22>🗺️ De Kempen</text></svg>'">
-        <div class="card-body">
-            <h4>De Kempen — MVP Map</h4>
-            <p>256x256 game units. Vlak met heuvels, bossen, vennen. 6 gold mines, 8-10 bomen-clusters, chokepoints via water.</p>
-        </div>
-    </div>
-
-    <h3 style="margin-top: 3rem;">Battle Concept</h3>
-    <div class="card" style="max-width: 800px;">
-        <img src="../assets/concepts/battle-concept.png" alt="Battle Concept" class="card-image" style="aspect-ratio: 4/3;" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 800 600%22><rect fill=%22%231a1a2e%22 width=%22800%22 height=%22600%22/><text x=%22400%22 y=%22300%22 text-anchor=%22middle%22 fill=%22%23E67E22%22 font-size=%2240%22>⚔️ Slag om Brabant</text></svg>'">
-        <div class="card-body">
-            <h4>De Slag om Brabant</h4>
-            <p>Carnavalvierders vs Corporate Managers. Confetti vs spreadsheets. Worstenbroodjes vs PowerPoints.</p>
-        </div>
-    </div>
-</section>
-
-<!-- ===== 12: CONTROLS ===== -->
-<section id="controls">
-    <h2><span class="section-number">12</span>Controls -- Volledige Besturingsreferentie</h2>
-    <p class="section-intro">WarCraft-style besturing met muis en toetsenbord. Alle essentials voor een RTS zijn geimplementeerd.</p>
-
-    <h3>Muis</h3>
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>Actie</th><th>Input</th><th>Effect</th></tr></thead>
-            <tbody>
-                <tr><td>Selecteer unit</td><td>Linkermuisklik</td><td>Selecteert de aangeklikte unit</td></tr>
-                <tr><td>Multi-select</td><td>Klik + sleep (drag box)</td><td>Selecteert alle eigen units in de rechthoek</td></tr>
-                <tr><td>Same-type select</td><td>Ctrl + klik op unit</td><td>Selecteert alle units van hetzelfde type op het scherm</td></tr>
-                <tr><td>Beweeg / Gather</td><td>Rechtermuisklik op terrein/resource</td><td>Geselecteerde units bewegen naar locatie of gatheren resource</td></tr>
-                <tr><td>Aanvallen</td><td>Rechtermuisklik op vijand</td><td>Geselecteerde units vallen de vijand aan</td></tr>
-                <tr><td>Rally point</td><td>Rechtermuisklik met gebouw geselecteerd</td><td>Nieuw geproduceerde units lopen naar dit punt</td></tr>
-                <tr><td>Camera pan</td><td>Muis naar schermrand / Middle mouse drag</td><td>Camera beweegt in die richting</td></tr>
-                <tr><td>Camera zoom</td><td>Scrollwiel</td><td>In/uit zoomen</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <h3 style="margin-top: 2rem;">Toetsenbord</h3>
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>Toets</th><th>Actie</th><th>Details</th></tr></thead>
-            <tbody>
-                <tr><td style="font-family: 'JetBrains Mono', monospace; color: var(--gold);">Ctrl + 1-9</td><td>Control group opslaan</td><td>Sla huidige selectie op als control group</td></tr>
-                <tr><td style="font-family: 'JetBrains Mono', monospace; color: var(--gold);">1-9</td><td>Control group oproepen</td><td>Selecteer de opgeslagen groep. Dubbeltap centert camera.</td></tr>
-                <tr><td style="font-family: 'JetBrains Mono', monospace; color: var(--gold);">A</td><td>Attack-move</td><td>Klik daarna op locatie: units bewegen erheen en vallen alles aan onderweg</td></tr>
-                <tr><td style="font-family: 'JetBrains Mono', monospace; color: var(--gold);">ESC</td><td>Pause menu</td><td>Opent pause menu met hotkey referentie overlay</td></tr>
-                <tr><td style="font-family: 'JetBrains Mono', monospace; color: var(--gold);">WASD / Pijltjes</td><td>Camera pan</td><td>Beweeg de camera</td></tr>
-                <tr><td style="font-family: 'JetBrains Mono', monospace; color: var(--gold);">Q / W / E</td><td>Hero abilities</td><td>Activeer hero ability 1, 2, 3</td></tr>
-                <tr><td style="font-family: 'JetBrains Mono', monospace; color: var(--gold);">F11</td><td>Fullscreen</td><td>Toggle fullscreen mode (tip getoond bij game start)</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <h3 style="margin-top: 2rem;">Productie &amp; Gebouwen</h3>
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>Actie</th><th>Methode</th><th>Details</th></tr></thead>
-            <tbody>
-                <tr><td>Gebouw plaatsen</td><td>Klik build-knop in HUD, dan klik op terrein</td><td>Worker loopt naar locatie en begint bouwen</td></tr>
-                <tr><td>Unit produceren</td><td>Klik productie-knop in gebouw-panel</td><td>Unit wordt aan queue toegevoegd, progress bar zichtbaar</td></tr>
-                <tr><td>Rally point instellen</td><td>Rechtermuisklik met gebouw geselecteerd</td><td>Alle nieuw geproduceerde units lopen naar rally point</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 1.5rem;">Mobile ondersteuning is gepland voor een toekomstige versie. De huidige besturing is geoptimaliseerd voor desktop met muis en toetsenbord.</p>
-</section>
-
-<!-- ===== 13: SUB-PRDs ===== -->
-<section id="subprds">
-    <h2><span class="section-number">13</span>Sub-PRDs -- De Complete Blueprints</h2>
-    <p class="section-intro">8 gespecialiseerde agents werkten parallel aan gedetailleerde specificaties. Elk document is direct implementeerbaar.</p>
-
+    <h3 style="margin-top: 3rem;">Wat er nog komt</h3>
     <div class="card-grid">
-        <div class="card">
+        <div class="card" style="border-color: rgba(212, 168, 71, 0.3);">
             <div class="card-body">
-                <h4 style="color: var(--randstad-primary);">📡 Multiplayer & P2P</h4>
-                <p>Colyseus op Mac mini M4, invite via link (geen account), ELO rating, reconnection, anti-cheat, Carnavalsmode party game.</p>
-                <div class="card-stats">
-                    <div class="stat"><div class="stat-value">1.754</div><div class="stat-label">Regels</div></div>
-                    <div class="stat"><div class="stat-value">10</div><div class="stat-label">Hoofdstukken</div></div>
-                    <div class="stat"><div class="stat-value">67K</div><div class="stat-label">Bestand</div></div>
-                </div>
+                <h4 style="color: var(--gold);">Echte stemacteurs</h4>
+                <p>De AI-stemmen zijn een goed begin, maar de nuances van een Tilburgse boer of een Limburgse mijnwerker kun je niet faken. Echte native speakers voor de factie-leiders en hero characters.</p>
             </div>
         </div>
-        <div class="card">
+        <div class="card" style="border-color: rgba(212, 168, 71, 0.3);">
             <div class="card-body">
-                <h4 style="color: var(--brabant-primary);">⚔️ Campaign & Content</h4>
-                <p>38 missies, 4 campaigns + geheime Efteling campaign, survival/tower defense/boss rush, 28 easter eggs, 30+ achievements.</p>
-                <div class="card-stats">
-                    <div class="stat"><div class="stat-value">2.553</div><div class="stat-label">Regels</div></div>
-                    <div class="stat"><div class="stat-value">38</div><div class="stat-label">Missies</div></div>
-                    <div class="stat"><div class="stat-value">28</div><div class="stat-label">Easter Eggs</div></div>
-                </div>
+                <h4 style="color: var(--gold);">Multiplayer</h4>
+                <p>1v1 en 2v2 via WebSockets. Gehost op de Mac mini M4 server. Lobby systeem, matchmaking, en spectator mode. Speel tegen je vrienden -- of tegen vreemden.</p>
             </div>
         </div>
-        <div class="card">
+        <div class="card" style="border-color: rgba(212, 168, 71, 0.3);">
             <div class="card-body">
-                <h4 style="color: var(--limburg-primary);">🎨 UI/UX & Settings</h4>
-                <p>16 schermen, 39 settings, 14 error scenarios, 3 colorblind modes, 19-staps tutorial, 50 loading tips, 20 achievements.</p>
-                <div class="card-stats">
-                    <div class="stat"><div class="stat-value">2.303</div><div class="stat-label">Regels</div></div>
-                    <div class="stat"><div class="stat-value">16</div><div class="stat-label">Schermen</div></div>
-                    <div class="stat"><div class="stat-value">39</div><div class="stat-label">Settings</div></div>
-                </div>
+                <h4 style="color: var(--gold);">Meer facties</h4>
+                <p>Zeeuwen, Friezen, Tukkers -- de community bepaalt wie er als volgende komt. Compleet met eigen units, gebouwen, tech tree, stemmen en campaign missies.</p>
             </div>
         </div>
-        <div class="card">
+        <div class="card" style="border-color: rgba(212, 168, 71, 0.3);">
             <div class="card-body">
-                <h4 style="color: var(--belgen-primary);">🔊 Audio Design</h4>
-                <p>516 voice line scripts, 80 SFX, 15 muziek tracks, 3D spatial audio, voice recording guide voor Richard.</p>
-                <div class="card-stats">
-                    <div class="stat"><div class="stat-value">2.062</div><div class="stat-label">Regels</div></div>
-                    <div class="stat"><div class="stat-value">516</div><div class="stat-label">Voice Lines</div></div>
-                    <div class="stat"><div class="stat-value">612</div><div class="stat-label">Audio Assets</div></div>
-                </div>
+                <h4 style="color: var(--gold);">Grotere maps en meer missies</h4>
+                <p>Maps tot 512x512 met meerdere eilanden, bruggen en verborgen paden. Nieuwe campaign arcs. Map obstacles, tunnelsystemen, en epische veldslagen op nog grotere schaal.</p>
             </div>
         </div>
-        <div class="card">
+        <div class="card" style="border-color: rgba(212, 168, 71, 0.3);">
             <div class="card-body">
-                <h4>⚙️ Technische Architectuur</h4>
-                <p>bitECS met 29 systems, rendering pipeline, recast pathfinding, AI FSM, save/load, performance budgets, security.</p>
-                <div class="card-stats">
-                    <div class="stat"><div class="stat-value">3.494</div><div class="stat-label">Regels</div></div>
-                    <div class="stat"><div class="stat-value">29</div><div class="stat-label">ECS Systems</div></div>
-                    <div class="stat"><div class="stat-value">20+</div><div class="stat-label">Components</div></div>
-                </div>
+                <h4 style="color: var(--gold);">AI Cinematics</h4>
+                <p>Cinematische cutscenes gegenereerd met AI, zoals de WarCraft III intro's. Tussen missies, bij story moments, bij epische veldslagen. Een preview van vijf seconden staat al op de Steun pagina.</p>
             </div>
         </div>
-        <div class="card">
+        <div class="card" style="border-color: rgba(212, 168, 71, 0.3);">
             <div class="card-body">
-                <h4 style="color: var(--gold);">🎆 Klapper van de Week</h4>
-                <p>Epic Replay met AI-commentator, echt Brabants weer in-game, seizoensevents, geheime Efteling-factie, GIF generator.</p>
-                <div class="card-stats">
-                    <div class="stat"><div class="stat-value">1.749</div><div class="stat-label">Regels</div></div>
-                    <div class="stat"><div class="stat-value">10</div><div class="stat-label">Features</div></div>
-                    <div class="stat"><div class="stat-value">10/10</div><div class="stat-label">WOW Factor</div></div>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h4 style="color: var(--limburg-primary);">⛏️ Limburgers Factie</h4>
-                <p>10 units, 10 buildings, underground tunnel-netwerk, tech tree, 156 voice lines in Limburgs dialect. Complete factie-specificatie.</p>
-                <div class="card-stats">
-                    <div class="stat"><div class="stat-value">10</div><div class="stat-label">Units</div></div>
-                    <div class="stat"><div class="stat-value">10</div><div class="stat-label">Buildings</div></div>
-                    <div class="stat"><div class="stat-value">156</div><div class="stat-label">Voice Lines</div></div>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h4 style="color: var(--belgen-primary);">🍟 Belgen Factie</h4>
-                <p>9 units, 12 buildings, diplomatie/compromis mechanic, Chocolade-Overtuiging, 135 voice lines in Vlaams dialect.</p>
-                <div class="card-stats">
-                    <div class="stat"><div class="stat-value">9</div><div class="stat-label">Units</div></div>
-                    <div class="stat"><div class="stat-value">12</div><div class="stat-label">Buildings</div></div>
-                    <div class="stat"><div class="stat-value">135</div><div class="stat-label">Voice Lines</div></div>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h4 style="color: var(--gold);">⚔️ Campaign 10-12</h4>
-                <p>De Raad van Brabant, De Slag om de A2 (384x384!), Het Gouden Worstenbroodje (3-fasen boss fight). Complete campaign finale.</p>
-                <div class="card-stats">
-                    <div class="stat"><div class="stat-value">3</div><div class="stat-label">Missies</div></div>
-                    <div class="stat"><div class="stat-value">384x384</div><div class="stat-label">Max Map</div></div>
-                    <div class="stat"><div class="stat-value">3</div><div class="stat-label">Boss Fasen</div></div>
-                </div>
+                <h4 style="color: var(--gold);">Professionele soundtrack</h4>
+                <p>De Suno-muziek aangevuld met orkestrale thema's per factie. Battle music die meebeweegt met de intensiteit van het gevecht. En een main theme dat je drie dagen in je hoofd zit.</p>
             </div>
         </div>
     </div>
+</section>
 
-    <div class="cost-highlight" style="margin-top: 2rem;">
-        <div class="big-number">33.000+</div>
-        <div class="cost-label">Regels TypeScript code + 67 bronbestanden + 166 tests</div>
-        <div style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">~30 parallelle AI agents over 3 sessies | github.com/RichardTheuws/reign-of-brabant</div>
+<!-- ===== 07: STEUN ===== -->
+<section id="steun">
+    <div class="cta-box">
+        <h3>Kies je factie. Word deel van het verhaal.</h3>
+        <p>Reign of Brabant is gratis en blijft gratis. Maar de AI-tools, hosting en toekomstige features kosten honderden euro's per maand. Met jouw steun wordt dit project sneller, groter en mooier. Stem een karakter in, ontwerp een missie, of gooi er gewoon een worstenbroodje bij.</p>
+        <div>
+            <a href="/steun/" class="btn btn-primary">Steun het project</a>
+            <a href="/play/" class="btn btn-ghost">Eerst zelf spelen</a>
+        </div>
+    </div>
+
+    <div class="quote" style="margin-top: 2rem;">
+        "Ik bouw dit sowieso. Maar met jullie erbij bouw ik het sneller, groter, en mooier. Elke bijdrage geeft je iets echt -- geen stickers, geen bedankkaartjes. Echte invloed op de game die je speelt."
+        <span class="author">-- Richard Theuws, solo dev, Brabander, eigenaar van een WarCraft tattoo</span>
     </div>
 </section>
 
 <!-- ===== FOOTER ===== -->
 <footer>
     <div class="footer-logo">Reign of Brabant</div>
-    <p>Development Bible v0.17.0 -- 8 april 2026</p>
-    <p style="margin-top: 0.5rem;">Gebouwd met Claude Code + Meshy Studio + Blender CLI + ElevenLabs + Suno + fal.ai</p>
-    <p style="margin-top: 0.5rem; color: var(--text-muted);">Game Master &times; Richard Theuws</p>
-    <p style="margin-top: 1rem;"><a href="../" style="color: var(--gold); text-decoration: none; font-weight: 600; border: 1px solid var(--gold); padding: 8px 24px; border-radius: 6px; display: inline-block; transition: all 0.2s;">Speel de Game</a></p>
-    <p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.8rem;">Van een typo ("Zu") tot een speelbare RTS met 4 facties, 25 missies en 39 unit types -- in 3 sessies.</p>
+    <p>Het Verhaal -- v0.20.0</p>
+    <p style="margin-top: 0.5rem;">Gebouwd met Claude Code, Meshy Studio, Blender CLI, ElevenLabs, Suno en fal.ai</p>
+    <p style="margin-top: 0.5rem; color: var(--text-muted);">Richard Theuws -- Brabander, ontwikkelaar, dromer</p>
+    <p style="margin-top: 1rem;">
+        <a href="/play/" style="color: var(--gold); text-decoration: none; font-weight: 600; border: 1px solid var(--gold); padding: 8px 24px; border-radius: 6px; display: inline-block; transition: all 0.2s;">Speel de Game</a>
+        <a href="/steun/" style="color: var(--text-secondary); text-decoration: none; font-weight: 600; border: 1px solid var(--border); padding: 8px 24px; border-radius: 6px; display: inline-block; transition: all 0.2s; margin-left: 0.5rem;">Steun het project</a>
+    </p>
 </footer>
 
 <script>
@@ -2635,33 +1130,6 @@ const observer = new IntersectionObserver(entries => {
 }, { threshold: 0.3 });
 
 sections.forEach(s => observer.observe(s));
-
-// ===== Gezelligheid animation on scroll =====
-const gezelObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.querySelectorAll('.gezelligheid-fill').forEach((bar, i) => {
-                setTimeout(() => {
-                    bar.style.width = bar.style.width; // trigger reflow
-                }, i * 300);
-            });
-        }
-    });
-}, { threshold: 0.5 });
-
-document.querySelectorAll('.mechanic-box.brabant').forEach(el => gezelObserver.observe(el));
-
-// ===== Voice playback =====
-// Wordt geactiveerd zodra echte ElevenLabs samples beschikbaar zijn
-// Audio bestanden komen in assets/audio/voices/<factie>/<unit>-<type>.mp3
-function playVoice(btn) {
-    const src = btn.dataset.src;
-    if (!src) return;
-    const audio = new Audio(src);
-    audio.play();
-    btn.innerHTML = '&#9632;';
-    audio.onended = () => { btn.innerHTML = '&#9654;'; };
-}
 </script>
 </body>
 </html>

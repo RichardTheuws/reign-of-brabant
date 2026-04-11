@@ -13,8 +13,8 @@ import { clone as skeletonClone } from 'three/addons/utils/SkeletonUtils.js';
 // Types
 // ---------------------------------------------------------------------------
 
-/** The three unit types available in the PoC. */
-export type UnitTypeName = 'worker' | 'infantry' | 'ranged';
+/** Unit types available for rendering (includes hero sub-types per faction). */
+export type UnitTypeName = 'worker' | 'infantry' | 'ranged' | 'hero0' | 'hero1';
 
 /** Faction identifier as stored in the ECS Faction.id component. */
 export const FACTION_ORANGE = 0;
@@ -41,6 +41,15 @@ const UNIT_MODEL_PATHS: Record<string, string> = {
   worker_3: '/assets/models/v02/belgen/worker.glb',
   infantry_3: '/assets/models/v02/belgen/infantry.glb',
   ranged_3: '/assets/models/v02/belgen/ranged.glb',
+  // Heroes (static fallback = same as animated path, they are self-contained GLBs)
+  hero0_0: '/assets/models/heroes/brabant-prins.glb',
+  hero1_0: '/assets/models/heroes/brabant-boer.glb',
+  hero0_1: '/assets/models/heroes/randstad-ceo.glb',
+  hero1_1: '/assets/models/heroes/randstad-politicus.glb',
+  hero0_2: '/assets/models/heroes/limburg-mijnbaas.glb',
+  hero1_2: '/assets/models/heroes/limburg-maasmeester.glb',
+  hero0_3: '/assets/models/heroes/belgen-frietkoning.glb',
+  hero1_3: '/assets/models/heroes/belgen-abdijbrouwer.glb',
 };
 
 const UNIT_MODEL_FALLBACKS: Record<string, string> = {
@@ -58,6 +67,15 @@ const UNIT_MODEL_FALLBACKS: Record<string, string> = {
   worker_3: '/assets/models/v01/brabanders/worker.glb',
   infantry_3: '/assets/models/v01/brabanders/infantry.glb',
   ranged_3: '/assets/models/v01/brabanders/ranged.glb',
+  // Heroes (fallback to infantry of same faction)
+  hero0_0: '/assets/models/v02/brabanders/infantry.glb',
+  hero1_0: '/assets/models/v02/brabanders/infantry.glb',
+  hero0_1: '/assets/models/v02/randstad/infantry.glb',
+  hero1_1: '/assets/models/v02/randstad/infantry.glb',
+  hero0_2: '/assets/models/v02/limburgers/infantry.glb',
+  hero1_2: '/assets/models/v02/limburgers/infantry.glb',
+  hero0_3: '/assets/models/v02/belgen/infantry.glb',
+  hero1_3: '/assets/models/v02/belgen/infantry.glb',
 };
 
 /** Animated model paths — only for (unitType, faction) combos that have skeletal animation. */
@@ -78,6 +96,15 @@ const ANIMATED_MODEL_PATHS: Record<string, string> = {
   worker_3: '/assets/models/v03/belgen/worker.glb',
   infantry_3: '/assets/models/v03/belgen/infantry.glb',
   ranged_3: '/assets/models/v03/belgen/ranged.glb',
+  // Heroes — unique models per faction (hero0 = primary, hero1 = secondary)
+  hero0_0: '/assets/models/heroes/brabant-prins.glb',
+  hero1_0: '/assets/models/heroes/brabant-boer.glb',
+  hero0_1: '/assets/models/heroes/randstad-ceo.glb',
+  hero1_1: '/assets/models/heroes/randstad-politicus.glb',
+  hero0_2: '/assets/models/heroes/limburg-mijnbaas.glb',
+  hero1_2: '/assets/models/heroes/limburg-maasmeester.glb',
+  hero0_3: '/assets/models/heroes/belgen-frietkoning.glb',
+  hero1_3: '/assets/models/heroes/belgen-abdijbrouwer.glb',
 };
 
 /** UnitAIState values (mirrored from types/index.ts to avoid circular imports). */
