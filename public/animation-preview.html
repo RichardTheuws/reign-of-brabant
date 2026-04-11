@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RoB Animation Preview</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a2e; color: #eee; font-family: monospace; overflow: hidden; }
+  canvas { display: block; }
+  #controls {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 10px; z-index: 10;
+  }
+  button {
+    padding: 10px 20px; border: 2px solid #ff8830; background: #2a2a4e;
+    color: #ff8830; font-family: monospace; font-size: 14px; cursor: pointer;
+    border-radius: 4px; transition: all 0.2s;
+  }
+  button:hover, button.active { background: #ff8830; color: #1a1a2e; }
+  #info {
+    position: fixed; top: 20px; left: 20px; z-index: 10;
+    font-size: 14px; line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+<div id="info">
+  <strong>Reign of Brabant — Animation Preview</strong><br>
+  Left: Infantry | Right: Worker (Meshy v6 + Blender auto-rig)<br>
+  <span id="anim-name">Animation: Idle</span>
+</div>
+<div id="controls">
+  <button class="active" data-anim="Idle">Idle</button>
+  <button data-anim="Walk">Walk</button>
+  <button data-anim="Attack">Attack</button>
+  <button data-anim="Death">Death</button>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// Scene setup
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1a1a2e);
+
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(0, 1.5, 4);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+document.body.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 0.8, 0);
+controls.update();
+
+// Lighting
+const ambientLight = new THREE.AmbientLight(0x404060, 1.5);
+scene.add(ambientLight);
+
+const dirLight = new THREE.DirectionalLight(0xffeedd, 2.0);
+dirLight.position.set(3, 5, 3);
+scene.add(dirLight);
+
+const backLight = new THREE.DirectionalLight(0x4488ff, 0.5);
+backLight.position.set(-2, 3, -3);
+scene.add(backLight);
+
+// Ground grid
+const grid = new THREE.GridHelper(6, 12, 0x333366, 0x222244);
+scene.add(grid);
+
+// Load both animated models side by side
+const loader = new GLTFLoader();
+const mixers = [];
+const allActions = {};
+let currentAnimName = 'Idle';
+
+const models = [
+  { path: 'assets/models/test/infantry-animated.glb', x: -1.2, label: 'Infantry' },
+  { path: 'assets/models/test/worker-animated.glb',   x:  1.2, label: 'Worker' },
+];
+
+for (const { path, x, label } of models) {
+  loader.load(path, (gltf) => {
+    const model = gltf.scene;
+    model.position.x = x;
+    scene.add(model);
+
+    // Put feet on ground
+    const box = new THREE.Box3().setFromObject(model);
+    model.position.y -= box.min.y;
+
+    // Animation mixer
+    const mixer = new THREE.AnimationMixer(model);
+    mixers.push(mixer);
+
+    console.log(`${label}: ${gltf.animations.length} animations`);
+    for (const clip of gltf.animations) {
+      console.log(`  ${clip.name}: ${clip.duration.toFixed(2)}s`);
+      const action = mixer.clipAction(clip);
+      if (!allActions[clip.name]) allActions[clip.name] = [];
+      allActions[clip.name].push(action);
+    }
+
+    // Play idle by default
+    if (allActions['Idle']) {
+      for (const a of allActions['Idle']) a.play();
+    }
+
+    // Skeleton helper
+    const skeleton = new THREE.SkeletonHelper(model);
+    skeleton.material.linewidth = 2;
+    scene.add(skeleton);
+  }, undefined, (err) => {
+    console.error(`Load error (${label}):`, err);
+  });
+}
+
+// Animation buttons — control both models simultaneously
+document.querySelectorAll('#controls button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const animName = btn.dataset.anim;
+    if (!allActions[animName]) return;
+
+    document.querySelectorAll('#controls button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('anim-name').textContent = `Animation: ${animName}`;
+
+    // Fade out current animation on all models
+    if (allActions[currentAnimName]) {
+      for (const a of allActions[currentAnimName]) a.fadeOut(0.3);
+    }
+
+    // Play new animation on all models
+    for (const a of allActions[animName]) {
+      a.reset().fadeIn(0.3).play();
+      if (animName === 'Death' || animName === 'Attack') {
+        a.setLoop(THREE.LoopOnce, 1);
+        a.clampWhenFinished = true;
+      } else {
+        a.setLoop(THREE.LoopRepeat, Infinity);
+      }
+    }
+
+    currentAnimName = animName;
+  });
+});
+
+// Render loop
+const clock = new THREE.Clock();
+function animate() {
+  requestAnimationFrame(animate);
+  const delta = clock.getDelta();
+  for (const m of mixers) m.update(delta);
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+
+// Resize
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>

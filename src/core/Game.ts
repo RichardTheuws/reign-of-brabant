@@ -12,7 +12,7 @@ import { addEntity, addComponent, hasComponent, query, entityExists } from 'bite
 import { world, resetGameWorld } from '../ecs/world';
 import { Position, Faction, Health, Attack, Armor, Movement, UnitType, UnitAI, Gatherer, Visibility, Building, Resource, Selected, Production, Rotation, GezeligheidBonus, Hero, HeroAbilities, RallyPoint } from '../ecs/components';
 import { IsUnit, IsBuilding, IsResource, IsWorker, IsDead, IsHero } from '../ecs/tags';
-import { FactionId, UnitTypeId, BuildingTypeId, HeroTypeId, UpgradeId, ResourceType, MAP_SIZE, UnitAIState, NO_PRODUCTION, NO_ENTITY, HERO_POPULATION_COST } from '../types/index';
+import { FactionId, UnitTypeId, BuildingTypeId, HeroTypeId, UpgradeId, ResourceType, MAP_SIZE, UnitAIState, NO_PRODUCTION, NO_ENTITY, HERO_POPULATION_COST, type UnitArchetype } from '../types/index';
 import { UNIT_ARCHETYPES, BUILDING_ARCHETYPES } from '../entities/archetypes';
 import { HERO_ARCHETYPES, getHeroTypesForFaction, getHeroArchetype } from '../entities/heroArchetypes';
 import { getFactionUnitArchetype } from '../data/factionData';
@@ -64,9 +64,10 @@ const FACTION_DEATH_COLORS: Record<number, number> = {
   [FactionId.Belgen]: 0xa01030,
 };
 
-function unitTypeName(unitType: number): 'worker' | 'infantry' | 'ranged' {
+function unitTypeName(unitType: number): 'worker' | 'infantry' | 'ranged' | 'heavy' {
   if (unitType === UnitTypeId.Worker) return 'worker';
   if (unitType === UnitTypeId.Ranged) return 'ranged';
+  if (unitType === UnitTypeId.Heavy) return 'heavy';
   return 'infantry';
 }
 
@@ -2867,7 +2868,12 @@ export class Game {
 
   private createUnitEntity(type: UnitTypeId, faction: FactionId, x: number, z: number): number {
     const eid = addEntity(world);
-    const arch = UNIT_ARCHETYPES[type];
+    let arch: UnitArchetype;
+    try {
+      arch = getFactionUnitArchetype(faction, type);
+    } catch {
+      arch = UNIT_ARCHETYPES[type];
+    }
     const y = this.terrain.getHeightAt(x, z);
 
     addComponent(world, eid, Position); Position.x[eid] = x; Position.y[eid] = y; Position.z[eid] = z;

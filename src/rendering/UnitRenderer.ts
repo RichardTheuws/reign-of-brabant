@@ -14,7 +14,7 @@ import { clone as skeletonClone } from 'three/addons/utils/SkeletonUtils.js';
 // ---------------------------------------------------------------------------
 
 /** Unit types available for rendering (includes hero sub-types per faction). */
-export type UnitTypeName = 'worker' | 'infantry' | 'ranged' | 'hero0' | 'hero1';
+export type UnitTypeName = 'worker' | 'infantry' | 'ranged' | 'heavy' | 'hero0' | 'hero1';
 
 /** Faction identifier as stored in the ECS Faction.id component. */
 export const FACTION_ORANGE = 0;
@@ -41,6 +41,11 @@ const UNIT_MODEL_PATHS: Record<string, string> = {
   worker_3: '/assets/models/v02/belgen/worker.glb',
   infantry_3: '/assets/models/v02/belgen/infantry.glb',
   ranged_3: '/assets/models/v02/belgen/ranged.glb',
+  // Heavy (fallback to infantry models until dedicated Heavy GLBs exist)
+  heavy_0: '/assets/models/v02/brabanders/infantry.glb',  // Tractorrijder (TODO: own model)
+  heavy_1: '/assets/models/v02/randstad/infantry.glb',     // CorporateAdvocaat (TODO: own model)
+  heavy_2: '/assets/models/v02/limburgers/infantry.glb',   // Mergelridder (TODO: own model)
+  heavy_3: '/assets/models/v02/belgen/infantry.glb',       // Frituurridder (TODO: own model)
   // Heroes (static fallback = same as animated path, they are self-contained GLBs)
   hero0_0: '/assets/models/heroes/brabant-prins.glb',
   hero1_0: '/assets/models/heroes/brabant-boer.glb',
@@ -67,6 +72,11 @@ const UNIT_MODEL_FALLBACKS: Record<string, string> = {
   worker_3: '/assets/models/v01/brabanders/worker.glb',
   infantry_3: '/assets/models/v01/brabanders/infantry.glb',
   ranged_3: '/assets/models/v01/brabanders/ranged.glb',
+  // Heavy (fallback to infantry v01)
+  heavy_0: '/assets/models/v01/brabanders/infantry.glb',
+  heavy_1: '/assets/models/v01/randstad/infantry.glb',
+  heavy_2: '/assets/models/v02/limburgers/infantry.glb',
+  heavy_3: '/assets/models/v02/belgen/infantry.glb',
   // Heroes (fallback to infantry of same faction)
   hero0_0: '/assets/models/v02/brabanders/infantry.glb',
   hero1_0: '/assets/models/v02/brabanders/infantry.glb',
@@ -96,6 +106,11 @@ const ANIMATED_MODEL_PATHS: Record<string, string> = {
   worker_3: '/assets/models/v03/belgen/worker.glb',
   infantry_3: '/assets/models/v03/belgen/infantry.glb',
   ranged_3: '/assets/models/v03/belgen/ranged.glb',
+  // Heavy (reuse infantry animations until dedicated Heavy GLBs exist)
+  heavy_0: '/assets/models/v03/brabanders/infantry.glb',
+  heavy_1: '/assets/models/v03/randstad/infantry.glb',
+  heavy_2: '/assets/models/v03/limburgers/infantry.glb',
+  heavy_3: '/assets/models/v03/belgen/infantry.glb',
   // Heroes — unique models per faction (hero0 = primary, hero1 = secondary)
   hero0_0: '/assets/models/heroes/brabant-prins.glb',
   hero1_0: '/assets/models/heroes/brabant-boer.glb',

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>RoB Voice Preview — Dialect Samples</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a2e; color: #e8e6e3; font-family: 'Segoe UI', system-ui, sans-serif; padding: 24px; }
+  h1 { color: #d4a853; margin-bottom: 8px; font-size: 1.4rem; }
+  p.sub { color: #888; margin-bottom: 32px; font-size: 0.85rem; }
+  .faction { margin-bottom: 36px; }
+  .faction h2 {
+    font-size: 1.1rem; padding: 8px 16px; border-radius: 6px; margin-bottom: 12px;
+    display: inline-block;
+  }
+  .faction.brabanders h2 { background: #ff8830; color: #1a1a2e; }
+  .faction.randstad h2 { background: #4070bb; color: #fff; }
+  .faction.limburgers h2 { background: #3a7d32; color: #fff; }
+  .faction.belgen h2 { background: #a01030; color: #fff; }
+  .faction.narrator h2 { background: #d4a853; color: #1a1a2e; }
+  .sample {
+    display: flex; align-items: center; gap: 16px;
+    padding: 10px 16px; margin: 4px 0; border-radius: 6px;
+    background: rgba(255,255,255,0.04); transition: background 0.2s;
+  }
+  .sample:hover { background: rgba(255,255,255,0.08); }
+  .sample .info { flex: 1; }
+  .sample .name { font-weight: 600; font-size: 0.95rem; }
+  .sample .desc { color: #999; font-size: 0.8rem; margin-top: 2px; }
+  audio { height: 32px; min-width: 280px; }
+  .now-playing {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: rgba(26,26,46,0.95); border-top: 1px solid #d4a853;
+    padding: 12px 24px; font-size: 0.85rem; color: #d4a853;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<h1>Reign of Brabant — Voice Preview</h1>
+<p class="sub">17 ElevenLabs dialect test samples. Klik play om te beluisteren.</p>
+
+<div class="faction brabanders">
+  <h2>Brabanders</h2>
+  <div class="sample">
+    <div class="info">
+      <div class="name">Richard (gekloond) — Primaire stem</div>
+      <div class="desc">Brabants accent, zachte g. "Houdoe en bedankt, ge zijt een echte held!"</div>
+    </div>
+    <audio controls preload="none" src="voice-preview/brabanders_test.mp3"></audio>
+  </div>
+  <div class="sample">
+    <div class="info">
+      <div class="name">Joost — Alternatief mannelijk</div>
+      <div class="desc">Brabantse stem uit shared library. Variatie op Richard.</div>
+    </div>
+    <audio controls preload="none" src="voice-preview/brabanders_joost_test.mp3"></audio>
+  </div>
+  <div class="sample">
+    <div class="info">
+      <div class="name">Roos — Boerinne (vrouwelijk)</div>
+      <div class="desc">Warm, jong, vrolijk. Support/healer karakter.</div>
+    </div>
+    <audio controls preload="none" src="voice-preview/brabanders_roos_boerinne_test.mp3"></audio>
+  </div>
+</div>
+
+<div class="faction randstad">
+  <h2>Randstad</h2>
+  <div class="sample">
+    <div class="info">
+      <div class="name">Serge de Beer — Primaire stem</div>
+      <div class="desc">Professioneel ABN. "Uitstekend, de kwartaalcijfers zijn boven verwachting."</div>
+    </div>
+    <audio controls preload="none" src="voice-preview/randstad_test.mp3"></audio>
+  </div>
+  <div class="sample">
+    <div class="info">
+      <div class="name">Daniel Wichers — Alternatief</div>
+      <div class="desc">Gooisch accent, casual corporate.</div>
+    </div>
+    <audio controls preload="none" src="voice-preview/randstad_daniel_test.mp3"></audio>
+  </div>
+  <div class="sample">
+    <div class="info">
+      <div class="name">Tijs — De CEO (hero)</div>
+      <div class="desc">Diep, autoritair, podcast-host kwaliteit.</div>
+    </div>
+    <audio controls preload="none" src="voice-preview/randstad_tijs_hero_test.mp3"></audio>
+  </div>
+</div>
+
+<div class="faction limburgers">
+  <h2>Limburgers</h2>
+  <div class="sample">
+    <div class="info">
+      <div class="name">Reinoud — "The Nasal Limburger"</div>
+      <div class="desc">Nasaal Limburgs accent. "Jao, dat is sjoen! De mijn is van os!"</div>
+    </div>
+    <audio controls preload="none" src="voice-preview/limburgers_reinoud_test.mp3"></audio>
+  </div>
+  <div class="sample">
+    <div class="info">
+      <div class="name">Nick — Alternatief</div>
+      <div class="desc">Limburgse coaching stem, helder.</div>
+    </div>
+    <audio controls preload="none" src="voice-preview/limburgers_nick_test.mp3"></audio>
+  </div>
+  <div class="sample">
+    <div class="info">
+      <div class="name">Luk Balcer — Mijnbaas (hero)</div>
+      <div class="desc">55 jaar, Belgisch Limburg, wijs en diep.</div>
+    </div>
+    <audio controls preload="none" src="voice-preview/limburgers_luk_test.mp3"></audio>
+  </div>
+  <div class="sample">
+    <div class="info">
+      <div class="name">Bart — Belgisch Limburgs</div>
+      <div class="desc">Informatief, diep, Belgisch accent.</div>
+    </div>
+    <audio controls preload="none" src="voice-preview/limburgers_bart_test.mp3"></audio>
+  </div>
+  <div class="sample">
+    <div class="info">
+      <div class="name">Reinoud (language_code test)</div>
+      <div class="desc">Zelfde stem, andere language_code instellingen.</div>
+    </div>
+    <audio controls preload="none" src="voice-preview/limburgers_langcode_test.mp3"></audio>
+  </div>
+  <div class="sample">
+    <div class="info">
+      <div class="name">Melanie — Vrouwelijk (met dialect tekst)</div>
+      <div class="desc">Standaard NL stem met Limburgse woorden in tekst.</div>
+    </div>
+    <audio controls preload="none" src="voice-preview/limburgers_test.mp3"></audio>
+  </div>
+</div>
+
+<div class="faction belgen">
+  <h2>Belgen</h2>
+  <div class="sample">
+    <div class="info">
+      <div class="name">Hans Claesen — Primaire stem</div>
+      <div class="desc">Vlaams accent. "Allez, we gaan ervoor! Nog een frietje erbij?"</div>
+    </div>
+    <audio controls preload="none" src="voice-preview/belgen_test.mp3"></audio>
+  </div>
+  <div class="sample">
+    <div class="info">
+      <div class="name">Walter — Frietkoning (hero)</div>
+      <div class="desc">Warm, professioneel Belgisch, storytelling kwaliteit.</div>
+    </div>
+    <audio controls preload="none" src="voice-preview/belgen_walter_hero_test.mp3"></audio>
+  </div>
+  <div class="sample">
+    <div class="info">
+      <div class="name">Petra Vlaams — Wafelzuster (vrouwelijk)</div>
+      <div class="desc">Energiek, Vlaams, professioneel.</div>
+    </div>
+    <audio controls preload="none" src="voice-preview/belgen_petra_female_test.mp3"></audio>
+  </div>
+</div>
+
+<div class="faction narrator">
+  <h2>Narrators</h2>
+  <div class="sample">
+    <div class="info">
+      <div class="name">Eric Cinematic — Epische narrator</div>
+      <div class="desc">Diep, cinematisch. Campaign briefings.</div>
+    </div>
+    <audio controls preload="none" src="voice-preview/narrator_epic_test.mp3"></audio>
+  </div>
+  <div class="sample">
+    <div class="info">
+      <div class="name">Melanie — Vrouwelijke narrator</div>
+      <div class="desc">Professioneel, helder. Meest gebruikte NL stem op ElevenLabs.</div>
+    </div>
+    <audio controls preload="none" src="voice-preview/narrator_melanie_test.mp3"></audio>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1567,11 +1567,11 @@ const MISSION_9_RAAD: MissionDefinition = {
 // ---------------------------------------------------------------------------
 
 const M10_SABOTAGE_NORTH_X = 0;
-const M10_SABOTAGE_NORTH_Z = 100;
-const M10_SABOTAGE_WEST_X = -80;
-const M10_SABOTAGE_WEST_Z = 60;
-const M10_SABOTAGE_EAST_X = 80;
-const M10_SABOTAGE_EAST_Z = 60;
+const M10_SABOTAGE_NORTH_Z = 62;
+const M10_SABOTAGE_WEST_X = -50;
+const M10_SABOTAGE_WEST_Z = 37;
+const M10_SABOTAGE_EAST_X = 50;
+const M10_SABOTAGE_EAST_Z = 37;
 
 const MISSION_10_RAAD: MissionDefinition = {
   id: 'brabant-10-de-raad-van-brabant',
@@ -1591,77 +1591,77 @@ const MISSION_10_RAAD: MissionDefinition = {
     'de Randstad stuurt saboteurs om de boel te saboteren. Bescherm de kathedraal. ' +
     'Bescherm de alliantie. En bereid je voor op oorlog.',
 
-  mapSize: 256,
+  mapSize: 128,
   startingGold: 600,
   startingGoldAI: 0,
 
   buildings: [
     // Player: base south of the cathedral
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: 0, z: -20, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: 10, z: -20, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: -10, z: -20, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.LumberCamp, x: 0, z: -30, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Blacksmith, x: 10, z: -30, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: 0, z: -12, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: 6, z: -12, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: -6, z: -12, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.LumberCamp, x: 0, z: -19, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Blacksmith, x: 6, z: -19, complete: true },
     // Limburgse bondgenoot basis (oost) — represented by AI-friendly barracks
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: 80, z: 0, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: 50, z: 0, complete: true },
     // Belgische bondgenoot basis (west)
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: -80, z: 0, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: -50, z: 0, complete: true },
   ],
 
   units: [
     // Player: 8 workers, 6 infantry (Carnavalvierders), 4 ranged (Sluipers), 2 ranged (Boerinnen equivalent)
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -3, z: -18 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -18 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -18 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 3, z: -18 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -3, z: -16 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -16 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -16 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 3, z: -16 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -2, z: -11 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -11 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -11 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 2, z: -11 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -2, z: -10 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -10 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -10 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 2, z: -10 },
     // Infantry (Carnavalvierders)
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 8, z: -18 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 10, z: -18 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 12, z: -18 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 8, z: -16 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 10, z: -16 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 12, z: -16 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 5, z: -11 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 6, z: -11 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 7, z: -11 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 5, z: -10 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 6, z: -10 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 7, z: -10 },
     // Ranged (Sluipers)
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -8, z: -18 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -10, z: -18 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -8, z: -16 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -10, z: -16 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -5, z: -11 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -6, z: -11 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -5, z: -10 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -6, z: -10 },
     // Limburgse bondgenoot units (oost)
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 78, z: -2 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 80, z: -2 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 82, z: -2 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 78, z: 2 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 80, z: 2 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 82, z: 2 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 84, z: 0 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 76, z: 0 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 48, z: -1 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 50, z: -1 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 51, z: -1 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 48, z: 1 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 50, z: 1 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 51, z: 1 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 52, z: 0 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 47, z: 0 },
     // Belgische bondgenoot units (west)
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -78, z: -2 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -80, z: -2 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -82, z: -2 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -78, z: 2 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -80, z: 2 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -82, z: 2 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -84, z: 0 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -76, z: 0 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -48, z: -1 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -50, z: -1 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -51, z: -1 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -48, z: 1 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -50, z: 1 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -51, z: 1 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -52, z: 0 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -47, z: 0 },
   ],
 
   goldMines: [
-    { x: -20, z: -30, amount: 3000 },
-    { x: 20, z: -30, amount: 3000 },
-    { x: -60, z: 40, amount: 2000 }, // Contested — past de Dieze
-    { x: 60, z: 40, amount: 2000 },  // Contested — past de Dieze
+    { x: -12, z: -19, amount: 3000 },
+    { x: 12, z: -19, amount: 3000 },
+    { x: -37, z: 25, amount: 2000 }, // Contested — past de Dieze
+    { x: 37, z: 25, amount: 2000 },  // Contested — past de Dieze
   ],
 
   treeResources: [
-    { x: -40, z: -40, amount: 800 },
-    { x: 40, z: -40, amount: 800 },
-    { x: -30, z: -10, amount: 600 },
-    { x: 30, z: -10, amount: 600 },
+    { x: -25, z: -25, amount: 800 },
+    { x: 25, z: -25, amount: 800 },
+    { x: -19, z: -6, amount: 600 },
+    { x: 19, z: -6, amount: 600 },
   ],
 
   objectives: [
@@ -1748,8 +1748,8 @@ const MISSION_10_RAAD: MissionDefinition = {
         {
           type: 'spawn-units',
           units: [
-            { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -5, z: 5 },
-            { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 5, z: 5 },
+            { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -3, z: 3 },
+            { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 3, z: 3 },
           ],
         },
       ],
@@ -1863,17 +1863,17 @@ const MISSION_10_RAAD: MissionDefinition = {
 // ---------------------------------------------------------------------------
 
 const M11_A2_NORTH_X = 0;
-const M11_A2_NORTH_Z = 170;
-const M11_WEST_FLANK_X = -120;
-const M11_WEST_FLANK_Z = 100;
-const M11_EAST_FLANK_X = 120;
-const M11_EAST_FLANK_Z = 100;
+const M11_A2_NORTH_Z = 62;
+const M11_WEST_FLANK_X = -44;
+const M11_WEST_FLANK_Z = 36;
+const M11_EAST_FLANK_X = 44;
+const M11_EAST_FLANK_Z = 36;
 const M11_FORT_DENBOSCH_X = 0;
-const M11_FORT_DENBOSCH_Z = -60;
-const M11_FORT_VEGHEL_X = 80;
-const M11_FORT_VEGHEL_Z = 20;
-const M11_FORT_BEST_X = -80;
-const M11_FORT_BEST_Z = 20;
+const M11_FORT_DENBOSCH_Z = -22;
+const M11_FORT_VEGHEL_X = 29;
+const M11_FORT_VEGHEL_Z = 7;
+const M11_FORT_BEST_X = -29;
+const M11_FORT_BEST_Z = 7;
 
 const MISSION_11_A2: MissionDefinition = {
   id: 'brabant-11-de-slag-om-de-a2',
@@ -1892,107 +1892,107 @@ const MISSION_11_A2: MissionDefinition = {
     'waarop we laten zien dat het zuiden nie buigt.\n\n' +
     'Win, en de weg naar de Randstad ligt open. Verlies... en er IS geen Brabant meer.',
 
-  mapSize: 384,
+  mapSize: 128,
   startingGold: 800,
   startingGoldAI: 0,
 
   buildings: [
     // Fort Den Bosch (south-center) — player main base
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: M11_FORT_DENBOSCH_X, z: M11_FORT_DENBOSCH_Z, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M11_FORT_DENBOSCH_X + 10, z: M11_FORT_DENBOSCH_Z, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M11_FORT_DENBOSCH_X - 10, z: M11_FORT_DENBOSCH_Z, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.LumberCamp, x: M11_FORT_DENBOSCH_X, z: M11_FORT_DENBOSCH_Z - 10, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Blacksmith, x: M11_FORT_DENBOSCH_X + 10, z: M11_FORT_DENBOSCH_Z - 10, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M11_FORT_DENBOSCH_X + 4, z: M11_FORT_DENBOSCH_Z, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M11_FORT_DENBOSCH_X - 4, z: M11_FORT_DENBOSCH_Z, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.LumberCamp, x: M11_FORT_DENBOSCH_X, z: M11_FORT_DENBOSCH_Z - 4, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Blacksmith, x: M11_FORT_DENBOSCH_X + 4, z: M11_FORT_DENBOSCH_Z - 4, complete: true },
     // Fort Veghel (center-east) — allied outpost
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: M11_FORT_VEGHEL_X, z: M11_FORT_VEGHEL_Z, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M11_FORT_VEGHEL_X + 8, z: M11_FORT_VEGHEL_Z, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M11_FORT_VEGHEL_X + 3, z: M11_FORT_VEGHEL_Z, complete: true },
     // Fort Best (center-west) — allied outpost
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: M11_FORT_BEST_X, z: M11_FORT_BEST_Z, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M11_FORT_BEST_X - 8, z: M11_FORT_BEST_Z, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M11_FORT_BEST_X - 3, z: M11_FORT_BEST_Z, complete: true },
     // Randstad Veldkwartier (mobile HQ — represented as a northern TownHall)
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: M11_A2_NORTH_X, z: 140, complete: true },
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: M11_A2_NORTH_X + 10, z: 140, complete: true },
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: M11_A2_NORTH_X - 10, z: 140, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: M11_A2_NORTH_X, z: 51, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: M11_A2_NORTH_X + 4, z: 51, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: M11_A2_NORTH_X - 4, z: 51, complete: true },
   ],
 
   units: [
     // Fort Den Bosch garrison — 10 infantry + 6 ranged + 6 workers
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -3, z: -58 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -58 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -58 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 3, z: -58 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -3, z: -56 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -56 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 8, z: -58 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 10, z: -58 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 12, z: -58 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 14, z: -58 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 8, z: -56 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 10, z: -56 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 12, z: -56 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 14, z: -56 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -8, z: -58 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -10, z: -58 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -8, z: -56 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -10, z: -56 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -12, z: -56 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -12, z: -58 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -14, z: -56 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -14, z: -58 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -21 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 0, z: -21 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 0, z: -22 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -21 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -20 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 0, z: -20 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 3, z: -21 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 4, z: -21 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 4, z: -22 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 5, z: -21 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 3, z: -20 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 4, z: -20 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 4, z: -19 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 5, z: -20 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -3, z: -21 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -4, z: -21 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -3, z: -20 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -4, z: -20 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -4, z: -19 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -4, z: -22 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -5, z: -20 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -5, z: -21 },
     // Fort Veghel garrison — 12 infantry + 4 ranged
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 78, z: 18 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 80, z: 18 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 82, z: 18 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 84, z: 18 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 78, z: 22 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 80, z: 22 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 82, z: 22 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 84, z: 22 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 76, z: 20 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 86, z: 20 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 78, z: 24 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 82, z: 24 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 80, z: 24 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 84, z: 24 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 76, z: 22 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 86, z: 22 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 28, z: 7 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 29, z: 7 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 30, z: 7 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 31, z: 7 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 28, z: 8 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 29, z: 8 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 30, z: 8 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 31, z: 8 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 28, z: 6 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 31, z: 6 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 28, z: 9 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 30, z: 9 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 29, z: 9 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 31, z: 9 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 28, z: 5 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 31, z: 5 },
     // Fort Best garrison — 10 infantry + 4 ranged
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -78, z: 18 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -80, z: 18 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -82, z: 18 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -84, z: 18 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -78, z: 22 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -80, z: 22 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -82, z: 22 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -84, z: 22 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -76, z: 20 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -86, z: 20 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -80, z: 24 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -84, z: 24 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -76, z: 22 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -86, z: 22 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -28, z: 7 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -29, z: 7 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -30, z: 7 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -31, z: 7 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -28, z: 8 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -29, z: 8 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -30, z: 8 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -31, z: 8 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -28, z: 6 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -31, z: 6 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -29, z: 9 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -31, z: 9 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -28, z: 5 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -31, z: 5 },
     // Veldkwartier guards
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -2, z: 138 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 2, z: 138 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -2, z: 142 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 2, z: 142 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -5, z: 140 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 5, z: 140 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -1, z: 50 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 1, z: 50 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -1, z: 52 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 1, z: 52 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -2, z: 51 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 2, z: 51 },
   ],
 
   goldMines: [
-    { x: -20, z: -70, amount: 4000 },
-    { x: 20, z: -70, amount: 4000 },
-    { x: M11_FORT_VEGHEL_X, z: M11_FORT_VEGHEL_Z - 15, amount: 3000 },
-    { x: M11_FORT_BEST_X, z: M11_FORT_BEST_Z - 15, amount: 3000 },
-    { x: 0, z: 50, amount: 2500 },  // Contested — in no-man's land
+    { x: -7, z: -26, amount: 4000 },
+    { x: 7, z: -26, amount: 4000 },
+    { x: M11_FORT_VEGHEL_X, z: M11_FORT_VEGHEL_Z - 5, amount: 3000 },
+    { x: M11_FORT_BEST_X, z: M11_FORT_BEST_Z - 5, amount: 3000 },
+    { x: 0, z: 18, amount: 2500 },  // Contested — in no-man's land
   ],
 
   treeResources: [
-    { x: -40, z: -50, amount: 1000 },
-    { x: 40, z: -50, amount: 1000 },
-    { x: -60, z: 10, amount: 800 },
-    { x: 60, z: 10, amount: 800 },
+    { x: -15, z: -18, amount: 1000 },
+    { x: 15, z: -18, amount: 1000 },
+    { x: -22, z: 4, amount: 800 },
+    { x: 22, z: 4, amount: 800 },
   ],
 
   objectives: [
@@ -2176,9 +2176,9 @@ const MISSION_11_A2: MissionDefinition = {
       index: 0,
       spawnTime: 180,
       units: [
-        ...createWaveUnits(12, UnitTypeId.Infantry, M11_A2_NORTH_X, M11_A2_NORTH_Z, 8),
-        ...createWaveUnits(4, UnitTypeId.Ranged, M11_A2_NORTH_X + 10, M11_A2_NORTH_Z, 4),
-        ...createWaveUnits(2, UnitTypeId.Infantry, M11_A2_NORTH_X - 10, M11_A2_NORTH_Z, 2),
+        ...createWaveUnits(12, UnitTypeId.Infantry, M11_A2_NORTH_X, M11_A2_NORTH_Z, 3),
+        ...createWaveUnits(4, UnitTypeId.Ranged, M11_A2_NORTH_X + 4, M11_A2_NORTH_Z, 2),
+        ...createWaveUnits(2, UnitTypeId.Infantry, M11_A2_NORTH_X - 4, M11_A2_NORTH_Z, 1),
       ],
       message: 'Golf 1 van 6 — Voorhoede',
     },
@@ -2187,10 +2187,10 @@ const MISSION_11_A2: MissionDefinition = {
       index: 1,
       spawnTime: 480,
       units: [
-        ...createWaveUnits(10, UnitTypeId.Infantry, M11_WEST_FLANK_X, M11_WEST_FLANK_Z, 6),
-        ...createWaveUnits(4, UnitTypeId.Ranged, M11_WEST_FLANK_X + 10, M11_WEST_FLANK_Z, 4),
-        ...createWaveUnits(3, UnitTypeId.Ranged, M11_WEST_FLANK_X + 5, M11_WEST_FLANK_Z - 5, 3),
-        ...createWaveUnits(2, UnitTypeId.Infantry, M11_WEST_FLANK_X + 15, M11_WEST_FLANK_Z, 2),
+        ...createWaveUnits(10, UnitTypeId.Infantry, M11_WEST_FLANK_X, M11_WEST_FLANK_Z, 2),
+        ...createWaveUnits(4, UnitTypeId.Ranged, M11_WEST_FLANK_X + 4, M11_WEST_FLANK_Z, 2),
+        ...createWaveUnits(3, UnitTypeId.Ranged, M11_WEST_FLANK_X + 2, M11_WEST_FLANK_Z - 2, 1),
+        ...createWaveUnits(2, UnitTypeId.Infantry, M11_WEST_FLANK_X + 5, M11_WEST_FLANK_Z, 1),
       ],
       message: 'Golf 2 van 6 — Westvleugel naar Fort Best',
     },
@@ -2199,9 +2199,9 @@ const MISSION_11_A2: MissionDefinition = {
       index: 2,
       spawnTime: 780,
       units: [
-        ...createWaveUnits(12, UnitTypeId.Infantry, M11_EAST_FLANK_X, M11_EAST_FLANK_Z, 7),
-        ...createWaveUnits(6, UnitTypeId.Ranged, M11_EAST_FLANK_X - 10, M11_EAST_FLANK_Z, 5),
-        ...createWaveUnits(2, UnitTypeId.Infantry, M11_EAST_FLANK_X - 5, M11_EAST_FLANK_Z + 5, 2),
+        ...createWaveUnits(12, UnitTypeId.Infantry, M11_EAST_FLANK_X, M11_EAST_FLANK_Z, 3),
+        ...createWaveUnits(6, UnitTypeId.Ranged, M11_EAST_FLANK_X - 4, M11_EAST_FLANK_Z, 2),
+        ...createWaveUnits(2, UnitTypeId.Infantry, M11_EAST_FLANK_X - 2, M11_EAST_FLANK_Z + 2, 1),
       ],
       message: 'Golf 3 van 6 — Oostvleugel + De CEO',
     },
@@ -2211,11 +2211,11 @@ const MISSION_11_A2: MissionDefinition = {
       spawnTime: 1080,
       units: [
         // West pincer
-        ...createWaveUnits(8, UnitTypeId.Infantry, M11_WEST_FLANK_X + 20, M11_WEST_FLANK_Z + 20, 5),
-        ...createWaveUnits(3, UnitTypeId.Ranged, M11_WEST_FLANK_X + 25, M11_WEST_FLANK_Z + 20, 3),
+        ...createWaveUnits(8, UnitTypeId.Infantry, M11_WEST_FLANK_X + 7, M11_WEST_FLANK_Z + 7, 2),
+        ...createWaveUnits(3, UnitTypeId.Ranged, M11_WEST_FLANK_X + 9, M11_WEST_FLANK_Z + 7, 1),
         // East pincer
-        ...createWaveUnits(8, UnitTypeId.Infantry, M11_EAST_FLANK_X - 20, M11_EAST_FLANK_Z + 20, 5),
-        ...createWaveUnits(3, UnitTypeId.Ranged, M11_EAST_FLANK_X - 25, M11_EAST_FLANK_Z + 20, 3),
+        ...createWaveUnits(8, UnitTypeId.Infantry, M11_EAST_FLANK_X - 7, M11_EAST_FLANK_Z + 7, 2),
+        ...createWaveUnits(3, UnitTypeId.Ranged, M11_EAST_FLANK_X - 9, M11_EAST_FLANK_Z + 7, 1),
       ],
       message: 'Golf 4 van 6 — Tangbeweging!',
     },
@@ -2224,11 +2224,11 @@ const MISSION_11_A2: MissionDefinition = {
       index: 4,
       spawnTime: 1440,
       units: [
-        ...createWaveUnits(15, UnitTypeId.Infantry, M11_A2_NORTH_X, M11_A2_NORTH_Z, 10),
-        ...createWaveUnits(8, UnitTypeId.Ranged, M11_A2_NORTH_X, M11_A2_NORTH_Z + 10, 6),
-        ...createWaveUnits(4, UnitTypeId.Infantry, M11_WEST_FLANK_X + 40, M11_WEST_FLANK_Z + 10, 3),
-        ...createWaveUnits(3, UnitTypeId.Ranged, M11_EAST_FLANK_X - 40, M11_EAST_FLANK_Z + 10, 3),
-        ...createWaveUnits(2, UnitTypeId.Infantry, M11_A2_NORTH_X + 30, M11_A2_NORTH_Z, 2),
+        ...createWaveUnits(15, UnitTypeId.Infantry, M11_A2_NORTH_X, M11_A2_NORTH_Z, 4),
+        ...createWaveUnits(8, UnitTypeId.Ranged, M11_A2_NORTH_X, M11_A2_NORTH_Z + 4, 2),
+        ...createWaveUnits(4, UnitTypeId.Infantry, M11_WEST_FLANK_X + 15, M11_WEST_FLANK_Z + 4, 1),
+        ...createWaveUnits(3, UnitTypeId.Ranged, M11_EAST_FLANK_X - 15, M11_EAST_FLANK_Z + 4, 1),
+        ...createWaveUnits(2, UnitTypeId.Infantry, M11_A2_NORTH_X + 11, M11_A2_NORTH_Z, 1),
       ],
       message: 'Golf 5 van 6 — HOOFDMACHT!',
     },
@@ -2238,14 +2238,14 @@ const MISSION_11_A2: MissionDefinition = {
       spawnTime: 1800,
       units: [
         // Main A2 push
-        ...createWaveUnits(20, UnitTypeId.Infantry, M11_A2_NORTH_X, M11_A2_NORTH_Z, 12),
-        ...createWaveUnits(10, UnitTypeId.Ranged, M11_A2_NORTH_X, M11_A2_NORTH_Z + 5, 8),
+        ...createWaveUnits(20, UnitTypeId.Infantry, M11_A2_NORTH_X, M11_A2_NORTH_Z, 4),
+        ...createWaveUnits(10, UnitTypeId.Ranged, M11_A2_NORTH_X, M11_A2_NORTH_Z + 2, 3),
         // West flank
-        ...createWaveUnits(4, UnitTypeId.Infantry, M11_WEST_FLANK_X + 30, M11_WEST_FLANK_Z + 30, 4),
-        ...createWaveUnits(2, UnitTypeId.Ranged, M11_WEST_FLANK_X + 35, M11_WEST_FLANK_Z + 30, 2),
+        ...createWaveUnits(4, UnitTypeId.Infantry, M11_WEST_FLANK_X + 11, M11_WEST_FLANK_Z + 11, 2),
+        ...createWaveUnits(2, UnitTypeId.Ranged, M11_WEST_FLANK_X + 13, M11_WEST_FLANK_Z + 11, 1),
         // East flank
-        ...createWaveUnits(4, UnitTypeId.Infantry, M11_EAST_FLANK_X - 30, M11_EAST_FLANK_Z + 30, 4),
-        ...createWaveUnits(2, UnitTypeId.Ranged, M11_EAST_FLANK_X - 35, M11_EAST_FLANK_Z + 30, 2),
+        ...createWaveUnits(4, UnitTypeId.Infantry, M11_EAST_FLANK_X - 11, M11_EAST_FLANK_Z + 11, 2),
+        ...createWaveUnits(2, UnitTypeId.Ranged, M11_EAST_FLANK_X - 13, M11_EAST_FLANK_Z + 11, 1),
       ],
       message: 'GOLF 6 — ALLES OF NIETS!',
     },
@@ -2265,12 +2265,12 @@ const MISSION_11_A2: MissionDefinition = {
 // ---------------------------------------------------------------------------
 
 const M12_PLAYER_BASE_X = 0;
-const M12_PLAYER_BASE_Z = -130;
-const M12_RING1_Z = -40;
-const M12_RING2_Z = 30;
-const M12_RING3_Z = 100;
+const M12_PLAYER_BASE_Z = -60;
+const M12_RING1_Z = -18;
+const M12_RING2_Z = 14;
+const M12_RING3_Z = 46;
 const M12_TOWER_X = 0;
-const M12_TOWER_Z = 120;
+const M12_TOWER_Z = 55;
 
 const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
   id: 'brabant-12-het-gouden-worstenbroodje',
@@ -2296,189 +2296,189 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
     'Brabant buigt nie.\n\n' +
     'VOOR HET WORSTENBROODJE!',
 
-  mapSize: 320,
+  mapSize: 128,
   startingGold: 700,
   startingGoldAI: 2000,
 
   buildings: [
     // Player base (south — open polder)
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: M12_PLAYER_BASE_X, z: M12_PLAYER_BASE_Z, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M12_PLAYER_BASE_X + 10, z: M12_PLAYER_BASE_Z, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M12_PLAYER_BASE_X - 10, z: M12_PLAYER_BASE_Z, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.LumberCamp, x: M12_PLAYER_BASE_X + 10, z: M12_PLAYER_BASE_Z - 10, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Blacksmith, x: M12_PLAYER_BASE_X - 10, z: M12_PLAYER_BASE_Z - 10, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M12_PLAYER_BASE_X + 5, z: M12_PLAYER_BASE_Z, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M12_PLAYER_BASE_X - 5, z: M12_PLAYER_BASE_Z, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.LumberCamp, x: M12_PLAYER_BASE_X + 5, z: M12_PLAYER_BASE_Z - 5, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Blacksmith, x: M12_PLAYER_BASE_X - 5, z: M12_PLAYER_BASE_Z - 5, complete: true },
     // Ring 1 — Buitenwijken (2 Barracks as Kantoor-torens at city gates)
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: -40, z: M12_RING1_Z, complete: true },
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 40, z: M12_RING1_Z, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: -18, z: M12_RING1_Z, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 18, z: M12_RING1_Z, complete: true },
     // Ring 2 — Bedrijventerrein (2 Barracks as Coworking Spaces + Politicus patrol zone)
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: -30, z: M12_RING2_Z, complete: true },
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 30, z: M12_RING2_Z, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: -14, z: M12_RING2_Z, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 14, z: M12_RING2_Z, complete: true },
     // Ring 3 — Centrum (TownHall as Corporate Tower, surrounded by Barracks as Kantoor-torens)
     { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: M12_TOWER_X, z: M12_TOWER_Z, complete: true },
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: M12_TOWER_X - 20, z: M12_RING3_Z, complete: true },
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: M12_TOWER_X + 20, z: M12_RING3_Z, complete: true },
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: M12_TOWER_X, z: M12_RING3_Z - 15, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: M12_TOWER_X - 9, z: M12_RING3_Z, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: M12_TOWER_X + 9, z: M12_RING3_Z, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: M12_TOWER_X, z: M12_RING3_Z - 7, complete: true },
   ],
 
   units: [
     // Player starting army: 8 workers + 10 infantry + 6 ranged
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -3, z: -128 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -128 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -128 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 3, z: -128 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -3, z: -126 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -126 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -126 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 3, z: -126 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -59 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 0, z: -59 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 0, z: -60 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -59 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -58 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 0, z: -58 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 0, z: -57 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -58 },
     // Infantry
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 8, z: -128 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 10, z: -128 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 12, z: -128 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 14, z: -128 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 16, z: -128 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 8, z: -126 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 10, z: -126 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 12, z: -126 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 14, z: -126 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 16, z: -126 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 4, z: -59 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 5, z: -59 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 6, z: -59 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 6, z: -60 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 7, z: -59 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 4, z: -58 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 5, z: -58 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 6, z: -58 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 6, z: -57 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 7, z: -58 },
     // Ranged
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -8, z: -128 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -10, z: -128 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -12, z: -128 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -8, z: -126 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -10, z: -126 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -12, z: -126 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -4, z: -59 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -5, z: -59 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -6, z: -59 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -4, z: -58 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -5, z: -58 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -6, z: -58 },
     // Limburgse bondgenoten (east flank)
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 80, z: -110 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 82, z: -110 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 84, z: -110 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 80, z: -108 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 82, z: -108 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 84, z: -108 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 86, z: -110 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 86, z: -108 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 78, z: -110 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 78, z: -108 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 80, z: -106 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 82, z: -106 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 84, z: -106 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 86, z: -106 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 88, z: -110 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 37, z: -51 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 38, z: -51 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 39, z: -51 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 37, z: -50 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 38, z: -50 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 39, z: -50 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 39, z: -52 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 40, z: -50 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 36, z: -51 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 36, z: -50 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 37, z: -49 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 38, z: -49 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 39, z: -49 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 40, z: -49 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 40, z: -51 },
     // Belgische bondgenoten (west flank)
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -80, z: -110 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -82, z: -110 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -84, z: -110 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -80, z: -108 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -82, z: -108 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -84, z: -108 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -78, z: -110 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -78, z: -108 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -80, z: -106 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -82, z: -106 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -84, z: -106 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -86, z: -110 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -37, z: -51 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -38, z: -51 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -39, z: -51 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -37, z: -50 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -38, z: -50 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -39, z: -50 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -36, z: -51 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -36, z: -50 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -37, z: -49 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -38, z: -49 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -39, z: -49 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -39, z: -52 },
 
     // --- ENEMY FORCES ---
     // Ring 1 — Buitenwijken: 10 Infantry (Managers) + 4 Ranged (Consultants) + 4 Infantry (Hipsters)
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -30, z: -45 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -25, z: -45 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -20, z: -42 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 20, z: -42 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 25, z: -45 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 30, z: -45 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -10, z: -38 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 10, z: -38 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 0, z: -42 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 5, z: -42 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -35, z: -40 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 35, z: -40 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -15, z: -38 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 15, z: -38 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -45, z: -38 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 45, z: -38 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -50, z: -35 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 50, z: -35 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -14, z: -21 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -11, z: -21 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -9, z: -19 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 9, z: -19 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 11, z: -21 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 14, z: -21 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -5, z: -17 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 5, z: -17 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 0, z: -19 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 2, z: -19 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -16, z: -18 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 16, z: -18 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -7, z: -17 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 7, z: -17 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -21, z: -17 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 21, z: -17 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -23, z: -16 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 23, z: -16 },
 
     // Ring 2 — Bedrijventerrein: 14 Infantry + 6 Ranged (Corporate Advocaten) + 4 Ranged (HR) + 3 Ranged (Influencers)
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -25, z: 25 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -20, z: 25 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -15, z: 28 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -10, z: 28 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -5, z: 30 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 0, z: 30 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 5, z: 30 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 10, z: 28 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 15, z: 28 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 20, z: 25 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 25, z: 25 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -35, z: 30 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 35, z: 30 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 0, z: 35 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -28, z: 32 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 28, z: 32 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -20, z: 32 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 20, z: 32 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -10, z: 34 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 10, z: 34 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -11, z: 11 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -9, z: 11 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -7, z: 13 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -5, z: 13 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -2, z: 14 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 0, z: 14 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 2, z: 14 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 5, z: 13 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 7, z: 13 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 9, z: 11 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 11, z: 11 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -16, z: 14 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 16, z: 14 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 0, z: 16 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -13, z: 15 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 13, z: 15 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -9, z: 15 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 9, z: 15 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -5, z: 16 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 5, z: 16 },
     // Politicus elite escorte
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -5, z: 32 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 5, z: 32 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 0, z: 28 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -3, z: 33 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 3, z: 33 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -15, z: 35 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 15, z: 35 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 0, z: 37 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -2, z: 15 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 2, z: 15 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 0, z: 13 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -1, z: 15 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 1, z: 15 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -7, z: 16 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 7, z: 16 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 0, z: 17 },
 
     // Ring 3 — Centrum: 12 Infantry + 8 Ranged + 4 Infantry (siege defense)
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -15, z: 95 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -10, z: 95 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -5, z: 98 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 0, z: 98 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 5, z: 98 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 10, z: 95 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 15, z: 95 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -20, z: 100 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 20, z: 100 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -15, z: 105 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 15, z: 105 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 0, z: 105 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -18, z: 102 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 18, z: 102 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -10, z: 102 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 10, z: 102 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -5, z: 108 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 5, z: 108 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -10, z: 110 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 10, z: 110 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -7, z: 44 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -5, z: 44 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -2, z: 45 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 0, z: 45 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 2, z: 45 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 5, z: 44 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 7, z: 44 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -9, z: 46 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 9, z: 46 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -7, z: 48 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 7, z: 48 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 0, z: 48 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -8, z: 47 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 8, z: 47 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -5, z: 47 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 5, z: 47 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -2, z: 50 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 2, z: 50 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -5, z: 51 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 5, z: 51 },
     // Siege defenders (Vastgoedmakelaars)
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -22, z: 98 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 22, z: 98 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -22, z: 105 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 22, z: 105 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -10, z: 45 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 10, z: 45 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -10, z: 48 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 10, z: 48 },
 
     // Corporate Tower guards (CEO bodyguards) — 4 elite Infantry
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -3, z: 118 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 3, z: 118 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -3, z: 122 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 3, z: 122 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -1, z: 54 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 1, z: 54 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -1, z: 56 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 1, z: 56 },
     // CEO himself (represented as Ranged — uses ranged attacks from the tower)
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 0, z: 120 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 0, z: 55 },
   ],
 
   goldMines: [
-    { x: M12_PLAYER_BASE_X - 30, z: M12_PLAYER_BASE_Z - 10, amount: 4000 },
-    { x: M12_PLAYER_BASE_X + 30, z: M12_PLAYER_BASE_Z - 10, amount: 4000 },
-    { x: M12_PLAYER_BASE_X, z: M12_PLAYER_BASE_Z + 20, amount: 3000 },
-    { x: 60, z: -80, amount: 2500 },   // Near east flank approach
-    { x: -60, z: -80, amount: 2500 },  // Near west flank approach
+    { x: M12_PLAYER_BASE_X - 14, z: M12_PLAYER_BASE_Z - 5, amount: 4000 },
+    { x: M12_PLAYER_BASE_X + 14, z: M12_PLAYER_BASE_Z - 5, amount: 4000 },
+    { x: M12_PLAYER_BASE_X, z: M12_PLAYER_BASE_Z + 9, amount: 3000 },
+    { x: 28, z: -37, amount: 2500 },   // Near east flank approach
+    { x: -28, z: -37, amount: 2500 },  // Near west flank approach
   ],
 
   treeResources: [
-    { x: -50, z: -130, amount: 1000 },
-    { x: 50, z: -130, amount: 1000 },
-    { x: -30, z: -110, amount: 800 },
-    { x: 30, z: -110, amount: 800 },
+    { x: -23, z: -60, amount: 1000 },
+    { x: 23, z: -60, amount: 1000 },
+    { x: -14, z: -51, amount: 800 },
+    { x: 14, z: -51, amount: 800 },
   ],
 
   objectives: [
@@ -2528,8 +2528,8 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
         {
           type: 'spawn-units',
           units: [
-            ...createWaveUnits(6, UnitTypeId.Infantry, -20, -50, 4),
-            ...createWaveUnits(3, UnitTypeId.Ranged, 20, -50, 3),
+            ...createWaveUnits(6, UnitTypeId.Infantry, -9, -23, 2),
+            ...createWaveUnits(3, UnitTypeId.Ranged, 9, -23, 1),
           ],
         },
       ],
@@ -2547,8 +2547,8 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
         {
           type: 'spawn-units',
           units: [
-            ...createWaveUnits(8, UnitTypeId.Infantry, 0, 40, 5),
-            ...createWaveUnits(4, UnitTypeId.Ranged, 0, 45, 3),
+            ...createWaveUnits(8, UnitTypeId.Infantry, 0, 18, 2),
+            ...createWaveUnits(4, UnitTypeId.Ranged, 0, 21, 1),
           ],
         },
       ],
@@ -2563,9 +2563,9 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
         {
           type: 'spawn-units',
           units: [
-            ...createWaveUnits(6, UnitTypeId.Infantry, -30, 35, 4),
-            ...createWaveUnits(6, UnitTypeId.Infantry, 30, 35, 4),
-            ...createWaveUnits(3, UnitTypeId.Ranged, 0, 38, 3),
+            ...createWaveUnits(6, UnitTypeId.Infantry, -14, 16, 2),
+            ...createWaveUnits(6, UnitTypeId.Infantry, 14, 16, 2),
+            ...createWaveUnits(3, UnitTypeId.Ranged, 0, 17, 1),
           ],
         },
       ],
@@ -2590,9 +2590,9 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
         {
           type: 'spawn-units',
           units: [
-            ...createWaveUnits(8, UnitTypeId.Infantry, 0, 100, 6),
-            ...createWaveUnits(4, UnitTypeId.Ranged, -10, 105, 4),
-            ...createWaveUnits(4, UnitTypeId.Ranged, 10, 105, 4),
+            ...createWaveUnits(8, UnitTypeId.Infantry, 0, 46, 3),
+            ...createWaveUnits(4, UnitTypeId.Ranged, -5, 48, 2),
+            ...createWaveUnits(4, UnitTypeId.Ranged, 5, 48, 2),
           ],
         },
       ],
@@ -2611,7 +2611,7 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
           type: 'spawn-units',
           units: [
             // Stagiaires shield
-            ...createWaveUnits(4, UnitTypeId.Infantry, 0, 115, 3),
+            ...createWaveUnits(4, UnitTypeId.Infantry, 0, 53, 1),
           ],
         },
       ],
@@ -2630,9 +2630,9 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
           type: 'spawn-units',
           units: [
             // Desperate reinforcements
-            ...createWaveUnits(6, UnitTypeId.Infantry, -15, 120, 4),
-            ...createWaveUnits(6, UnitTypeId.Infantry, 15, 120, 4),
-            ...createWaveUnits(3, UnitTypeId.Ranged, 0, 125, 3),
+            ...createWaveUnits(6, UnitTypeId.Infantry, -7, 55, 2),
+            ...createWaveUnits(6, UnitTypeId.Infantry, 7, 55, 2),
+            ...createWaveUnits(3, UnitTypeId.Ranged, 0, 57, 1),
           ],
         },
       ],
@@ -2650,8 +2650,8 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
         {
           type: 'spawn-units',
           units: [
-            ...createWaveUnits(10, UnitTypeId.Infantry, 0, 130, 8),
-            ...createWaveUnits(5, UnitTypeId.Ranged, 0, 135, 5),
+            ...createWaveUnits(10, UnitTypeId.Infantry, 0, 60, 4),
+            ...createWaveUnits(5, UnitTypeId.Ranged, 0, 62, 2),
           ],
         },
       ],
@@ -2666,8 +2666,8 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
         {
           type: 'spawn-units',
           units: [
-            ...createWaveUnits(5, UnitTypeId.Infantry, -60, 0, 4),
-            ...createWaveUnits(2, UnitTypeId.Ranged, -55, 5, 2),
+            ...createWaveUnits(5, UnitTypeId.Infantry, -28, 0, 2),
+            ...createWaveUnits(2, UnitTypeId.Ranged, -25, 2, 1),
           ],
         },
       ],
@@ -2681,8 +2681,8 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
         {
           type: 'spawn-units',
           units: [
-            ...createWaveUnits(5, UnitTypeId.Infantry, 60, 0, 4),
-            ...createWaveUnits(2, UnitTypeId.Ranged, 55, 5, 2),
+            ...createWaveUnits(5, UnitTypeId.Infantry, 28, 0, 2),
+            ...createWaveUnits(2, UnitTypeId.Ranged, 25, 2, 1),
           ],
         },
       ],
@@ -4498,55 +4498,55 @@ const RANDSTAD_MISSION_3_VIJANDIGE_OVERNAME: MissionDefinition = {
     'onze jaarcijfers bladzijden hebben. Gebruik Managers op afstand en vermijd direct ' +
     'melee-contact. Dit is geen vergadering — dit is oorlog.',
 
-  mapSize: 192,
+  mapSize: 128,
   startingGold: 350,
   startingGoldAI: 200,
 
   buildings: [
     // Player base — southwest corner
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: -70, z: -70, complete: true },
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: -62, z: -70, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: -59, z: -59, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: -52, z: -59, complete: true },
     // Limburger mining operation 1 — center-north
-    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.TownHall, x: 0, z: 40, complete: true },
-    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.Barracks, x: 8, z: 40, complete: true },
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.TownHall, x: 0, z: 34, complete: true },
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.Barracks, x: 7, z: 34, complete: true },
     // Limburger mining operation 2 — east
-    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.TownHall, x: 60, z: 0, complete: true },
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.TownHall, x: 50, z: 0, complete: true },
   ],
 
   units: [
     // Player: 5 Stagiairs + 2 Managers
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -67, z: -68 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -65, z: -68 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -63, z: -68 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -67, z: -66 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -65, z: -66 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -60, z: -66 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -58, z: -66 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -56, z: -57 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -54, z: -57 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -53, z: -57 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -56, z: -55 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -54, z: -55 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -50, z: -55 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -49, z: -55 },
     // Limburger defenders — operation 1 (north)
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -2, z: 38 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 2, z: 38 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 0, z: 36 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: -3, z: 42 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 3, z: 42 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -2, z: 32 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 2, z: 32 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 0, z: 30 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: -3, z: 35 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 3, z: 35 },
     // Limburger defenders — operation 2 (east)
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 58, z: -2 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 62, z: -2 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 60, z: 2 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 49, z: -2 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 52, z: -2 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 50, z: 2 },
   ],
 
   goldMines: [
-    { x: -60, z: -70, amount: 2000 },
-    { x: -70, z: -60, amount: 2000 },
-    { x: -30, z: -30, amount: 2500 },
-    { x: 0, z: 50, amount: 3000 },
-    { x: 60, z: 10, amount: 3000 },
+    { x: -50, z: -59, amount: 2000 },
+    { x: -59, z: -50, amount: 2000 },
+    { x: -25, z: -25, amount: 2500 },
+    { x: 0, z: 42, amount: 3000 },
+    { x: 50, z: 8, amount: 3000 },
   ],
 
   treeResources: [
-    { x: -65, z: -60, amount: 1000 },
-    { x: -55, z: -65, amount: 1000 },
-    { x: -30, z: -40, amount: 800 },
-    { x: 10, z: 30, amount: 800 },
+    { x: -54, z: -50, amount: 1000 },
+    { x: -46, z: -54, amount: 1000 },
+    { x: -25, z: -34, amount: 800 },
+    { x: 8, z: 25, amount: 800 },
   ],
 
   objectives: [
@@ -4577,10 +4577,10 @@ const RANDSTAD_MISSION_3_VIJANDIGE_OVERNAME: MissionDefinition = {
         {
           type: 'spawn-units',
           units: [
-            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -20, z: 70 },
-            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -18, z: 72 },
-            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -22, z: 72 },
-            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: -20, z: 74 },
+            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -17, z: 59 },
+            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -15, z: 60 },
+            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -18, z: 60 },
+            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: -17, z: 62 },
           ],
         },
       ],
@@ -4594,11 +4594,11 @@ const RANDSTAD_MISSION_3_VIJANDIGE_OVERNAME: MissionDefinition = {
         {
           type: 'spawn-units',
           units: [
-            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 70, z: -30 },
-            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 72, z: -28 },
-            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 68, z: -28 },
-            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 74, z: -30 },
-            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 70, z: -26 },
+            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 59, z: -25 },
+            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 60, z: -23 },
+            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 57, z: -23 },
+            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 62, z: -25 },
+            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 59, z: -22 },
           ],
         },
       ],
@@ -4841,87 +4841,87 @@ const RANDSTAD_MISSION_5_BOARDROOM_BESLISSING: MissionDefinition = {
     'totale overwinning.\n\n' +
     'Dit wordt de langste vergadering ooit. Maar aan het einde tekent iedereen.',
 
-  mapSize: 256,
+  mapSize: 128,
   startingGold: 600,
   startingGoldAI: 400,
 
   buildings: [
     // Player base — south-center
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: 0, z: -90, complete: true },
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 8, z: -90, complete: true },
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: -8, z: -90, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: 0, z: -59, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 5, z: -59, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: -5, z: -59, complete: true },
     // Brabanders base — southeast
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: 80, z: -60, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: 88, z: -60, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: 52, z: -39, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: 57, z: -39, complete: true },
     // Limburgers base — northeast
-    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.TownHall, x: 80, z: 60, complete: true },
-    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.Barracks, x: 88, z: 60, complete: true },
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.TownHall, x: 52, z: 39, complete: true },
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.Barracks, x: 57, z: 39, complete: true },
     // Belgen base — northwest
-    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.TownHall, x: -80, z: 60, complete: true },
-    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.Barracks, x: -88, z: 60, complete: true },
+    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.TownHall, x: -52, z: 39, complete: true },
+    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.Barracks, x: -57, z: 39, complete: true },
   ],
 
   units: [
     // Player: 8 Stagiairs + 4 Managers + 2 Consultants
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -3, z: -88 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -1, z: -88 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: 1, z: -88 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: 3, z: -88 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -3, z: -86 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -1, z: -86 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: 1, z: -86 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: 3, z: -86 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 10, z: -88 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 12, z: -88 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -10, z: -88 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -12, z: -88 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 10, z: -86 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -10, z: -86 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -2, z: -57 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -1, z: -57 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: 1, z: -57 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: 2, z: -57 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -2, z: -56 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -1, z: -56 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: 1, z: -56 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: 2, z: -56 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 7, z: -57 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 8, z: -57 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -7, z: -57 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -8, z: -57 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 7, z: -56 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -7, z: -56 },
     // Brabanders defenders (southeast) — 6 units
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 78, z: -58 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 82, z: -58 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 80, z: -56 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 78, z: -62 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 82, z: -62 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Heavy, x: 80, z: -64 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 51, z: -38 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 54, z: -38 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 52, z: -37 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 51, z: -40 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 54, z: -40 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Heavy, x: 52, z: -42 },
     // Limburgers defenders (northeast) — 6 units
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 78, z: 58 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 82, z: 58 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 80, z: 56 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 80, z: 64 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 78, z: 62 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 82, z: 62 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 51, z: 38 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 54, z: 38 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 52, z: 37 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 52, z: 42 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 51, z: 40 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 54, z: 40 },
     // Belgen defenders (northwest) — 5 units
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -78, z: 58 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -82, z: 58 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -80, z: 56 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -78, z: 62 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -82, z: 62 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -51, z: 38 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -54, z: 38 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -52, z: 37 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -51, z: 40 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -54, z: 40 },
   ],
 
   goldMines: [
     // Player area
-    { x: -10, z: -95, amount: 3000 },
-    { x: 10, z: -95, amount: 3000 },
-    { x: 0, z: -75, amount: 2500 },
+    { x: -7, z: -62, amount: 3000 },
+    { x: 7, z: -62, amount: 3000 },
+    { x: 0, z: -49, amount: 2500 },
     // Center contested
     { x: 0, z: 0, amount: 4000 },
-    { x: -30, z: -30, amount: 2500 },
-    { x: 30, z: -30, amount: 2500 },
+    { x: -20, z: -20, amount: 2500 },
+    { x: 20, z: -20, amount: 2500 },
     // Near enemies
-    { x: 70, z: -55, amount: 2000 },
-    { x: 70, z: 55, amount: 2000 },
-    { x: -70, z: 55, amount: 2000 },
+    { x: 46, z: -36, amount: 2000 },
+    { x: 46, z: 36, amount: 2000 },
+    { x: -46, z: 36, amount: 2000 },
   ],
 
   treeResources: [
-    { x: -15, z: -85, amount: 1200 },
-    { x: 15, z: -85, amount: 1200 },
-    { x: -20, z: -70, amount: 1000 },
-    { x: 20, z: -70, amount: 1000 },
-    { x: 0, z: -50, amount: 800 },
-    { x: -40, z: 0, amount: 800 },
-    { x: 40, z: 0, amount: 800 },
+    { x: -10, z: -55, amount: 1200 },
+    { x: 10, z: -55, amount: 1200 },
+    { x: -13, z: -46, amount: 1000 },
+    { x: 13, z: -46, amount: 1000 },
+    { x: 0, z: -33, amount: 800 },
+    { x: -26, z: 0, amount: 800 },
+    { x: 26, z: 0, amount: 800 },
   ],
 
   objectives: [
@@ -4953,10 +4953,10 @@ const RANDSTAD_MISSION_5_BOARDROOM_BESLISSING: MissionDefinition = {
         {
           type: 'spawn-units',
           units: [
-            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 60, z: -40 },
-            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 58, z: -38 },
-            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 62, z: -38 },
-            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 60, z: -36 },
+            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 39, z: -26 },
+            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 38, z: -25 },
+            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 40, z: -25 },
+            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 39, z: -23 },
           ],
         },
       ],
@@ -4970,11 +4970,11 @@ const RANDSTAD_MISSION_5_BOARDROOM_BESLISSING: MissionDefinition = {
         {
           type: 'spawn-units',
           units: [
-            { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -60, z: 40 },
-            { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -58, z: 38 },
-            { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -62, z: 38 },
-            { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -58, z: 42 },
-            { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -62, z: 42 },
+            { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -39, z: 26 },
+            { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -38, z: 25 },
+            { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -40, z: 25 },
+            { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -38, z: 27 },
+            { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -40, z: 27 },
           ],
         },
       ],
@@ -4988,11 +4988,11 @@ const RANDSTAD_MISSION_5_BOARDROOM_BESLISSING: MissionDefinition = {
         {
           type: 'spawn-units',
           units: [
-            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 60, z: 40 },
-            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 58, z: 42 },
-            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 56, z: 38 },
-            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 62, z: 38 },
-            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 60, z: 44 },
+            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 39, z: 26 },
+            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 38, z: 27 },
+            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 37, z: 25 },
+            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 40, z: 25 },
+            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 39, z: 29 },
           ],
         },
       ],
@@ -5007,17 +5007,17 @@ const RANDSTAD_MISSION_5_BOARDROOM_BESLISSING: MissionDefinition = {
           type: 'spawn-units',
           units: [
             // Brabanders van het zuiden
-            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 40, z: -70 },
-            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 42, z: -68 },
-            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 38, z: -68 },
+            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 26, z: -46 },
+            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 27, z: -44 },
+            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 25, z: -44 },
             // Belgen van het westen
-            { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -40, z: -20 },
-            { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -38, z: -18 },
-            { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -42, z: -18 },
+            { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -26, z: -13 },
+            { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -25, z: -12 },
+            { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -27, z: -12 },
             // Limburgers van het noorden
-            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 0, z: 50 },
-            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -2, z: 48 },
-            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 2, z: 48 },
+            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 0, z: 33 },
+            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -1, z: 31 },
+            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 1, z: 31 },
           ],
         },
       ],

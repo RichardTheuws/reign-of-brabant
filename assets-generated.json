@@ -1,0 +1,15 @@
+{
+  "generated": "2026-04-11",
+  "assets": [
+    {
+      "file": "public/assets/og/og-main.png",
+      "model": "fal-ai/flux/dev",
+      "prompt": "Epic fantasy RTS battle scene, aerial isometric perspective, four rival medieval armies clashing on lush green Dutch Brabant countryside, windmills and fortified towns in background, warm golden sunset lighting, dramatic clouds, banners and flags waving, cavalry charges and infantry formations, a giant golden sausage roll pastry on a war banner as faction symbol, Warcraft style key art, cinematic composition, detailed miniature war game aesthetic, rich saturated colors, no text",
+      "size": "1200x630",
+      "copies": [
+        "public/assets/og/og-landing.png",
+        "public/assets/og/og-play.png"
+      ]
+    }
+  ]
+}

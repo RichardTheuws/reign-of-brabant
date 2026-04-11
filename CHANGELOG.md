@@ -1,5 +1,41 @@
 # Changelog
 
+## [0.22.0] - 2026-04-11
+
+### Added
+- **Social share buttons** -- WhatsApp, Facebook, LinkedIn, Telegram, X op steun, het-verhaal en bedankt pagina's
+- **/deel/ pagina** -- Social sharing hub met kant-en-klare berichten per platform en UTM tracking
+- **Heavy unit type** -- UnitTypeId.Heavy volledig werkend met faction-specifieke archetypes (Tractorrijder, Corporate Advocaat, Mergelridder, Frituurridder)
+- **Heavy model rendering** -- UnitRenderer model mappings voor heavy_0-3 (infantry fallback)
+- **Social media profielfoto's** -- 3 unieke 1080x1080 karakterportretten (Prins, CEO, Frietkoning) via Flux Pro
+- **Cinematic images** -- Landscape (1920x1080) en portrait (1080x1920) key art voor social media
+- **Deploy validatie gate** -- Pre-deploy check: public/dist file parity, minimum asset counts, entry point verificatie
+- **Post-deploy HTTP verificatie** -- Automatische 200-check op 5 kritieke URLs na deploy
+- **Server architectuur documentatie** -- docs/server-architecture.md met volledige M4 topology
+
+### Fixed
+- **Play page OG image** -- Gebruikte hero-banner.webp i.p.v. og-play, nu correct
+- **Heavy unit crash** -- Missie "Vijandige Overname" (Randstad) hing op 85% door UnitTypeId.Heavy zonder archetype
+- **Out-of-bounds missie coordinaten** -- 5 missies (randstad-3/5, brabant-10/11/12) geschaald naar map bounds (max +/-62)
+- **OG images te groot voor WhatsApp** -- PNG (994KB) geconverteerd naar JPG (226KB), WhatsApp previews werken nu
+- **Missende assets na deploy** -- Stale dist/ veroorzaakte 251 ontbrekende bestanden, opgelost door clean build pipeline
+
+### Changed
+- **OG meta tags** -- og:locale (nl_NL) en og:site_name (Reign of Brabant) toegevoegd aan alle 12 pagina's
+- **OG images formaat** -- PNG naar JPG voor alle 9 OG images (70-80% kleiner)
+- **Bedankt pagina share buttons** -- WhatsApp + Facebook + LinkedIn toegevoegd naast bestaande X + Copy
+- **Deploy script** -- Altijd clean build (rm -rf dist), validatie gate, HTTP verificatie, veilige rsync
+- **Mollie betaalsleutel** -- Test key vervangen door live key, betalingen actief
+- **Game.ts createUnitEntity** -- Gebruikt nu getFactionUnitArchetype() met legacy fallback i.p.v. directe UNIT_ARCHETYPES index
+- **factionData.ts** -- Heavy units (4 facties) typeId gecorrigeerd van Infantry naar Heavy
+
+### Documentation
+- **Social media strategie** -- research/social-media-strategy.md (4-weken plan, 5 platforms)
+- **Social content drafts** -- research/social-content-ready.md (kant-en-klare posts)
+- **Social image checklist** -- research/social-image-checklist.md (65 assets, 10 screenshot momenten)
+- **itch.io + IndieDB drafts** -- research/listings/itch-indiedb-draft.md + Reddit posts
+- **Server architectuur** -- docs/server-architecture.md
+
 ## [0.21.0] - 2026-04-11
 
 ### Added

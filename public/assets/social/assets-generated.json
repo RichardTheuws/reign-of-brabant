@@ -1,0 +1,40 @@
+{
+  "generated": "2026-04-11",
+  "assets": [
+    {
+      "file": "profile-instagram.png",
+      "model": "fal-ai/flux-pro/v1.1",
+      "prompt": "Close-up portrait of a medieval Dutch prince holding a golden worstenbroodje (sausage roll) like a scepter, wearing an orange crown, dramatic lighting, fantasy game art style, rich warm colors, humorous regal expression, square format, no text",
+      "size": "1080x1080",
+      "use": "Instagram profile picture - Brabander faction (Prins van Brabant)"
+    },
+    {
+      "file": "profile-facebook.png",
+      "model": "fal-ai/flux-pro/v1.1",
+      "prompt": "Close-up portrait of a corporate CEO in an expensive blue suit holding a laptop like a shield and a graph-shaped sword, medieval fantasy style mixed with modern corporate, dramatic lighting, satirical heroic pose, game art, square format, no text",
+      "size": "1080x1080",
+      "use": "Facebook profile picture - Randstad faction (The CEO)"
+    },
+    {
+      "file": "profile-x.png",
+      "model": "fal-ai/flux-pro/v1.1",
+      "prompt": "Close-up portrait of a Belgian medieval knight made entirely of french fries and beer, wearing golden armor, holding a giant deep fryer as weapon, dramatic fantasy lighting, humorous game art style, rich warm colors, square format, no text",
+      "size": "1080x1080",
+      "use": "X/Twitter profile picture - Belgen faction (De Frietkoning)"
+    },
+    {
+      "file": "cinematic-landscape.png",
+      "model": "fal-ai/flux-pro/v1.1",
+      "prompt": "Epic wide cinematic shot of a fantasy medieval Dutch battlefield, four armies facing each other: orange medieval farmers with carnival floats, blue corporate knights with laptop shields, green underground miners with pickaxes, red Belgian knights with beer barrels as weapons, dramatic sunset lighting, rolling hills with windmills and tulips, WarCraft game art style, detailed fantasy landscape, 16:9 widescreen cinematic, no text",
+      "size": "1920x1080",
+      "use": "Cinematic landscape - social media banner, YouTube cover, press kit"
+    },
+    {
+      "file": "cinematic-portrait.png",
+      "model": "fal-ai/flux-pro/v1.1",
+      "prompt": "Vertical epic fantasy poster of four faction leaders standing dramatically: an orange-crowned prince holding a golden sausage roll scepter, a blue-suited CEO with spreadsheet magic, a green-helmeted mine boss with a glowing pickaxe, a red-caped fry king with a golden deep fryer, dark moody background with faction banners and medieval castle, fantasy game art poster style, dramatic lighting from below, tall vertical format, no text",
+      "size": "1080x1920",
+      "use": "Cinematic portrait - Instagram/TikTok stories, vertical social media"
+    }
+  ]
+}

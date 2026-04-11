@@ -261,7 +261,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
     },
     // Tractorrijder (Heavy / Cavalry) [Tier 2] -- mid-tank, mid-speed for Brabanders
     {
-      typeId: UnitTypeId.Infantry,
+      typeId: UnitTypeId.Heavy,
       name: 'Tractorrijder',
       brabantName: 'Tractorrijder',
       hp: 200,
@@ -423,7 +423,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
     },
     // Corporate Advocaat (Heavy melee) [Tier 2] -- expensive powerhouse
     {
-      typeId: UnitTypeId.Infantry,
+      typeId: UnitTypeId.Heavy,
       name: 'Corporate Advocaat',
       brabantName: 'Corporate Advocaat',
       hp: 190,
@@ -545,7 +545,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
     },
     // Mergelridder (Heavy / Cavalry) -- tankiest unit in the game, very slow
     {
-      typeId: UnitTypeId.Infantry,
+      typeId: UnitTypeId.Heavy,
       name: 'Mergelridder',
       brabantName: 'Mergelridder',
       hp: 280,
@@ -706,7 +706,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
     },
     // Frituurridder (Heavy / Cavalry) -- aggressive heavy, lower armor than Mergelridder
     {
-      typeId: UnitTypeId.Infantry,
+      typeId: UnitTypeId.Heavy,
       name: 'Frituurridder',
       brabantName: 'Frituurridder',
       hp: 200,
