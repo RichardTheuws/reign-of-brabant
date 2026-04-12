@@ -124,7 +124,6 @@ export class Tutorial {
   /** DOM overlay element. */
   private overlayEl: HTMLElement | null = null;
   private messageEl: HTMLElement | null = null;
-  private arrowEl: HTMLElement | null = null;
   private skipBtn: HTMLElement | null = null;
   private stepCounterEl: HTMLElement | null = null;
 
@@ -229,9 +228,6 @@ export class Tutorial {
     if (this.messageEl) {
       this.messageEl.textContent = 'Tutorial voltooid! Veel succes, opzichter!';
     }
-    if (this.arrowEl) {
-      this.arrowEl.style.display = 'none';
-    }
     if (this.skipBtn) {
       this.skipBtn.style.display = 'none';
     }
@@ -255,14 +251,6 @@ export class Tutorial {
     if (this.stepCounterEl) {
       this.stepCounterEl.textContent = `${this.currentStepIndex + 1} / ${this.steps.length}`;
     }
-    if (this.arrowEl) {
-      if (step.highlight) {
-        this.arrowEl.style.display = 'block';
-        this.arrowEl.dataset.target = step.highlight;
-      } else {
-        this.arrowEl.style.display = 'none';
-      }
-    }
   }
 
   private createOverlay(): void {
@@ -274,17 +262,11 @@ export class Tutorial {
     overlay.innerHTML = `
       <div class="tutorial-panel">
         <div class="tutorial-header">
-          <span class="tutorial-icon">&#x1F4D6;</span>
           <span class="tutorial-title">Tutorial</span>
           <span class="tutorial-step-counter" id="tutorial-step-counter">1 / ${this.steps.length}</span>
         </div>
         <div class="tutorial-message" id="tutorial-message"></div>
         <button class="tutorial-skip-btn" id="tutorial-skip-btn">Overslaan</button>
-      </div>
-      <div class="tutorial-arrow" id="tutorial-arrow" style="display: none;">
-        <svg width="32" height="32" viewBox="0 0 32 32">
-          <polygon points="16,4 28,28 16,20 4,28" fill="#d4a853" stroke="#8B6914" stroke-width="1.5"/>
-        </svg>
       </div>
     `;
 
@@ -292,7 +274,6 @@ export class Tutorial {
 
     this.overlayEl = overlay;
     this.messageEl = overlay.querySelector('#tutorial-message');
-    this.arrowEl = overlay.querySelector('#tutorial-arrow');
     this.skipBtn = overlay.querySelector('#tutorial-skip-btn');
     this.stepCounterEl = overlay.querySelector('#tutorial-step-counter');
 
@@ -306,7 +287,6 @@ export class Tutorial {
       this.overlayEl.remove();
       this.overlayEl = null;
       this.messageEl = null;
-      this.arrowEl = null;
       this.skipBtn = null;
       this.stepCounterEl = null;
     }

@@ -259,15 +259,20 @@ setGameFlowDeps({
 
     game.update(dt);
 
-    // Update tutorial if active
+    // Update tutorial if active — only track the condition for the CURRENT step
+    // to prevent auto-gather/auto-assign from skipping ahead
     if (tutorialActive && tutorial.isActive) {
-      // Feed game state into tutorial
       tutorialState.gold = game.getPlayerGold();
-      tutorialState.workerSelected = game.hasWorkerSelected();
-      tutorialState.gatheringStarted = game.hasGatheringStarted();
-      tutorialState.barracksBuilt = game.hasBarracksBuilt();
-      tutorialState.unitTrained = game.hasUnitTrained();
-      tutorialState.attackIssued = game.hasAttackIssued();
+      const step = tutorial.stepIndex;
+      // Step 0: cameraMoved (tracked above via camera position delta)
+      // Step 1: auto-advance (minimap info)
+      if (step >= 2) tutorialState.workerSelected = game.hasWorkerSelected();
+      if (step >= 3) tutorialState.gatheringStarted = game.hasGatheringStarted();
+      // Step 4: auto-advance (info)
+      if (step >= 5) tutorialState.barracksBuilt = game.hasBarracksBuilt();
+      // Step 6: auto-advance (info)
+      if (step >= 7) tutorialState.unitTrained = game.hasUnitTrained();
+      if (step >= 8) tutorialState.attackIssued = game.hasAttackIssued();
 
       tutorial.update(dt, tutorialState);
     }
@@ -318,12 +323,23 @@ setGameFlowDeps({
     initialCameraX = cameraIntroTargetX;
     initialCameraZ = cameraIntroTargetZ;
 
-    // Start tutorial if in tutorial mode
+    // Start tutorial AFTER camera intro completes (3.5s)
     if (tutorialActive) {
-      tutorial.start(() => {
-        // Tutorial completed -- just continue playing
-        tutorialActive = false;
-      });
+      setTimeout(() => {
+        // Reset state right before tutorial starts so auto-gather doesn't pre-fill
+        tutorialState.cameraMoved = false;
+        tutorialState.workerSelected = false;
+        tutorialState.gatheringStarted = false;
+        tutorialState.barracksBuilt = false;
+        tutorialState.unitTrained = false;
+        tutorialState.attackIssued = false;
+        // Re-record camera position so movement is tracked from here
+        initialCameraX = rtsCamera.camera.position.x;
+        initialCameraZ = rtsCamera.camera.position.z;
+        tutorial.start(() => {
+          tutorialActive = false;
+        });
+      }, 4000);
     }
   },
 });
