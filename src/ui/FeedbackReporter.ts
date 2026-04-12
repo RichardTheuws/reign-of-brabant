@@ -123,6 +123,9 @@ export class FeedbackReporter {
 
     // Feedback button in pause menu
     document.getElementById('btn-feedback')?.addEventListener('click', () => this.open());
+
+    // Subtle feedback button on HUD
+    document.getElementById('hud-feedback-btn')?.addEventListener('click', () => this.open());
   }
 
   /** Open the feedback modal. */

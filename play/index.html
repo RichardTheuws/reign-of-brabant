@@ -618,7 +618,14 @@
       color: var(--color-text-dim); background: rgba(20, 15, 10, 0.85);
       padding: 3px 10px; border-radius: 6px;
       border: 1px solid rgba(212, 168, 83, 0.15);
-      z-index: 18;
+      z-index: 18; display: flex; align-items: center; gap: 0;
+    }
+    .hud-feedback-btn {
+      background: none; border: none; color: var(--color-gold); cursor: pointer;
+      font-size: 0.7rem; font-family: var(--font-body); padding: 0; margin: 0;
+      opacity: 0.6; transition: opacity 0.15s;
+    }
+    .hud-feedback-btn:hover { opacity: 1; text-decoration: underline;
     }
     #audio-mute-btn {
       position: absolute; top: 8px; right: 80px; font-size: 1rem; cursor: pointer;
@@ -1751,9 +1758,9 @@
           </div>
         </div>
 
-        <!-- FPS Counter + Version -->
+        <!-- FPS Counter + Version + Feedback -->
         <div id="fps-counter">
-          FPS: <span id="fps-value">0</span> | v__VERSION__
+          FPS: <span id="fps-value">0</span> | v__VERSION__ | <button id="hud-feedback-btn" class="hud-feedback-btn">Feedback</button>
         </div>
 
         <!-- Audio Mute Button -->

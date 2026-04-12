@@ -476,6 +476,136 @@
     <div class="content">
         <div class="timeline">
 
+            <!-- ── v0.28.0 ─────────────────────────────── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.28.0</span>
+                        <span class="update__date">12 april 2026</span>
+                        <h2 class="update__title">In-Game Feedback -- Jouw Stem Telt</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Community</span>
+                            <span class="tag tag--infra">API</span>
+                        </div>
+                        <ul class="update__highlights">
+                            <li><strong>Feedback systeem</strong> -- druk ESC en kies "Feedback geven", of klik de subtiele knop rechtsboven in het HUD</li>
+                            <li><strong>4 categorieën</strong> -- Bug/Issue, Balans, Idee/Feature, of gewoon een compliment</li>
+                            <li><strong>Auto-capture</strong> -- game state (factie, difficulty, speeltijd, stats) en screenshot worden automatisch meegestuurd</li>
+                            <li><strong>GitHub Issues</strong> -- elke feedback wordt automatisch een issue op GitHub, inclusief game state en screenshot</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.27.0 ─────────────────────────────── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.27.0</span>
+                        <span class="update__date">12 april 2026</span>
+                        <h2 class="update__title">Schermutsel Overhaul -- Van Menu naar Beleving</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Schermutsel</span>
+                            <span class="tag tag--visual">UI</span>
+                            <span class="tag tag--gameplay">Maps</span>
+                        </div>
+                        <ul class="update__highlights">
+                            <li><strong>Faction select met hero portraits</strong> -- ronde kaarten met de Prins, CEO, Mijnbaas en Frietkoning i.p.v. letters</li>
+                            <li><strong>6 map templates</strong> -- Klassiek, Kruispunt, Eilanden, Arena + 2 nieuwe: Fort (centraal beleg) en Rivierdal (brede rivier, 5 bruggen)</li>
+                            <li><strong>Difficulty selector</strong> -- Makkelijk, Normaal, Moeilijk. AI past attack timing en leger-grootte aan</li>
+                            <li><strong>Map kaarten met beschrijvingen</strong> -- visuele selectie i.p.v. dropdown</li>
+                        </ul>
+
+                        <div class="update__media">
+                            <div class="media-item">
+                                <img src="/assets/portraits/brabant-prins.png" alt="Prins van Brabant" loading="lazy">
+                                <div class="media-item__label">Faction Select</div>
+                            </div>
+                            <div class="media-item">
+                                <img src="/assets/portraits/randstad-ceo.png" alt="CEO" loading="lazy">
+                                <div class="media-item__label">Hero Portraits</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.26.0 ─────────────────────────────── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.26.0</span>
+                        <span class="update__date">12 april 2026</span>
+                        <h2 class="update__title">Goldmine, Tutorial & Campaign Fixes</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--visual">3D Model</span>
+                            <span class="tag tag--feat">Tutorial</span>
+                            <span class="tag tag--fix">Bugfixes</span>
+                            <span class="tag tag--audio">Audio</span>
+                        </div>
+                        <ul class="update__highlights">
+                            <li><strong>Nieuw goldmine model</strong> -- Meshy v6 productie-kwaliteit met stenen boog, goudaders en mijnkarretje (4.6MB)</li>
+                            <li><strong>Tutorial in eerste missie</strong> -- "De Oogst" is nu een 8-staps guided tutorial met correcte hotkeys (B=barracks, W=infantry)</li>
+                            <li><strong>Campaign scroll fix</strong> -- alle 12 Brabanders missies zijn nu bereikbaar</li>
+                            <li><strong>Unit spawn voices</strong> -- elke eenheid spreekt nu in eigen stem bij training (was 1 generiek geluid)</li>
+                            <li><strong>Schermutsel fix</strong> -- faction select was onzichtbaar door CSS conflict</li>
+                        </ul>
+
+                        <div class="model-showcase">
+                            <div class="model-card">
+                                <model-viewer
+                                    src="/assets/models/v02/shared/goldmine.glb"
+                                    alt="Nieuwe goldmine 3D model"
+                                    auto-rotate
+                                    camera-controls
+                                    loading="lazy"
+                                    rotation-per-second="30deg"
+                                    camera-orbit="45deg 75deg 2.5m"
+                                    min-camera-orbit="auto auto 1.5m"
+                                    max-camera-orbit="auto auto 5m"
+                                    environment-image="neutral"
+                                    shadow-intensity="0.5"
+                                    style="background: radial-gradient(circle, rgba(212,168,83,0.08) 0%, transparent 70%);"
+                                ></model-viewer>
+                                <div class="model-card__info">
+                                    <div class="model-card__name">Goldmine v2</div>
+                                    <div class="model-card__faction" style="color: var(--gold);">Meshy v6</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.25.0 ─────────────────────────────── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.25.0</span>
+                        <span class="update__date">12 april 2026</span>
+                        <h2 class="update__title">Updates Pagina & Agent Memory</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">DevOps</span>
+                            <span class="tag tag--infra">Systeem</span>
+                        </div>
+                        <ul class="update__highlights">
+                            <li><strong>Visuele changelog</strong> -- deze pagina! Met interactieve 3D model viewers, hero portraits en versie-timeline</li>
+                            <li><strong>Bidirectioneel agent memory</strong> -- 7 AI-agents onthouden nu lessen tussen sessies. Shared memory + per-agent geheugen voorkomt herhaalde fouten</li>
+                            <li><strong>Kosten-tekst verwijderd</strong> -- de toon is nu ambitieus ("vetste game ooit"), niet zielig</li>
+                            <li><strong>Updates link in navigatie</strong> -- toegevoegd aan alle pagina's</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
             <!-- ── v0.24.0 ─────────────────────────────── -->
             <article class="update">
                 <div class="update__card">
