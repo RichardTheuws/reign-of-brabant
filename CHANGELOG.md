@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.26.2] - 2026-04-12
+
+### Fixed
+- **Tutorial hotkeys** -- B voor barracks (was fout: Q), W voor infantry
+- **Tutorial stap-skipping** -- Gathering check gebruikt nu `gold >= 20` i.p.v. `gatheringStarted` (auto-gather skipte stappen)
+- **Tutorial timing** -- Start 4s na camera intro, state reset vlak voor start
+- **Tutorial arrow** -- Broken arrow element verwijderd (had geen positioneringslogica)
+- **Tutorial volgorde** -- 8 heldere stappen (was 10 met verwarrende volgorde)
+- **Unit spawn sound** -- Generiek `unit_trained.mp3` vervangen door faction-specifieke voice lines via `playUnitVoice('ready')`
+
 ## [0.26.0] - 2026-04-12
 
 ### Added
