@@ -385,7 +385,7 @@ export class Game {
     this.missionSystem.start(mission, cb, wc);
     this._createMsgOverlay();
     this._createObjHUD();
-    this._createSurrenderBtn();
+    // Surrender button removed from HUD -- accessible via pause menu (ESC)
 
     // Start ambient audio + faction music
     audioManager.init();

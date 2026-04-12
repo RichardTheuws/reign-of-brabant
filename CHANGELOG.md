@@ -1,10 +1,14 @@
 # Changelog
 
-## [0.28.1] - 2026-04-12
+## [0.28.2] - 2026-04-12
 
 ### Added
-- **HUD feedback knop** -- subtiele "Feedback" link rechtsboven in het FPS/versie paneel, altijd bereikbaar zonder pauze
+- **Feedback knop in hoofdmenu** -- "Feedback geven" knop onder de navigatie, zichtbaar voor alle spelers bij het opstarten
 - **Updates pagina v0.25-v0.28** -- 4 nieuwe entries met interactief goldmine 3D model, schermutsel hero portraits, feedback systeem beschrijving
+
+### Removed
+- **HUD feedback knop** -- was te druk rechtsboven naast FPS/SND/Opgeven, feedback nu via hoofdmenu + pauzemenu
+- **Opgeven knop uit HUD** -- was redundant, surrender zit al in het pauzemenu (ESC)
 
 ## [0.28.0] - 2026-04-12
 
