@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.26.3] - 2026-04-12
+
+### Fixed
+- **Schermutsel modus** -- Faction select scherm was onzichtbaar door CSS display conflict. `setScreen()` zette `display: ''` maar CSS default was `display: none`. Fix: alle schermen gebruiken nu `display: flex`.
+
 ## [0.26.2] - 2026-04-12
 
 ### Fixed

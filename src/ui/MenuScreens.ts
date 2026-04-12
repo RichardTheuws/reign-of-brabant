@@ -499,7 +499,7 @@ export class MenuScreens {
   private setScreen(id: string, visible: boolean): void {
     const el = document.getElementById(id);
     if (el) {
-      el.style.display = visible ? '' : 'none';
+      el.style.display = visible ? 'flex' : 'none';
     }
   }
 
