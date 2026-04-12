@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.25.0] - 2026-04-12
+
+### Added
+- **/updates/ visuele changelog pagina** -- Timeline met versie-cards, 3D model viewers (model-viewer web component), hero portraits, cinematic images, tags per entry
+- **Interactieve 3D model showcase** -- Heavy units (Tractorrijder, CorporateAdvocaat, Mergelridder, Frituurridder) en hero models direct draaibaar en zoombaar in de browser
+- **Updates link in navigatie** -- Toegevoegd aan root, steun, het-verhaal en roadmap pagina's
+- **/updates/ in sitemap.xml** -- Weekly changefreq, priority 0.7
+
+### Changed
+- **Kosten-tekst verwijderd** -- Alle "honderden euro's per maand" en kostenverantwoording verwijderd uit steun en het-verhaal pagina's. Toon is nu "we bouwen de vetste game" i.p.v. "kijk wat het kost"
+- **"Eerlijk over kosten" card** -- Vervangen door "100% Solo Dev" card op het-verhaal pagina
+- **FAQ "Waar gaat het geld naartoe?"** -- Herschreven: focus op meer modellen/stemmen/features i.p.v. opsomming tool-kosten
+- **Steun disclaimer** -- "passieproject met serieuze lopende kosten" → "de vetste browser-RTS die ooit gebouwd is"
+
 ## [0.24.0] - 2026-04-11
 
 ### Added

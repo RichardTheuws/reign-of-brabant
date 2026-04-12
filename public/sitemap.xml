@@ -41,6 +41,14 @@
     <priority>0.7</priority>
   </url>
 
+  <!-- Updates (visuele changelog) -->
+  <url>
+    <loc>https://reign-of-brabant.nl/updates/</loc>
+    <lastmod>2026-04-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
   <!-- Roadmap -->
   <url>
     <loc>https://reign-of-brabant.nl/roadmap/</loc>

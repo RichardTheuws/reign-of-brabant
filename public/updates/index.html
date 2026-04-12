@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Updates — Reign of Brabant</title>
+    <meta name="description" content="Volg de ontwikkeling van Reign of Brabant. Visuele changelog met 3D modellen, nieuwe features en verbeteringen.">
+    <meta property="og:title" content="Updates — Reign of Brabant">
+    <meta property="og:description" content="Volg de ontwikkeling van Reign of Brabant. Visuele changelog met 3D modellen, nieuwe features en verbeteringen.">
+    <meta property="og:image" content="https://reign-of-brabant.nl/assets/og/og-main.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="nl_NL">
+    <meta property="og:site_name" content="Reign of Brabant">
+    <meta property="og:url" content="https://reign-of-brabant.nl/updates/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Updates — Reign of Brabant">
+    <meta name="twitter:description" content="Volg de ontwikkeling van Reign of Brabant. Visuele changelog met 3D modellen, nieuwe features en verbeteringen.">
+    <meta name="twitter:image" content="https://reign-of-brabant.nl/assets/og/og-main.jpg">
+    <link rel="canonical" href="https://reign-of-brabant.nl/updates/">
+    <link rel="alternate" hreflang="nl" href="https://reign-of-brabant.nl/updates/">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Richard Theuws">
+    <meta name="theme-color" content="#0a0806">
+    <link rel="icon" href="/assets/ui/logo.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- model-viewer for interactive 3D -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+
+    <style>
+    /* ============================================================
+       DESIGN TOKENS (consistent with steun/verhaal/root)
+       ============================================================ */
+    :root {
+        --bg: #0a0806;
+        --bg-card: rgba(20, 15, 10, 0.92);
+        --bg-card-hover: rgba(30, 22, 14, 0.95);
+        --border: rgba(212, 168, 83, 0.25);
+        --border-strong: rgba(212, 168, 83, 0.5);
+        --gold: #d4a853;
+        --gold-light: #e8c065;
+        --gold-dim: rgba(212, 168, 83, 0.08);
+        --text: #e8e6e3;
+        --text-secondary: #b0ada8;
+        --text-muted: #807d78;
+        --font-heading: 'Cinzel', serif;
+        --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        --font-mono: 'JetBrains Mono', monospace;
+        --space-xs: 0.25rem;
+        --space-sm: 0.5rem;
+        --space-md: 1rem;
+        --space-lg: 2rem;
+        --space-xl: 3rem;
+        --space-xxl: 5rem;
+        --radius: 12px;
+        --radius-lg: 16px;
+        --duration-fast: 0.15s;
+        --duration-med: 0.3s;
+
+        /* Faction colors */
+        --brabant: #e8933a;
+        --randstad: #4a90d9;
+        --limburg: #5cb85c;
+        --belgen: #d94444;
+    }
+
+    /* ============================================================
+       RESET + BASE
+       ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font-body);
+        line-height: 1.65;
+        min-height: 100vh;
+    }
+    a { color: var(--gold-light); text-decoration: none; transition: color var(--duration-fast); }
+    a:hover { color: var(--gold); text-decoration: underline; }
+    img { max-width: 100%; height: auto; display: block; }
+
+    /* ============================================================
+       STICKY NAV
+       ============================================================ */
+    .sticky-nav {
+        position: sticky; top: 0; z-index: 100;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0.6rem 1.2rem;
+        background: rgba(10, 8, 6, 0.92);
+        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+    }
+    .sticky-nav__brand {
+        display: flex; align-items: center; gap: 10px;
+        font-family: var(--font-heading);
+        font-weight: 900; font-size: 0.95rem;
+        color: var(--gold); letter-spacing: 0.04em;
+        text-decoration: none;
+    }
+    .sticky-nav__brand:hover { text-decoration: none; }
+    .sticky-nav__brand img { width: 32px; height: 32px; object-fit: contain; }
+    .sticky-nav__links { display: flex; align-items: center; gap: 0.6rem; }
+    .sticky-nav__links a {
+        color: var(--text-secondary);
+        font-size: 0.85rem; font-weight: 500;
+        padding: 0.3rem 0.6rem; border-radius: 6px;
+        transition: color var(--duration-fast), background var(--duration-fast);
+    }
+    .sticky-nav__links a:hover {
+        color: var(--gold);
+        background: var(--gold-dim);
+        text-decoration: none;
+    }
+    .sticky-nav__links a.active {
+        color: var(--gold);
+        background: var(--gold-dim);
+    }
+
+    /* ============================================================
+       HERO
+       ============================================================ */
+    .hero {
+        padding: var(--space-xxl) var(--space-lg) var(--space-xl);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .hero::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse at 50% 0%, rgba(212, 168, 83, 0.06) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .hero__label {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        color: var(--gold);
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        margin-bottom: var(--space-sm);
+    }
+    .hero__title {
+        font-family: var(--font-heading);
+        font-size: clamp(1.8rem, 5vw, 3rem);
+        font-weight: 900;
+        color: var(--gold-light);
+        line-height: 1.2;
+        margin-bottom: var(--space-md);
+    }
+    .hero__sub {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        max-width: 640px;
+        margin: 0 auto;
+    }
+
+    /* ============================================================
+       CONTENT LAYOUT
+       ============================================================ */
+    .content {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 var(--space-lg) var(--space-xxl);
+    }
+
+    /* ============================================================
+       VERSION TIMELINE
+       ============================================================ */
+    .timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(to bottom, var(--gold), var(--border), transparent);
+    }
+
+    /* ============================================================
+       UPDATE CARD
+       ============================================================ */
+    .update {
+        position: relative;
+        margin-bottom: var(--space-xl);
+        opacity: 0;
+        transform: translateY(20px);
+        animation: cardReveal 0.5s ease forwards;
+    }
+    .update:nth-child(1) { animation-delay: 0.1s; }
+    .update:nth-child(2) { animation-delay: 0.2s; }
+    .update:nth-child(3) { animation-delay: 0.3s; }
+    .update:nth-child(4) { animation-delay: 0.4s; }
+    .update:nth-child(5) { animation-delay: 0.5s; }
+    .update:nth-child(6) { animation-delay: 0.6s; }
+    .update:nth-child(7) { animation-delay: 0.7s; }
+
+    @keyframes cardReveal {
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Timeline dot */
+    .update::before {
+        content: '';
+        position: absolute;
+        left: -2rem;
+        top: 1.4rem;
+        width: 12px; height: 12px;
+        border-radius: 50%;
+        background: var(--gold);
+        border: 2px solid var(--bg);
+        transform: translateX(-5px);
+        z-index: 1;
+    }
+    .update:first-child::before {
+        width: 16px; height: 16px;
+        transform: translateX(-7px);
+        box-shadow: 0 0 12px rgba(212, 168, 83, 0.5);
+    }
+
+    .update__card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        transition: border-color var(--duration-med), box-shadow var(--duration-med);
+    }
+    .update__card:hover {
+        border-color: var(--border-strong);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .update__header {
+        padding: var(--space-lg);
+        display: flex;
+        align-items: baseline;
+        gap: var(--space-md);
+        flex-wrap: wrap;
+    }
+    .update__version {
+        font-family: var(--font-heading);
+        font-weight: 900;
+        font-size: 1.4rem;
+        color: var(--gold-light);
+    }
+    .update__date {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+    .update__title {
+        width: 100%;
+        font-family: var(--font-heading);
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-top: var(--space-xs);
+    }
+
+    .update__body {
+        padding: 0 var(--space-lg) var(--space-lg);
+    }
+
+    /* Tags */
+    .update__tags {
+        display: flex;
+        gap: var(--space-xs);
+        flex-wrap: wrap;
+        margin-bottom: var(--space-md);
+    }
+    .tag {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 500;
+        padding: 2px 10px;
+        border-radius: 999px;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+    }
+    .tag--feat { background: rgba(212, 168, 83, 0.15); color: var(--gold-light); border: 1px solid rgba(212, 168, 83, 0.3); }
+    .tag--fix { background: rgba(92, 184, 92, 0.12); color: #7fd17f; border: 1px solid rgba(92, 184, 92, 0.25); }
+    .tag--visual { background: rgba(163, 92, 214, 0.12); color: #c08de8; border: 1px solid rgba(163, 92, 214, 0.25); }
+    .tag--gameplay { background: rgba(214, 142, 50, 0.12); color: #e8a840; border: 1px solid rgba(214, 142, 50, 0.25); }
+    .tag--audio { background: rgba(50, 160, 214, 0.12); color: #60b8e0; border: 1px solid rgba(50, 160, 214, 0.25); }
+    .tag--infra { background: rgba(160, 160, 160, 0.1); color: var(--text-secondary); border: 1px solid rgba(160, 160, 160, 0.2); }
+
+    /* Highlights list */
+    .update__highlights {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+    .update__highlights li {
+        position: relative;
+        padding-left: 1.2rem;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+    }
+    .update__highlights li::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0.55em;
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: var(--gold);
+        opacity: 0.6;
+    }
+    .update__highlights li strong {
+        color: var(--text);
+        font-weight: 600;
+    }
+
+    /* ============================================================
+       MEDIA GRID (images + 3D viewers)
+       ============================================================ */
+    .update__media {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: var(--space-sm);
+        margin-top: var(--space-md);
+    }
+    .update__media--wide {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+
+    .media-item {
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: rgba(0, 0, 0, 0.3);
+        position: relative;
+    }
+    .media-item img {
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: cover;
+    }
+    .media-item__label {
+        position: absolute;
+        bottom: 0;
+        left: 0; right: 0;
+        padding: var(--space-xs) var(--space-sm);
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    /* 3D model viewer */
+    .model-showcase {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: var(--space-md);
+        margin-top: var(--space-md);
+    }
+    .model-card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: rgba(0, 0, 0, 0.3);
+    }
+    .model-card model-viewer {
+        width: 100%;
+        height: 240px;
+        --poster-color: transparent;
+    }
+    .model-card__info {
+        padding: var(--space-sm) var(--space-md);
+        border-top: 1px solid var(--border);
+    }
+    .model-card__name {
+        font-family: var(--font-heading);
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--gold-light);
+    }
+    .model-card__faction {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+
+    /* ============================================================
+       FULL-CHANGELOG TOGGLE
+       ============================================================ */
+    .changelog-link {
+        text-align: center;
+        padding: var(--space-xl) 0;
+    }
+    .changelog-link a {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-sm);
+        font-family: var(--font-heading);
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--gold);
+        padding: 0.6rem 1.4rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        transition: all var(--duration-med);
+    }
+    .changelog-link a:hover {
+        background: var(--gold-dim);
+        border-color: var(--border-strong);
+        text-decoration: none;
+    }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 640px) {
+        .hero { padding: var(--space-xl) var(--space-md) var(--space-lg); }
+        .content { padding: 0 var(--space-md) var(--space-xl); }
+        .timeline { padding-left: 1.4rem; }
+        .update__header { padding: var(--space-md); }
+        .update__body { padding: 0 var(--space-md) var(--space-md); }
+        .update__version { font-size: 1.2rem; }
+        .update::before { left: -1.4rem; }
+        .model-showcase { grid-template-columns: repeat(2, 1fr); }
+        .model-card model-viewer { height: 180px; }
+        .sticky-nav__links { gap: 0.3rem; }
+        .sticky-nav__links a { font-size: 0.78rem; padding: 0.25rem 0.4rem; }
+    }
+    @media (max-width: 380px) {
+        .model-showcase { grid-template-columns: 1fr; }
+    }
+    </style>
+
+    <!-- Umami Analytics -->
+    <script defer src="https://analytics.reign-of-brabant.nl/script.js" data-website-id="8c91d569-5945-45d6-b407-ffe6749b9cbc"></script>
+</head>
+<body>
+
+    <!-- ========================================================
+         STICKY NAV
+         ======================================================== -->
+    <nav class="sticky-nav" aria-label="Navigatie">
+        <a href="/" class="sticky-nav__brand">
+            <img src="/assets/ui/logo.png" alt="" width="32" height="32" loading="lazy">
+            Reign of Brabant
+        </a>
+        <div class="sticky-nav__links">
+            <a href="/play/">Spelen</a>
+            <a href="/het-verhaal/">Het Verhaal</a>
+            <a href="/steun/">Steun</a>
+            <a href="/updates/" class="active">Updates</a>
+        </div>
+    </nav>
+
+
+    <!-- ========================================================
+         HERO
+         ======================================================== -->
+    <section class="hero">
+        <div class="hero__label">Development Log</div>
+        <h1 class="hero__title">Wat is er nieuw?</h1>
+        <p class="hero__sub">
+            Elke update, elke verbetering, elk nieuw model. Volg de bouw van de vetste browser-RTS live.
+        </p>
+    </section>
+
+
+    <!-- ========================================================
+         TIMELINE
+         ======================================================== -->
+    <div class="content">
+        <div class="timeline">
+
+            <!-- ── v0.24.0 ─────────────────────────────── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.24.0</span>
+                        <span class="update__date">11 april 2026</span>
+                        <h2 class="update__title">Heavy Units -- De Cavalerie Arriveert</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--visual">3D Models</span>
+                            <span class="tag tag--feat">Nieuw Unit Type</span>
+                        </div>
+                        <ul class="update__highlights">
+                            <li><strong>4 unieke Heavy unit modellen</strong> -- elk via Meshy v6 image-to-3D, geript en geanimeerd in Blender</li>
+                            <li><strong>Tractorrijder</strong> (Brabanders) -- gepantserde boer op z'n tractor, 11MB aan detail</li>
+                            <li><strong>CorporateAdvocaat</strong> (Randstad) -- advocaat in pak met stalen pantserplaten</li>
+                            <li><strong>Mergelridder</strong> (Limburgers) -- ridder in mergelsteen-armor</li>
+                            <li><strong>Frituurridder</strong> (Belgen) -- ridder met frituur-thema armor</li>
+                        </ul>
+
+                        <!-- Interactive 3D model showcase -->
+                        <div class="model-showcase">
+                            <div class="model-card">
+                                <model-viewer
+                                    src="/assets/models/v02/brabanders/heavy.glb"
+                                    alt="Tractorrijder 3D model"
+                                    auto-rotate
+                                    camera-controls
+                                    loading="lazy"
+                                    rotation-per-second="30deg"
+                                    camera-orbit="45deg 75deg 2.5m"
+                                    min-camera-orbit="auto auto 1.5m"
+                                    max-camera-orbit="auto auto 5m"
+                                    environment-image="neutral"
+                                    shadow-intensity="0.5"
+                                    style="background: radial-gradient(circle, rgba(232,147,58,0.08) 0%, transparent 70%);"
+                                ></model-viewer>
+                                <div class="model-card__info">
+                                    <div class="model-card__name">Tractorrijder</div>
+                                    <div class="model-card__faction" style="color: var(--brabant);">Brabanders</div>
+                                </div>
+                            </div>
+                            <div class="model-card">
+                                <model-viewer
+                                    src="/assets/models/v02/randstad/heavy.glb"
+                                    alt="CorporateAdvocaat 3D model"
+                                    auto-rotate
+                                    camera-controls
+                                    loading="lazy"
+                                    rotation-per-second="30deg"
+                                    camera-orbit="45deg 75deg 2.5m"
+                                    min-camera-orbit="auto auto 1.5m"
+                                    max-camera-orbit="auto auto 5m"
+                                    environment-image="neutral"
+                                    shadow-intensity="0.5"
+                                    style="background: radial-gradient(circle, rgba(74,144,217,0.08) 0%, transparent 70%);"
+                                ></model-viewer>
+                                <div class="model-card__info">
+                                    <div class="model-card__name">CorporateAdvocaat</div>
+                                    <div class="model-card__faction" style="color: var(--randstad);">Randstad</div>
+                                </div>
+                            </div>
+                            <div class="model-card">
+                                <model-viewer
+                                    src="/assets/models/v02/limburgers/heavy.glb"
+                                    alt="Mergelridder 3D model"
+                                    auto-rotate
+                                    camera-controls
+                                    loading="lazy"
+                                    rotation-per-second="30deg"
+                                    camera-orbit="45deg 75deg 2.5m"
+                                    min-camera-orbit="auto auto 1.5m"
+                                    max-camera-orbit="auto auto 5m"
+                                    environment-image="neutral"
+                                    shadow-intensity="0.5"
+                                    style="background: radial-gradient(circle, rgba(92,184,92,0.08) 0%, transparent 70%);"
+                                ></model-viewer>
+                                <div class="model-card__info">
+                                    <div class="model-card__name">Mergelridder</div>
+                                    <div class="model-card__faction" style="color: var(--limburg);">Limburgers</div>
+                                </div>
+                            </div>
+                            <div class="model-card">
+                                <model-viewer
+                                    src="/assets/models/v02/belgen/heavy.glb"
+                                    alt="Frituurridder 3D model"
+                                    auto-rotate
+                                    camera-controls
+                                    loading="lazy"
+                                    rotation-per-second="30deg"
+                                    camera-orbit="45deg 75deg 2.5m"
+                                    min-camera-orbit="auto auto 1.5m"
+                                    max-camera-orbit="auto auto 5m"
+                                    environment-image="neutral"
+                                    shadow-intensity="0.5"
+                                    style="background: radial-gradient(circle, rgba(217,68,68,0.08) 0%, transparent 70%);"
+                                ></model-viewer>
+                                <div class="model-card__info">
+                                    <div class="model-card__name">Frituurridder</div>
+                                    <div class="model-card__faction" style="color: var(--belgen);">Belgen</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.23.0 ─────────────────────────────── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.23.0</span>
+                        <span class="update__date">11 april 2026</span>
+                        <h2 class="update__title">UX Polish -- Tooltips, Surrender & HUD</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">UI/UX</span>
+                            <span class="tag tag--fix">Bugfixes</span>
+                            <span class="tag tag--gameplay">Balans</span>
+                        </div>
+                        <ul class="update__highlights">
+                            <li><strong>HUD mode indicators</strong> -- persistent top-bar toont actieve modus (Bouw/Rally Point/Attack-Move) met ESC-hint</li>
+                            <li><strong>Tooltip systeem</strong> -- hover over bouw- en trainingsknoppen voor archetype stats (HP, Attack, DPS, Armor)</li>
+                            <li><strong>Mission surrender</strong> -- "Opgeven" knop voorkomt softlocks bij onwinbare situaties</li>
+                            <li><strong>Infantry/Ranged DPS rebalance</strong> -- vloeiendere early game gevechten</li>
+                            <li><strong>Hero revive bug gefixt</strong> -- fragiele indexOf check vervangen door robuuste template literal</li>
+                            <li><strong>Donation flow vereenvoudigd</strong> -- van 2-stap naar 1-stap checkout</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.22.0 ─────────────────────────────── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.22.0</span>
+                        <span class="update__date">11 april 2026</span>
+                        <h2 class="update__title">Social & Cinematic -- De Wereld Delen</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Social</span>
+                            <span class="tag tag--visual">Cinematics</span>
+                            <span class="tag tag--infra">Deploy</span>
+                        </div>
+                        <ul class="update__highlights">
+                            <li><strong>Social share buttons</strong> -- WhatsApp, Facebook, LinkedIn, Telegram, X op alle pagina's</li>
+                            <li><strong>Cinematic key art</strong> -- landscape en portrait renders voor social media</li>
+                            <li><strong>3 unieke profielfoto's</strong> -- Prins, CEO en Frietkoning als social media avatars</li>
+                            <li><strong>Deploy validatie gate</strong> -- automatische pre-deploy checks en post-deploy HTTP verificatie</li>
+                        </ul>
+
+                        <div class="update__media">
+                            <div class="media-item">
+                                <img src="/assets/social/cinematic-landscape.png" alt="Cinematic landscape key art" loading="lazy">
+                                <div class="media-item__label">Cinematic Key Art</div>
+                            </div>
+                            <div class="media-item">
+                                <img src="/assets/social/profile-x.png" alt="Social media profielfoto" loading="lazy">
+                                <div class="media-item__label">Social Avatar</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.21.0 ─────────────────────────────── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.21.0</span>
+                        <span class="update__date">11 april 2026</span>
+                        <h2 class="update__title">De Wereld Komt Tot Leven -- Heroes, Terrein & Tunnels</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--visual">3D Models</span>
+                            <span class="tag tag--feat">Heroes</span>
+                            <span class="tag tag--gameplay">Map System</span>
+                        </div>
+                        <ul class="update__highlights">
+                            <li><strong>8 hero portraits</strong> -- unieke painted art per hero via fal.ai Flux Dev</li>
+                            <li><strong>12 unit portraits</strong> -- faction-specifieke portraits voor worker/infantry/ranged</li>
+                            <li><strong>8 hero 3D modellen</strong> -- Meshy v6 image-to-3D met Blender auto-rig en 5 animaties per hero</li>
+                            <li><strong>Terrein variatie</strong> -- heuvels, plateaus, kliffen, 4 biomes per map template</li>
+                            <li><strong>Rivieren en bruggen</strong> -- natuurlijke barrières met strategische choke points</li>
+                            <li><strong>Tunnel systeem</strong> -- bidirectionele warp-punten met 3D grot-ingangen</li>
+                            <li><strong>Wegen</strong> -- visuele paden met 35% speed bonus</li>
+                        </ul>
+
+                        <!-- Hero portraits grid -->
+                        <div class="update__media">
+                            <div class="media-item">
+                                <img src="/assets/portraits/brabant-prins.png" alt="Prins van Brabant" loading="lazy">
+                                <div class="media-item__label">Prins van Brabant</div>
+                            </div>
+                            <div class="media-item">
+                                <img src="/assets/portraits/randstad-ceo.png" alt="CEO van Randstad" loading="lazy">
+                                <div class="media-item__label">CEO</div>
+                            </div>
+                            <div class="media-item">
+                                <img src="/assets/portraits/limburg-mijnbaas.png" alt="Mijnbaas" loading="lazy">
+                                <div class="media-item__label">Mijnbaas</div>
+                            </div>
+                            <div class="media-item">
+                                <img src="/assets/portraits/belgen-frietkoning.png" alt="Frietkoning" loading="lazy">
+                                <div class="media-item__label">Frietkoning</div>
+                            </div>
+                        </div>
+
+                        <!-- Hero 3D models -->
+                        <div class="model-showcase" style="margin-top: var(--space-md);">
+                            <div class="model-card">
+                                <model-viewer
+                                    src="/assets/models/heroes/brabant-prins.glb"
+                                    alt="Prins van Brabant 3D model"
+                                    auto-rotate
+                                    camera-controls
+                                    loading="lazy"
+                                    rotation-per-second="30deg"
+                                    camera-orbit="45deg 75deg 2.5m"
+                                    min-camera-orbit="auto auto 1.5m"
+                                    max-camera-orbit="auto auto 5m"
+                                    environment-image="neutral"
+                                    shadow-intensity="0.5"
+                                    style="background: radial-gradient(circle, rgba(232,147,58,0.08) 0%, transparent 70%);"
+                                ></model-viewer>
+                                <div class="model-card__info">
+                                    <div class="model-card__name">Prins van Brabant</div>
+                                    <div class="model-card__faction" style="color: var(--brabant);">Hero</div>
+                                </div>
+                            </div>
+                            <div class="model-card">
+                                <model-viewer
+                                    src="/assets/models/heroes/randstad-ceo.glb"
+                                    alt="CEO 3D model"
+                                    auto-rotate
+                                    camera-controls
+                                    loading="lazy"
+                                    rotation-per-second="30deg"
+                                    camera-orbit="45deg 75deg 2.5m"
+                                    min-camera-orbit="auto auto 1.5m"
+                                    max-camera-orbit="auto auto 5m"
+                                    environment-image="neutral"
+                                    shadow-intensity="0.5"
+                                    style="background: radial-gradient(circle, rgba(74,144,217,0.08) 0%, transparent 70%);"
+                                ></model-viewer>
+                                <div class="model-card__info">
+                                    <div class="model-card__name">CEO</div>
+                                    <div class="model-card__faction" style="color: var(--randstad);">Hero</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.19.0 ─────────────────────────────── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.19.0</span>
+                        <span class="update__date">10 april 2026</span>
+                        <h2 class="update__title">Analytics, Payments & Crypto</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--infra">Infra</span>
+                            <span class="tag tag--feat">Payments</span>
+                        </div>
+                        <ul class="update__highlights">
+                            <li><strong>Umami Analytics</strong> -- self-hosted analytics op eigen M4 server</li>
+                            <li><strong>Mollie betalingen</strong> -- iDEAL, creditcard, Bancontact, PayPal</li>
+                            <li><strong>Live donatie-teller</strong> -- worstenbroodjes counter op de steunpagina</li>
+                            <li><strong>Crypto wallets</strong> -- Bitcoin en Ethereum via Kraken met QR codes</li>
+                            <li><strong>SEO basis</strong> -- robots.txt, sitemap, structured data, OG images op alle pagina's</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.18.0 ─────────────────────────────── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.18.0</span>
+                        <span class="update__date">10 april 2026</span>
+                        <h2 class="update__title">Eigen Domein & Crowdfunding Launch</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Launch</span>
+                            <span class="tag tag--visual">Landing Page</span>
+                            <span class="tag tag--gameplay">Balans</span>
+                        </div>
+                        <ul class="update__highlights">
+                            <li><strong>reign-of-brabant.nl</strong> -- eigen domein live op de Mac mini M4 in Bladel</li>
+                            <li><strong>Landing page</strong> -- parallax hero, factie showcase, cinematic embed, bio</li>
+                            <li><strong>Crowdfunding pagina</strong> -- worstenbroodjes-economie, Konami code easter egg</li>
+                            <li><strong>Hero ability systeem</strong> -- visuele Q/W/E knoppen met cooldown sweep</li>
+                            <li><strong>Late-game economie</strong> -- unit upkeep, diminishing returns, AI scaling</li>
+                            <li><strong>Factie-specifieke unit costs</strong> -- elke factie heeft eigen economische balans</li>
+                        </ul>
+
+                        <div class="update__media update__media--wide">
+                            <div class="media-item">
+                                <img src="/assets/steun/hero-banner.webp" alt="Reign of Brabant hero banner" loading="lazy">
+                                <div class="media-item__label">Landing Page Hero</div>
+                            </div>
+                            <div class="media-item">
+                                <img src="/assets/steun/world-map.webp" alt="Wereldkaart vier facties" loading="lazy">
+                                <div class="media-item__label">Wereldkaart</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.17.0 ─────────────────────────────── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.17.0</span>
+                        <span class="update__date">7 april 2026</span>
+                        <h2 class="update__title">Randstad Campaign -- De Grote Overname</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Campaign</span>
+                            <span class="tag tag--gameplay">5 Missies</span>
+                        </div>
+                        <ul class="update__highlights">
+                            <li><strong>5 Randstad campaign missies</strong> -- van "De Eerste Vergadering" tot "De Boardroom Beslissing"</li>
+                            <li><strong>Progressief leerpad</strong> -- elke missie leert nieuwe Randstad mechanics</li>
+                            <li><strong>Epische finale</strong> -- versla alle 3 andere facties op een 256-size map</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+        </div><!-- /timeline -->
+
+        <div class="changelog-link">
+            <a href="https://github.com/RichardTheuws/reign-of-brabant" target="_blank" rel="noopener">
+                Bekijk de volledige changelog op GitHub
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h8v8"/><path d="M13 3L3 13"/></svg>
+            </a>
+        </div>
+    </div>
+
+
+    <!-- ========================================================
+         FOOTER
+         ======================================================== -->
+    <footer style="text-align:center; padding:var(--space-lg); border-top:1px solid var(--border); color:var(--text-muted); font-size:0.8rem;">
+        <p>Reign of Brabant &mdash; gebouwd door <a href="https://theuws.com" style="color:var(--gold)">Richard Theuws</a></p>
+        <p style="margin-top:var(--space-xs)">
+            <a href="/play/">Spelen</a> &middot;
+            <a href="/het-verhaal/">Het Verhaal</a> &middot;
+            <a href="/steun/">Steun</a> &middot;
+            <a href="/roadmap/">Roadmap</a>
+        </p>
+    </footer>
+
+</body>
+</html>
