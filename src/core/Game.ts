@@ -116,6 +116,7 @@ export class Game {
 
   // Player's chosen faction (0=Brabanders, 1=Randstad, 2=Limburgers, 3=Belgen)
   private playerFactionId: FactionId = FactionId.Brabanders;
+  private difficulty: string = 'normal';
 
   // Game over state
   private gameOver = false;
@@ -185,8 +186,9 @@ export class Game {
     this.playerState = playerState;
   }
 
-  async init(playerFaction: number = FactionId.Brabanders, mapTemplate: string = 'classic'): Promise<void> {
+  async init(playerFaction: number = FactionId.Brabanders, mapTemplate: string = 'classic', difficulty: string = 'normal'): Promise<void> {
     this.playerFactionId = playerFaction as FactionId;
+    this.difficulty = difficulty;
 
     // 1. Generate map layout (2 players for skirmish: player + 1 AI)
     this.map = generateMap(42, (x, z) => this.terrain.getHeightAt(x, z), 2, mapTemplate as any);
@@ -208,7 +210,7 @@ export class Game {
 
     // Set shared game config so all systems know the player's faction
     gameConfig.setPlayerFaction(this.playerFactionId);
-    AISystem.setFaction(this.getAIFactionId());
+    AISystem.setFaction(this.getAIFactionId(), this.difficulty);
 
     // 2. Load GLB models (only active factions for performance)
     const activeFactions = new Set<number>([this.playerFactionId, this.getAIFactionId()]);

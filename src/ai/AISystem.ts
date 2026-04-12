@@ -112,8 +112,9 @@ let callbacks: AISystemCallbacks | null = null;
 
 /** The faction the AI plays as. Default: Randstad for backwards compatibility. */
 let aiFactionId: FactionId = FactionId.Randstad;
+let aiDifficulty = 'normal';
 
-let aiController = new AIController(aiFactionId);
+let aiController = new AIController(aiFactionId, aiDifficulty);
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -135,9 +136,10 @@ export const AISystem = {
    *
    * @default FactionId.Randstad (backwards compatible)
    */
-  setFaction(factionId: FactionId): void {
+  setFaction(factionId: FactionId, difficulty?: string): void {
     aiFactionId = factionId;
-    aiController = new AIController(factionId);
+    if (difficulty) aiDifficulty = difficulty;
+    aiController = new AIController(factionId, aiDifficulty);
   },
 
   /**
@@ -172,7 +174,7 @@ export const AISystem = {
    * Reset the AI state (new game). Preserves the current faction setting.
    */
   reset(): void {
-    aiController = new AIController(aiFactionId);
+    aiController = new AIController(aiFactionId, aiDifficulty);
   },
 
   /**

@@ -15,11 +15,19 @@ import { MUSIC_IDS } from '../systems/MusicSystem';
 export type FactionChoice = 'brabanders' | 'randstad' | 'limburgers' | 'belgen';
 export type MenuAction = 'play' | 'campaign' | 'tutorial' | 'settings';
 
-export type MapTemplateChoice = 'classic' | 'crossroads' | 'islands' | 'arena';
+export type MapTemplateChoice = 'classic' | 'crossroads' | 'islands' | 'arena' | 'fortress' | 'river-valley';
+export type DifficultyChoice = 'easy' | 'normal' | 'hard';
 
 export interface MenuScreenEvents {
   onMenuAction: (action: MenuAction) => void;
-  onFactionSelected: (faction: FactionChoice, startTutorial: boolean, mapTemplate: MapTemplateChoice) => void;
+  onFactionSelected: (faction: FactionChoice, startTutorial: boolean, mapTemplate: MapTemplateChoice, difficulty: DifficultyChoice) => void;
+}
+
+interface MapTemplateData {
+  id: MapTemplateChoice;
+  name: string;
+  description: string;
+  features: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -122,7 +130,7 @@ const FACTIONS: FactionData[] = [
     subtitle: 'Meesters van de Ondergrond',
     description: 'Vanuit hun uitgebreide mijnnetwerk beheersen de Limburgers het ondergrondse. Hun tunnels maken verrassingsaanvallen mogelijk die geen vijand ziet aankomen. Met Kolen als brandstof voor hun industrie bouwen ze een onzichtbaar imperium.',
     traits: ['Tunnelnetwerk', 'Verrassingsaanvallen', 'Kolen-economie', 'Defensief sterk'],
-    image: 'assets/factions/limburgers-mijnwerker.png',
+    image: 'assets/factions/limburgers-mijnbaas.png',
     available: true,
   },
   {
@@ -131,8 +139,47 @@ const FACTIONS: FactionData[] = [
     subtitle: 'Diplomaten en Compromismeesters',
     description: 'Waarom vechten als ge kunt onderhandelen? De Belgen winnen oorlogen met woorden, Chocolade en eindeloos overleg. Hun Commissies vertragen vijanden, hun Compromissen kopen tijd, en hun Chocolade-Overtuiging steelt vijandelijke eenheden.',
     traits: ['Diplomatie', 'Compromis-abilities', 'Chocolade-overtuiging', 'Commissie-sabotage'],
-    image: 'assets/factions/belgen-diplomaat.png',
+    image: 'assets/factions/belgen-frietkoning.png',
     available: true,
+  },
+];
+
+const MAP_TEMPLATES: MapTemplateData[] = [
+  {
+    id: 'classic',
+    name: 'Klassiek',
+    description: 'Diagonale verdeling met rivier en bruggen. Gebalanceerd voor beginners.',
+    features: ['Rivier', '2 Bruggen', 'Tunnels'],
+  },
+  {
+    id: 'crossroads',
+    name: 'Kruispunt',
+    description: 'Vier wegen kruisen in het midden. Snelle gevechten om controle.',
+    features: ['4-weg', 'Stedelijk', 'Tunnels'],
+  },
+  {
+    id: 'islands',
+    name: 'Eilanden',
+    description: 'Vier eilanden gescheiden door water. Bruggen zijn strategische chokepunten.',
+    features: ['Water', '4 Bruggen', 'Tunnels'],
+  },
+  {
+    id: 'arena',
+    name: 'Arena',
+    description: 'Circulaire arena met rotswanden. Snelle, agressieve gevechten.',
+    features: ['Rotsring', 'Compact', 'Snel'],
+  },
+  {
+    id: 'fortress',
+    name: 'Fort',
+    description: 'Centraal fort met 4 poorten. Beleg of verdedig het hart van de kaart.',
+    features: ['Fort', '4 Poorten', 'Beleg'],
+  },
+  {
+    id: 'river-valley',
+    name: 'Rivierdal',
+    description: 'Brede rivier verdeelt de kaart. Wie de bruggen controleert, wint.',
+    features: ['Brede rivier', '5 Bruggen', 'Flanken'],
   },
 ];
 
@@ -144,6 +191,7 @@ export class MenuScreens {
   private events: MenuScreenEvents | null = null;
   private selectedFaction: FactionChoice | null = null;
   private selectedMap: MapTemplateChoice = 'classic';
+  private selectedDifficulty: DifficultyChoice = 'normal';
   private currentTipIndex = 0;
   private tipIntervalId = 0;
   private loadingProgress = 0;
@@ -299,16 +347,44 @@ export class MenuScreens {
     const confirmBtn = document.getElementById('faction-confirm-btn');
     confirmBtn?.addEventListener('click', () => {
       if (this.selectedFaction) {
-        this.events?.onFactionSelected(this.selectedFaction, false, this.selectedMap);
+        this.events?.onFactionSelected(this.selectedFaction, false, this.selectedMap, this.selectedDifficulty);
       }
     });
 
-    // Map template selector
-    const mapSelect = document.getElementById('map-template-select') as HTMLSelectElement | null;
-    if (mapSelect) {
-      mapSelect.addEventListener('change', () => {
-        this.selectedMap = mapSelect.value as MapTemplateChoice;
+    // Map template cards
+    for (const tpl of MAP_TEMPLATES) {
+      const card = document.getElementById(`map-card-${tpl.id}`);
+      card?.addEventListener('click', () => {
+        this.selectedMap = tpl.id;
+        this.updateMapCardSelection();
       });
+    }
+
+    // Difficulty buttons
+    for (const diff of ['easy', 'normal', 'hard'] as DifficultyChoice[]) {
+      const btn = document.getElementById(`diff-${diff}`);
+      btn?.addEventListener('click', () => {
+        this.selectedDifficulty = diff;
+        this.updateDifficultySelection();
+      });
+    }
+  }
+
+  private updateMapCardSelection(): void {
+    const cards = document.querySelectorAll('.map-card');
+    for (const card of cards) {
+      const el = card as HTMLElement;
+      el.classList.toggle('is-selected', el.dataset.map === this.selectedMap);
+    }
+    // Enable confirm if faction also selected
+    const confirmBtn = document.getElementById('faction-confirm-btn') as HTMLButtonElement | null;
+    if (confirmBtn) confirmBtn.disabled = !this.selectedFaction;
+  }
+
+  private updateDifficultySelection(): void {
+    for (const diff of ['easy', 'normal', 'hard']) {
+      const btn = document.getElementById(`diff-${diff}`);
+      btn?.classList.toggle('is-selected', diff === this.selectedDifficulty);
     }
   }
 

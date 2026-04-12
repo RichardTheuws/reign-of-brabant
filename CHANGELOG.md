@@ -1,9 +1,17 @@
 # Changelog
 
-## [0.26.3] - 2026-04-12
+## [0.27.0] - 2026-04-12
+
+### Added
+- **Schermutsel UI overhaul** -- Faction cards met hero portraits (was letters B/R/L/V), map selector met 6 visuele kaarten en beschrijvingen, difficulty selector (Makkelijk/Normaal/Moeilijk)
+- **AI difficulty systeem** -- Easy: +50% attack threshold, +60% force attack time. Hard: -30% attack threshold, -40% force attack time, extra worker
+- **Fort map template** -- Centraal fort met 8 rotswand-segmenten, 4 poorten, 2 tunnels, approach roads. Arid biome
+- **Rivierdal map template** -- Brede rivier met 5 bruggen, north/south spawns, rock walls bij bruggen. Aquatic biome
+- **Map selector visuele kaarten** -- 6 kaarten (Klassiek, Kruispunt, Eilanden, Arena, Fort, Rivierdal) met beschrijvingen
 
 ### Fixed
-- **Schermutsel modus** -- Faction select scherm was onzichtbaar door CSS display conflict. `setScreen()` zette `display: ''` maar CSS default was `display: none`. Fix: alle schermen gebruiken nu `display: flex`.
+- **Broken faction images** -- Limburgers (mijnwerker→mijnbaas) en Belgen (diplomaat→frietkoning) image references gecorrigeerd
+- **Schermutsel modus** -- Faction select scherm was onzichtbaar door CSS display conflict
 
 ## [0.26.2] - 2026-04-12
 

@@ -274,9 +274,28 @@ export class AIController {
   /** Pending commands to be consumed by the AISystem. */
   private pendingCommands: AICommand[] = [];
 
-  constructor(factionId: FactionId = FactionId.Randstad) {
+  constructor(factionId: FactionId = FactionId.Randstad, difficulty: string = 'normal') {
     this.factionId = factionId;
-    this.strategy = FACTION_STRATEGIES[factionId] ?? FACTION_STRATEGIES[FactionId.Randstad];
+    const base = FACTION_STRATEGIES[factionId] ?? FACTION_STRATEGIES[FactionId.Randstad];
+
+    // Apply difficulty modifiers
+    if (difficulty === 'easy') {
+      this.strategy = {
+        ...base,
+        attackThreshold: Math.ceil(base.attackThreshold * 1.5),   // Needs bigger army before attacking
+        forceAttackTime: Math.ceil(base.forceAttackTime * 1.6),   // Waits much longer
+        maxWorkers: Math.max(3, base.maxWorkers - 1),             // Slightly fewer workers
+      };
+    } else if (difficulty === 'hard') {
+      this.strategy = {
+        ...base,
+        attackThreshold: Math.max(4, Math.floor(base.attackThreshold * 0.7)), // Attacks earlier
+        forceAttackTime: Math.floor(base.forceAttackTime * 0.6),              // Much faster aggression
+        maxWorkers: base.maxWorkers + 1,                                       // Extra worker
+      };
+    } else {
+      this.strategy = base;
+    }
   }
 
   /**

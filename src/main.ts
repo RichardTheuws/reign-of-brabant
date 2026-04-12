@@ -126,6 +126,7 @@ const campaignUI = new CampaignUI(campaignManager);
 let activeMissionId: string | null = null;
 let selectedPlayerFaction: number = 0; // FactionId: 0=Brabanders, 1=Randstad, 2=Limburgers, 3=Belgen
 let selectedMapTemplate: string = 'classic';
+let selectedDifficulty: string = 'normal';
 
 // ---------------------------------------------------------------------------
 // Tutorial
@@ -192,7 +193,7 @@ setGameFlowDeps({
 
   startGame: async (isTutorial: boolean) => {
     if (!gameInitialized) {
-      await game.init(selectedPlayerFaction, selectedMapTemplate);
+      await game.init(selectedPlayerFaction, selectedMapTemplate, selectedDifficulty);
       gameInitialized = true;
     }
     tutorialActive = isTutorial;
@@ -374,10 +375,11 @@ menuScreens.init({
         break;
     }
   },
-  onFactionSelected: (faction, _startTutorial, mapTemplate) => {
+  onFactionSelected: (faction, _startTutorial, mapTemplate, difficulty) => {
     const factionMap: Record<string, number> = { brabanders: 0, randstad: 1, limburgers: 2, belgen: 3 };
     selectedPlayerFaction = factionMap[faction] ?? 0;
     selectedMapTemplate = mapTemplate ?? 'classic';
+    selectedDifficulty = difficulty ?? 'normal';
     stateMachine.requestTransition(GameStateId.LOADING, { tutorial: false });
   },
 });

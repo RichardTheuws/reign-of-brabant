@@ -441,6 +441,15 @@
       background: rgba(212,168,83,0.15); border: 1px solid var(--color-panel-border);
       color: var(--color-gold);
     }
+    .faction-card-portrait {
+      width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+      border: 2px solid var(--color-panel-border); margin-bottom: 8px;
+      transition: border-color 0.2s;
+    }
+    .faction-card.is-selected .faction-card-portrait { border-color: var(--color-gold-bright); }
+    .faction-card-sub {
+      font-size: 0.7rem; color: var(--color-text-dim); font-style: italic; margin-top: 2px;
+    }
     .faction-confirm-area { text-align: center; }
     .faction-confirm-btn {
       padding: 14px 48px; border: 2px solid var(--color-gold); border-radius: 8px;
@@ -450,10 +459,52 @@
     }
     .faction-confirm-btn:hover:not(:disabled) { background: rgba(212,168,83,0.25); transform: scale(1.02); }
     .faction-confirm-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Map template cards */
+    .map-cards-row {
+      display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+    }
+    .map-card {
+      width: 100px; padding: 10px 8px; border: 1px solid var(--color-panel-border);
+      border-radius: 8px; background: var(--color-panel-bg); cursor: pointer;
+      text-align: center; transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .map-card:hover { border-color: var(--color-gold); transform: translateY(-2px); }
+    .map-card.is-selected {
+      border-color: var(--color-gold-bright);
+      box-shadow: 0 0 12px rgba(212,168,83,0.25), inset 0 0 8px rgba(212,168,83,0.06);
+    }
+    .map-card-name {
+      font-family: var(--font-heading); font-size: 0.8rem; font-weight: 700;
+      color: var(--color-text); margin-bottom: 4px;
+    }
+    .map-card-desc { font-size: 0.65rem; color: var(--color-text-dim); line-height: 1.3; }
+
+    /* Difficulty selector */
+    .diff-row { display: flex; gap: 8px; justify-content: center; }
+    .diff-btn {
+      flex: 1; max-width: 200px; padding: 10px 12px; border: 1px solid var(--color-panel-border);
+      border-radius: 8px; background: var(--color-panel-bg); cursor: pointer;
+      text-align: center; transition: border-color 0.2s, box-shadow 0.2s;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .diff-btn:hover { border-color: var(--color-gold); }
+    .diff-btn.is-selected {
+      border-color: var(--color-gold-bright);
+      box-shadow: 0 0 12px rgba(212,168,83,0.25), inset 0 0 8px rgba(212,168,83,0.06);
+    }
+    .diff-label {
+      font-family: var(--font-heading); font-size: 0.85rem; font-weight: 700; color: var(--color-text);
+    }
+    .diff-desc { font-size: 0.65rem; color: var(--color-text-dim); }
+
     @media (max-width: 640px) {
       .faction-preview-content { flex-direction: column; align-items: center; }
       .faction-preview-image { width: 140px; height: 170px; }
       .faction-card { width: 120px; padding: 12px; }
+      .map-card { width: 80px; padding: 8px 6px; }
+      .map-card-name { font-size: 0.7rem; }
+      .diff-btn { padding: 8px; }
     }
     @media (max-height: 600px) {
       #main-menu { padding: 12px; }
@@ -1487,20 +1538,24 @@
 
         <div class="faction-cards-row">
           <div class="faction-card" id="faction-card-brabanders" data-faction="brabanders">
-            <span class="faction-card-icon" style="color:#E67E22;font-family:Cinzel,serif;font-weight:900;">B</span>
+            <img class="faction-card-portrait" src="/assets/portraits/brabant-prins.png" alt="Brabanders" loading="lazy">
             <div class="faction-card-name">Brabanders</div>
+            <div class="faction-card-sub">De Gezelligen</div>
           </div>
           <div class="faction-card" id="faction-card-randstad" data-faction="randstad">
-            <span class="faction-card-icon" style="color:#4A4A5A;font-family:Cinzel,serif;font-weight:900;">R</span>
+            <img class="faction-card-portrait" src="/assets/portraits/randstad-ceo.png" alt="Randstad" loading="lazy">
             <div class="faction-card-name">Randstad</div>
+            <div class="faction-card-sub">De Efficienten</div>
           </div>
           <div class="faction-card" id="faction-card-limburgers" data-faction="limburgers">
-            <span class="faction-card-icon" style="color:#8B6914;font-family:Cinzel,serif;font-weight:900;">L</span>
+            <img class="faction-card-portrait" src="/assets/portraits/limburg-mijnbaas.png" alt="Limburgers" loading="lazy">
             <div class="faction-card-name">Limburgers</div>
+            <div class="faction-card-sub">De Ondergrond</div>
           </div>
           <div class="faction-card" id="faction-card-belgen" data-faction="belgen">
-            <span class="faction-card-icon" style="color:#C0392B;font-family:Cinzel,serif;font-weight:900;">V</span>
+            <img class="faction-card-portrait" src="/assets/portraits/belgen-frietkoning.png" alt="Belgen" loading="lazy">
             <div class="faction-card-name">Belgen</div>
+            <div class="faction-card-sub">De Diplomaten</div>
           </div>
         </div>
 
@@ -1508,16 +1563,57 @@
           <p class="faction-preview-placeholder">Kies een factie om details te zien</p>
         </div>
 
-        <div class="faction-confirm-area">
-          <div style="margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px;">
-            <label style="font-family: 'Cinzel', serif; font-size: 0.85rem; color: var(--color-text-dim);">Slagveld:</label>
-            <select id="map-template-select" style="background: rgba(20,15,10,0.9); color: var(--color-text); border: 1px solid rgba(212,168,83,0.3); border-radius: 6px; padding: 6px 12px; font-family: 'Cinzel', serif; font-size: 0.85rem; cursor: pointer;">
-              <option value="classic">Klassiek</option>
-              <option value="crossroads">Kruispunt</option>
-              <option value="islands">Eilanden</option>
-              <option value="arena">Arena</option>
-            </select>
+        <!-- Map Template Cards -->
+        <div style="width:100%;max-width:700px;margin:0 auto 16px;">
+          <div style="font-family:var(--font-heading);font-size:0.9rem;color:var(--color-gold);margin-bottom:10px;text-align:center;">Slagveld</div>
+          <div class="map-cards-row">
+            <div class="map-card is-selected" id="map-card-classic" data-map="classic">
+              <div class="map-card-name">Klassiek</div>
+              <div class="map-card-desc">Rivier &amp; bruggen</div>
+            </div>
+            <div class="map-card" id="map-card-crossroads" data-map="crossroads">
+              <div class="map-card-name">Kruispunt</div>
+              <div class="map-card-desc">Vier wegen kruisen</div>
+            </div>
+            <div class="map-card" id="map-card-islands" data-map="islands">
+              <div class="map-card-name">Eilanden</div>
+              <div class="map-card-desc">Water &amp; bruggen</div>
+            </div>
+            <div class="map-card" id="map-card-arena" data-map="arena">
+              <div class="map-card-name">Arena</div>
+              <div class="map-card-desc">Snelle gevechten</div>
+            </div>
+            <div class="map-card" id="map-card-fortress" data-map="fortress">
+              <div class="map-card-name">Fort</div>
+              <div class="map-card-desc">Centraal beleg</div>
+            </div>
+            <div class="map-card" id="map-card-river-valley" data-map="river-valley">
+              <div class="map-card-name">Rivierdal</div>
+              <div class="map-card-desc">Brede rivier</div>
+            </div>
           </div>
+        </div>
+
+        <!-- Difficulty Selector -->
+        <div style="width:100%;max-width:700px;margin:0 auto 20px;">
+          <div style="font-family:var(--font-heading);font-size:0.9rem;color:var(--color-gold);margin-bottom:10px;text-align:center;">Moeilijkheid</div>
+          <div class="diff-row">
+            <button class="diff-btn" id="diff-easy">
+              <span class="diff-label">Makkelijk</span>
+              <span class="diff-desc">Trage AI, minder troepen</span>
+            </button>
+            <button class="diff-btn is-selected" id="diff-normal">
+              <span class="diff-label">Normaal</span>
+              <span class="diff-desc">Gebalanceerd gevecht</span>
+            </button>
+            <button class="diff-btn" id="diff-hard">
+              <span class="diff-label">Moeilijk</span>
+              <span class="diff-desc">Agressieve AI, bonus</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="faction-confirm-area">
           <button class="faction-confirm-btn" id="faction-confirm-btn" disabled>
             Start Gevecht &gt;
           </button>
