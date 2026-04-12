@@ -48,40 +48,62 @@ export interface TutorialState {
 // ---------------------------------------------------------------------------
 
 const TUTORIAL_STEPS: TutorialStep[] = [
+  // --- Basis: Camera & Navigatie ---
   {
-    message: 'Welkom in Brabant! Gebruik WASD of de pijltjestoetsen om rond te kijken.',
+    message: 'Welkom in Reusel, opzichter! Dit is jouw boerderij. Gebruik WASD of de pijltjestoetsen om rond te kijken. Scroll om in en uit te zoomen.',
     condition: (s) => s.cameraMoved,
     highlight: 'camera',
   },
   {
-    message: 'Goed zo! Klik nu op een Boer om hem te selecteren.',
+    message: 'Rechtsonder zie je de minimap — een overzicht van het hele slagveld. Gouden stippen zijn goudmijnen, groene stippen zijn bomen.',
+    condition: () => true,
+    autoAdvanceMs: 5000,
+  },
+  // --- Eenheden selecteren ---
+  {
+    message: 'Klik op een Boer om hem te selecteren. Je ziet zijn stats (HP, aanval, snelheid) rechtsonder. Sleep een kader om meerdere eenheden tegelijk te selecteren.',
     condition: (s) => s.workerSelected,
     highlight: 'worker',
   },
+  // --- Grondstoffen verzamelen ---
   {
-    message: 'Klik met rechts op de goudmijn om te verzamelen.',
+    message: 'Klik met rechts op de goudmijn om te gaan verzamelen. Boeren brengen goud automatisch terug naar de Boerderij.',
     condition: (s) => s.gatheringStarted,
     highlight: 'goldmine',
   },
   {
-    message: 'Uitstekend! Je Boer brengt nu worstenbroodjes naar de Boerderij.',
+    message: 'Goed bezig! Stuur al je Boeren naar de mijnen — hoe meer Boeren, hoe sneller je goud binnenkomt. Linksboven zie je je goud, hout en populatie.',
     condition: () => true,
-    autoAdvanceMs: 4000,
+    autoAdvanceMs: 6000,
   },
+  // --- Bouwen ---
   {
-    message: 'Je hebt genoeg goud! Selecteer een Boer en druk op B om een Kazerne te bouwen.',
+    message: 'Tijd om te bouwen! Selecteer een Boer en druk op Q om een Kazerne neer te zetten. Klik waar je wilt bouwen. Je kunt ook op B drukken voor het bouwmenu.',
     condition: (s) => s.barracksBuilt,
     highlight: 'barracks',
   },
   {
-    message: 'Selecteer de Kazerne en train een Carnavalvierder (klik op het zwaard-icoon).',
+    message: 'De Kazerne is af! Gebouwen hebben een productie-wachtrij — je kunt meerdere eenheden achter elkaar trainen.',
+    condition: () => true,
+    autoAdvanceMs: 4000,
+  },
+  // --- Eenheden trainen ---
+  {
+    message: 'Selecteer de Kazerne en klik op het trainings-icoon (of druk W) om een Carnavalvierder te trainen. Dat is je infanterie.',
     condition: (s) => s.unitTrained,
     highlight: 'barracks',
   },
+  // --- Gevecht ---
   {
-    message: 'Selecteer je leger en val de vijand aan! Rechts-klik op hun gebouw.',
+    message: 'Er komen vijanden aan! Selecteer je soldaten en rechts-klik op de vijand om aan te vallen. A + rechts-klik doet een attack-move (aanvallen onderweg).',
     condition: (s) => s.attackIssued,
     highlight: 'enemy',
+  },
+  // --- Afsluiting ---
+  {
+    message: 'Je kent nu de basis! Tip: druk ESC voor het pauzemenu met alle hotkeys. Verzamel 500 goud om deze missie te voltooien. Succes!',
+    condition: () => true,
+    autoAdvanceMs: 6000,
   },
 ];
 

@@ -120,12 +120,13 @@ const MISSION_1_DE_OOGST: MissionDefinition = {
   title: 'De Oogst',
   playerFactionId: FactionId.Brabanders,
   aiFactionIds: [FactionId.Randstad],
-  briefingTitle: 'Missie 1: De Oogst',
+  briefingTitle: 'Tutorial: De Oogst',
   briefingText:
     'Welkom in Reusel, het hart van Brabant. Het is een rustige ochtend — de vogels zingen, ' +
     'de koeien loeien, en de geur van versgebakken worstenbroodjes hangt in de lucht.\n\n' +
-    'Jij bent de nieuwe opzichter van de boerderij. Leer de basis: verzamel grondstoffen, ' +
-    'beheer je boeren, en bescherm het dorp tegen onverwachte gasten.\n\n' +
+    'Jij bent de nieuwe opzichter van de boerderij. In deze tutorial leer je stap voor stap ' +
+    'de basis: camera besturen, grondstoffen verzamelen, gebouwen neerzetten, eenheden trainen ' +
+    'en je eerste gevecht winnen.\n\n' +
     'Niets kan deze dag verpesten... toch?',
 
   mapSize: 64,

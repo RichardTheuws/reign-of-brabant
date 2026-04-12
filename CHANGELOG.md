@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.26.0] - 2026-04-12
+
+### Added
+- **Goldmine model upgrade** -- Nieuw Meshy v6 text-to-3D model (4.6MB) vervangt oud V02 model (3.6MB). Stenen boog met goudaders, houten balken en mijnkarretje.
+- **Tutorial in eerste missie** -- "De Oogst" is nu een volledige 10-staps guided tutorial: camera, minimap, selectie, grondstoffen, bouwen, trainen, gevecht, hotkeys
+- **Campaign missie scroll** -- Mission list is nu scrollbaar (flex overflow fix). Alle 12 Brabanders missies bereikbaar.
+
+### Changed
+- **"Hoe Te Spelen" knop verwijderd** -- Aparte tutorial knop uit hoofdmenu gehaald. Tutorial is nu geïntegreerd in de eerste campaign missie.
+- **Missie 1 briefing** -- Titel "Tutorial: De Oogst", briefing tekst vermeldt nu expliciet dat dit een tutorial is
+
+### Fixed
+- **Campaign scroll bug** -- #campaign-mission-list container had geen height constraint, latere missies waren onbereikbaar
+
 ## [0.25.0] - 2026-04-12
 
 ### Added

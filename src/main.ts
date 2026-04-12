@@ -212,6 +212,17 @@ setGameFlowDeps({
     await game.initMission(missionId);
     gameInitialized = true;
 
+    // Auto-start tutorial on first campaign mission (De Oogst)
+    if (missionId === 'brabant-1-de-oogst') {
+      tutorialActive = true;
+      tutorialState.cameraMoved = false;
+      tutorialState.workerSelected = false;
+      tutorialState.gatheringStarted = false;
+      tutorialState.barracksBuilt = false;
+      tutorialState.unitTrained = false;
+      tutorialState.attackIssued = false;
+    }
+
     // Wire up mission victory/defeat callbacks
     game.onMissionVictory = (stars, time, bonuses) => {
       const mission = getMissionById(missionId);
@@ -342,7 +353,8 @@ menuScreens.init({
         stateMachine.requestTransition(GameStateId.CAMPAIGN_SELECT);
         break;
       case 'tutorial':
-        stateMachine.requestTransition(GameStateId.LOADING, { tutorial: true });
+        // Tutorial is now integrated into first campaign mission (De Oogst)
+        stateMachine.requestTransition(GameStateId.CAMPAIGN_SELECT);
         break;
       case 'settings':
         // Settings not implemented yet

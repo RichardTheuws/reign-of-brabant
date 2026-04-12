@@ -181,6 +181,7 @@ export class CampaignUI {
 
       <div id="campaign-mission-list" style="
         width: 100%; max-width: 700px; display: flex; flex-direction: column; gap: 12px;
+        flex: 1; min-height: 0; overflow-y: auto; padding-bottom: 40px;
       "></div>
     `;
 
