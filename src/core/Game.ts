@@ -125,6 +125,9 @@ export class Game {
   // HP tracking for damage flash detection
   private lastHpMap = new Map<number, number>();
 
+  // Game elapsed time (seconds)
+  private _elapsedTime = 0;
+
   // Stats tracking
   private stats = {
     unitsProduced: 0,
@@ -2239,6 +2242,7 @@ export class Game {
 
   update(dt: number): void {
     if (this.gameOver) return;
+    this._elapsedTime += dt;
 
     // Update ECS world metadata
     world.meta.deltaTime = dt;
@@ -3015,6 +3019,16 @@ export class Game {
   /** Get current player gold amount. */
   getPlayerGold(): number {
     return this.playerState.getGold(this.playerFactionId);
+  }
+
+  /** Get elapsed game time in seconds. */
+  getElapsedTime(): number {
+    return this._elapsedTime;
+  }
+
+  /** Get game stats for feedback reporting. */
+  getStats(): Readonly<typeof this.stats> {
+    return this.stats;
   }
 
   /** Whether the player currently has a worker selected. */

@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.28.0] - 2026-04-12
+
+### Added
+- **In-game feedback systeem** -- "Feedback geven" knop in pauzemenu met 3-staps modal (categorie → formulier → bevestiging)
+- **4 feedback categorieën** -- Bug/Issue, Balans, Idee/Feature, Compliment -- elk met eigen placeholder tekst
+- **Auto-capture** -- Game state (versie, factie, difficulty, speeltijd, unit stats) + canvas screenshot automatisch meegestuurd
+- **Server-side feedback API** -- Node.js endpoint op M4 (port 3007) die GitHub Issues aanmaakt met speler-rapporten
+- **FeedbackReporter.ts** -- Client-side TypeScript module met screenshot capture, game state serialisatie, POST naar /api/feedback
+- **Game.getElapsedTime()** -- Publieke getter voor speeltijd
+- **Game.getStats()** -- Publieke getter voor game statistieken (feedback reporting)
+- **Docker setup** -- Dockerfile + docker-compose.yml voor rob-feedback-api container
+
 ## [0.27.0] - 2026-04-12
 
 ### Added

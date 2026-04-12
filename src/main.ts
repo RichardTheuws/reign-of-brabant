@@ -12,6 +12,7 @@ import { CampaignManager } from './campaign/CampaignManager';
 import { getMissionById } from './campaign/MissionDefinitions';
 import { Tutorial } from './core/Tutorial';
 import type { TutorialState as TutorialStateData } from './core/Tutorial';
+import { FeedbackReporter } from './ui/FeedbackReporter';
 import { initAtmosphere, updateAtmosphere } from './rendering/Atmosphere';
 import { updateWater } from './world/Terrain';
 import { PostProcessing } from './rendering/PostProcessing';
@@ -123,6 +124,7 @@ const menuScreens = new MenuScreens();
 // ---------------------------------------------------------------------------
 const campaignManager = new CampaignManager();
 const campaignUI = new CampaignUI(campaignManager);
+const feedbackReporter = new FeedbackReporter();
 let activeMissionId: string | null = null;
 let selectedPlayerFaction: number = 0; // FactionId: 0=Brabanders, 1=Randstad, 2=Limburgers, 3=Belgen
 let selectedMapTemplate: string = 'classic';
@@ -353,6 +355,43 @@ stateMachine.register(new LoadingState());
 stateMachine.register(new TutorialState());
 stateMachine.register(new PlayingState());
 stateMachine.register(new GameOverState());
+
+// ---------------------------------------------------------------------------
+// Feedback reporter
+// ---------------------------------------------------------------------------
+const FACTION_NAMES = ['Brabanders', 'Randstad', 'Limburgers', 'Belgen'];
+feedbackReporter.init(
+  () => ({
+    version: typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'unknown',
+    faction: FACTION_NAMES[selectedPlayerFaction] ?? 'unknown',
+    difficulty: selectedDifficulty,
+    elapsedSeconds: Math.floor(game.getElapsedTime()),
+    mission: activeMissionId,
+    stats: {
+      unitsProduced: game.getStats().unitsProduced,
+      unitsLost: game.getStats().unitsLost,
+      enemiesKilled: game.getStats().enemiesKilled,
+      buildingsBuilt: game.getStats().buildingsBuilt,
+      resourcesGathered: game.getStats().resourcesGathered,
+    },
+    browser: {
+      userAgent: navigator.userAgent,
+      resolution: `${window.innerWidth}x${window.innerHeight}`,
+    },
+  }),
+  async () => {
+    try {
+      const canvas = document.querySelector('canvas');
+      if (!canvas) return null;
+      return canvas.toDataURL('image/png', 0.7);
+    } catch { return null; }
+  },
+  () => {
+    // Re-show pause overlay when feedback closes
+    const pause = document.getElementById('pause-overlay');
+    if (pause) pause.hidden = false;
+  },
+);
 
 // ---------------------------------------------------------------------------
 // Menu screen events

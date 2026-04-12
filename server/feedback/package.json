@@ -1,0 +1,16 @@
+{
+  "name": "rob-feedback-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Reign of Brabant - In-game feedback to GitHub Issues proxy",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

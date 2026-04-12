@@ -1165,6 +1165,105 @@
     .pause-buttons { display: flex; flex-direction: column; gap: 12px; }
     .pause-buttons .go-btn { min-width: 200px; }
 
+    /* ================================================================ FEEDBACK MODAL */
+    #feedback-modal {
+      position: absolute; inset: 0; display: flex;
+      align-items: center; justify-content: center;
+      background: rgba(0, 0, 0, 0.8); z-index: 46;
+      backdrop-filter: blur(6px);
+    }
+    #feedback-modal[hidden] { display: none; }
+    .feedback-panel {
+      background: rgba(20, 15, 10, 0.96);
+      border: 2px solid rgba(212, 168, 83, 0.5);
+      border-radius: 12px; padding: 28px 32px;
+      max-width: 440px; width: 90vw;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+      animation: feedbackSlideIn 0.25s ease-out;
+    }
+    @keyframes feedbackSlideIn {
+      from { opacity: 0; transform: translateY(16px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .feedback-title {
+      font-family: var(--font-heading); font-size: 1.2rem;
+      color: var(--color-gold); margin: 0 0 4px 0; font-weight: 700;
+    }
+    .feedback-sub {
+      color: var(--color-text-dim); font-size: 0.85rem; margin: 0 0 16px 0;
+    }
+    .feedback-categories {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;
+    }
+    .feedback-cat {
+      background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(212, 168, 83, 0.2);
+      border-radius: 8px; padding: 12px 10px; cursor: pointer;
+      text-align: center; transition: border-color 0.15s, transform 0.15s;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .feedback-cat:hover { border-color: var(--color-gold); transform: translateY(-2px); }
+    .feedback-cat-icon {
+      font-family: var(--font-heading); font-size: 1.4rem; color: var(--color-gold);
+      font-weight: 900;
+    }
+    .feedback-cat-label {
+      font-family: var(--font-heading); font-size: 0.8rem;
+      color: var(--color-text); font-weight: 700;
+    }
+    .feedback-cat-desc { font-size: 0.65rem; color: var(--color-text-dim); }
+    .feedback-cancel, .feedback-back {
+      background: none; border: 1px solid rgba(212, 168, 83, 0.25);
+      color: var(--color-text-dim); padding: 8px 20px; border-radius: 6px;
+      cursor: pointer; font-size: 0.85rem; transition: border-color 0.15s;
+    }
+    .feedback-cancel:hover, .feedback-back:hover {
+      border-color: var(--color-gold); color: var(--color-text);
+    }
+    .feedback-cancel { display: block; margin: 0 auto; }
+    .feedback-label {
+      display: block; font-size: 0.8rem; color: var(--color-gold);
+      margin: 12px 0 4px 0; font-family: var(--font-heading); font-weight: 600;
+    }
+    .feedback-input, .feedback-textarea {
+      width: 100%; background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(212, 168, 83, 0.25); border-radius: 6px;
+      color: var(--color-text); padding: 8px 12px; font-size: 0.9rem;
+      font-family: var(--font-body); resize: vertical;
+    }
+    .feedback-input:focus, .feedback-textarea:focus {
+      outline: none; border-color: var(--color-gold);
+    }
+    .feedback-input::placeholder, .feedback-textarea::placeholder {
+      color: var(--color-text-dim); opacity: 0.6;
+    }
+    .feedback-options {
+      display: flex; gap: 16px; margin: 12px 0;
+    }
+    .feedback-check {
+      font-size: 0.78rem; color: var(--color-text-dim); cursor: pointer;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .feedback-check input { accent-color: var(--color-gold); }
+    .feedback-actions {
+      display: flex; justify-content: space-between; margin-top: 16px; gap: 8px;
+    }
+    .feedback-submit {
+      flex: 1; padding: 10px 20px;
+      background: rgba(212, 168, 83, 0.15); border: 1px solid var(--color-gold);
+      border-radius: 6px; color: var(--color-gold); cursor: pointer;
+      font-family: var(--font-heading); font-size: 0.9rem; font-weight: 700;
+      transition: background 0.15s;
+    }
+    .feedback-submit:hover { background: rgba(212, 168, 83, 0.3); }
+    .feedback-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+    .feedback-confirm-text {
+      color: var(--color-text); font-size: 0.9rem; margin: 8px 0 0 0; line-height: 1.5;
+    }
+    @media (max-width: 480px) {
+      .feedback-panel { padding: 20px; }
+      .feedback-categories { grid-template-columns: 1fr; }
+    }
+
     /* ================================================================ SETTINGS PANEL */
     #settings-panel {
       position: fixed;
@@ -1847,7 +1946,73 @@
             <div class="pause-buttons">
               <button class="go-btn" id="btn-resume">Hervatten</button>
               <button class="go-btn" id="btn-pause-settings">Instellingen</button>
+              <button class="go-btn" id="btn-feedback">Feedback geven</button>
               <button class="go-btn" id="btn-pause-menu">Naar Menu</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feedback Modal -->
+        <div id="feedback-modal" hidden>
+          <div class="feedback-panel">
+            <!-- Step 1: Category -->
+            <div id="feedback-step-1">
+              <h3 class="feedback-title">Jij hebt feedback voor ons?</h3>
+              <p class="feedback-sub">Kies een categorie</p>
+              <div class="feedback-categories">
+                <button class="feedback-cat" data-cat="bug">
+                  <span class="feedback-cat-icon">!</span>
+                  <span class="feedback-cat-label">Bug / Issue</span>
+                  <span class="feedback-cat-desc">Iets werkt niet goed</span>
+                </button>
+                <button class="feedback-cat" data-cat="balance">
+                  <span class="feedback-cat-icon">~</span>
+                  <span class="feedback-cat-label">Balans</span>
+                  <span class="feedback-cat-desc">Te moeilijk of te makkelijk</span>
+                </button>
+                <button class="feedback-cat" data-cat="feature">
+                  <span class="feedback-cat-icon">+</span>
+                  <span class="feedback-cat-label">Idee / Feature</span>
+                  <span class="feedback-cat-desc">Wat zou je willen zien?</span>
+                </button>
+                <button class="feedback-cat" data-cat="praise">
+                  <span class="feedback-cat-icon">*</span>
+                  <span class="feedback-cat-label">Compliment</span>
+                  <span class="feedback-cat-desc">Wat vond je vet?</span>
+                </button>
+              </div>
+              <button class="feedback-cancel" id="feedback-cancel">Annuleer</button>
+            </div>
+
+            <!-- Step 2: Form -->
+            <div id="feedback-step-2" hidden>
+              <h3 class="feedback-title" id="feedback-form-title">Bug / Issue</h3>
+              <label class="feedback-label" for="feedback-title-input">Kort samengevat</label>
+              <input type="text" id="feedback-title-input" class="feedback-input" placeholder="bijv. Eenheden lopen vast bij de brug" maxlength="120">
+              <label class="feedback-label" for="feedback-desc-input">Wat gebeurde er?</label>
+              <textarea id="feedback-desc-input" class="feedback-textarea" placeholder="Beschrijf wat je deed en wat er mis ging..." rows="4" maxlength="1000"></textarea>
+              <div class="feedback-options">
+                <label class="feedback-check"><input type="checkbox" id="feedback-screenshot" checked> Screenshot meesturen</label>
+                <label class="feedback-check"><input type="checkbox" id="feedback-gamestate" checked> Game state meesturen</label>
+              </div>
+              <div class="feedback-actions">
+                <button class="feedback-back" id="feedback-back">Terug</button>
+                <button class="feedback-submit" id="feedback-submit">Verzend</button>
+              </div>
+            </div>
+
+            <!-- Step 3: Confirmation -->
+            <div id="feedback-step-3" hidden>
+              <h3 class="feedback-title">Dankjewel!</h3>
+              <p class="feedback-confirm-text" id="feedback-confirm-text">Je feedback is ontvangen. We kijken ernaar.</p>
+              <div class="feedback-actions">
+                <button class="feedback-submit" id="feedback-done">Terug naar spel</button>
+              </div>
+            </div>
+
+            <!-- Loading state -->
+            <div id="feedback-loading" hidden>
+              <h3 class="feedback-title">Bezig met verzenden...</h3>
             </div>
           </div>
         </div>

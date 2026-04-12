@@ -1,0 +1,17 @@
+services:
+  feedback-api:
+    build: .
+    container_name: rob-feedback-api
+    restart: unless-stopped
+    ports:
+      - "3007:3007"
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - GITHUB_REPO=${GITHUB_REPO:-RichardTheuws/reign-of-brabant}
+      - PORT=3007
+    networks:
+      - webnet
+
+networks:
+  webnet:
+    external: true
