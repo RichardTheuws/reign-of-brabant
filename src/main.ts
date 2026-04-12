@@ -262,17 +262,14 @@ setGameFlowDeps({
     // Update tutorial if active — only track the condition for the CURRENT step
     // to prevent auto-gather/auto-assign from skipping ahead
     if (tutorialActive && tutorial.isActive) {
-      tutorialState.gold = game.getPlayerGold();
       const step = tutorial.stepIndex;
       // Step 0: cameraMoved (tracked above via camera position delta)
-      // Step 1: auto-advance (minimap info)
-      if (step >= 2) tutorialState.workerSelected = game.hasWorkerSelected();
-      if (step >= 3) tutorialState.gatheringStarted = game.hasGatheringStarted();
-      // Step 4: auto-advance (info)
-      if (step >= 5) tutorialState.barracksBuilt = game.hasBarracksBuilt();
-      // Step 6: auto-advance (info)
-      if (step >= 7) tutorialState.unitTrained = game.hasUnitTrained();
-      if (step >= 8) tutorialState.attackIssued = game.hasAttackIssued();
+      if (step >= 1) tutorialState.workerSelected = game.hasWorkerSelected();
+      if (step >= 2) tutorialState.gold = game.getPlayerGold(); // gold >= 20 check
+      // Step 3: auto-advance (economy info)
+      if (step >= 4) tutorialState.barracksBuilt = game.hasBarracksBuilt();
+      if (step >= 5) tutorialState.unitTrained = game.hasUnitTrained();
+      if (step >= 6) tutorialState.attackIssued = game.hasAttackIssued();
 
       tutorial.update(dt, tutorialState);
     }

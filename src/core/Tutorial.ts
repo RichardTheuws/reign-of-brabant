@@ -48,60 +48,45 @@ export interface TutorialState {
 // ---------------------------------------------------------------------------
 
 const TUTORIAL_STEPS: TutorialStep[] = [
-  // --- Basis: Camera & Navigatie ---
+  // 1/8 — Camera
   {
-    message: 'Welkom in Reusel, opzichter! Dit is jouw boerderij. Gebruik WASD of de pijltjestoetsen om rond te kijken. Scroll om in en uit te zoomen.',
+    message: 'Welkom in Reusel! Gebruik WASD of pijltjestoetsen om rond te kijken. Scroll om in en uit te zoomen.',
     condition: (s) => s.cameraMoved,
-    highlight: 'camera',
   },
+  // 2/8 — Selecteren
   {
-    message: 'Rechtsonder zie je de minimap — een overzicht van het hele slagveld. Gouden stippen zijn goudmijnen, groene stippen zijn bomen.',
-    condition: () => true,
-    autoAdvanceMs: 5000,
-  },
-  // --- Eenheden selecteren ---
-  {
-    message: 'Klik op een Boer om hem te selecteren. Je ziet zijn stats (HP, aanval, snelheid) rechtsonder. Sleep een kader om meerdere eenheden tegelijk te selecteren.',
+    message: 'Klik op een Boer om hem te selecteren. Rechtsonder verschijnen zijn stats. Sleep een kader om meerdere Boeren te selecteren.',
     condition: (s) => s.workerSelected,
-    highlight: 'worker',
   },
-  // --- Grondstoffen verzamelen ---
+  // 3/8 — Grondstoffen verzamelen (wacht op gold > 20, niet op gatheringStarted)
   {
-    message: 'Klik met rechts op de goudmijn om te gaan verzamelen. Boeren brengen goud automatisch terug naar de Boerderij.',
-    condition: (s) => s.gatheringStarted,
-    highlight: 'goldmine',
+    message: 'Selecteer je Boeren en rechts-klik op de goudmijn om te gaan verzamelen. Wacht tot je wat goud binnen hebt.',
+    condition: (s) => s.gold >= 20,
   },
+  // 4/8 — Goud binnenkomt, info over economie
   {
-    message: 'Goed bezig! Stuur al je Boeren naar de mijnen — hoe meer Boeren, hoe sneller je goud binnenkomt. Linksboven zie je je goud, hout en populatie.',
+    message: 'Het goud komt binnen! Linksboven zie je je grondstoffen. Stuur al je Boeren naar de mijnen voor meer inkomen.',
     condition: () => true,
     autoAdvanceMs: 6000,
   },
-  // --- Bouwen ---
+  // 5/8 — Bouwen (B = barracks)
   {
-    message: 'Tijd om te bouwen! Selecteer een Boer en druk op Q om een Kazerne neer te zetten. Klik waar je wilt bouwen. Je kunt ook op B drukken voor het bouwmenu.',
+    message: 'Tijd om te bouwen! Selecteer een Boer en druk op B om een Kazerne neer te zetten. Klik dan op de grond om te plaatsen.',
     condition: (s) => s.barracksBuilt,
-    highlight: 'barracks',
   },
+  // 6/8 — Eenheden trainen (W = infantry)
   {
-    message: 'De Kazerne is af! Gebouwen hebben een productie-wachtrij — je kunt meerdere eenheden achter elkaar trainen.',
-    condition: () => true,
-    autoAdvanceMs: 4000,
-  },
-  // --- Eenheden trainen ---
-  {
-    message: 'Selecteer de Kazerne en klik op het trainings-icoon (of druk W) om een Carnavalvierder te trainen. Dat is je infanterie.',
+    message: 'Klik op de Kazerne en druk W om een Carnavalvierder te trainen. Dat is je infanterie. Je kunt er meerdere achter elkaar trainen.',
     condition: (s) => s.unitTrained,
-    highlight: 'barracks',
   },
-  // --- Gevecht ---
+  // 7/8 — Gevecht
   {
-    message: 'Er komen vijanden aan! Selecteer je soldaten en rechts-klik op de vijand om aan te vallen. A + rechts-klik doet een attack-move (aanvallen onderweg).',
+    message: 'Selecteer je soldaten en rechts-klik op een vijand om aan te vallen. Tip: A + rechts-klik doet een attack-move.',
     condition: (s) => s.attackIssued,
-    highlight: 'enemy',
   },
-  // --- Afsluiting ---
+  // 8/8 — Afsluiting
   {
-    message: 'Je kent nu de basis! Tip: druk ESC voor het pauzemenu met alle hotkeys. Verzamel 500 goud om deze missie te voltooien. Succes!',
+    message: 'Je kent de basis! Druk ESC voor het pauzemenu met alle hotkeys. Verzamel 500 goud om de missie te voltooien. Succes!',
     condition: () => true,
     autoAdvanceMs: 6000,
   },
