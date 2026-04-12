@@ -1392,9 +1392,9 @@ export class Game {
         // Apply completed tech tree upgrades to newly trained unit
         techTreeSystem.applyAllUpgradesToNewUnit(eid, event.factionId);
       }
-      // Audio: play unit trained horn (only for player units)
+      // Audio: play faction-specific voice line when unit spawns (player only)
       if (event.factionId === this.playerFactionId) {
-        audioManager.playSound('unit_trained');
+        playUnitVoice(event.factionId, 'ready', event.unitTypeId);
       }
     });
 
@@ -1491,7 +1491,7 @@ export class Game {
     eventBus.on('research-completed', (event) => {
       if (event.factionId === this.playerFactionId) {
         this.hud?.showAlert(`Onderzoek voltooid: ${event.upgradeName}`, 'info');
-        audioManager.playSound('unit_trained'); // reuse fanfare sound
+        audioManager.playSound('building_complete'); // use building fanfare for research
       }
     });
   }

@@ -23,7 +23,7 @@ import { UnitTypeId } from '../types/index';
 // Types
 // ---------------------------------------------------------------------------
 
-export type VoiceAction = 'select' | 'move' | 'attack' | 'gather' | 'death' | 'ability' | 'idle';
+export type VoiceAction = 'select' | 'move' | 'attack' | 'gather' | 'death' | 'ability' | 'idle' | 'ready';
 
 type UnitTypeName = 'worker' | 'infantry' | 'ranged' | 'heavy' | 'siege' | 'support' | 'special' | 'hero';
 
@@ -146,6 +146,7 @@ function standardUnitVoices(
     death: unitLines(faction, unitName, 'death', 2),
     ability: unitLines(faction, unitName, 'ability', 2),
     idle: unitLines(faction, unitName, 'idle', 2),
+    ready: unitLines(faction, unitName, 'idle', 2), // reuse idle as spawn announcement
   };
 }
 
@@ -210,6 +211,7 @@ const GENERIC_VOICE_LINES: Record<number, Record<VoiceAction, string[]>> = {
     death: genericLines('brabanders', 'death', 2),
     ability: genericLines('brabanders', 'ability', 2),
     idle: genericLines('brabanders', 'idle', 2),
+    ready: genericLines('brabanders', 'idle', 2),
   },
   1: {
     select: genericLines('randstad', 'select', 3),
@@ -219,6 +221,7 @@ const GENERIC_VOICE_LINES: Record<number, Record<VoiceAction, string[]>> = {
     death: genericLines('randstad', 'death', 2),
     ability: genericLines('randstad', 'ability', 2),
     idle: genericLines('randstad', 'idle', 2),
+    ready: genericLines('randstad', 'idle', 2),
   },
   2: {
     select: genericLines('limburgers', 'select', 3),
@@ -228,6 +231,7 @@ const GENERIC_VOICE_LINES: Record<number, Record<VoiceAction, string[]>> = {
     death: genericLines('limburgers', 'death', 2),
     ability: genericLines('limburgers', 'ability', 2),
     idle: genericLines('limburgers', 'idle', 2),
+    ready: genericLines('limburgers', 'idle', 2),
   },
   3: {
     select: genericLines('belgen', 'select', 3),
@@ -237,6 +241,7 @@ const GENERIC_VOICE_LINES: Record<number, Record<VoiceAction, string[]>> = {
     death: genericLines('belgen', 'death', 2),
     ability: genericLines('belgen', 'ability', 2),
     idle: genericLines('belgen', 'idle', 2),
+    ready: genericLines('belgen', 'idle', 2),
   },
 };
 
