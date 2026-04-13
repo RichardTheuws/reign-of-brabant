@@ -373,6 +373,7 @@ export class Game {
       triggerDefeat: () => { this.gameOver = true; this.musicSystem.playDefeat(); this.onMissionDefeat?.(); },
       getPlayerGold: () => this.playerState.getGold(this.playerFactionId),
       hasPlayerBuilding: (bt) => this._hasPlayerBldg(bt),
+      getPlayerBuildingCount: (bt) => this._playerBldgCount(bt),
       getPlayerArmyCount: () => this._armyCount(),
       isEnemyBuildingDestroyed: (f, bt) => this._enemyBldgDestroyed(f, bt),
       getDestroyedEnemyBuildingCount: () => this._destroyedEnemyBldgCount(),
@@ -453,6 +454,7 @@ export class Game {
     eventBus.on('building-destroyed', (ev) => { if (ev.factionId === this.playerFactionId && ev.buildingTypeId === BuildingTypeId.TownHall) this.missionSystem?.onTownHallLost(); });
   }
   private _hasPlayerBldg(bt: BuildingTypeId): boolean { for (const eid of this.knownBuildingEntities) { if (!entityExists(world, eid)) continue; if (Faction.id[eid] === this.playerFactionId && Building.typeId[eid] === bt && Building.complete[eid] === 1) return true; } return false; }
+  private _playerBldgCount(bt: BuildingTypeId): number { let c = 0; for (const eid of this.knownBuildingEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead)) continue; if (Faction.id[eid] === this.playerFactionId && Building.typeId[eid] === bt && Building.complete[eid] === 1) c++; } return c; }
   private _armyCount(): number { let c = 0; for (const eid of this.knownUnitEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead) || Faction.id[eid] !== this.playerFactionId) continue; const ut = UnitType.id[eid]; if (ut === UnitTypeId.Infantry || ut === UnitTypeId.Ranged) c++; } return c; }
   private _enemyBldgDestroyed(fid: FactionId, bt: BuildingTypeId): boolean { for (const eid of this.knownBuildingEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead) || Health.current[eid] <= 0) continue; if (Faction.id[eid] === fid && Building.typeId[eid] === bt) return false; } return this.activeMission?.buildings.some(b => b.factionId === fid && b.buildingType === bt) ?? false; }
   private _destroyedEnemyBldgCount(): number { let count = 0; if (!this.activeMission) return 0; for (const b of this.activeMission.buildings) { if (b.factionId !== this.playerFactionId) { let alive = false; for (const eid of this.knownBuildingEntities) { if (!entityExists(world, eid) || hasComponent(world, eid, IsDead) || Health.current[eid] <= 0) continue; if (Faction.id[eid] === b.factionId && Building.typeId[eid] === b.buildingType && Math.abs(Position.x[eid] - b.x) < 2 && Math.abs(Position.z[eid] - b.z) < 2) { alive = true; break; } } if (!alive) count++; } } return count; }

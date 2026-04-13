@@ -29,6 +29,10 @@ const GOLD_MINE_PATH = '/assets/models/v02/shared/goldmine.glb';
 /** Scale multipliers for props. */
 const TREE_SCALE_MULTIPLIER = 1.5;
 const ROCK_SCALE_MULTIPLIER = 1.3;
+/** Gold mine scale: v02 models need upscaling like buildings. */
+const GOLD_MINE_SCALE = 2.8;
+/** Gold mine Y-offset: lift above terrain so model doesn't sink. */
+const GOLD_MINE_Y_OFFSET = 2.5;
 
 /** Maximum instances per variant (InstancedMesh budget). */
 const MAX_INSTANCES_PER_VARIANT = 256;
@@ -186,14 +190,16 @@ export class PropRenderer {
       this.group.add(im);
     }
 
-    // Gold mine source model — enable shadow casting
-    mineGltf.scene.traverse((child) => {
+    // Gold mine source model — scale up and enable shadow casting
+    const mineScene = mineGltf.scene;
+    mineScene.scale.set(GOLD_MINE_SCALE, GOLD_MINE_SCALE, GOLD_MINE_SCALE);
+    mineScene.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         child.castShadow = true;
         child.receiveShadow = false;
       }
     });
-    this.goldMineSource = mineGltf.scene;
+    this.goldMineSource = mineScene;
 
     // Tree resource source model — uses first tree variant with brighter green tint
     if (treeGltfs.length > 0) {
@@ -303,7 +309,7 @@ export class PropRenderer {
       }
     });
 
-    clone.position.set(x, y + 1.8, z);
+    clone.position.set(x, y + GOLD_MINE_Y_OFFSET, z);
     clone.name = `goldmine_${eid}`;
     clone.userData.eid = eid;
     this.goldMines.set(eid, clone);

@@ -50,6 +50,7 @@ function createMockCallbacks(overrides: Partial<MissionCallbacks> = {}): Mission
     triggerDefeat: () => {},
     getPlayerGold: () => 100,
     hasPlayerBuilding: () => false,
+    getPlayerBuildingCount: () => 0,
     getPlayerArmyCount: () => 0,
     isEnemyBuildingDestroyed: () => false,
     getDestroyedEnemyBuildingCount: () => 0,
@@ -198,6 +199,7 @@ describe('CampaignManager — Objective Tracking', () => {
     });
     const callbacks = createMockCallbacks({
       hasPlayerBuilding: (bt: BuildingTypeId) => bt === BuildingTypeId.Barracks,
+      getPlayerBuildingCount: (bt: BuildingTypeId) => bt === BuildingTypeId.Barracks ? 1 : 0,
     });
     ms.start(mission, callbacks, 3);
     ms.update(0.1);

@@ -12,6 +12,11 @@ const PERSISTENCE = 0.45;
 const LACUNARITY = 2.2;
 
 // ---------------------------------------------------------------------------
+// Procedural normal map resolution
+// ---------------------------------------------------------------------------
+const NORMAL_MAP_SIZE = 1024;
+
+// ---------------------------------------------------------------------------
 // Biome color palettes
 // ---------------------------------------------------------------------------
 
@@ -206,12 +211,7 @@ export class Terrain {
     this.markRoads();
     this.applyVertexColors();
 
-    const material = new THREE.MeshStandardMaterial({
-      vertexColors: true,
-      side: THREE.FrontSide,
-      roughness: 0.85,
-      metalness: 0.0,
-    });
+    const material = this.createTerrainMaterial();
 
     this.mesh = new THREE.Mesh(this.geometry, material);
     this.mesh.receiveShadow = true;
@@ -320,6 +320,13 @@ export class Terrain {
     // Update geometry
     this.geometry.attributes.position.needsUpdate = true;
     this.geometry.computeVertexNormals();
+
+    // Rebuild material with new terrain-aware normal + roughness maps
+    const oldMaterial = this.mesh.material as THREE.MeshStandardMaterial;
+    if (oldMaterial.normalMap) oldMaterial.normalMap.dispose();
+    if (oldMaterial.roughnessMap) oldMaterial.roughnessMap.dispose();
+    oldMaterial.dispose();
+    this.mesh.material = this.createTerrainMaterial();
   }
 
   /** Check if a world position is on a road (for speed bonus). */
@@ -342,7 +349,10 @@ export class Terrain {
 
   dispose(): void {
     this.geometry.dispose();
-    (this.mesh.material as THREE.Material).dispose();
+    const terrainMat = this.mesh.material as THREE.MeshStandardMaterial;
+    if (terrainMat.normalMap) terrainMat.normalMap.dispose();
+    if (terrainMat.roughnessMap) terrainMat.roughnessMap.dispose();
+    terrainMat.dispose();
     (this.waterMesh.material as THREE.Material).dispose();
     this.waterMesh.geometry.dispose();
     if (this.gridOverlay) {
@@ -489,10 +499,14 @@ export class Terrain {
     // Use active biome palette
     const pal = activePalette;
 
-    // River water color
-    const riverColor = new THREE.Color('#2a7a9a');
-    // Road color
+    // River water colors — deeper blue with teal tones
+    const riverColor = new THREE.Color('#1a6a8a');
+    const riverDeepColor = new THREE.Color('#0e4a6a');
+    // Road colors — warm packed earth with subtle variation
     const roadColor = new THREE.Color('#a09070');
+    const roadDarkColor = new THREE.Color('#8a7a60');
+    // Water-edge transition color
+    const waterEdgeColor = pal.waterEdge;
 
     for (let i = 0; i < count; i++) {
       const height = this.heightData[i];
@@ -507,10 +521,11 @@ export class Terrain {
       const isRoadCell = this.roadMask[i] === 1;
 
       if (isRiverCell) {
-        // River vertices: blue water color with slight variation
+        // River vertices: depth-based color with teal variation
         const rng = seededRandom(ix, iz);
-        color.copy(riverColor);
-        color.multiplyScalar(0.9 + rng * 0.2);
+        const depthRng = seededRandom(ix + 5555, iz + 3333);
+        color.lerpColors(riverDeepColor, riverColor, 0.3 + depthRng * 0.5);
+        color.multiplyScalar(0.92 + rng * 0.16);
         colors[i * 3] = color.r;
         colors[i * 3 + 1] = color.g;
         colors[i * 3 + 2] = color.b;
@@ -518,10 +533,12 @@ export class Terrain {
       }
 
       if (isRoadCell) {
-        // Road vertices: packed earth/dirt color
+        // Road vertices: packed earth with tire-track-like variation
         const rng = seededRandom(ix, iz);
-        color.copy(roadColor);
-        color.multiplyScalar(0.92 + rng * 0.16);
+        const trackRng = seededRandom(ix + 1234, iz + 5678);
+        color.lerpColors(roadDarkColor, roadColor, 0.4 + trackRng * 0.5);
+        // Road edges are slightly darker (worn)
+        color.multiplyScalar(0.9 + rng * 0.18);
         colors[i * 3] = color.r;
         colors[i * 3 + 1] = color.g;
         colors[i * 3 + 2] = color.b;
@@ -535,55 +552,101 @@ export class Terrain {
       // Normalized height 0..1
       const t = Math.min(1, height / MAX_HEIGHT);
 
-      if (t < 0.2) {
-        color.lerpColors(pal.deepGrass, pal.grassLush, t / 0.2);
-        color.multiplyScalar(0.88 + t * 0.6);
+      // Enhanced height-based coloring with smoother transitions and more zones
+      if (t < 0.1) {
+        // Very low terrain near water: dark lush grass with water-edge tint
+        color.lerpColors(waterEdgeColor, pal.deepGrass, t / 0.1);
+        color.multiplyScalar(0.85 + t * 0.8);
+      } else if (t < 0.25) {
+        // Low-lying meadow: deep lush grass
+        const mt = (t - 0.1) / 0.15;
+        color.lerpColors(pal.deepGrass, pal.grassLush, mt);
+        color.multiplyScalar(0.92 + mt * 0.08);
       } else if (t < 0.45) {
-        const mt = (t - 0.2) / 0.25;
+        // Standard grass zone
+        const mt = (t - 0.25) / 0.2;
         color.lerpColors(pal.grassLush, pal.grass, mt);
-      } else if (t < 0.65) {
-        const mt = (t - 0.45) / 0.2;
+      } else if (t < 0.6) {
+        // Mid elevation: lighter grass with dirt patch breakup
+        const mt = (t - 0.45) / 0.15;
         color.lerpColors(pal.grass, pal.grassLight, mt);
-        if (detail > 0.3) {
+        // Detail noise creates natural dirt/path patches
+        if (detail > 0.2) {
           tmpColor.copy(pal.path);
-          color.lerp(tmpColor, (detail - 0.3) * 0.45);
+          const patchIntensity = (detail - 0.2) * 0.5;
+          color.lerp(tmpColor, patchIntensity);
         }
-      } else if (t < 0.85) {
-        const ht = (t - 0.65) / 0.2;
+      } else if (t < 0.75) {
+        // Upper-mid: transition grass to hill color with rocky patches
+        const ht = (t - 0.6) / 0.15;
         color.lerpColors(pal.grassLight, pal.hill, ht);
+        // Rocky patches on slopes
+        if (detail < -0.2 && slope > 0.08) {
+          tmpColor.copy(pal.sandy);
+          color.lerp(tmpColor, (-detail - 0.2) * 0.4);
+        }
+      } else if (t < 0.9) {
+        // Hill zone: exposed earth/rock
+        const ht = (t - 0.75) / 0.15;
+        color.lerpColors(pal.hill, pal.hillTop, ht);
+        color.multiplyScalar(1.02 + ht * 0.06);
       } else {
-        const pt = (t - 0.85) / 0.15;
-        color.lerpColors(pal.hill, pal.hillTop, Math.min(1, pt));
-        color.multiplyScalar(1.05 + pt * 0.08);
+        // Peak zone: bright hilltop with slight bleaching
+        const pt = (t - 0.9) / 0.1;
+        color.copy(pal.hillTop);
+        color.multiplyScalar(1.06 + Math.min(pt, 1) * 0.1);
       }
 
-      // Slope-based blending: steep slopes get sandy/brown tones
-      if (slope > 0.15) {
+      // Slope-based blending: steep slopes expose sandy/rocky terrain underneath
+      if (slope > 0.1) {
         tmpColor.copy(pal.sandy);
-        const slopeFactor = Math.min(1, (slope - 0.15) * 3.0);
-        color.lerp(tmpColor, slopeFactor * 0.5);
+        // Steeper slopes show more exposed earth
+        const slopeFactor = Math.min(1, (slope - 0.1) * 2.5);
+        color.lerp(tmpColor, slopeFactor * 0.55);
+        // Very steep slopes darken slightly (shadow accumulation)
+        if (slope > 0.3) {
+          color.multiplyScalar(0.92);
+        }
       }
 
-      // Micro-variation: seeded random per vertex for +-6% brightness/hue shift
+      // Ambient occlusion approximation: vertices in valleys are slightly darker
+      if (t < 0.15) {
+        const aoFactor = 0.9 + (t / 0.15) * 0.1;
+        color.multiplyScalar(aoFactor);
+      }
+
+      // ---- Multi-scale micro-variation ----
+
+      // Scale 1: Large clumps (meadow patches, ~8-12 vertex radius)
+      const clumpRng = seededRandom(Math.floor(ix / 6), Math.floor(iz / 6));
+      const clumpShift = (clumpRng - 0.5) * 0.06; // +-3% brightness
+
+      // Scale 2: Per-vertex noise for individual variation
       const rng = seededRandom(ix, iz); // 0..1
       const brightnessShift = 0.94 + rng * 0.12; // 0.94 .. 1.06
 
-      // Slight hue shift: nudge green channel for organic feel
-      const hueShift = (seededRandom(ix + 9999, iz + 7777) - 0.5) * 0.035;
+      // Scale 3: Green channel hue shift for organic feel
+      const hueShift = (seededRandom(ix + 9999, iz + 7777) - 0.5) * 0.04;
 
-      // Detail noise drives green-shade patches (clumps of different grass)
+      // Detail noise drives visible grass-shade patches
       const detailFactor = detail * 0.5 + 0.5; // 0..1
-      const detailVariation = 0.96 + detailFactor * 0.08; // 0.96..1.04
+      const detailVariation = 0.95 + detailFactor * 0.1; // 0.95..1.05
 
-      // Extra green micro-patches: some vertices get slightly warmer/cooler green
+      // Warm/cool micro-patches: some vertices get a yellow or blue-green tint
       const patchRng = seededRandom(ix + 3141, iz + 2718);
-      const patchShift = patchRng > 0.8 ? 0.04 : (patchRng < 0.2 ? -0.03 : 0);
+      let warmShift = 0;
+      let coolShift = 0;
+      if (patchRng > 0.85) {
+        warmShift = 0.035; // Warm yellow-green tint
+      } else if (patchRng < 0.15) {
+        coolShift = 0.025; // Cool blue-green tint
+      }
 
-      const finalVariation = brightnessShift * detailVariation;
+      const finalVariation = (brightnessShift + clumpShift) * detailVariation;
 
-      colors[i * 3] = Math.min(1, Math.max(0, color.r * finalVariation));
-      colors[i * 3 + 1] = Math.min(1, Math.max(0, (color.g + hueShift + patchShift) * finalVariation));
-      colors[i * 3 + 2] = Math.min(1, Math.max(0, (color.b - hueShift * 0.5) * finalVariation));
+      colors[i * 3]     = Math.min(1, Math.max(0, (color.r + warmShift) * finalVariation));
+      colors[i * 3 + 1] = Math.min(1, Math.max(0, (color.g + hueShift) * finalVariation));
+      colors[i * 3 + 2] = Math.min(1, Math.max(0, (color.b - hueShift * 0.5 + coolShift) * finalVariation));
     }
 
     this.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
@@ -969,6 +1032,278 @@ export class Terrain {
     return lineSegments;
   }
 
+  // ---------------------------------------------------------------------------
+  // Hi-res terrain material with procedural normal + roughness maps
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Create the terrain material with:
+   * - Vertex colors for biome coloring
+   * - Procedural normal map for surface micro-detail (grass blades, dirt grain, rock cracks)
+   * - Procedural roughness map varying by terrain zone
+   * - Custom shader injection for extra per-fragment detail noise
+   */
+  private createTerrainMaterial(): THREE.MeshStandardMaterial {
+    const normalMap = this.generateProceduralNormalMap();
+    const roughnessMap = this.generateProceduralRoughnessMap();
+
+    const material = new THREE.MeshStandardMaterial({
+      vertexColors: true,
+      side: THREE.FrontSide,
+      roughness: 1.0, // Base roughness; roughness map modulates this
+      metalness: 0.0,
+      normalMap,
+      normalScale: new THREE.Vector2(0.35, 0.35),
+      roughnessMap,
+      envMapIntensity: 0.3,
+    });
+
+    // Inject custom shader code for per-fragment micro-detail noise.
+    // This adds tiny normal perturbations that break up the flat-shaded look
+    // without requiring image textures.
+    material.onBeforeCompile = (shader) => {
+      // Add uniforms for terrain detail
+      shader.uniforms.uDetailScale = { value: 48.0 };
+      shader.uniforms.uDetailStrength = { value: 0.12 };
+
+      // Insert noise function before main() in fragment shader
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <normal_pars_fragment>',
+        /* glsl */ `
+        #include <normal_pars_fragment>
+
+        // Simple 2D hash for per-fragment noise
+        float terrainHash(vec2 p) {
+          vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+          p3 += dot(p3, p3.yzx + 33.33);
+          return fract((p3.x + p3.y) * p3.z);
+        }
+
+        // Value noise with smooth interpolation
+        float terrainNoise(vec2 p) {
+          vec2 i = floor(p);
+          vec2 f = fract(p);
+          f = f * f * (3.0 - 2.0 * f); // smoothstep
+          float a = terrainHash(i);
+          float b = terrainHash(i + vec2(1.0, 0.0));
+          float c = terrainHash(i + vec2(0.0, 1.0));
+          float d = terrainHash(i + vec2(1.0, 1.0));
+          return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+        }
+
+        // Fractal Brownian Motion for multi-scale detail
+        float terrainFBM(vec2 p) {
+          float v = 0.0;
+          float a = 0.5;
+          for (int i = 0; i < 4; i++) {
+            v += a * terrainNoise(p);
+            p *= 2.1;
+            a *= 0.5;
+          }
+          return v;
+        }
+
+        uniform float uDetailScale;
+        uniform float uDetailStrength;
+        `,
+      );
+
+      // Perturb the normal after normal map is applied
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <normal_fragment_maps>',
+        /* glsl */ `
+        #include <normal_fragment_maps>
+
+        // Per-fragment micro-detail: perturb normal with FBM noise
+        {
+          vec2 detailUV = vUv * uDetailScale;
+          float nx = terrainFBM(detailUV + vec2(0.37, 0.0)) - terrainFBM(detailUV - vec2(0.37, 0.0));
+          float nz = terrainFBM(detailUV + vec2(0.0, 0.37)) - terrainFBM(detailUV - vec2(0.0, 0.37));
+          vec3 detailPerturbation = vec3(nx, nz, 0.0) * uDetailStrength;
+          normal = normalize(normal + detailPerturbation);
+        }
+        `,
+      );
+    };
+
+    return material;
+  }
+
+  /**
+   * Generate a procedural normal map on a canvas.
+   * Uses multiple octaves of noise to create grass-like micro-detail,
+   * dirt grain patterns, and rocky surface texture.
+   */
+  private generateProceduralNormalMap(): THREE.CanvasTexture {
+    const size = NORMAL_MAP_SIZE;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d')!;
+    const imageData = ctx.createImageData(size, size);
+    const data = imageData.data;
+
+    const noise2D = createNoise2D();
+    const detailNoise = createNoise2D();
+    const microNoise = createNoise2D();
+
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        const idx = (y * size + x) * 4;
+
+        // Normalized coords 0..1
+        const u = x / size;
+        const v = y / size;
+
+        // Map to world space for height sampling
+        const worldX = u * MAP_SIZE - MAP_SIZE / 2;
+        const worldZ = v * MAP_SIZE - MAP_SIZE / 2;
+
+        // Sample height at this point for terrain-type-aware normals
+        const gridX = Math.floor(u * SEGMENTS);
+        const gridZ = Math.floor(v * SEGMENTS);
+        const heightIdx = Math.min(gridZ, SEGMENTS) * (SEGMENTS + 1) + Math.min(gridX, SEGMENTS);
+        const height = this.heightData[heightIdx] ?? 0;
+        const t = Math.min(1, height / MAX_HEIGHT);
+        const isRiver = this.riverMask[heightIdx] === 1;
+        const isRoad = this.roadMask[heightIdx] === 1;
+
+        // Multi-scale noise for surface detail
+        // Scale 1: Large-scale undulations (terrain bumps between vertices)
+        const n1 = noise2D(u * 60, v * 60) * 0.4;
+        // Scale 2: Medium detail (grass clumps, dirt patches)
+        const n2 = detailNoise(u * 180, v * 180) * 0.35;
+        // Scale 3: Fine micro-detail (individual grass blades, grain)
+        const n3 = microNoise(u * 500, v * 500) * 0.25;
+
+        // Combine scales based on terrain type
+        let strength: number;
+        if (isRiver) {
+          // Water: very subtle ripple normal
+          strength = 0.08;
+        } else if (isRoad) {
+          // Road: low-frequency bumps, packed earth
+          strength = 0.2;
+        } else if (t > 0.7) {
+          // High terrain (rocky hills): strong normals
+          strength = 0.9;
+        } else if (t > 0.4) {
+          // Mid terrain (grass with dirt patches): medium normals
+          strength = 0.6;
+        } else {
+          // Low terrain (lush grass): moderate normals with grass-like detail
+          strength = 0.5;
+        }
+
+        // Compute normal perturbation from noise gradients
+        // Finite difference for normal map X and Y
+        const eps = 1.0 / size;
+        const hCenter = n1 + n2 + n3;
+        const hRight = noise2D((u + eps) * 60, v * 60) * 0.4
+                      + detailNoise((u + eps) * 180, v * 180) * 0.35
+                      + microNoise((u + eps) * 500, v * 500) * 0.25;
+        const hUp    = noise2D(u * 60, (v + eps) * 60) * 0.4
+                      + detailNoise(u * 180, (v + eps) * 180) * 0.35
+                      + microNoise(u * 500, (v + eps) * 500) * 0.25;
+
+        const dx = (hRight - hCenter) * strength;
+        const dy = (hUp - hCenter) * strength;
+
+        // Encode as normal map: R = X perturbation, G = Y perturbation, B = Z (up)
+        // Normal map encoding: 0.5 = no perturbation, 0 = -1, 1 = +1
+        data[idx]     = Math.floor(Math.min(255, Math.max(0, (dx * 0.5 + 0.5) * 255)));  // R
+        data[idx + 1] = Math.floor(Math.min(255, Math.max(0, (dy * 0.5 + 0.5) * 255)));  // G
+        data[idx + 2] = Math.floor(Math.min(255, Math.max(0, (1.0 - Math.abs(dx) - Math.abs(dy)) * 0.5 * 255 + 128))); // B
+        data[idx + 3] = 255; // A
+      }
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.magFilter = THREE.LinearFilter;
+    texture.minFilter = THREE.LinearMipmapLinearFilter;
+    texture.anisotropy = 4;
+    return texture;
+  }
+
+  /**
+   * Generate a procedural roughness map.
+   * - Grass areas: moderate roughness (0.7-0.9) with variation
+   * - Dirt/paths: high roughness (0.85-0.95)
+   * - Rocky hills: variable roughness (0.6-0.95)
+   * - Water edges: low roughness (0.3-0.5)
+   * - Roads: packed earth roughness (0.7-0.85)
+   */
+  private generateProceduralRoughnessMap(): THREE.CanvasTexture {
+    const size = NORMAL_MAP_SIZE;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d')!;
+    const imageData = ctx.createImageData(size, size);
+    const data = imageData.data;
+
+    const noise2D = createNoise2D();
+    const detailNoise = createNoise2D();
+
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        const idx = (y * size + x) * 4;
+
+        const u = x / size;
+        const v = y / size;
+
+        // Sample terrain type
+        const gridX = Math.floor(u * SEGMENTS);
+        const gridZ = Math.floor(v * SEGMENTS);
+        const heightIdx = Math.min(gridZ, SEGMENTS) * (SEGMENTS + 1) + Math.min(gridX, SEGMENTS);
+        const height = this.heightData[heightIdx] ?? 0;
+        const t = Math.min(1, height / MAX_HEIGHT);
+        const isRiver = this.riverMask[heightIdx] === 1;
+        const isRoad = this.roadMask[heightIdx] === 1;
+
+        // Base roughness by terrain type
+        let roughness: number;
+        if (isRiver) {
+          roughness = 0.15; // Smooth water
+        } else if (isRoad) {
+          roughness = 0.75 + noise2D(u * 100, v * 100) * 0.1; // Packed earth
+        } else if (t > 0.8) {
+          // Rocky hilltops: variable
+          roughness = 0.65 + noise2D(u * 80, v * 80) * 0.15 + detailNoise(u * 200, v * 200) * 0.1;
+        } else if (t > 0.5) {
+          // Grass-dirt transition
+          roughness = 0.75 + noise2D(u * 60, v * 60) * 0.12;
+        } else if (t < 0.15) {
+          // Near water: slightly smoother
+          roughness = 0.6 + noise2D(u * 40, v * 40) * 0.1;
+        } else {
+          // Standard grass
+          roughness = 0.78 + noise2D(u * 120, v * 120) * 0.08 + detailNoise(u * 300, v * 300) * 0.05;
+        }
+
+        const val = Math.floor(Math.min(255, Math.max(0, roughness * 255)));
+        data[idx]     = val; // R (roughness)
+        data[idx + 1] = val; // G
+        data[idx + 2] = val; // B
+        data[idx + 3] = 255; // A
+      }
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.magFilter = THREE.LinearFilter;
+    texture.minFilter = THREE.LinearMipmapLinearFilter;
+    texture.anisotropy = 4;
+    return texture;
+  }
+
   private createWaterPlane(): THREE.Mesh {
     const waterGeo = new THREE.PlaneGeometry(MAP_SIZE * 1.5, MAP_SIZE * 1.5, 80, 80);
     waterGeo.rotateX(-Math.PI / 2);
@@ -978,10 +1313,10 @@ export class Terrain {
     const waterMat = new THREE.MeshStandardMaterial({
       color: '#1a6b8a',
       transparent: true,
-      opacity: 0.82,
-      roughness: 0.08,
-      metalness: 0.6,
-      envMapIntensity: 1.2,
+      opacity: 0.78,
+      roughness: 0.05,
+      metalness: 0.65,
+      envMapIntensity: 1.5,
       side: THREE.DoubleSide,
     });
 

@@ -40,12 +40,17 @@ export interface MissionObjective {
   readonly description: string;
   readonly targetValue: number;
   readonly isBonus: boolean;
+  /** For 'build-building' objectives: which building type to check. Defaults to Barracks if omitted. */
+  readonly targetBuildingType?: BuildingTypeId;
+  /** For 'build-building' objectives: how many of this building the player needs. Defaults to 1. */
+  readonly targetBuildingCount?: number;
 }
 
 export type TriggerCondition =
   | { type: 'time'; seconds: number }
   | { type: 'gold-reached'; amount: number }
   | { type: 'building-built'; buildingType: BuildingTypeId }
+  | { type: 'building-count'; buildingType: BuildingTypeId; count: number }
   | { type: 'army-count'; count: number }
   | { type: 'building-destroyed'; factionId: FactionId; buildingType: BuildingTypeId }
   | { type: 'wave-defeated'; waveIndex: number }
@@ -3376,15 +3381,19 @@ const LIMBURGERS_MISSION_1_EERSTE_SCHACHT: MissionDefinition = {
     'iets klopt niet. Maar eerst: de basis moet draaien.\n\n' +
     'Bouw een Mijnschacht om Kolen te winnen, verzamel Vlaai en Mergel, en train je ' +
     'eerste Mijnwerkers. De Limburgse economie draait op wat je uit de grond haalt.\n\n' +
+    'Limburgers hebben een unieke kracht: tunnels. Mijnschachten functioneren als ' +
+    'tunneluitgangen — bouw er twee en je eenheden kunnen ondergronds reizen.\n\n' +
     'En houd je ogen open. Die trillingen komen niet van een aardbeving.',
 
   mapSize: 96,
-  startingGold: 100,
+  startingGold: 150,
   startingGoldAI: 0,
 
   buildings: [
     // Player: Grottentempel (TownHall) in south-center of map
     { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.TownHall, x: -5, z: -35, complete: true },
+    // Pre-built Mijnschacht near base — first tunnel endpoint + Kolen production
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.TertiaryResourceBuilding, x: 5, z: -30, complete: true },
   ],
 
   units: [
@@ -3398,7 +3407,7 @@ const LIMBURGERS_MISSION_1_EERSTE_SCHACHT: MissionDefinition = {
   goldMines: [
     { x: 5, z: -35, amount: 1500 },   // Close to start
     { x: -15, z: -25, amount: 1500 },  // Medium distance
-    { x: 10, z: -20, amount: 2000 },   // Contested area
+    { x: 10, z: -10, amount: 2000 },   // North — tunnel helps reach this safely
   ],
 
   treeResources: [
@@ -3410,6 +3419,7 @@ const LIMBURGERS_MISSION_1_EERSTE_SCHACHT: MissionDefinition = {
 
   objectives: [
     { id: 'gather-400', type: 'gather-gold', description: 'Verzamel 400 Vlaai', targetValue: 400, isBonus: false },
+    { id: 'build-mijnschacht', type: 'build-building', description: 'Bouw een tweede Mijnschacht (tunnelnetwerk)', targetValue: 2, isBonus: false, targetBuildingType: BuildingTypeId.TertiaryResourceBuilding, targetBuildingCount: 2 },
     { id: 'build-barracks', type: 'build-building', description: 'Bouw een Heuvelfort (Kazerne)', targetValue: 1, isBonus: false },
     { id: 'train-3-units', type: 'train-units', description: 'Train 3 Schutterij-soldaten', targetValue: 3, isBonus: false },
     { id: 'no-worker-loss', type: 'no-worker-loss', description: 'Verlies geen Mijnwerkers', targetValue: 0, isBonus: true },
@@ -3419,13 +3429,31 @@ const LIMBURGERS_MISSION_1_EERSTE_SCHACHT: MissionDefinition = {
     {
       id: 'start-narrator',
       condition: { type: 'time', seconds: 3 },
-      actions: [{ type: 'message', text: 'Welkom in de grotten van Valkenburg. De Mijnbaas rekent op je. Bouw een Mijnschacht en begin met het verzamelen van Vlaai.' }],
+      actions: [{ type: 'message', text: 'Welkom in de grotten van Valkenburg. De Mijnbaas rekent op je. Stuur je Mijnwerkers naar de Vlaaimijnen en begin met verzamelen.' }],
+      once: true,
+    },
+    {
+      id: 'tip-tunnel-intro',
+      condition: { type: 'time', seconds: 25 },
+      actions: [{ type: 'message', text: 'De Mijnbaas: "Zie je die Mijnschacht bij de basis? Die produceert Kolen en is een tunneluitgang. Bouw een tweede Mijnschacht op een strategische plek en je eenheden kunnen ondergronds reizen. Selecteer een Mijnwerker en kies Mijnschacht in het bouwmenu."' }],
       once: true,
     },
     {
       id: 'tip-60s',
       condition: { type: 'time', seconds: 60 },
       actions: [{ type: 'message', text: 'Stuur je Mijnwerkers naar de Vlaaimijnen. In Limburg halen we alles uit de grond — letterlijk.' }],
+      once: true,
+    },
+    {
+      id: 'tunnel-network-active',
+      condition: { type: 'building-count', buildingType: BuildingTypeId.TertiaryResourceBuilding, count: 2 },
+      actions: [{ type: 'message', text: 'De Mijnbaas: "Het tunnelnetwerk is actief! Stuur eenheden naar een Mijnschacht — ze reizen ondergronds naar de andere uitgang in 3 seconden. Na aankomst krijgen ze een verrassingsbonus: +25% schade gedurende 3 seconden! Let op: belegeringswapens passen niet door tunnels."' }],
+      once: true,
+    },
+    {
+      id: 'tip-tunnel-maintenance',
+      condition: { type: 'time', seconds: 100 },
+      actions: [{ type: 'message', text: 'Tunneltip: Het netwerk kan maximaal 4 uitgangen hebben en 12 eenheden tegelijk transporteren. Zorg dat je Mijnschachten Kolen blijven produceren — zonder Kolen valt het tunnelnetwerk uit.' }],
       once: true,
     },
     {
@@ -3444,7 +3472,7 @@ const LIMBURGERS_MISSION_1_EERSTE_SCHACHT: MissionDefinition = {
       id: 'first-attack',
       condition: { type: 'time', seconds: 200 },
       actions: [
-        { type: 'message', text: 'Randstad-verkenners! Ze hebben onze grotten gevonden! Verdedig de Grottentempel!' },
+        { type: 'message', text: 'Randstad-verkenners! Ze hebben onze grotten gevonden! Gebruik je tunnelnetwerk om troepen snel naar het front te sturen!' },
         {
           type: 'spawn-units',
           units: [
@@ -3470,8 +3498,8 @@ const LIMBURGERS_MISSION_1_EERSTE_SCHACHT: MissionDefinition = {
   hasAIProduction: false,
 
   starThresholds: {
-    threeStarTime: 240,  // 4 min
-    twoStarTime: 420,    // 7 min
+    threeStarTime: 300,  // 5 min (extra time for tunnel objective)
+    twoStarTime: 480,    // 8 min
     allBonusesGrants3Stars: true,
   },
 };

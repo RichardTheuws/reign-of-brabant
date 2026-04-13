@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.30.0] - 2026-04-13
+
+### Fixed
+- **Goudmijn zinkt in terrein** -- v02 goldmine model kreeg nu correcte scale (2.8) en Y-offset (2.5), consistent met andere buildings
+
+### Added
+- **Tunnels tutorial** -- Limburger Mission 1 leert spelers tunnel mechanics: pre-placed Mijnschacht, objective voor tweede endpoint, 4 tutorial triggers met uitleg over transit, surprise bonus en onderhoud
+- **`building-count` trigger type** -- Nieuw mission objective type dat checkt op aantal gebouwen van een specifiek type
+
+### Improved
+- **Terrein rendering upgrade** -- Procedurele normal map (1024x1024) met 3 octaves simplex noise, roughness map met terrain-aware zones, custom shader met 4-octave FBM noise, 8 height zones (was 5), slope-based AO, valley darkening
+- **Water rendering** -- Meer transparantie, scherpere reflecties, hogere envMapIntensity
+
 ## [0.29.0] - 2026-04-13
 
 ### Added

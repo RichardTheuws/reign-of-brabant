@@ -37,6 +37,8 @@ export interface MissionCallbacks {
   getPlayerGold: () => number;
   /** Query: has player built a specific building type? */
   hasPlayerBuilding: (buildingType: BuildingTypeId) => boolean;
+  /** Query: count how many completed buildings of a specific type the player has. */
+  getPlayerBuildingCount: (buildingType: BuildingTypeId) => number;
   /** Query: how many military units does the player have? */
   getPlayerArmyCount: () => number;
   /** Query: has a specific enemy building been destroyed? */
@@ -269,12 +271,16 @@ export class MissionSystem {
           }
           break;
 
-        case 'build-building':
-          if (this.callbacks.hasPlayerBuilding(BuildingTypeId.Barracks)) {
-            state.currentValue = 1;
+        case 'build-building': {
+          const targetBt = state.objective.targetBuildingType ?? BuildingTypeId.Barracks;
+          const requiredCount = state.objective.targetBuildingCount ?? 1;
+          const currentCount = this.callbacks.getPlayerBuildingCount(targetBt);
+          state.currentValue = currentCount;
+          if (currentCount >= requiredCount) {
             state.completed = true;
           }
           break;
+        }
 
         case 'no-worker-loss':
           // This is evaluated at mission end; stays "completed" unless a worker dies
@@ -325,6 +331,9 @@ export class MissionSystem {
 
       case 'building-built':
         return this.callbacks.hasPlayerBuilding(condition.buildingType);
+
+      case 'building-count':
+        return this.callbacks.getPlayerBuildingCount(condition.buildingType) >= condition.count;
 
       case 'army-count':
         return this.callbacks.getPlayerArmyCount() >= condition.count;
