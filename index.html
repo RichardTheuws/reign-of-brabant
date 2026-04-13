@@ -280,16 +280,36 @@
     .hero__content { position: relative; z-index: 3; max-width: 800px; }
 
     .hero__logo {
-        width: min(280px, 50vw); height: auto;
+        width: min(600px, 85vw); height: auto;
         margin: 0 auto var(--space-sm);
         filter: drop-shadow(0 0 50px var(--gold-glow));
-        border-radius: 12px;
+        border-radius: 8px;
         opacity: 0;
         animation: logoReveal 1.5s var(--ease-out-expo) 0.3s forwards;
     }
     @keyframes logoReveal {
         from { opacity: 0; transform: scale(0.85) translateY(20px); }
         to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .hero__cinematic {
+        width: min(800px, 92vw);
+        margin: var(--space-lg) auto 0;
+        border-radius: var(--radius-lg);
+        border: 1px solid rgba(212, 168, 83, 0.3);
+        overflow: hidden;
+        box-shadow: 0 8px 48px rgba(0,0,0,0.7), 0 0 80px rgba(212, 168, 83, 0.08);
+        opacity: 0;
+        animation: logoReveal 1.5s var(--ease-out-expo) 0.8s forwards;
+    }
+    .hero__cinematic video {
+        width: 100%; display: block;
+    }
+    .hero__cinematic-label {
+        text-align: center; padding: var(--space-xs) var(--space-sm);
+        font-size: 0.75rem; color: var(--text-muted);
+        background: rgba(10, 8, 6, 0.8);
+        letter-spacing: 0.05em;
     }
 
     .hero__title {
@@ -903,18 +923,23 @@
 
         <div class="hero__content">
             <img
-                src="/assets/ui/logo.png"
-                alt="Reign of Brabant logo"
+                src="/assets/ui/logo-banner.png"
+                alt="Reign of Brabant"
                 class="hero__logo"
-                width="280"
-                height="280"
             >
-            <h1 class="hero__title">Reign of Brabant</h1>
-            <p class="hero__tagline">Nie Fokke Mee Brabant</p>
             <p class="hero__subtitle">
                 Een satirische RTS in de stijl van WarCraft.<br>
                 Gebouwd door 1 persoon. Met AI.
             </p>
+
+            <div class="hero__cinematic">
+                <video controls playsinline preload="metadata"
+                       poster="/assets/ui/title-card.png">
+                    <source src="/assets/steun/het-ontstaan.mp4" type="video/mp4">
+                </video>
+                <div class="hero__cinematic-label">Het Ontstaan -- 30 seconden origin cinematic</div>
+            </div>
+
             <div class="hero__cta-group">
                 <a href="/play/" class="btn btn--primary" data-umami-event="play_click">Speel Nu</a>
                 <a href="/het-verhaal/" class="btn">Het Verhaal</a>

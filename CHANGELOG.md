@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.29.0] - 2026-04-13
+
+### Added
+- **"Het Ontstaan" AI cinematic** -- 30 seconden origin story cinematic, volledig AI-gegenereerd
+- **Cinematic pipeline** -- Flux Pro keyframes, face-swap (fal.ai), Kling v3 + Seedance 2.0 video, MMAudio V2 SFX
+- **Voice-over** -- Brabantse narration door Richard
+- **Epische audio** -- "Storm Over Low Fields" score, 12 SFX (oorlogshoorn, strijdkreet, troepen, kerkklok, bass drop)
+- **Steun pagina** -- cinematics sectie geüpgraded met volledige cinematic + productie-details
+- **Updates pagina** -- v0.29.0 entry met embedded video player
+
 ## [0.28.2] - 2026-04-12
 
 ### Added

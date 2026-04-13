@@ -1245,8 +1245,8 @@
 
             <h1 class="hero__title" style="animation-delay:2.8s">Nie Fokke Mee Brabant</h1>
 
-            <img class="hero__logo" src="/assets/ui/logo.png" alt="Reign of Brabant"
-                 width="360" height="360" loading="eager">
+            <img class="hero__logo" src="/assets/ui/logo-banner.png" alt="Reign of Brabant"
+                 style="width:min(500px,80vw);height:auto;" loading="eager">
 
             <div class="hero__stats-bar">
                 <span>33.559 regels code</span>
@@ -1484,16 +1484,33 @@
         <div class="container" style="max-width:var(--content-width);margin:0 auto;">
             <h2 class="section__title" data-reveal>AI Cinematics</h2>
             <p class="section__intro" data-reveal>
-                Stel je voor: cinematische cutscenes tussen missies. Gegenereerd met AI. Dit is een preview van 5 seconden.
+                Cinematische cutscenes. Gegenereerd met AI. Dit is "Het Ontstaan" -- de origin story van
+                Reign of Brabant in 30 seconden. Van maker achter zijn laptop tot het slagveld
+                met vier facties. Met voice-over, orkestrale score, en sound design.
             </p>
-            <div style="max-width:800px;" data-reveal>
-                <video autoplay muted loop playsinline
+            <div style="max-width:900px;" data-reveal>
+                <video controls playsinline preload="metadata"
                        poster="/assets/steun/hero-banner.webp"
-                       style="width:100%; border-radius:8px; border:1px solid var(--border);">
-                    <source src="/assets/steun/cinematic-preview.mp4" type="video/mp4">
+                       style="width:100%; border-radius:var(--radius); border:1px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,0.6);">
+                    <source src="/assets/steun/het-ontstaan.mp4" type="video/mp4">
                 </video>
-                <p style="text-align:center; color:var(--text-secondary); margin-top:var(--space-sm); font-size:0.85rem;">
-                    Kling 3.0 Pro via fal.ai -- image-to-video, 5 seconden, gegenereerd in 58 seconden
+                <div style="display:flex; gap:var(--space-md); margin-top:var(--space-md); flex-wrap:wrap; justify-content:center;" data-reveal>
+                    <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-sm) var(--space-md); font-size:0.8rem; color:var(--text-secondary);">
+                        <span style="color:var(--gold);">9</span> keyframes via Flux Pro
+                    </div>
+                    <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-sm) var(--space-md); font-size:0.8rem; color:var(--text-secondary);">
+                        <span style="color:var(--gold);">9</span> videoclips via Kling v3 + Seedance 2.0
+                    </div>
+                    <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-sm) var(--space-md); font-size:0.8rem; color:var(--text-secondary);">
+                        <span style="color:var(--gold);">12</span> SFX via MMAudio V2
+                    </div>
+                    <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-sm) var(--space-md); font-size:0.8rem; color:var(--text-secondary);">
+                        Face-swap voor character consistency
+                    </div>
+                </div>
+                <p style="text-align:center; color:var(--text-muted); margin-top:var(--space-md); font-size:0.85rem; font-style:italic;">
+                    Volledige productie: keyframes, video, audio, SFX, montage -- alles AI-gegenereerd in &eacute;&eacute;n sessie.
+                    Dit is waar we naartoe werken: cinematische cutscenes tussen elke campaign missie.
                 </p>
             </div>
         </div>
