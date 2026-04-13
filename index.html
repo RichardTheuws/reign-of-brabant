@@ -351,7 +351,7 @@
         border-radius: var(--radius-lg);
         overflow: hidden;
         opacity: 0;
-        animation: logoReveal 1.5s var(--ease-out-expo) 0.8s forwards;
+        animation: cinematicFadeIn 1s ease-out 1.2s forwards;
         cursor: pointer;
         box-shadow:
             0 4px 60px rgba(0,0,0,0.8),
@@ -365,6 +365,10 @@
         background: conic-gradient(from 0deg, rgba(212,168,83,0.5), rgba(212,168,83,0.05) 25%, rgba(212,168,83,0.3) 50%, rgba(212,168,83,0.05) 75%, rgba(212,168,83,0.5));
         z-index: -1;
         animation: borderSpin 8s linear infinite;
+    }
+    @keyframes cinematicFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
     }
     @keyframes borderSpin {
         to { transform: rotate(360deg); }
