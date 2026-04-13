@@ -11,6 +11,8 @@ import {
   BUILDING_ARCHETYPES,
 } from '../entities/archetypes';
 import { UnitTypeId, BuildingTypeId } from '../types/index';
+import { createCommandIcon, replaceIconText } from './CommandIcons';
+import { createBuildingPortraitImg } from './BuildingPortraits';
 
 // ---------------------------------------------------------------------------
 // Types (from POC-UI.md section 5)
@@ -79,7 +81,8 @@ export interface BuildingCardData {
   hp: number;
   maxHp: number;
   status: string;       // 'Idle', 'Training Infantry (12s)', etc.
-  portraitAbbrev: string; // Short building type abbreviation (TH, BRK, etc.)
+  portraitAbbrev: string; // Short building type abbreviation (TH, BRK, etc.) -- legacy fallback
+  buildingTypeId: number; // BuildingTypeId for canvas-drawn portrait
   actions: BuildingCardAction[];
 }
 
@@ -384,6 +387,9 @@ export class HUD {
     this.cmdBuilding = this.el('cmd-building');
     this.cmdWorker = this.el('cmd-worker');
 
+    // Replace text-based icons with SVG icons on all static command buttons
+    this.replaceStaticButtonIcons();
+
     // Bind event listeners
     this.bindCommandButtons();
     this.bindMinimapClick();
@@ -391,6 +397,19 @@ export class HUD {
     this.bindHotkeys();
     this.bindRageButton();
     this.bindMuteButton();
+  }
+
+  /**
+   * Replace text icon labels on all static HTML command buttons with SVG icons.
+   * Targets .btn-icon spans in cmd-unit, cmd-multi, cmd-building, and cmd-hero panels.
+   */
+  private replaceStaticButtonIcons(): void {
+    const iconSpans = document.querySelectorAll<HTMLElement>(
+      '#cmd-unit .btn-icon, #cmd-multi .btn-icon, #cmd-building .btn-icon, #cmd-hero .btn-icon'
+    );
+    for (const span of iconSpans) {
+      replaceIconText(span);
+    }
   }
 
   // -----------------------------------------------------------------------
@@ -644,6 +663,17 @@ export class HUD {
 
     this.buildingName.textContent = building.name;
 
+    // Canvas-drawn building portrait (replaces text placeholder)
+    const buildingTypeId = this.buildingTypeToId(building.type);
+    const placeholder = this.buildingPortrait.querySelector('.portrait-placeholder') as HTMLElement | null;
+    const existingImg = this.buildingPortrait.querySelector('img');
+    if (existingImg) existingImg.remove();
+    const pxSize = 88;
+    const img = createBuildingPortraitImg(buildingTypeId, pxSize, pxSize);
+    img.style.borderRadius = '4px';
+    this.buildingPortrait.appendChild(img);
+    if (placeholder) placeholder.style.display = 'none';
+
     // HP bar
     const ratio = building.maxHp > 0 ? building.hp / building.maxHp : 0;
     this.buildingHpBar.style.width = `${ratio * 100}%`;
@@ -694,9 +724,17 @@ export class HUD {
     this.buildingPanel.hidden = true;
     this.buildingCard.hidden = false;
 
-    // Portrait abbreviation
+    // Canvas-drawn building portrait (replaces text abbreviation)
     const portraitText = this.bcardPortrait.querySelector('.bcard-portrait-text');
-    if (portraitText) portraitText.textContent = data.portraitAbbrev;
+    const existingImg = this.bcardPortrait.querySelector('img');
+    if (existingImg) existingImg.remove();
+
+    // Portrait container is 44x44 CSS px; draw at 2x for retina
+    const pxSize = 88;
+    const img = createBuildingPortraitImg(data.buildingTypeId as BuildingTypeId, pxSize, pxSize);
+    img.style.borderRadius = '4px';
+    this.bcardPortrait.appendChild(img);
+    if (portraitText) (portraitText as HTMLElement).style.display = 'none';
 
     // Name and faction
     this.bcardName.textContent = data.name;
@@ -733,7 +771,12 @@ export class HUD {
       const iconSpan = document.createElement('span');
       iconSpan.className = 'bcard-action-icon';
       if (act.iconClass) iconSpan.classList.add(act.iconClass);
-      iconSpan.textContent = act.icon;
+      const svgIcon = createCommandIcon(act.icon, 20);
+      if (svgIcon) {
+        iconSpan.appendChild(svgIcon);
+      } else {
+        iconSpan.textContent = act.icon;
+      }
       btn.appendChild(iconSpan);
 
       const labelSpan = document.createElement('span');
@@ -870,10 +913,16 @@ export class HUD {
       }
 
       btn.innerHTML = `
-        <span class="btn-icon btn-icon--research">UPG</span>
+        <span class="btn-icon btn-icon--research"></span>
         <span class="research-name">${this.escapeHtml(upg.name)}</span>
         <span class="research-cost">${upg.isResearched ? 'OK' : upg.costGold + 'g'}</span>
       `;
+      const upgIconSpan = btn.querySelector('.btn-icon') as HTMLElement;
+      if (upgIconSpan) {
+        const upgSvg = createCommandIcon('UPG', 18);
+        if (upgSvg) upgIconSpan.appendChild(upgSvg);
+        else upgIconSpan.textContent = 'UPG';
+      }
       btn.title = `${upg.name}\n${upg.description}\nKosten: ${upg.costGold} goud`;
 
       if (!upg.isResearched && upg.canResearch) {
@@ -1260,7 +1309,12 @@ export class HUD {
 
     const iconSpan = document.createElement('span');
     iconSpan.className = 'btn-icon' + (cmd.iconClass ? ` ${cmd.iconClass}` : '');
-    iconSpan.textContent = cmd.icon;
+    const svgIcon = createCommandIcon(cmd.icon, 20);
+    if (svgIcon) {
+      iconSpan.appendChild(svgIcon);
+    } else {
+      iconSpan.textContent = cmd.icon;
+    }
     btn.appendChild(iconSpan);
 
     if (cmd.label) {
@@ -1500,6 +1554,16 @@ export class HUD {
     if (ratio > 0.6) return 'var(--color-hp-high)';
     if (ratio > 0.3) return 'var(--color-hp-mid)';
     return 'var(--color-hp-low)';
+  }
+
+  private buildingTypeToId(type: BuildingType): BuildingTypeId {
+    switch (type) {
+      case 'townhall': return BuildingTypeId.TownHall;
+      case 'barracks': return BuildingTypeId.Barracks;
+      case 'lumbercamp': return BuildingTypeId.LumberCamp;
+      case 'blacksmith': return BuildingTypeId.Blacksmith;
+      default: return BuildingTypeId.TownHall;
+    }
   }
 
   private getUnitAbbrev(name: string): string {

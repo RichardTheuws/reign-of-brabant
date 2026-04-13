@@ -2190,6 +2190,7 @@ export class Game {
       maxHp: Health.max[eid],
       status,
       portraitAbbrev: portraitAbbrevs[buildingType] ?? 'BLD',
+      buildingTypeId: buildingType,
       actions,
     };
   }
@@ -2585,10 +2586,20 @@ export class Game {
       if (tertiaryEl && tertiaryVal) {
         tertiaryEl.style.display = 'flex';
         tertiaryVal.textContent = String(Math.floor(this.playerState.getTertiary(this.playerFactionId)));
-        if (tertiaryIcon) {
-          // Tertiary icon uses CSS class on the resource-icon span -- no text content needed
-          tertiaryIcon.textContent = '';
-          tertiaryIcon.className = 'resource-icon resource-icon--gold';
+        if (tertiaryIcon && !tertiaryIcon.dataset.iconSet) {
+          // Set faction-specific SVG icon for tertiary resource
+          tertiaryIcon.className = 'resource-icon';
+          if (this.playerFactionId === FactionId.Randstad) {
+            // Havermoutmelk - milk carton
+            tertiaryIcon.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none"><path d="M8 4h8l2 5v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9l2-5z" fill="#F5F0E0"/><path d="M8 4h8l2 5H6l2-5z" fill="#E8DCC8"/><rect x="6" y="9" width="12" height="12" rx="0.5" fill="#FAF5E8"/><rect x="9" y="11" width="6" height="4" rx="0.5" fill="#8BC34A" opacity="0.7"/><line x1="6" y1="9" x2="18" y2="9" stroke="#D4C8A8" stroke-width="0.5"/></svg>';
+          } else if (this.playerFactionId === FactionId.Limburgers) {
+            // Kolen - coal chunk
+            tertiaryIcon.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none"><path d="M6 14l2-6 4-2 5 1 3 5-1 5-4 3-5 0-4-3z" fill="#2C2C2C"/><path d="M8 8l4-2 5 1 1 3-3-1-4 1-3-2z" fill="#404040"/><path d="M6 14l2-2 3 1 2-1 3 1 2-1 1 3-3 2-4 1-4-1z" fill="#1A1A1A"/><path d="M10 9l1.5-0.5 2 0.5" stroke="#555" stroke-width="0.4" opacity="0.6"/><ellipse cx="9" cy="10" rx="1.5" ry="1" fill="#4A4A4A" opacity="0.5"/></svg>';
+          } else if (this.playerFactionId === FactionId.Belgen) {
+            // Chocolade - chocolate bar
+            tertiaryIcon.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none"><rect x="4" y="7" width="16" height="10" rx="1.5" fill="#5C3317"/><rect x="5" y="8" width="14" height="8" rx="1" fill="#7B4B2A"/><line x1="9.5" y1="8" x2="9.5" y2="16" stroke="#5C3317" stroke-width="0.8"/><line x1="14.5" y1="8" x2="14.5" y2="16" stroke="#5C3317" stroke-width="0.8"/><line x1="5" y1="12" x2="19" y2="12" stroke="#5C3317" stroke-width="0.8"/><rect x="5.5" y="8.5" width="3.5" height="3" rx="0.3" fill="#8B6340" opacity="0.4"/><rect x="14.8" y="12.5" width="3.5" height="3" rx="0.3" fill="#8B6340" opacity="0.4"/></svg>';
+          }
+          tertiaryIcon.dataset.iconSet = '1';
         }
       }
     }

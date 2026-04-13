@@ -167,9 +167,14 @@ body {
 }
 
 .resource-icon {
-  font-size: 18px;
+  display: inline-flex;
+  align-items: center;
   line-height: 1;
   filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.3));
+}
+
+.resource-icon svg {
+  display: block;
 }
 
 .resource-value {

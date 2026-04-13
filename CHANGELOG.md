@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.31.0] - 2026-04-13
+
+### Improved
+- **Command button icons** — 12 tekst-afkortingen (MOV/ATK/STP/etc.) vervangen door SVG icons: zwaarden, schild, boog, kroon, vlag, aambeeld
+- **Building portraits** — 9 canvas-drawn gebouw-portretten (Town Hall, Barracks, Blacksmith, LumberCamp, Housing, Mine, Tower, Temples) i.p.v. tekst-afkortingen
+- **Resource bar icons** — CSS gradient shapes vervangen door inline SVG: gouden munt, houtblok, persoon silhouet, bierpul, factie-specifieke tertiaire resources (kolen/chocolade/havermoutmelk)
+
+### Fixed
+- **Design-bible emoji fallbacks** — 4 gebroken image paden geremapt naar bestaande bestanden, 11 onerror emoji SVG handlers verwijderd, CSS gradient fallback toegevoegd
+
 ## [0.30.0] - 2026-04-13
 
 ### Fixed
