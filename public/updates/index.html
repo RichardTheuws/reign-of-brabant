@@ -476,6 +476,53 @@
     <div class="content">
         <div class="timeline">
 
+            <!-- ── v0.31.0 ─────────────────────────────── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.31.0</span>
+                        <span class="update__date">13 april 2026</span>
+                        <h2 class="update__title">HUD Visual Upgrade — Van Tekst naar Iconen</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--visual">UI</span>
+                            <span class="tag tag--fix">Fix</span>
+                        </div>
+                        <ul class="update__highlights">
+                            <li><strong>12 SVG command icons</strong> -- Tekst-labels (MOV/ATK/STP) vervangen door visuele iconen: gekruiste zwaarden, schild, boog met pijl, kroon, vlag, aambeeld</li>
+                            <li><strong>9 gebouw-portretten</strong> -- Canvas-drawn portraits voor elk gebouwtype: Town Hall met toren en vlag, kazerne met zwaarden-embleem, smederij met aambeeld, mijnschacht met ertskar</li>
+                            <li><strong>Resource bar vernieuwd</strong> -- CSS-shapes vervangen door inline SVG: gouden munt, houtblok met jaarringen, bierpul voor Gezelligheid, factie-specifieke tertiaire icons (kolen, chocolade, havermoutmelk)</li>
+                            <li><strong>Design-bible opgeschoond</strong> -- 4 gebroken image-paden hersteld, 11 emoji-fallbacks verwijderd (nul emoji's in de hele codebase)</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.30.0 ─────────────────────────────── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.30.0</span>
+                        <span class="update__date">13 april 2026</span>
+                        <h2 class="update__title">Gameplay Sprint — Tunnels, Terrein en Goudmijn</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Gameplay</span>
+                            <span class="tag tag--fix">Fix</span>
+                            <span class="tag tag--visual">Terrein</span>
+                        </div>
+                        <ul class="update__highlights">
+                            <li><strong>Tunnels tutorial</strong> -- Limburger Mission 1 leert nu het tunnelsysteem: pre-placed Mijnschacht als endpoint, objective om tweede te bouwen, tips over transit (3 seconden, +25% surprise attack bonus) en onderhoud</li>
+                            <li><strong>Terrein rendering upgrade</strong> -- Procedurele normal map (1024×1024) met 3 octaves simplex noise, roughness map per terreinzone, custom FBM shader met 4 octaves micro-detail, 8 hoogtezones (was 5), slope-based AO en valley darkening</li>
+                            <li><strong>Goudmijn gefixed</strong> -- v02 goldmine model zakte in het terrein door ontbrekende scale (nu 2.8) en verkeerde Y-offset (nu 2.5, consistent met alle andere gebouwen)</li>
+                            <li><strong>Water verfijnd</strong> -- Meer transparantie, scherpere reflecties, hogere envMapIntensity voor realistischer uiterlijk</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
             <!-- ── v0.29.0 ─────────────────────────────── -->
             <article class="update">
                 <div class="update__card">
