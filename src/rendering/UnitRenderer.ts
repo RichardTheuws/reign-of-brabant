@@ -251,6 +251,15 @@ const DAMAGE_FLASH_COLOR = new THREE.Color(1.0, 0.2, 0.2);
 /** Default (neutral) instance color: white = no tinting. */
 const DEFAULT_COLOR = new THREE.Color(1, 1, 1);
 
+/** Buff indicator: golden glow when unit has a stat buff. */
+const BUFF_COLOR = new THREE.Color(1.0, 0.85, 0.3);
+
+/** Stun indicator: grey tint when stunned. */
+const STUN_COLOR = new THREE.Color(0.5, 0.5, 0.7);
+
+/** Invincible indicator: bright golden shield glow. */
+const INVINCIBLE_COLOR = new THREE.Color(1.0, 0.95, 0.5);
+
 /** Idle bob: gentle up-and-down movement for idle units. */
 const IDLE_BOB_AMPLITUDE = 0.08;
 const IDLE_BOB_SPEED = 2.5;
@@ -905,6 +914,9 @@ export class UnitRenderer {
       unitTypeId?: number;
       targetX?: number;
       targetZ?: number;
+      isBuffed?: boolean;
+      isStunned?: boolean;
+      isInvincible?: boolean;
     }>,
   ): void {
     this.elapsedTime += dt;
@@ -1026,19 +1038,22 @@ export class UnitRenderer {
         proxy.rotation.y = facingY;
       }
 
-      // --- Instance color: selection highlight / damage flash ---
+      // --- Instance color: damage flash > selected > invincible > stunned > buffed > default ---
       const isFlashing = this.damageFlashTimers.has(data.eid);
+      let instanceColor = DEFAULT_COLOR;
       if (isFlashing) {
-        bucket.mesh.setColorAt(instanceIndex, DAMAGE_FLASH_COLOR);
-        dirtyColorBuckets.add(key);
+        instanceColor = DAMAGE_FLASH_COLOR;
       } else if (data.selected) {
-        bucket.mesh.setColorAt(instanceIndex, SELECTION_COLOR);
-        dirtyColorBuckets.add(key);
-      } else {
-        // Reset to neutral white
-        bucket.mesh.setColorAt(instanceIndex, DEFAULT_COLOR);
-        dirtyColorBuckets.add(key);
+        instanceColor = SELECTION_COLOR;
+      } else if (data.isInvincible) {
+        instanceColor = INVINCIBLE_COLOR;
+      } else if (data.isStunned) {
+        instanceColor = STUN_COLOR;
+      } else if (data.isBuffed) {
+        instanceColor = BUFF_COLOR;
       }
+      bucket.mesh.setColorAt(instanceIndex, instanceColor);
+      dirtyColorBuckets.add(key);
 
       // --- Sync blob shadow position (slightly above ground) ---
       const shadow = this.blobShadows.get(data.eid);
@@ -1072,6 +1087,7 @@ export class UnitRenderer {
       selected: boolean; isIdle?: boolean; aiState?: number;
       unitTypeId?: number;
       targetX?: number; targetZ?: number;
+      isBuffed?: boolean; isStunned?: boolean; isInvincible?: boolean;
     },
     animUnit: AnimatedUnit,
   ): void {
@@ -1114,19 +1130,22 @@ export class UnitRenderer {
       shadow.position.set(data.x, data.y + 0.05, data.z);
     }
 
-    // --- Damage flash / selection highlight for animated units ---
+    // --- Damage flash / selection highlight / buff indicator for animated units ---
     const isFlashing = this.damageFlashTimers.has(data.eid);
-    this.setAnimatedUnitEmissive(animUnit, isFlashing, data.selected);
+    this.setAnimatedUnitEmissive(animUnit, isFlashing, data.selected, data.isBuffed, data.isStunned, data.isInvincible);
   }
 
   /**
    * Set emissive color on all materials of an animated unit model
-   * for damage flash and selection highlight effects.
+   * for damage flash, selection highlight, and buff/debuff effects.
    */
   private setAnimatedUnitEmissive(
     animUnit: AnimatedUnit,
     isFlashing: boolean,
     isSelected: boolean,
+    isBuffed?: boolean,
+    isStunned?: boolean,
+    isInvincible?: boolean,
   ): void {
     animUnit.model.traverse((child) => {
       if (!(child as THREE.Mesh).isMesh) return;
@@ -1140,6 +1159,15 @@ export class UnitRenderer {
             stdMat.emissiveIntensity = 0.8;
           } else if (isSelected) {
             stdMat.emissive.copy(SELECTION_COLOR);
+            stdMat.emissiveIntensity = 0.3;
+          } else if (isInvincible) {
+            stdMat.emissive.copy(INVINCIBLE_COLOR);
+            stdMat.emissiveIntensity = 0.6;
+          } else if (isStunned) {
+            stdMat.emissive.copy(STUN_COLOR);
+            stdMat.emissiveIntensity = 0.4;
+          } else if (isBuffed) {
+            stdMat.emissive.copy(BUFF_COLOR);
             stdMat.emissiveIntensity = 0.3;
           } else {
             stdMat.emissive.setScalar(0);

@@ -53,6 +53,8 @@ export interface ProjectileSpawnData {
   targetZ: number;
   /** Time in seconds the projectile takes to arrive. */
   duration: number;
+  /** Projectile type: 'arrow' (default) or 'siege' (larger, fiery arc). */
+  projectileType?: 'arrow' | 'siege';
 }
 
 interface ActiveProjectile {
@@ -80,6 +82,8 @@ interface ActiveProjectile {
   active: boolean;
   /** When > 0 the projectile has hit and the trail is fading out. */
   fadeOut: number;
+  /** Projectile type for rendering differences. */
+  projectileType: 'arrow' | 'siege';
 }
 
 /** A single dust particle in an impact effect. */
@@ -214,6 +218,7 @@ export class ProjectileRenderer {
         peakY: 0,
         active: false,
         fadeOut: 0,
+        projectileType: 'arrow',
       });
     }
 
@@ -256,6 +261,9 @@ export class ProjectileRenderer {
     const slot = this.acquireSlot();
     if (!slot) return false;
 
+    const isSiege = data.projectileType === 'siege';
+    slot.projectileType = isSiege ? 'siege' : 'arrow';
+
     slot.startX = data.startX;
     slot.startY = data.startY;
     slot.startZ = data.startZ;
@@ -280,8 +288,14 @@ export class ProjectileRenderer {
     const dx = data.targetX - data.startX;
     const dz = data.targetZ - data.startZ;
     const dist = Math.sqrt(dx * dx + dz * dz);
-    // Higher arc for longer distances
-    slot.peakY = midY + Math.max(MIN_ARC_PEAK, dist * 0.15);
+    // Siege: higher arc, larger visual
+    if (isSiege) {
+      slot.peakY = midY + Math.max(MIN_ARC_PEAK * 2, dist * 0.3);
+      slot.obj.scale.set(2.5, 2.5, 2.5);
+    } else {
+      slot.peakY = midY + Math.max(MIN_ARC_PEAK, dist * 0.15);
+      slot.obj.scale.set(1, 1, 1);
+    }
 
     slot.obj.visible = true;
     slot.obj.position.set(data.startX, data.startY, data.startZ);

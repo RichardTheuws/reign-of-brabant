@@ -418,6 +418,93 @@ export class BuildingRenderer {
   }
 
   // -----------------------------------------------------------------------
+  // Destruction animation
+  // -----------------------------------------------------------------------
+
+  /** Buildings currently playing destruction animation: eid -> elapsed time. */
+  private destroyingBuildings = new Map<number, number>();
+
+  /** Duration of the destruction animation in seconds. */
+  private static readonly DESTRUCTION_DURATION = 1.8;
+
+  /**
+   * Start the destruction animation for a building.
+   * Called when a building's HP reaches 0 (IsDead tag added).
+   */
+  startDestruction(eid: number): void {
+    if (this.destroyingBuildings.has(eid)) return;
+    const obj = this.instances.get(eid);
+    if (!obj) return;
+    this.destroyingBuildings.set(eid, 0);
+    // Store the original Y position for sinking animation
+    obj.userData.destructionOriginY = obj.position.y;
+    obj.userData.destructionOriginScaleY = obj.scale.y;
+  }
+
+  /**
+   * Tick destruction animations. Returns eids that finished their animation.
+   */
+  updateDestructions(dt: number): number[] {
+    const finished: number[] = [];
+
+    for (const [eid, elapsed] of this.destroyingBuildings) {
+      const obj = this.instances.get(eid);
+      if (!obj) {
+        this.destroyingBuildings.delete(eid);
+        continue;
+      }
+
+      const newElapsed = elapsed + dt;
+      const t = Math.min(newElapsed / BuildingRenderer.DESTRUCTION_DURATION, 1.0);
+
+      // Ease-in curve for accelerating collapse
+      const eased = t * t;
+
+      // Sink into ground
+      const originY = obj.userData.destructionOriginY ?? obj.position.y;
+      obj.position.y = originY - eased * 3.0;
+
+      // Tilt to the side (topple effect)
+      obj.rotation.z = eased * 0.4;
+      obj.rotation.x = eased * 0.15;
+
+      // Shrink vertically (crumbling)
+      const scaleY = obj.userData.destructionOriginScaleY ?? obj.scale.y;
+      obj.scale.y = scaleY * (1.0 - eased * 0.5);
+
+      // Fade out in last 40%
+      if (t > 0.6) {
+        const fadeT = (t - 0.6) / 0.4;
+        const opacity = 1.0 - fadeT;
+        obj.traverse((child) => {
+          if ((child as THREE.Mesh).isMesh) {
+            const mesh = child as THREE.Mesh;
+            const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+            for (const mat of mats) {
+              (mat as THREE.Material).opacity = opacity;
+              (mat as THREE.Material).transparent = true;
+            }
+          }
+        });
+      }
+
+      if (newElapsed >= BuildingRenderer.DESTRUCTION_DURATION) {
+        finished.push(eid);
+        this.destroyingBuildings.delete(eid);
+      } else {
+        this.destroyingBuildings.set(eid, newElapsed);
+      }
+    }
+
+    return finished;
+  }
+
+  /** Check if a building is currently being destroyed (skip normal updates). */
+  isDestroying(eid: number): boolean {
+    return this.destroyingBuildings.has(eid);
+  }
+
+  // -----------------------------------------------------------------------
   // Per-frame sync
   // -----------------------------------------------------------------------
 

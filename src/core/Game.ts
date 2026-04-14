@@ -10,7 +10,7 @@ import * as THREE from 'three';
 import { addEntity, addComponent, hasComponent, query, entityExists } from 'bitecs';
 
 import { world, resetGameWorld } from '../ecs/world';
-import { Position, Faction, Health, Attack, Armor, Movement, UnitType, UnitAI, Gatherer, Visibility, Building, Resource, Selected, Production, Rotation, GezeligheidBonus, Hero, HeroAbilities, RallyPoint } from '../ecs/components';
+import { Position, Faction, Health, Attack, Armor, Movement, UnitType, UnitAI, Gatherer, Visibility, Building, Resource, Selected, Production, Rotation, GezeligheidBonus, Hero, HeroAbilities, RallyPoint, StatBuff, Stunned, Invincible } from '../ecs/components';
 import { IsUnit, IsBuilding, IsResource, IsWorker, IsDead, IsHero } from '../ecs/tags';
 import { FactionId, UnitTypeId, BuildingTypeId, HeroTypeId, UpgradeId, ResourceType, MAP_SIZE, UnitAIState, NO_PRODUCTION, NO_ENTITY, HERO_POPULATION_COST, type UnitArchetype } from '../types/index';
 import { UNIT_ARCHETYPES, BUILDING_ARCHETYPES } from '../entities/archetypes';
@@ -50,6 +50,7 @@ import type { Terrain } from '../world/Terrain';
 import type { RTSCamera } from '../camera/RTSCamera';
 import type { EventBus as EventBusType } from '../core/EventBus';
 import type { ParticleSystem } from '../rendering/ParticleSystem';
+import { initAbilityEffects } from '../rendering/AbilityEffects';
 
 const MINIMAP_COLORS: Record<number, string> = {
   [FactionId.Brabanders]: '#FF8C00',
@@ -1612,6 +1613,9 @@ export class Game {
       // Mesh creation is handled by detectAndRenderNewEntities
     });
 
+    // Hero ability + heal visual effects
+    initAbilityEffects(this.particles, this.camera);
+
     // Audio + particles: combat hits
     eventBus.on('combat-hit', (event) => {
       const targetPos = { x: event.x, z: event.z };
@@ -2469,8 +2473,8 @@ export class Game {
     // Update fog of war overlay
     this.fogOfWarRenderer.update(dt);
 
-    // Remove dead entity meshes
-    this.cleanupDeadEntities();
+    // Remove dead entity meshes + tick building destruction animations
+    this.cleanupDeadEntities(dt);
 
     // Update HUD
     this.updateHUD();
@@ -2622,6 +2626,7 @@ export class Game {
       selected: boolean; isIdle?: boolean; aiState?: number;
       unitTypeId?: number;
       targetX?: number; targetZ?: number;
+      isBuffed?: boolean; isStunned?: boolean; isInvincible?: boolean;
     }> = [];
 
     for (const [eid, mesh] of this.entityMeshMap) {
@@ -2641,6 +2646,9 @@ export class Game {
             unitTypeId: UnitType.id[eid],
             targetX: hasTarget ? Movement.targetX[eid] : undefined,
             targetZ: hasTarget ? Movement.targetZ[eid] : undefined,
+            isBuffed: hasComponent(world, eid, StatBuff) && StatBuff.duration[eid] > 0,
+            isStunned: hasComponent(world, eid, Stunned) && Stunned.duration[eid] > 0,
+            isInvincible: hasComponent(world, eid, Invincible) && Invincible.duration[eid] > 0,
           });
         } else if (!hasComponent(world, eid, IsBuilding)) {
           // Resources: position sync with Y offset to prevent terrain clipping
@@ -2718,7 +2726,7 @@ export class Game {
     this.selectionRenderer.update(dt, selectionData);
   }
 
-  private cleanupDeadEntities(): void {
+  private cleanupDeadEntities(dt: number): void {
     for (const eid of this.knownUnitEntities) {
       if (!entityExists(world, eid) || hasComponent(world, eid, IsDead)) {
         if (this.entityMeshMap.has(eid)) {
@@ -2732,6 +2740,8 @@ export class Game {
     }
     for (const eid of this.knownBuildingEntities) {
       if (!entityExists(world, eid)) {
+        // Entity removed from ECS — if destruction animation is running, let it finish
+        if (this.buildingRenderer.isDestroying(eid)) continue;
         if (this.entityMeshMap.has(eid)) {
           this.buildingRenderer.removeBuilding(eid);
           this.entityMeshMap.delete(eid);
@@ -2739,7 +2749,28 @@ export class Game {
         // Remove rally point flag if building is destroyed
         this.buildingRenderer.removeRallyPoint(eid);
         this.knownBuildingEntities.delete(eid);
+      } else if (hasComponent(world, eid, IsDead) && !this.buildingRenderer.isDestroying(eid)) {
+        // Building just died — start destruction animation + effects
+        this.buildingRenderer.startDestruction(eid);
+        const obj = this.buildingRenderer.getObject(eid);
+        if (obj) {
+          const factionColor = FACTION_DEATH_COLORS[Faction.id[eid]] ?? 0x4a4a5a;
+          this.particles.spawnBuildingDestruction(obj.position.x, obj.position.y, obj.position.z, factionColor);
+          this.camera.shake(0.8, 0.5);
+          audioManager.playSound('building_complete', { x: obj.position.x, z: obj.position.z });
+        }
       }
+    }
+
+    // Tick building destruction animations — remove meshes when finished
+    const finishedDestructions = this.buildingRenderer.updateDestructions(dt);
+    for (const eid of finishedDestructions) {
+      if (this.entityMeshMap.has(eid)) {
+        this.buildingRenderer.removeBuilding(eid);
+        this.entityMeshMap.delete(eid);
+      }
+      this.buildingRenderer.removeRallyPoint(eid);
+      this.knownBuildingEntities.delete(eid);
     }
   }
 

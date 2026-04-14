@@ -81,6 +81,51 @@ const DEATH_SIZE_MAX = 0.35;
 const DEATH_LIFE_MIN = 1.0;
 const DEATH_LIFE_MAX = 1.5;
 
+// -- Building Destruction ---------------------------------------------------
+const DESTRUCTION_MIN = 35;
+const DESTRUCTION_MAX = 50;
+const DESTRUCTION_DEBRIS_COLORS: [number, number, number][] = [
+  [0.545, 0.380, 0.220], // #8b6138 dark wood
+  [0.420, 0.420, 0.420], // #6b6b6b stone grey
+  [0.200, 0.150, 0.100], // #33261a dark debris
+];
+const DESTRUCTION_FIRE_COLORS: [number, number, number][] = [
+  [1.0, 0.400, 0.0],     // #ff6600 bright fire
+  [1.0, 0.200, 0.0],     // #ff3300 deep fire
+  [1.0, 0.667, 0.0],     // #ffaa00 golden flame
+];
+const DESTRUCTION_SPEED_MIN = 1.5;
+const DESTRUCTION_SPEED_MAX = 4.0;
+const DESTRUCTION_VY_MIN = 2.0;
+const DESTRUCTION_VY_MAX = 5.0;
+const DESTRUCTION_SIZE_MIN = 0.25;
+const DESTRUCTION_SIZE_MAX = 0.55;
+const DESTRUCTION_LIFE_MIN = 1.2;
+const DESTRUCTION_LIFE_MAX = 2.0;
+
+// -- Heal Effect ------------------------------------------------------------
+const HEAL_COUNT = 12;
+const HEAL_COLOR: [number, number, number] = [0.2, 1.0, 0.3]; // bright green
+const HEAL_VY_MIN = 1.0;
+const HEAL_VY_MAX = 2.0;
+const HEAL_DRIFT = 0.3;
+const HEAL_SIZE = 0.2;
+const HEAL_LIFE_MIN = 0.6;
+const HEAL_LIFE_MAX = 1.0;
+
+// -- Buff Aura --------------------------------------------------------------
+const BUFF_COUNT = 20;
+const BUFF_ORBIT_SPEED = 3.0;
+const BUFF_SIZE = 0.18;
+const BUFF_LIFE_MIN = 1.0;
+const BUFF_LIFE_MAX = 1.5;
+
+// -- Stun Stars -------------------------------------------------------------
+const STUN_COUNT = 6;
+const STUN_COLOR: [number, number, number] = [1.0, 1.0, 0.3]; // yellow stars
+const STUN_SIZE = 0.22;
+const STUN_LIFE = 1.2;
+
 // -- Ability Burst ----------------------------------------------------------
 const ABILITY_COUNT = 40;
 const ABILITY_EXPAND_SPEED = 2.0;
@@ -427,6 +472,237 @@ export class ParticleSystem {
         vz: Math.sin(angle) * ABILITY_EXPAND_SPEED,
         life,
         size,
+        color: [...rgb],
+        type: ParticleType.Ability,
+        gravity: false,
+      });
+    }
+  }
+
+  /**
+   * Spawn a large building destruction explosion:
+   * debris chunks flying outward + fire particles rising.
+   */
+  spawnBuildingDestruction(x: number, y: number, z: number, factionColor: number): void {
+    const count = randInt(DESTRUCTION_MIN, DESTRUCTION_MAX);
+    const factionRgb = hexToRgb(factionColor);
+
+    for (let n = 0; n < count; n++) {
+      const idx = this.allocate();
+      if (idx === -1) return;
+
+      const isFire = Math.random() < 0.35;
+      const isFaction = !isFire && Math.random() < 0.25;
+      let color: [number, number, number];
+      if (isFire) {
+        const palette = DESTRUCTION_FIRE_COLORS;
+        color = [...palette[Math.floor(Math.random() * palette.length)]];
+      } else if (isFaction) {
+        color = [...factionRgb];
+      } else {
+        const palette = DESTRUCTION_DEBRIS_COLORS;
+        color = [...palette[Math.floor(Math.random() * palette.length)]];
+      }
+
+      const life = rand(DESTRUCTION_LIFE_MIN, DESTRUCTION_LIFE_MAX);
+      const size = rand(DESTRUCTION_SIZE_MIN, DESTRUCTION_SIZE_MAX);
+      const angle = Math.random() * Math.PI * 2;
+      const speed = rand(DESTRUCTION_SPEED_MIN, DESTRUCTION_SPEED_MAX);
+
+      this.spawn(idx, {
+        x: x + rand(-1, 1),
+        y: y + rand(0, 1.5),
+        z: z + rand(-1, 1),
+        vx: Math.cos(angle) * speed,
+        vy: rand(DESTRUCTION_VY_MIN, DESTRUCTION_VY_MAX),
+        vz: Math.sin(angle) * speed,
+        life,
+        size,
+        color,
+        type: ParticleType.Death,
+        gravity: true,
+      });
+    }
+  }
+
+  /** Spawn upward green healing particles at position. */
+  spawnHealEffect(x: number, y: number, z: number): void {
+    for (let n = 0; n < HEAL_COUNT; n++) {
+      const idx = this.allocate();
+      if (idx === -1) return;
+
+      const life = rand(HEAL_LIFE_MIN, HEAL_LIFE_MAX);
+
+      this.spawn(idx, {
+        x: x + rand(-0.5, 0.5),
+        y,
+        z: z + rand(-0.5, 0.5),
+        vx: rand(-HEAL_DRIFT, HEAL_DRIFT),
+        vy: rand(HEAL_VY_MIN, HEAL_VY_MAX),
+        vz: rand(-HEAL_DRIFT, HEAL_DRIFT),
+        life,
+        size: HEAL_SIZE,
+        color: [...HEAL_COLOR],
+        type: ParticleType.Ability,
+        gravity: false,
+      });
+    }
+  }
+
+  /** Spawn orbiting buff aura particles around position. */
+  spawnBuffAura(x: number, y: number, z: number, color: number, radius: number): void {
+    const rgb = hexToRgb(color);
+
+    for (let n = 0; n < BUFF_COUNT; n++) {
+      const idx = this.allocate();
+      if (idx === -1) return;
+
+      const angle = (n / BUFF_COUNT) * Math.PI * 2;
+      const startX = x + Math.cos(angle) * radius;
+      const startZ = z + Math.sin(angle) * radius;
+      const life = rand(BUFF_LIFE_MIN, BUFF_LIFE_MAX);
+
+      // Orbit tangentially
+      this.spawn(idx, {
+        x: startX,
+        y: y + rand(0, 0.5),
+        z: startZ,
+        vx: -Math.sin(angle) * BUFF_ORBIT_SPEED,
+        vy: rand(0.2, 0.5),
+        vz: Math.cos(angle) * BUFF_ORBIT_SPEED,
+        life,
+        size: BUFF_SIZE,
+        color: [...rgb],
+        type: ParticleType.Ability,
+        gravity: false,
+      });
+    }
+  }
+
+  /** Spawn spinning star particles above stunned unit. */
+  spawnStunStars(x: number, y: number, z: number): void {
+    for (let n = 0; n < STUN_COUNT; n++) {
+      const idx = this.allocate();
+      if (idx === -1) return;
+
+      const angle = (n / STUN_COUNT) * Math.PI * 2;
+
+      this.spawn(idx, {
+        x: x + Math.cos(angle) * 0.6,
+        y: y + 2.5,
+        z: z + Math.sin(angle) * 0.6,
+        vx: -Math.sin(angle) * 2.0,
+        vy: rand(-0.1, 0.2),
+        vz: Math.cos(angle) * 2.0,
+        life: STUN_LIFE,
+        size: STUN_SIZE,
+        color: [...STUN_COLOR],
+        type: ParticleType.Ability,
+        gravity: false,
+      });
+    }
+  }
+
+  /**
+   * Spawn a cone-shaped burst (for abilities like Mestverspreider).
+   * @param facing Direction in radians
+   * @param halfAngle Half-width of cone in radians
+   * @param range Length of cone
+   */
+  spawnConeEffect(
+    x: number, y: number, z: number,
+    facing: number, halfAngle: number, range: number,
+    color: number,
+  ): void {
+    const rgb = hexToRgb(color);
+    const count = 25;
+
+    for (let n = 0; n < count; n++) {
+      const idx = this.allocate();
+      if (idx === -1) return;
+
+      const angle = facing + rand(-halfAngle, halfAngle);
+      const speed = rand(2.0, range * 0.5);
+      const life = rand(0.8, 1.4);
+
+      this.spawn(idx, {
+        x,
+        y: y + rand(0, 0.5),
+        z,
+        vx: Math.cos(angle) * speed,
+        vy: rand(0, 0.8),
+        vz: Math.sin(angle) * speed,
+        life,
+        size: rand(0.2, 0.4),
+        color: [...rgb],
+        type: ParticleType.Ability,
+        gravity: true,
+      });
+    }
+  }
+
+  /**
+   * Spawn a line/charge trail effect.
+   * @param startX/Z Start position
+   * @param endX/Z End position
+   */
+  spawnLineTrail(
+    startX: number, y: number, startZ: number,
+    endX: number, endZ: number,
+    color: number,
+  ): void {
+    const rgb = hexToRgb(color);
+    const count = 20;
+    const dx = endX - startX;
+    const dz = endZ - startZ;
+
+    for (let n = 0; n < count; n++) {
+      const idx = this.allocate();
+      if (idx === -1) return;
+
+      const t = n / count;
+      const px = startX + dx * t + rand(-0.5, 0.5);
+      const pz = startZ + dz * t + rand(-0.5, 0.5);
+      const life = rand(0.6, 1.2);
+
+      this.spawn(idx, {
+        x: px,
+        y: y + rand(0, 0.3),
+        z: pz,
+        vx: rand(-0.3, 0.3),
+        vy: rand(0.5, 1.5),
+        vz: rand(-0.3, 0.3),
+        life,
+        size: rand(0.15, 0.3),
+        color: [...rgb],
+        type: ParticleType.Ability,
+        gravity: false,
+      });
+    }
+  }
+
+  /** Spawn a teleport flash (implosion at origin, explosion at destination). */
+  spawnTeleportFlash(x: number, y: number, z: number, color: number): void {
+    const rgb = hexToRgb(color);
+    const count = 30;
+
+    for (let n = 0; n < count; n++) {
+      const idx = this.allocate();
+      if (idx === -1) return;
+
+      const angle = (n / count) * Math.PI * 2;
+      const speed = rand(3.0, 6.0);
+      const life = rand(0.4, 0.8);
+
+      this.spawn(idx, {
+        x,
+        y: y + rand(0, 2.0),
+        z,
+        vx: Math.cos(angle) * speed,
+        vy: rand(1.0, 3.0),
+        vz: Math.sin(angle) * speed,
+        life,
+        size: rand(0.2, 0.4),
         color: [...rgb],
         type: ParticleType.Ability,
         gravity: false,

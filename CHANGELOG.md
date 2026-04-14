@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.35.0] - 2026-04-14
+
+### Added
+- **Building destruction animation** — Gebouwen kantelen, zakken weg en vervagen over 1.8s bij vernietiging, met debris + vuurparticles en camera shake
+- **Hero ability visual effects** — Alle 24 hero abilities (8 heroes x Q/W/E) hebben nu visuele particle effects: AoE rings, cone sprays, line trails, teleport flashes, heal aura's
+- **Heal visual feedback** — Support unit heal ticks tonen groene opwaartse particles op het doelwit
+- **Buff/debuff/invincible indicators** — Units gloeien goudkleurig bij buff, grijs bij stun, helder goud bij invincibility (zowel instanced als animated units)
+- **Stun stars** — Draaiende gele ster-particles boven gestunde units
+- **New particle types** — `spawnBuildingDestruction()`, `spawnHealEffect()`, `spawnBuffAura()`, `spawnStunStars()`, `spawnConeEffect()`, `spawnLineTrail()`, `spawnTeleportFlash()` toegevoegd aan ParticleSystem
+- **AbilityEffects module** — Nieuwe `src/rendering/AbilityEffects.ts` koppelt `hero-ability-used` en `unit-healed` events aan visuele effecten
+- **Siege projectile type** — ProjectileRenderer ondersteunt nu `'siege'` type: 2.5x groter, hogere arc, voorbereiding voor siege unit rendering
+
+### Changed
+- **BuildingRenderer** — Destruction animation systeem: `startDestruction()`, `updateDestructions()`, `isDestroying()` methoden
+- **UnitRenderer** — Instance color priority: damage flash > selected > invincible > stunned > buffed > default
+- **Game.ts** — Dead entity cleanup nu met destruction animation integratie, dt parameter doorgegeven
+
 ## [0.34.0] - 2026-04-14
 
 ### Added
