@@ -913,6 +913,219 @@
       bottom: 130px;
     }
 
+    /* ---- Production Queue Cancel ---- */
+    .bcard-queue-row {
+      display: flex;
+      gap: 4px;
+      padding: 4px 12px 6px;
+      flex-wrap: wrap;
+    }
+    .bcard-queue-slot {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(212, 168, 83, 0.3);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .bcard-queue-slot--active {
+      border-color: rgba(212, 168, 83, 0.6);
+    }
+    .bcard-queue-label {
+      font-size: 0.55rem;
+      font-weight: 700;
+      color: rgba(245, 230, 200, 0.7);
+      z-index: 1;
+      user-select: none;
+    }
+    .bcard-queue-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background: var(--color-gold);
+      border-radius: 0 0 3px 3px;
+      transition: width 0.1s linear;
+    }
+    .bcard-queue-cancel {
+      position: absolute;
+      top: -1px;
+      right: -1px;
+      width: 14px;
+      height: 14px;
+      background: rgba(200, 50, 50, 0.85);
+      border: none;
+      border-radius: 0 3px 0 4px;
+      color: #fff;
+      font-size: 0.45rem;
+      font-weight: 900;
+      line-height: 1;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    .bcard-queue-slot:hover .bcard-queue-cancel {
+      opacity: 1;
+    }
+    .bcard-queue-cancel:hover {
+      background: rgba(230, 60, 60, 1);
+    }
+
+    /* ---- Tech Tree Button ---- */
+    #tech-tree-btn {
+      position: absolute;
+      top: 8px;
+      right: 200px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: rgba(20, 15, 10, 0.85);
+      border: 1px solid rgba(212, 168, 83, 0.25);
+      color: var(--color-text);
+      padding: 3px 10px;
+      border-radius: 6px;
+      z-index: 20;
+      line-height: 1;
+      font-family: 'Cinzel', serif;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    #tech-tree-btn:hover {
+      background: rgba(212, 168, 83, 0.2);
+      border-color: rgba(212, 168, 83, 0.5);
+    }
+
+    /* ---- Tech Tree Modal ---- */
+    .techtree-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
+      animation: fade-in 0.2s ease forwards;
+    }
+    .techtree-panel {
+      width: 560px;
+      max-width: 90vw;
+      max-height: 80vh;
+      overflow-y: auto;
+      background: rgba(20, 15, 10, 0.96);
+      border: 1px solid rgba(212, 168, 83, 0.4);
+      border-radius: 10px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+      animation: scale-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    .techtree-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px 10px;
+      border-bottom: 1px solid rgba(212, 168, 83, 0.2);
+    }
+    .techtree-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #e8c065;
+    }
+    .techtree-close {
+      width: 28px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(212, 168, 83, 0.3);
+      border-radius: 4px;
+      color: var(--color-text);
+      font-size: 0.7rem;
+      font-weight: 900;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .techtree-close:hover {
+      background: rgba(200, 50, 50, 0.3);
+      border-color: rgba(200, 50, 50, 0.6);
+    }
+    .techtree-tier {
+      padding: 12px 18px;
+    }
+    .techtree-tier + .techtree-tier {
+      border-top: 1px solid rgba(212, 168, 83, 0.15);
+    }
+    .techtree-tier-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: rgba(212, 168, 83, 0.7);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+    .techtree-tier-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 8px;
+    }
+    .techtree-upgrade {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(212, 168, 83, 0.2);
+      border-radius: 6px;
+      padding: 10px 12px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .techtree-upgrade.is-researched {
+      border-color: rgba(100, 200, 100, 0.4);
+      background: rgba(100, 200, 100, 0.06);
+    }
+    .techtree-upgrade.is-available {
+      border-color: rgba(212, 168, 83, 0.5);
+      background: rgba(212, 168, 83, 0.08);
+    }
+    .techtree-upgrade.is-locked {
+      opacity: 0.4;
+    }
+    .techtree-upgrade-name {
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #e8c065;
+      margin-bottom: 3px;
+    }
+    .techtree-upgrade.is-researched .techtree-upgrade-name {
+      color: #8fd88f;
+    }
+    .techtree-upgrade-desc {
+      font-size: 0.65rem;
+      color: rgba(245, 230, 200, 0.6);
+      line-height: 1.35;
+      margin-bottom: 5px;
+    }
+    .techtree-upgrade-cost {
+      font-size: 0.6rem;
+      font-weight: 600;
+      color: #d4a853;
+    }
+    .techtree-upgrade-cost.is-done {
+      color: #6c6;
+    }
+    @media (max-width: 768px) {
+      .techtree-panel { width: 95vw; }
+      .techtree-tier-grid { grid-template-columns: 1fr; }
+    }
+
     .command-panel {
       position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
       display: flex; gap: 4px; padding: 8px 12px;
@@ -1970,6 +2183,9 @@
 
         <!-- Pause Button -->
         <button id="pause-btn" title="Pauzeren (Esc)" style="position: absolute; top: 8px; right: 140px; font-size: 0.7rem; font-weight: 700; cursor: pointer; background: rgba(20,15,10,0.85); border: 1px solid rgba(212,168,83,0.25); color: var(--color-text); padding: 3px 10px; border-radius: 6px; z-index: 20; line-height: 1; transition: background 0.15s, border-color 0.15s;">II</button>
+
+        <!-- Tech Tree Button -->
+        <button id="tech-tree-btn" title="Tech Tree (T)">Tech Tree</button>
 
         <!-- Alert Container -->
         <div id="alert-container"></div>

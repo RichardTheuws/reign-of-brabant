@@ -195,6 +195,8 @@ import { createDiplomacySystem } from './DiplomacySystem';
 import { createSeparationSystem } from './SeparationSystem';
 import { createPopulationSystem } from './PopulationSystem';
 import { createTowerSystem } from './TowerSystem';
+import { createHealingSystem } from './HealingSystem';
+import { createUnitAbilitySystem } from './UnitAbilitySystem';
 import { createDeathSystem } from './DeathSystem';
 import { createUpkeepSystem } from './UpkeepSystem';
 import { createVisionSystem } from './VisionSystem';
@@ -232,6 +234,9 @@ export function createGamePipeline(terrain: Terrain, devMode = false): SystemPip
   // Phase 4.65: Hero System (hero abilities, stuns, invincibility, revivals, summons)
   pipeline.add('HeroSystem', createHeroSystem(), 'heroes');
 
+  // Phase 4.66: Unit Ability System (non-hero unit abilities: actives, passives, auras)
+  pipeline.add('UnitAbilitySystem', createUnitAbilitySystem(), 'abilities');
+
   // Phase 4.7: Bureaucracy (Randstad faction -- runs before economy so werkoverleg pauses are applied)
   pipeline.add('BureaucracySystem', createBureaucracySystem(), 'faction');
 
@@ -246,6 +251,7 @@ export function createGamePipeline(terrain: Terrain, devMode = false): SystemPip
 
   // Phase 5: Combat & Economy
   pipeline.add('CombatSystem', createCombatSystem(), 'combat');
+  pipeline.add('HealingSystem', createHealingSystem(), 'combat');
   pipeline.add('TowerSystem', createTowerSystem(), 'combat');
   pipeline.add('GatherSystem', createGatherSystem(), 'economy');
   pipeline.add('ProductionSystem', createProductionSystem(), 'economy');

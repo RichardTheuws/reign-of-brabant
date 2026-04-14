@@ -67,6 +67,9 @@ export const Attack = {
   range: f32(),     // attack range in world units (0 = melee)
   cooldown: f32(),  // reset value for timer (same as speed, cached for clarity)
   timer: f32(),     // countdown until next attack (decremented by dt)
+  attackType: u8(), // AttackType enum (Melee/Ranged/Siege/Magic)
+  siegeBonus: f32(), // damage multiplier vs buildings (1.0 = normal, 3.0 = 3x)
+  splashRadius: f32(), // AoE radius for siege attacks (0 = single target)
 };
 
 // ---------------------------------------------------------------------------
@@ -262,6 +265,27 @@ export const StatBuff = {
   speedMult: f32(),         // 1.0 = no buff
   armorMult: f32(),         // 1.0 = no buff
   duration: f32(),          // remaining buff time (0 = expired)
+};
+
+// ---------------------------------------------------------------------------
+// UnitAbility -- per-unit active ability state (max 1 active ability per unit)
+// ---------------------------------------------------------------------------
+export const UnitAbility = {
+  abilityId: u8(),          // index into UNIT_ABILITY_REGISTRY
+  cooldown: f32(),          // current cooldown remaining (0 = ready)
+  maxCooldown: f32(),       // max cooldown for this ability
+  activeDuration: f32(),    // remaining duration of active effect (0 = not active)
+  hasAbility: u8(),         // 1 = this entity has a unit ability, 0 = none
+};
+
+// ---------------------------------------------------------------------------
+// Healer -- support unit healing stats
+// ---------------------------------------------------------------------------
+export const Healer = {
+  healRate: f32(),          // HP healed per cast
+  healSpeed: f32(),         // seconds between heals
+  healRange: f32(),         // heal range in world units
+  healTimer: f32(),         // countdown until next heal (decremented by dt)
 };
 
 // ---------------------------------------------------------------------------

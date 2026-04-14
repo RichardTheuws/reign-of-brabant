@@ -22,6 +22,8 @@ import {
   UnitTypeId,
   BuildingTypeId,
   ResourceType,
+  AttackType,
+  ArmorType,
   UnitAIState,
   NO_ENTITY,
   NO_PRODUCTION,
@@ -49,7 +51,11 @@ import {
   PopulationCost,
   RenderRef,
   Velocity,
+  Healer,
+  UnitAbility,
 } from '../ecs/components';
+
+import { getUnitAbilities } from '../data/unitAbilityMap';
 
 import {
   IsUnit,
@@ -72,6 +78,17 @@ import {
   getUnitsForFaction,
   ExtendedUnitTypeId,
 } from '../data/factionData';
+
+// ---------------------------------------------------------------------------
+// Internal: derive attack type from unit type/range when not explicitly set
+// ---------------------------------------------------------------------------
+
+function deriveAttackType(typeId: UnitTypeId, range: number): AttackType {
+  if (typeId === UnitTypeId.Siege) return AttackType.Siege;
+  if (typeId === UnitTypeId.Support || typeId === UnitTypeId.Special) return AttackType.Magic;
+  if (range > 0) return AttackType.Ranged;
+  return AttackType.Melee;
+}
 
 // ---------------------------------------------------------------------------
 // Internal: archetype resolution helpers
@@ -180,6 +197,9 @@ function initUnit(
   Attack.range[eid] = arch.range;
   Attack.cooldown[eid] = arch.attackSpeed;
   Attack.timer[eid] = 0; // Ready to attack immediately
+  Attack.attackType[eid] = arch.attackType ?? deriveAttackType(unitTypeId, arch.range);
+  Attack.siegeBonus[eid] = arch.siegeBonus ?? 1.0;
+  Attack.splashRadius[eid] = arch.splashRadius ?? 0;
 
   // Armor
   Armor.value[eid] = arch.armor;
@@ -203,6 +223,15 @@ function initUnit(
 
   // RenderRef (use entity ID as mesh key)
   RenderRef.meshId[eid] = eid;
+
+  // Healer component for Support units
+  if (arch.healRate && arch.healRate > 0) {
+    addComponent(world, eid, Healer);
+    Healer.healRate[eid] = arch.healRate;
+    Healer.healSpeed[eid] = 2.0; // 2s between heals
+    Healer.healRange[eid] = arch.range > 0 ? arch.range : 6;
+    Healer.healTimer[eid] = 0;
+  }
 
   return eid;
 }
@@ -265,6 +294,9 @@ function initUnitFromArchetype(
   Attack.range[eid] = arch.range;
   Attack.cooldown[eid] = arch.attackSpeed;
   Attack.timer[eid] = 0;
+  Attack.attackType[eid] = arch.attackType ?? deriveAttackType(arch.typeId, arch.range);
+  Attack.siegeBonus[eid] = arch.siegeBonus ?? 1.0;
+  Attack.splashRadius[eid] = arch.splashRadius ?? 0;
 
   // Armor
   Armor.value[eid] = arch.armor;
@@ -288,6 +320,26 @@ function initUnitFromArchetype(
 
   // RenderRef
   RenderRef.meshId[eid] = eid;
+
+  // Healer component for Support units
+  if (arch.healRate && arch.healRate > 0) {
+    addComponent(world, eid, Healer);
+    Healer.healRate[eid] = arch.healRate;
+    Healer.healSpeed[eid] = 2.0;
+    Healer.healRange[eid] = arch.range > 0 ? arch.range : 6;
+    Healer.healTimer[eid] = 0;
+  }
+
+  // Unit ability assignment (based on faction + unit name)
+  const abilityAssignment = getUnitAbilities(factionId, arch.name);
+  if (abilityAssignment && abilityAssignment.activeAbility >= 0) {
+    addComponent(world, eid, UnitAbility);
+    UnitAbility.abilityId[eid] = abilityAssignment.activeAbility;
+    UnitAbility.cooldown[eid] = 0;
+    UnitAbility.maxCooldown[eid] = 0; // set from registry at runtime
+    UnitAbility.activeDuration[eid] = 0;
+    UnitAbility.hasAbility[eid] = 1;
+  }
 
   return eid;
 }
@@ -377,6 +429,7 @@ function initBuilding(
   addComponent(world, eid, Position);
   addComponent(world, eid, Rotation);
   addComponent(world, eid, Health);
+  addComponent(world, eid, Armor);
   addComponent(world, eid, Faction);
   addComponent(world, eid, Building);
   addComponent(world, eid, Visibility);
@@ -394,6 +447,10 @@ function initBuilding(
   // Health
   Health.current[eid] = startComplete ? arch.hp : arch.hp * 0.1; // 10% HP while building
   Health.max[eid] = arch.hp;
+
+  // Armor -- buildings have Building armor type (weak to Siege)
+  Armor.value[eid] = 0;
+  Armor.type[eid] = ArmorType.Building;
 
   // Faction
   Faction.id[eid] = factionId;

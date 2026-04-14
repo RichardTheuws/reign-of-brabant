@@ -396,6 +396,252 @@ function executeAbility(
       }
       break;
     }
+
+    // ===== DE MIJNBAAS (Limburgers) =====
+    case 'mijnbaas-mijnschacht-instorten': {
+      // AoE stun 4s + 25 dmg, radius 8
+      const radius = 8;
+      const radiusSq = radius * radius;
+      const allUnits = query(world, [Position, Faction, Health, IsUnit]);
+      for (const eid of allUnits) {
+        if (Faction.id[eid] === factionId) continue;
+        if (hasComponent(world, eid, IsDead)) continue;
+        const dx = Position.x[eid] - hx;
+        const dz = Position.z[eid] - hz;
+        if (dx * dx + dz * dz <= radiusSq) {
+          Health.current[eid] -= 25;
+          if (Health.current[eid] <= 0) {
+            addComponent(world, eid, IsDead);
+          } else {
+            applyStun(world, eid, 4);
+          }
+        }
+      }
+      break;
+    }
+
+    case 'mijnbaas-gluck-auf': {
+      // Buff allies in radius 12: +25% ATK, +15% armor, 15s
+      const radius = 12;
+      const radiusSq = radius * radius;
+      const allUnits = query(world, [Position, Faction, IsUnit]);
+      for (const eid of allUnits) {
+        if (Faction.id[eid] !== factionId) continue;
+        if (hasComponent(world, eid, IsDead)) continue;
+        const dx = Position.x[eid] - hx;
+        const dz = Position.z[eid] - hz;
+        if (dx * dx + dz * dz <= radiusSq) {
+          applyStatBuff(world, eid, 1.25, 1.0, 1.15, 15);
+        }
+      }
+      break;
+    }
+
+    case 'mijnbaas-tunnelcommando': {
+      // Teleport hero + up to 8 nearby allies to target position
+      // For now: teleport self to attack target location
+      const targetEid = UnitAI.targetEid[heroEid];
+      if (targetEid !== NO_ENTITY && entityExists(world, targetEid)) {
+        const tx = Position.x[targetEid];
+        const tz = Position.z[targetEid];
+        // Teleport hero
+        Position.x[heroEid] = tx;
+        Position.z[heroEid] = tz;
+        // Teleport up to 8 nearby allies
+        const allUnits = query(world, [Position, Faction, IsUnit]);
+        let teleported = 0;
+        const gatherRadius = 10;
+        const gatherRadiusSq = gatherRadius * gatherRadius;
+        for (const eid of allUnits) {
+          if (teleported >= 8) break;
+          if (eid === heroEid) continue;
+          if (Faction.id[eid] !== factionId) continue;
+          if (hasComponent(world, eid, IsDead)) continue;
+          const dx = Position.x[eid] - hx;
+          const dz = Position.z[eid] - hz;
+          if (dx * dx + dz * dz <= gatherRadiusSq) {
+            const angle = (teleported / 8) * Math.PI * 2;
+            Position.x[eid] = tx + Math.cos(angle) * 3;
+            Position.z[eid] = tz + Math.sin(angle) * 3;
+            teleported++;
+          }
+        }
+      }
+      break;
+    }
+
+    // ===== DE MAASRIDDER (Limburgers) =====
+    case 'maasridder-maasvloed': {
+      // Line AoE: width 4, length 20, 30 dmg + pushback
+      const chargeDistance = 20;
+      const chargeWidth = 2;
+      const facing3 = Math.atan2(
+        Movement.targetZ[heroEid] - hz,
+        Movement.targetX[heroEid] - hx,
+      );
+      const dX = Math.cos(facing3);
+      const dZ = Math.sin(facing3);
+      const allUnits = query(world, [Position, Faction, Health, IsUnit]);
+      for (const eid of allUnits) {
+        if (Faction.id[eid] === factionId) continue;
+        if (hasComponent(world, eid, IsDead)) continue;
+        const toX = Position.x[eid] - hx;
+        const toZ = Position.z[eid] - hz;
+        const proj = toX * dX + toZ * dZ;
+        if (proj < 0 || proj > chargeDistance) continue;
+        const pX = toX - proj * dX;
+        const pZ = toZ - proj * dZ;
+        const perpDist = Math.sqrt(pX * pX + pZ * pZ);
+        if (perpDist <= chargeWidth) {
+          Health.current[eid] -= 30;
+          if (Health.current[eid] <= 0) {
+            addComponent(world, eid, IsDead);
+          }
+          // Pushback away from line
+          const pushDist = 4;
+          const pushX = pX / (perpDist || 1) * pushDist;
+          const pushZ = pZ / (perpDist || 1) * pushDist;
+          Position.x[eid] += pushX;
+          Position.z[eid] += pushZ;
+        }
+      }
+      break;
+    }
+
+    case 'maasridder-nevelgordijn': {
+      // Fog radius 10, 15s: enemies lose sight, Limburg +20% speed
+      const radius = 10;
+      const radiusSq = radius * radius;
+      const allUnits = query(world, [Position, Faction, IsUnit]);
+      for (const eid of allUnits) {
+        if (hasComponent(world, eid, IsDead)) continue;
+        const dx = Position.x[eid] - hx;
+        const dz = Position.z[eid] - hz;
+        if (dx * dx + dz * dz > radiusSq) continue;
+        if (Faction.id[eid] === factionId) {
+          // Allies: speed boost
+          applyStatBuff(world, eid, 1.0, 1.2, 1.0, 15);
+        } else {
+          // Enemies: slow (simulates reduced sight)
+          applyStatBuff(world, eid, 1.0, 0.7, 1.0, 15);
+        }
+      }
+      break;
+    }
+
+    case 'maasridder-watergraf': {
+      // Impassable terrain radius 5, 12s -- simplified: stun enemies in area
+      const radius = 5;
+      const radiusSq = radius * radius;
+      const allUnits = query(world, [Position, Faction, Health, IsUnit]);
+      for (const eid of allUnits) {
+        if (Faction.id[eid] === factionId) continue;
+        if (hasComponent(world, eid, IsDead)) continue;
+        const dx = Position.x[eid] - hx;
+        const dz = Position.z[eid] - hz;
+        if (dx * dx + dz * dz <= radiusSq) {
+          applyStun(world, eid, 12);
+        }
+      }
+      break;
+    }
+
+    // ===== DE FRIETKONING (Belgen) =====
+    case 'frietkoning-koninklijke-portie': {
+      // AoE heal 30 HP + +15% stats, radius 10, 12s
+      const radius = 10;
+      const radiusSq = radius * radius;
+      const allUnits = query(world, [Position, Faction, Health, IsUnit]);
+      for (const eid of allUnits) {
+        if (Faction.id[eid] !== factionId) continue;
+        if (hasComponent(world, eid, IsDead)) continue;
+        const dx = Position.x[eid] - hx;
+        const dz = Position.z[eid] - hz;
+        if (dx * dx + dz * dz <= radiusSq) {
+          Health.current[eid] = Math.min(Health.max[eid], Health.current[eid] + 30);
+          applyStatBuff(world, eid, 1.15, 1.15, 1.15, 12);
+        }
+      }
+      break;
+    }
+
+    case 'frietkoning-belgisch-decreet': {
+      // Convert enemy unit for 10s -- simplified: stun + change faction temporarily
+      if (abilityTargetEid !== NO_ENTITY && entityExists(world, abilityTargetEid)) {
+        if (hasComponent(world, abilityTargetEid, IsUnit) && !hasComponent(world, abilityTargetEid, IsHero)) {
+          Faction.id[abilityTargetEid] = factionId;
+          applyStun(world, abilityTargetEid, 1); // Brief stun while converting
+          // Track for revert (simplified: permanent for now)
+        }
+      }
+      abilityTargetEid = NO_ENTITY;
+      break;
+    }
+
+    case 'frietkoning-frituurfondue': {
+      // Zone radius 6: 15 DPS to enemies, +5 HP/s to allies, 10s
+      // Simplified: instant burst of 60 dmg to enemies, 20 HP heal to allies
+      const radius = 6;
+      const radiusSq = radius * radius;
+      const allUnits = query(world, [Position, Faction, Health, IsUnit]);
+      for (const eid of allUnits) {
+        if (hasComponent(world, eid, IsDead)) continue;
+        const dx = Position.x[eid] - hx;
+        const dz = Position.z[eid] - hz;
+        if (dx * dx + dz * dz > radiusSq) continue;
+        if (Faction.id[eid] === factionId) {
+          Health.current[eid] = Math.min(Health.max[eid], Health.current[eid] + 20);
+        } else {
+          Health.current[eid] -= 60;
+          if (Health.current[eid] <= 0) {
+            addComponent(world, eid, IsDead);
+          }
+        }
+      }
+      break;
+    }
+
+    // ===== DE ABDIJBROUWER (Belgen) =====
+    case 'abdijbrouwer-stiltegelofte': {
+      // Silence enemy hero 8s -- implemented as stun
+      if (abilityTargetEid !== NO_ENTITY && entityExists(world, abilityTargetEid)) {
+        if (hasComponent(world, abilityTargetEid, IsHero)) {
+          applyStun(world, abilityTargetEid, 8);
+        }
+      }
+      abilityTargetEid = NO_ENTITY;
+      break;
+    }
+
+    case 'abdijbrouwer-trappistenzegen': {
+      // Regen aura: allies in radius 8 get +3 HP/s for 15s
+      // Simplified: instant heal of 45 HP (3 * 15) to all allies in radius
+      const radius = 8;
+      const radiusSq = radius * radius;
+      const allUnits = query(world, [Position, Faction, Health, IsUnit]);
+      for (const eid of allUnits) {
+        if (Faction.id[eid] !== factionId) continue;
+        if (hasComponent(world, eid, IsDead)) continue;
+        const dx = Position.x[eid] - hx;
+        const dz = Position.z[eid] - hz;
+        if (dx * dx + dz * dz <= radiusSq) {
+          Health.current[eid] = Math.min(Health.max[eid], Health.current[eid] + 45);
+        }
+      }
+      break;
+    }
+
+    case 'abdijbrouwer-dubbel-of-tripel': {
+      // Create 2 illusion copies with 50% HP, 0 dmg, 15s lifespan
+      for (let i = 0; i < 2; i++) {
+        const angle = (i / 2) * Math.PI * 2 + Math.PI / 4;
+        const sx = hx + Math.cos(angle) * 3;
+        const sz = hz + Math.sin(angle) * 3;
+        // Use militia as illusion base (low stats)
+        createMilitia(world, factionId, sx, sz, 15);
+      }
+      break;
+    }
   }
 }
 

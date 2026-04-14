@@ -56,7 +56,8 @@ export type CommandAction =
   | 'build-faction1' | 'build-faction2' | 'build-siege-workshop'
   | 'train-hero-0' | 'train-hero-1'
   | 'hero-ability-q' | 'hero-ability-w' | 'hero-ability-e'
-  | 'research-upgrade';
+  | 'research-upgrade'
+  | 'cancel-queue';
 
 export interface SelectedUnit {
   id: number;
@@ -97,6 +98,7 @@ export interface BuildingCardData {
   hp: number;
   maxHp: number;
   status: string;       // 'Idle', 'Training Infantry (12s)', etc.
+  queue: ProductionQueueItem[]; // Production queue items for cancel buttons
   portraitAbbrev: string; // Short building type abbreviation (TH, BRK, etc.) -- legacy fallback
   buildingTypeId: number; // BuildingTypeId for canvas-drawn portrait
   actions: BuildingCardAction[];
@@ -134,6 +136,23 @@ export interface HUDEvents {
   onPortraitClick: (unitId: number) => void;
   onRetry: () => void;
   onMenu: () => void;
+  onQueueCancel: (buildingId: number, queueIndex: number) => void;
+}
+
+// ---------------------------------------------------------------------------
+// Tech tree panel data interface
+// ---------------------------------------------------------------------------
+
+export interface TechTreeUpgradeData {
+  id: number;
+  name: string;
+  description: string;
+  costGold: number;
+  costWood?: number;
+  tier: number;         // 1, 2, or 3
+  isResearched: boolean;
+  isAvailable: boolean; // prerequisites met + not researched
+  isLocked: boolean;    // prerequisites not met
 }
 
 // ---------------------------------------------------------------------------
@@ -313,6 +332,16 @@ export class HUD {
   // Tooltip element
   private tooltipEl: HTMLDivElement | null = null;
 
+  // Production queue display
+  private bcardQueueRow: HTMLElement | null = null;
+
+  // Tech tree modal
+  private techTreeOverlay: HTMLElement | null = null;
+  private techTreePanel: HTMLElement | null = null;
+
+  // Currently displayed building id (for queue cancel)
+  private currentBuildingId: number = -1;
+
   // Callbacks
   private events: HUDEvents | null = null;
 
@@ -413,6 +442,7 @@ export class HUD {
     this.bindHotkeys();
     this.bindRageButton();
     this.bindMuteButton();
+    this.bindTechTreeButton();
   }
 
   /**
@@ -739,6 +769,7 @@ export class HUD {
     this.selectionPanel.hidden = true;
     this.buildingPanel.hidden = true;
     this.buildingCard.hidden = false;
+    this.currentBuildingId = data.id;
 
     // Canvas-drawn building portrait (replaces text abbreviation)
     const portraitText = this.bcardPortrait.querySelector('.bcard-portrait-text');
@@ -838,6 +869,102 @@ export class HUD {
 
       this.bcardActions.appendChild(btn);
     }
+
+    // Production queue display (with cancel buttons)
+    this.renderProductionQueue(data.queue);
+  }
+
+  /**
+   * Render the production queue icons below the building card status.
+   * Each queued item shows a small icon with an X cancel button on hover.
+   */
+  private renderProductionQueue(queue: ProductionQueueItem[]): void {
+    // Remove existing queue row if any
+    if (this.bcardQueueRow) {
+      this.bcardQueueRow.remove();
+      this.bcardQueueRow = null;
+    }
+
+    if (!queue || queue.length === 0) return;
+
+    const row = document.createElement('div');
+    row.className = 'bcard-queue-row';
+
+    for (let i = 0; i < queue.length; i++) {
+      const item = queue[i];
+      const slot = document.createElement('div');
+      slot.className = 'bcard-queue-slot';
+      if (i === 0) slot.classList.add('bcard-queue-slot--active');
+
+      // Unit name abbreviation
+      const label = document.createElement('span');
+      label.className = 'bcard-queue-label';
+      label.textContent = this.getQueueAbbrev(item.unitName);
+      slot.appendChild(label);
+
+      // Progress bar for active item
+      if (i === 0 && item.progress > 0) {
+        const progressBar = document.createElement('div');
+        progressBar.className = 'bcard-queue-progress';
+        progressBar.style.width = `${Math.min(item.progress, 1) * 100}%`;
+        slot.appendChild(progressBar);
+      }
+
+      // Cancel button (X)
+      const cancelBtn = document.createElement('button');
+      cancelBtn.className = 'bcard-queue-cancel';
+      cancelBtn.textContent = 'X';
+      cancelBtn.title = `Annuleer ${item.unitName}`;
+      const queueIndex = i;
+      const buildingId = this.currentBuildingId;
+      cancelBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        audioManager.playSound('click');
+        this.events?.onQueueCancel(buildingId, queueIndex);
+      });
+      slot.appendChild(cancelBtn);
+
+      row.appendChild(slot);
+    }
+
+    // Insert queue row into building card, after bcard-stats
+    const statsEl = this.buildingCard.querySelector('.bcard-stats');
+    if (statsEl && statsEl.nextSibling) {
+      this.buildingCard.insertBefore(row, statsEl.nextSibling);
+    } else {
+      this.buildingCard.appendChild(row);
+    }
+
+    this.bcardQueueRow = row;
+  }
+
+  // Cache for queue comparison to avoid DOM thrash
+  private lastQueueKey: string = '';
+
+  /**
+   * Update the production queue display (called each frame when building selected).
+   * Only re-renders when the queue changes (item count, types, or active progress).
+   */
+  updateProductionQueueDisplay(queue: ProductionQueueItem[]): void {
+    // Build a cache key from queue state (names + rounded progress)
+    const key = queue.map((q, i) =>
+      `${q.unitName}:${i === 0 ? Math.floor(q.progress * 20) : 0}`
+    ).join('|');
+    if (key === this.lastQueueKey) return;
+    this.lastQueueKey = key;
+    this.renderProductionQueue(queue);
+  }
+
+  /**
+   * Get a short abbreviation for a unit name in the queue display.
+   */
+  private getQueueAbbrev(name: string): string {
+    const lower = name.toLowerCase();
+    for (const [key, abbrev] of Object.entries(UNIT_ABBREV)) {
+      if (lower.includes(key)) return abbrev;
+    }
+    // Fallback: first 3 chars uppercase
+    return name.substring(0, 3).toUpperCase();
   }
 
   /**
@@ -871,6 +998,12 @@ export class HUD {
    */
   hideBuildingCard(): void {
     this.buildingCard.hidden = true;
+    this.currentBuildingId = -1;
+    this.lastQueueKey = '';
+    if (this.bcardQueueRow) {
+      this.bcardQueueRow.remove();
+      this.bcardQueueRow = null;
+    }
   }
 
   /**
@@ -968,6 +1101,129 @@ export class HUD {
       panel.hidden = true;
       panel.innerHTML = '';
     }
+  }
+
+  // -----------------------------------------------------------------------
+  // Tech Tree Panel
+  // -----------------------------------------------------------------------
+
+  /**
+   * Show the tech tree modal panel with upgrade data.
+   */
+  showTechTree(upgrades: TechTreeUpgradeData[]): void {
+    // Remove existing overlay if any
+    this.hideTechTree();
+
+    // Create overlay (click outside to dismiss)
+    const overlay = document.createElement('div');
+    overlay.className = 'techtree-overlay';
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) this.hideTechTree();
+    });
+
+    // Create panel
+    const panel = document.createElement('div');
+    panel.className = 'techtree-panel';
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'techtree-header';
+    header.innerHTML = `
+      <span class="techtree-title">Tech Tree</span>
+      <button class="techtree-close" title="Sluiten (Esc)">X</button>
+    `;
+    const closeBtn = header.querySelector('.techtree-close') as HTMLButtonElement;
+    closeBtn.addEventListener('click', () => this.hideTechTree());
+    panel.appendChild(header);
+
+    // Group upgrades by tier
+    const tiers = [1, 2, 3];
+    const tierNames = ['Tier I', 'Tier II', 'Tier III'];
+
+    for (let t = 0; t < tiers.length; t++) {
+      const tier = tiers[t];
+      const tierUpgrades = upgrades.filter(u => u.tier === tier);
+      if (tierUpgrades.length === 0) continue;
+
+      const tierSection = document.createElement('div');
+      tierSection.className = 'techtree-tier';
+
+      const tierTitle = document.createElement('div');
+      tierTitle.className = 'techtree-tier-title';
+      tierTitle.textContent = tierNames[t];
+      tierSection.appendChild(tierTitle);
+
+      const tierGrid = document.createElement('div');
+      tierGrid.className = 'techtree-tier-grid';
+
+      for (const upg of tierUpgrades) {
+        const card = document.createElement('div');
+        card.className = 'techtree-upgrade';
+        if (upg.isResearched) card.classList.add('is-researched');
+        else if (upg.isAvailable) card.classList.add('is-available');
+        else if (upg.isLocked) card.classList.add('is-locked');
+
+        const upgName = document.createElement('div');
+        upgName.className = 'techtree-upgrade-name';
+        upgName.textContent = upg.name;
+        card.appendChild(upgName);
+
+        const upgDesc = document.createElement('div');
+        upgDesc.className = 'techtree-upgrade-desc';
+        upgDesc.textContent = upg.description;
+        card.appendChild(upgDesc);
+
+        const upgCost = document.createElement('div');
+        upgCost.className = 'techtree-upgrade-cost';
+        if (upg.isResearched) {
+          upgCost.textContent = 'Onderzocht';
+          upgCost.classList.add('is-done');
+        } else {
+          let costText = `${upg.costGold} goud`;
+          if (upg.costWood) costText += ` + ${upg.costWood} hout`;
+          upgCost.textContent = costText;
+        }
+        card.appendChild(upgCost);
+
+        tierGrid.appendChild(card);
+      }
+
+      tierSection.appendChild(tierGrid);
+      panel.appendChild(tierSection);
+    }
+
+    overlay.appendChild(panel);
+    document.getElementById('game-hud')?.appendChild(overlay);
+
+    this.techTreeOverlay = overlay;
+    this.techTreePanel = panel;
+
+    // Bind Escape key to close
+    const escHandler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        this.hideTechTree();
+        document.removeEventListener('keydown', escHandler);
+      }
+    };
+    document.addEventListener('keydown', escHandler);
+  }
+
+  /**
+   * Hide the tech tree modal.
+   */
+  hideTechTree(): void {
+    if (this.techTreeOverlay) {
+      this.techTreeOverlay.remove();
+      this.techTreeOverlay = null;
+      this.techTreePanel = null;
+    }
+  }
+
+  /**
+   * Check if tech tree is currently visible.
+   */
+  isTechTreeVisible(): boolean {
+    return this.techTreeOverlay !== null;
   }
 
   // -----------------------------------------------------------------------
@@ -1477,6 +1733,19 @@ export class HUD {
     }
   }
 
+  private bindTechTreeButton(): void {
+    const techBtn = document.getElementById('tech-tree-btn');
+    if (techBtn) {
+      const handler = () => {
+        audioManager.playSound('click');
+        // Emit command for Game.ts to handle
+        this.events?.onCommand('research-upgrade');
+      };
+      techBtn.addEventListener('click', handler);
+      this.boundHandlers.push({ el: techBtn, event: 'click', handler: handler as EventListener });
+    }
+  }
+
   private bindGameOverButtons(): void {
     const retry = document.getElementById('btn-retry');
     const menu = document.getElementById('btn-menu');
@@ -1809,6 +2078,9 @@ export class HUD {
     // Remove tooltip element
     this.tooltipEl?.remove();
     this.tooltipEl = null;
+
+    // Remove tech tree overlay
+    this.hideTechTree();
 
     this.events = null;
   }

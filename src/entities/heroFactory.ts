@@ -15,6 +15,7 @@ import {
   HeroTypeId,
   UnitTypeId,
   UnitAIState,
+  AttackType,
   ArmorType,
   NO_ENTITY,
   HERO_POPULATION_COST,
@@ -166,6 +167,9 @@ export function createHero(
   Attack.range[eid] = arch.range;
   Attack.cooldown[eid] = arch.attackSpeed;
   Attack.timer[eid] = 0;
+  Attack.attackType[eid] = arch.attackType ?? (arch.range > 0 ? AttackType.Ranged : AttackType.Melee);
+  Attack.siegeBonus[eid] = 1.0;
+  Attack.splashRadius[eid] = 0;
 
   // Armor
   Armor.value[eid] = arch.armor;
@@ -274,6 +278,9 @@ export function createMilitia(
   Attack.range[eid] = 0;
   Attack.cooldown[eid] = 1.5;
   Attack.timer[eid] = 0;
+  Attack.attackType[eid] = AttackType.Melee;
+  Attack.siegeBonus[eid] = 1.0;
+  Attack.splashRadius[eid] = 0;
 
   Armor.value[eid] = 0;
   Armor.type[eid] = ArmorType.Light;

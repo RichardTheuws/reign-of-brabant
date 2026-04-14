@@ -711,6 +711,7 @@ export class Game {
         },
         onRetry: () => window.location.reload(),
         onMenu: () => window.location.reload(),
+        onQueueCancel: (buildingId, queueIndex) => this.cancelProductionQueueItem(buildingId, queueIndex),
       });
       const factionNames = ['brabant', 'randstad', 'limburg', 'belgen'] as const;
       this.hud.setFaction(factionNames[this.playerFactionId] ?? 'brabant');
@@ -813,7 +814,136 @@ export class Game {
       case 'rally-point':
         this.enterRallyPointMode();
         break;
+      case 'research-upgrade':
+        this.showTechTreeUI();
+        break;
+      case 'cancel-queue':
+        // Handled via onQueueCancel callback, not via command action
+        break;
     }
+  }
+
+  /**
+   * Cancel a production queue item at the given index for a building.
+   * Index 0 = currently producing item, 1-5 = queued items.
+   * Refunds gold for the cancelled unit.
+   */
+  private cancelProductionQueueItem(buildingId: number, queueIndex: number): void {
+    if (!entityExists(world, buildingId)) return;
+    if (!hasComponent(world, buildingId, Production)) return;
+    if (Faction.id[buildingId] !== this.playerFactionId) return;
+
+    const fid = Faction.id[buildingId];
+    const slots = [Production.queue0, Production.queue1, Production.queue2, Production.queue3, Production.queue4];
+
+    if (queueIndex === 0) {
+      // Cancel the currently producing item
+      const unitType = Production.unitType[buildingId];
+      if (unitType === NO_PRODUCTION) return;
+
+      // Refund gold
+      try {
+        const arch = getFactionUnitArchetype(fid, unitType);
+        this.playerState.addGold(fid, arch.costGold);
+      } catch { /* no refund if archetype unknown */ }
+
+      // Shift queue: move next queued item into production
+      const nextType = slots[0][buildingId];
+      if (nextType !== NO_PRODUCTION) {
+        Production.unitType[buildingId] = nextType;
+        Production.progress[buildingId] = 0;
+        try {
+          const arch = getFactionUnitArchetype(fid, nextType);
+          Production.duration[buildingId] = arch.buildTime;
+        } catch {
+          Production.duration[buildingId] = 15;
+        }
+        for (let i = 0; i < slots.length - 1; i++) {
+          slots[i][buildingId] = slots[i + 1][buildingId];
+        }
+        slots[slots.length - 1][buildingId] = NO_PRODUCTION;
+      } else {
+        Production.unitType[buildingId] = NO_PRODUCTION;
+        Production.progress[buildingId] = 0;
+      }
+
+      this.hud?.showAlert('Training geannuleerd', 'info');
+    } else {
+      // Cancel a queued item (index 1 = queue0, index 2 = queue1, etc.)
+      const slotIndex = queueIndex - 1;
+      if (slotIndex < 0 || slotIndex >= slots.length) return;
+
+      const unitType = slots[slotIndex][buildingId];
+      if (unitType === NO_PRODUCTION) return;
+
+      // Refund gold
+      try {
+        const arch = getFactionUnitArchetype(fid, unitType);
+        this.playerState.addGold(fid, arch.costGold);
+      } catch { /* no refund if archetype unknown */ }
+
+      // Remove from queue and shift remaining items down
+      for (let i = slotIndex; i < slots.length - 1; i++) {
+        slots[i][buildingId] = slots[i + 1][buildingId];
+      }
+      slots[slots.length - 1][buildingId] = NO_PRODUCTION;
+
+      this.hud?.showAlert('Uit wachtrij verwijderd', 'info');
+    }
+
+    // Refresh the building card display
+    this.onSelectionChanged(this.selectedEntities);
+  }
+
+  /**
+   * Show the tech tree panel with current research state.
+   */
+  private showTechTreeUI(): void {
+    if (!this.hud) return;
+
+    // If already visible, toggle off
+    if (this.hud.isTechTreeVisible()) {
+      this.hud.hideTechTree();
+      return;
+    }
+
+    const upgrades: Array<{
+      id: number;
+      name: string;
+      description: string;
+      costGold: number;
+      costWood?: number;
+      tier: number;
+      isResearched: boolean;
+      isAvailable: boolean;
+      isLocked: boolean;
+    }> = [];
+
+    for (const def of UPGRADE_DEFINITIONS) {
+      const isResearched = techTreeSystem.isResearched(this.playerFactionId, def.id);
+      const canResearch = techTreeSystem.canResearch(this.playerFactionId, def.id);
+
+      // Determine tier based on prerequisites
+      let tier = 1;
+      if (def.prerequisite !== null) {
+        const prereqDef = getUpgradeDefinition(def.prerequisite);
+        tier = prereqDef.prerequisite !== null ? 3 : 2;
+      }
+
+      upgrades.push({
+        id: def.id,
+        name: def.name,
+        description: def.description,
+        costGold: def.cost.gold,
+        costWood: def.cost.wood,
+        tier,
+        isResearched,
+        isAvailable: canResearch && !isResearched,
+        isLocked: !canResearch && !isResearched,
+      });
+    }
+
+    this.hud.showTechTree(upgrades);
   }
 
   private handleMinimapClick(normalizedX: number, normalizedY: number): void {
@@ -2238,6 +2368,7 @@ export class Game {
       hp: Health.current[eid],
       maxHp: Health.max[eid],
       status,
+      queue: queueItems,
       portraitAbbrev: portraitAbbrevs[buildingType] ?? 'BLD',
       buildingTypeId: buildingType,
       actions,
@@ -2696,6 +2827,10 @@ export class Game {
                 : `Training ${unitName}${timeStr}`;
             }
             this.hud.updateBuildingCardStatus(status);
+
+            // Update production queue display with cancel buttons
+            const queueItems = this.getBuildingQueue(firstEid);
+            this.hud.updateProductionQueueDisplay(queueItems);
           }
 
           // Update legacy production queue (backward compat)

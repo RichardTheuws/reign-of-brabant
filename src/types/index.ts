@@ -234,12 +234,32 @@ export enum StrategicAIPhase {
   Attack = 2,
 }
 
-/** Armor type classification for damage modifiers (future use, tracked now). */
+/** Armor type classification for damage modifiers. */
 export enum ArmorType {
   Unarmored = 0,
   Light = 1,
   Medium = 2,
   Heavy = 3,
+  /** Buildings have their own armor class — weak only to Siege. */
+  Building = 4,
+}
+
+/** Attack type classification — determines bonus damage vs armor types. */
+export enum AttackType {
+  Melee = 0,
+  Ranged = 1,
+  Siege = 2,
+  Magic = 3,
+}
+
+/** Unit ability activation type. */
+export enum UnitAbilityType {
+  /** Manually activated, has cooldown. */
+  Active = 0,
+  /** Always-on stat modifier, no activation needed. */
+  Passive = 1,
+  /** Radius-based buff/debuff, always active when alive. */
+  Aura = 2,
 }
 
 // ---------------------------------------------------------------------------
@@ -493,8 +513,12 @@ export interface UnitArchetype {
   readonly costWood?: number;
   /** Optional tertiary resource cost (defaults to 0 if omitted). */
   readonly costTertiary?: number;
+  /** Attack type for damage modifier lookup. Defaults to Melee (range=0) or Ranged (range>0). */
+  readonly attackType?: AttackType;
   /** Bonus damage multiplier vs buildings (for Siege units). Defaults to 1.0. */
   readonly siegeBonus?: number;
+  /** Splash/AoE radius for siege projectiles. 0 or omitted = single target. */
+  readonly splashRadius?: number;
   /** Heal rate per second (for Support units). 0 or omitted = no healing. */
   readonly healRate?: number;
   /** Which faction this archetype belongs to, if faction-specific. Omit for universal. */
@@ -550,6 +574,8 @@ export interface HeroArchetype {
   readonly attackSpeed: number;
   readonly armor: number;
   readonly armorType: ArmorType;
+  /** Attack type for damage modifier lookup. Defaults to Melee (range=0) or Ranged (range>0). */
+  readonly attackType?: AttackType;
   readonly speed: number;
   readonly range: number;
   readonly costGold: number;
@@ -932,6 +958,21 @@ export interface CombatHitEvent {
   readonly z: number;
 }
 
+export interface UnitAbilityUsedEvent {
+  readonly eid: number;
+  readonly abilityId: string;
+  readonly x: number;
+  readonly z: number;
+}
+
+export interface UnitHealedEvent {
+  readonly healerEid: number;
+  readonly targetEid: number;
+  readonly amount: number;
+  readonly x: number;
+  readonly z: number;
+}
+
 export interface CarnavalsrageActivatedEvent {
   readonly factionId: FactionId;
 }
@@ -962,6 +1003,8 @@ export interface GameEvents {
   'hero-revived': HeroRevivedEvent;
   'hero-ability-used': HeroAbilityUsedEvent;
   'combat-hit': CombatHitEvent;
+  'unit-healed': UnitHealedEvent;
+  'unit-ability-used': UnitAbilityUsedEvent;
   'carnavalsrage-activated': CarnavalsrageActivatedEvent;
   'research-started': ResearchStartedEvent;
   'research-completed': ResearchCompletedEvent;

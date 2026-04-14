@@ -28,6 +28,8 @@ import {
 import { IsUnit, IsBuilding, IsWorker, IsResource, IsDead, NeedsPathfinding } from '../ecs/tags';
 import {
   UnitAIState,
+  AttackType,
+  ArmorType,
   MIN_DAMAGE,
   ARMOR_FACTOR,
   AGGRO_RANGE,
@@ -44,6 +46,23 @@ import { playerState } from '../core/PlayerState';
 import { gameConfig } from '../core/GameConfig';
 import { eventBus } from '../core/EventBus';
 import type { GameWorld } from '../ecs/world';
+
+// ---------------------------------------------------------------------------
+// Damage modifier lookup: AttackType → ArmorType → multiplier
+// PRD 2.4: Melee→Light +50%, Ranged→Medium +50%, Siege→Building +100%, Magic→Heavy +50%
+// ---------------------------------------------------------------------------
+
+const DAMAGE_MODIFIERS: readonly (readonly number[])[] = [
+  //              Unarmored  Light  Medium  Heavy  Building
+  /* Melee  */ [  1.0,       1.5,   1.0,    1.0,   1.0  ],
+  /* Ranged */ [  1.0,       1.0,   1.5,    1.0,   1.0  ],
+  /* Siege  */ [  1.0,       1.0,   1.0,    1.0,   2.0  ],
+  /* Magic  */ [  1.0,       1.0,   1.0,    1.5,   1.0  ],
+];
+
+function getDamageModifier(attackType: number, armorType: number): number {
+  return DAMAGE_MODIFIERS[attackType]?.[armorType] ?? 1.0;
+}
 
 // Scratch values
 let _dx = 0;
@@ -144,6 +163,16 @@ function processAttacking(world: GameWorld, eid: number, dt: number): void {
   let attackerDamage = Attack.damage[eid] * (GezeligheidBonus.attackMult[eid] || 1.0);
   const targetArmor = Armor.value[targetEid] * (GezeligheidBonus.armorMult[targetEid] || 1.0);
 
+  // Siege bonus: multiply damage when attacking buildings
+  const isTargetBuilding = hasComponent(world, targetEid, IsBuilding);
+  if (isTargetBuilding && Attack.siegeBonus[eid] > 1.0) {
+    attackerDamage *= Attack.siegeBonus[eid];
+  }
+
+  // Armor type damage modifier (rock-paper-scissors)
+  const modifier = getDamageModifier(Attack.attackType[eid], Armor.type[targetEid]);
+  attackerDamage *= modifier;
+
   // Upkeep debt: reduce attack effectiveness
   const attackerFaction = Faction.id[eid];
   if (playerState.isInUpkeepDebt(attackerFaction)) {
@@ -170,6 +199,12 @@ function processAttacking(world: GameWorld, eid: number, dt: number): void {
   }
 
   Health.current[targetEid] -= effectiveDamage;
+
+  // Splash damage: siege units deal AoE damage to nearby enemies
+  const splashRadius = Attack.splashRadius[eid];
+  if (splashRadius > 0) {
+    applySplashDamage(world, eid, targetEid, effectiveDamage, splashRadius);
+  }
 
   // Damage triggers self-defense: non-attacking units retaliate against attacker
   if (hasComponent(world, targetEid, UnitAI) && hasComponent(world, targetEid, IsUnit)) {
@@ -311,6 +346,15 @@ function processHoldPosition(
           let attackerDamage = Attack.damage[eid] * (GezeligheidBonus.attackMult[eid] || 1.0);
           const targetArmor = Armor.value[currentTarget] * (GezeligheidBonus.armorMult[currentTarget] || 1.0);
 
+          // Siege bonus vs buildings
+          const isTargetBldg = hasComponent(world, currentTarget, IsBuilding);
+          if (isTargetBldg && Attack.siegeBonus[eid] > 1.0) {
+            attackerDamage *= Attack.siegeBonus[eid];
+          }
+
+          // Armor type damage modifier
+          attackerDamage *= getDamageModifier(Attack.attackType[eid], Armor.type[currentTarget]);
+
           if (playerState.isInUpkeepDebt(myFaction)) {
             attackerDamage *= UPKEEP_DEBT_EFFECTIVENESS;
           }
@@ -321,8 +365,23 @@ function processHoldPosition(
           }
 
           const rawDamage = attackerDamage - targetArmor * ARMOR_FACTOR;
-          const effectiveDamage = Math.max(MIN_DAMAGE, rawDamage);
+          let effectiveDamage = Math.max(MIN_DAMAGE, rawDamage);
+
+          // Gezelligheid damage reduction
+          const holdDmgRed = GezeligheidBonus.damageReduction[currentTarget] || 0;
+          if (holdDmgRed > 0) {
+            effectiveDamage *= (1 - holdDmgRed);
+            effectiveDamage = Math.max(MIN_DAMAGE, effectiveDamage);
+          }
+
           Health.current[currentTarget] = Math.max(0, Health.current[currentTarget] - effectiveDamage);
+
+          // Splash damage for siege units in hold position
+          const holdSplash = Attack.splashRadius[eid];
+          if (holdSplash > 0) {
+            applySplashDamage(world, eid, currentTarget, effectiveDamage, holdSplash);
+          }
+
           Attack.timer[eid] = Attack.speed[eid];
 
           const isRangedHold = Attack.range[eid] > MINIMUM_MELEE_RANGE;
@@ -419,6 +478,77 @@ function processSelfDefense(world: GameWorld, eid: number, allUnits: { readonly 
     UnitAI.state[eid] = UnitAIState.Attacking;
     UnitAI.targetEid[eid] = closestEid;
     Movement.hasTarget[eid] = 0;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Splash / AoE damage
+// ---------------------------------------------------------------------------
+
+/** Splash damage falloff: 50% at the edge of the radius. */
+const SPLASH_FALLOFF = 0.5;
+
+/**
+ * Apply splash damage to all enemies near the primary target.
+ * Damage falls off linearly from 100% at center to SPLASH_FALLOFF at edge.
+ * The primary target (already damaged) is excluded.
+ */
+function applySplashDamage(
+  world: GameWorld,
+  attackerEid: number,
+  primaryTarget: number,
+  primaryDamage: number,
+  radius: number,
+): void {
+  const tx = Position.x[primaryTarget];
+  const tz = Position.z[primaryTarget];
+  const radiusSq = radius * radius;
+  const attackerFaction = Faction.id[attackerEid];
+
+  // Splash hits enemy units
+  const units = query(world, [Position, Health, IsUnit]);
+  for (const other of units) {
+    if (other === primaryTarget || other === attackerEid) continue;
+    if (Faction.id[other] === attackerFaction) continue;
+    if (hasComponent(world, other, IsDead) || Health.current[other] <= 0) continue;
+    if (hasComponent(world, other, Invincible) && Invincible.duration[other] > 0) continue;
+
+    const sdx = Position.x[other] - tx;
+    const sdz = Position.z[other] - tz;
+    const dSq = sdx * sdx + sdz * sdz;
+    if (dSq > radiusSq) continue;
+
+    // Linear falloff
+    const dist = Math.sqrt(dSq);
+    const falloff = 1.0 - (1.0 - SPLASH_FALLOFF) * (dist / radius);
+    const splashDmg = Math.max(MIN_DAMAGE, primaryDamage * falloff);
+    Health.current[other] -= splashDmg;
+
+    if (Health.current[other] <= 0) {
+      addComponent(world, other, IsDead);
+    }
+  }
+
+  // Splash also hits enemy buildings
+  const buildings = query(world, [Position, Health, IsBuilding]);
+  for (const other of buildings) {
+    if (other === primaryTarget) continue;
+    if (Faction.id[other] === attackerFaction) continue;
+    if (hasComponent(world, other, IsDead) || Health.current[other] <= 0) continue;
+
+    const sdx = Position.x[other] - tx;
+    const sdz = Position.z[other] - tz;
+    const dSq = sdx * sdx + sdz * sdz;
+    if (dSq > radiusSq) continue;
+
+    const dist = Math.sqrt(dSq);
+    const falloff = 1.0 - (1.0 - SPLASH_FALLOFF) * (dist / radius);
+    const splashDmg = Math.max(MIN_DAMAGE, primaryDamage * falloff);
+    Health.current[other] -= splashDmg;
+
+    if (Health.current[other] <= 0) {
+      addComponent(world, other, IsDead);
+    }
   }
 }
 
