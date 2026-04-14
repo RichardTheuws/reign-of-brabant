@@ -1604,12 +1604,14 @@ export class Game {
     eventBus.on('hero-died', (event) => {
       const archetype = HERO_ARCHETYPES[event.heroTypeId];
       if (archetype) this.hud?.showAlert(`${archetype.name} is gevallen! Revival in 60s...`, 'warning');
+      audioManager.playSound('hero_death');
     });
 
     eventBus.on('hero-revived', (event) => {
       const eid = event.entityId;
       const archetype = HERO_ARCHETYPES[event.heroTypeId];
       if (archetype) this.hud?.showAlert(`${archetype.name} is terug!`, 'info');
+      audioManager.playSound('hero_spawn');
       // Mesh creation is handled by detectAndRenderNewEntities
     });
 
@@ -1674,7 +1676,7 @@ export class Game {
     eventBus.on('research-completed', (event) => {
       if (event.factionId === this.playerFactionId) {
         this.hud?.showAlert(`Onderzoek voltooid: ${event.upgradeName}`, 'info');
-        audioManager.playSound('building_complete'); // use building fanfare for research
+        audioManager.playSound('upgrade_complete');
       }
     });
   }
@@ -2757,7 +2759,7 @@ export class Game {
           const factionColor = FACTION_DEATH_COLORS[Faction.id[eid]] ?? 0x4a4a5a;
           this.particles.spawnBuildingDestruction(obj.position.x, obj.position.y, obj.position.z, factionColor);
           this.camera.shake(0.8, 0.5);
-          audioManager.playSound('building_complete', { x: obj.position.x, z: obj.position.z });
+          audioManager.playSound('building_destroy', { x: obj.position.x, z: obj.position.z });
         }
       }
     }

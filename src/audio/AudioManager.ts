@@ -88,6 +88,22 @@ const SOUND_DEFINITIONS: SoundDefinition[] = [
   // Ability
   { id: 'carnavalsrage',    src: sfxPath('carnavalsrage.mp3'),    category: 'sfx', baseVolume: 0.9 },
   { id: 'vergadering',      src: sfxPath('vergadering.mp3'),      category: 'sfx', baseVolume: 0.7 },
+
+  // Building destruction & construction
+  { id: 'building_destroy', src: sfxPath('building_destroy.mp3'), category: 'sfx', baseVolume: 0.9 },
+
+  // Upgrades & research
+  { id: 'upgrade_complete', src: sfxPath('upgrade_complete.mp3'), category: 'sfx', baseVolume: 0.8 },
+
+  // Heroes
+  { id: 'hero_spawn',       src: sfxPath('hero_spawn.mp3'),       category: 'sfx', baseVolume: 0.9 },
+  { id: 'hero_death',       src: sfxPath('hero_death.mp3'),       category: 'sfx', baseVolume: 0.8 },
+
+  // Combat extended
+  { id: 'siege_impact',     src: sfxPath('siege_impact.mp3'),     category: 'sfx', baseVolume: 0.9 },
+
+  // Healing
+  { id: 'heal_tick',         src: sfxPath('heal_tick.mp3'),        category: 'sfx', baseVolume: 0.4 },
 ];
 
 // ---------------------------------------------------------------------------

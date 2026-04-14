@@ -7,6 +7,7 @@
 import { eventBus } from '../core/EventBus';
 import { Position, Movement, UnitAI } from '../ecs/components';
 import { FactionId, NO_ENTITY } from '../types/index';
+import { audioManager } from '../audio/AudioManager';
 import type { ParticleSystem } from './ParticleSystem';
 import type { RTSCamera } from '../camera/RTSCamera';
 
@@ -199,5 +200,6 @@ export function initAbilityEffects(
     z: number;
   }) => {
     particles.spawnHealEffect(event.x, 1.0, event.z);
+    audioManager.playSound('heal_tick', { x: event.x, z: event.z });
   });
 }
