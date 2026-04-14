@@ -23,6 +23,7 @@ import {
   UnitTypeId,
   BuildingTypeId,
   MAP_SIZE,
+  type MapSizeOption,
   type MapDefinition,
   type SpawnPoint,
   type GoldMineSpawn,
@@ -89,7 +90,7 @@ const DECO_MIN_DISTANCE = 8;
 // Map template type
 // ---------------------------------------------------------------------------
 
-export type MapTemplate = 'classic' | 'crossroads' | 'islands' | 'arena' | 'fortress' | 'river-valley';
+export type MapTemplate = 'classic' | 'crossroads' | 'islands' | 'arena' | 'fortress' | 'river-valley' | 'canyon' | 'archipelago';
 
 export enum DecoType {
   Tree = 0,
@@ -212,31 +213,41 @@ const BASE_POSITIONS: readonly BasePositionConfig[] = [
  * @param playerCount - Number of players (2-4). Defaults to 2 for
  *   backwards compatibility with the original PoC layout.
  * @param mapTemplate - Map layout template. Defaults to 'classic' for
- *   backwards compatibility. Options: classic, crossroads, islands, arena.
+ *   backwards compatibility. Options: classic, crossroads, islands, arena,
+ *   fortress, river-valley, canyon, archipelago.
+ * @param mapSize - Map size in world units (80, 128, 192). Defaults to
+ *   MAP_SIZE (128) for backwards compatibility.
  */
 export function generateMap(
   seed: number = 42,
   getHeight: HeightCallback = () => 0,
   playerCount: 2 | 3 | 4 = 2,
   mapTemplate: MapTemplate = 'classic',
+  mapSize: MapSizeOption = MAP_SIZE as MapSizeOption,
 ): GeneratedMap {
   const rng = createRng(seed);
-  const halfMap = MAP_SIZE / 2;
+  const halfMap = mapSize / 2;
+  /** Scale factor relative to the default 128 map. Used to proportionally adjust counts/distances. */
+  const scale = mapSize / 128;
 
   switch (mapTemplate) {
     case 'crossroads':
-      return generateCrossroads(rng, getHeight, playerCount, halfMap);
+      return generateCrossroads(rng, getHeight, playerCount, halfMap, mapSize, scale);
     case 'islands':
-      return generateIslands(rng, getHeight, playerCount, halfMap);
+      return generateIslands(rng, getHeight, playerCount, halfMap, mapSize, scale);
     case 'arena':
-      return generateArena(rng, getHeight, playerCount, halfMap);
+      return generateArena(rng, getHeight, playerCount, halfMap, mapSize, scale);
     case 'fortress':
-      return generateFortress(rng, getHeight, playerCount, halfMap);
+      return generateFortress(rng, getHeight, playerCount, halfMap, mapSize, scale);
     case 'river-valley':
-      return generateRiverValley(rng, getHeight, playerCount, halfMap);
+      return generateRiverValley(rng, getHeight, playerCount, halfMap, mapSize, scale);
+    case 'canyon':
+      return generateCanyon(rng, getHeight, playerCount, halfMap, mapSize, scale);
+    case 'archipelago':
+      return generateArchipelago(rng, getHeight, playerCount, halfMap, mapSize, scale);
     case 'classic':
     default:
-      return generateClassic(rng, getHeight, playerCount, halfMap);
+      return generateClassic(rng, getHeight, playerCount, halfMap, mapSize, scale);
   }
 }
 
@@ -249,9 +260,11 @@ function generateFortress(
   getHeight: HeightCallback,
   playerCount: 2 | 3 | 4,
   halfMap: number,
+  mapSize: number = MAP_SIZE,
+  scale: number = 1,
 ): GeneratedMap {
-  const margin = 15;
-  const fortRadius = 20;
+  const margin = Math.round(15 * scale);
+  const fortRadius = Math.round(20 * scale);
 
   // Spawns: corners like classic
   const spawns: SpawnPoint[] = [];
@@ -265,10 +278,11 @@ function generateFortress(
   }
 
   // Gold mines: 2 per player near base + 4 rich central mines inside fort
+  const mineOffset = Math.round(8 * scale);
   const goldMines: GoldMineSpawn[] = [];
   for (const sp of spawns) {
-    goldMines.push({ x: sp.x + (sp.x > 0 ? -8 : 8), z: sp.z, amount: 2000 });
-    goldMines.push({ x: sp.x, z: sp.z + (sp.z > 0 ? -8 : 8), amount: 2000 });
+    goldMines.push({ x: sp.x + (sp.x > 0 ? -mineOffset : mineOffset), z: sp.z, amount: 2000 });
+    goldMines.push({ x: sp.x, z: sp.z + (sp.z > 0 ? -mineOffset : mineOffset), amount: 2000 });
   }
   for (let i = 0; i < 4; i++) {
     const angle = (i / 4) * Math.PI * 2 + Math.PI / 4;
@@ -291,12 +305,13 @@ function generateFortress(
   }
 
   // Tree resources
+  const treeOffset = Math.round(15 * scale);
   const treeResources: TreeResourceSpawn[] = [];
   for (const sp of spawns) {
-    const tx = sp.x + (sp.x > 0 ? -15 : 15);
-    const tz = sp.z + (sp.z > 0 ? -15 : 15);
-    for (let i = 0; i < 4; i++) {
-      treeResources.push({ x: tx + (rng() - 0.5) * 8, z: tz + (rng() - 0.5) * 8, amount: 300 });
+    const tx = sp.x + (sp.x > 0 ? -treeOffset : treeOffset);
+    const tz = sp.z + (sp.z > 0 ? -treeOffset : treeOffset);
+    for (let i = 0; i < Math.round(4 * scale); i++) {
+      treeResources.push({ x: tx + (rng() - 0.5) * 8 * scale, z: tz + (rng() - 0.5) * 8 * scale, amount: 300 });
     }
   }
 
@@ -326,10 +341,11 @@ function generateFortress(
   ];
 
   // Decorations
+  const decoCount = Math.round(100 * scale * scale);
   const decorations: DecoSpawn[] = [];
-  for (let i = 0; i < 100; i++) {
-    const x = (rng() - 0.5) * MAP_SIZE * 0.9;
-    const z = (rng() - 0.5) * MAP_SIZE * 0.9;
+  for (let i = 0; i < decoCount; i++) {
+    const x = (rng() - 0.5) * mapSize * 0.9;
+    const z = (rng() - 0.5) * mapSize * 0.9;
     if (Math.sqrt(x * x + z * z) > fortRadius + 8) {
       decorations.push({ x, z, type: rng() > 0.7 ? DecoType.Rock : DecoType.Tree, scale: 0.8 + rng() * 0.6, rotationY: rng() * Math.PI * 2 });
     }
@@ -338,7 +354,7 @@ function generateFortress(
   const flattenPositions = spawns.map(sp => ({ x: sp.x, z: sp.z }));
 
   return {
-    size: MAP_SIZE, heightScale: 10,
+    size: mapSize, heightScale: 10,
     spawns, goldMines, buildings, units, decorations, treeResources,
     terrainFeatures: { biome: 'arid', rivers: [], bridges: [], rockWalls, roads, tunnels, flattenPositions },
   };
@@ -353,8 +369,10 @@ function generateRiverValley(
   getHeight: HeightCallback,
   playerCount: 2 | 3 | 4,
   halfMap: number,
+  mapSize: number = MAP_SIZE,
+  scale: number = 1,
 ): GeneratedMap {
-  const margin = 15;
+  const margin = Math.round(15 * scale);
 
   // Spawns: north vs south
   const spawns: SpawnPoint[] = [];
@@ -408,8 +426,8 @@ function generateRiverValley(
   for (let i = 0; i <= 8; i++) {
     const t = i / 8;
     riverPath.push({
-      x: -halfMap + 5 + t * (MAP_SIZE - 10),
-      z: Math.sin(t * Math.PI * 2) * 6 + (rng() - 0.5) * 4,
+      x: -halfMap + 5 + t * (mapSize - 10),
+      z: Math.sin(t * Math.PI * 2) * 6 * scale + (rng() - 0.5) * 4,
     });
   }
 
@@ -435,10 +453,11 @@ function generateRiverValley(
   }
 
   // Decorations
+  const rvDecoCount = Math.round(140 * scale * scale);
   const decorations: DecoSpawn[] = [];
-  for (let i = 0; i < 140; i++) {
-    const x = (rng() - 0.5) * MAP_SIZE * 0.9;
-    const z = (rng() - 0.5) * MAP_SIZE * 0.9;
+  for (let i = 0; i < rvDecoCount; i++) {
+    const x = (rng() - 0.5) * mapSize * 0.9;
+    const z = (rng() - 0.5) * mapSize * 0.9;
     if (Math.abs(z) > 5) {
       decorations.push({ x, z, type: rng() > 0.6 ? DecoType.Rock : DecoType.Tree, scale: 0.8 + rng() * 0.6, rotationY: rng() * Math.PI * 2 });
     }
@@ -447,7 +466,7 @@ function generateRiverValley(
   const flattenPositions = spawns.map(sp => ({ x: sp.x, z: sp.z }));
 
   return {
-    size: MAP_SIZE, heightScale: 10,
+    size: mapSize, heightScale: 10,
     spawns, goldMines, buildings, units, decorations, treeResources,
     terrainFeatures: { biome: 'aquatic', rivers: [{ path: riverPath, width: 12 }], bridges, rockWalls, roads, tunnels: [], flattenPositions },
   };
@@ -462,6 +481,8 @@ function generateClassic(
   getHeight: HeightCallback,
   playerCount: 2 | 3 | 4,
   halfMap: number,
+  mapSize: number = MAP_SIZE,
+  scale: number = 1,
 ): GeneratedMap {
   // -----------------------------------------------------------------------
   // 1. Spawn points for all active players
@@ -615,8 +636,9 @@ function generateClassic(
   // -----------------------------------------------------------------------
 
   const { decorations } = generateDecorations(
-    rng, getHeight, halfMap, TREE_COUNT, ROCK_COUNT,
+    rng, getHeight, halfMap, Math.round(TREE_COUNT * scale * scale), Math.round(ROCK_COUNT * scale * scale),
     [...spawns, ...goldMines, ...treeResources, ...buildings, ...units],
+    mapSize,
   );
 
   // -----------------------------------------------------------------------
@@ -624,7 +646,7 @@ function generateClassic(
   // -----------------------------------------------------------------------
 
   return {
-    size: MAP_SIZE,
+    size: mapSize,
     heightScale: 10,
     spawns,
     goldMines,
@@ -674,6 +696,8 @@ function generateCrossroads(
   getHeight: HeightCallback,
   playerCount: 2 | 3 | 4,
   halfMap: number,
+  mapSize: number = MAP_SIZE,
+  scale: number = 1,
 ): GeneratedMap {
   const edgeMargin = BASE_MARGIN;
 
@@ -834,12 +858,13 @@ function generateCrossroads(
   // -----------------------------------------------------------------------
 
   const { decorations } = generateDecorations(
-    rng, getHeight, halfMap, TREE_COUNT + 60, ROCK_COUNT,
+    rng, getHeight, halfMap, Math.round((TREE_COUNT + 60) * scale * scale), Math.round(ROCK_COUNT * scale * scale),
     [...spawns, ...goldMines, ...treeResources, ...buildings, ...units],
+    mapSize,
   );
 
   return {
-    size: MAP_SIZE,
+    size: mapSize,
     heightScale: 10,
     spawns,
     goldMines,
@@ -864,6 +889,8 @@ function generateIslands(
   getHeight: HeightCallback,
   playerCount: 2 | 3 | 4,
   halfMap: number,
+  mapSize: number = MAP_SIZE,
+  scale: number = 1,
 ): GeneratedMap {
   // Wider margin pushes bases further into corners (more spread out)
   const islandMargin = BASE_MARGIN + 6;
@@ -1010,12 +1037,13 @@ function generateIslands(
   // -----------------------------------------------------------------------
 
   const { decorations } = generateDecorations(
-    rng, getHeight, halfMap, Math.floor(TREE_COUNT * 0.6), ROCK_COUNT,
+    rng, getHeight, halfMap, Math.round(TREE_COUNT * 0.6 * scale * scale), Math.round(ROCK_COUNT * scale * scale),
     [...spawns, ...goldMines, ...treeResources, ...buildings, ...units],
+    mapSize,
   );
 
   return {
-    size: MAP_SIZE,
+    size: mapSize,
     heightScale: 10,
     spawns,
     goldMines,
@@ -1040,8 +1068,10 @@ function generateArena(
   getHeight: HeightCallback,
   playerCount: 2 | 3 | 4,
   halfMap: number,
+  mapSize: number = MAP_SIZE,
+  scale: number = 1,
 ): GeneratedMap {
-  const arenaRadius = 25;
+  const arenaRadius = Math.round(25 * scale);
   const arenaGoldAmount = 1000;
 
   // -----------------------------------------------------------------------
@@ -1189,12 +1219,13 @@ function generateArena(
   // -----------------------------------------------------------------------
 
   const { decorations } = generateDecorations(
-    rng, getHeight, halfMap, TREE_COUNT, ROCK_COUNT,
+    rng, getHeight, halfMap, Math.round(TREE_COUNT * scale * scale), Math.round(ROCK_COUNT * scale * scale),
     [...spawns, ...goldMines, ...treeResources, ...buildings, ...units],
+    mapSize,
   );
 
   return {
-    size: MAP_SIZE,
+    size: mapSize,
     heightScale: 10,
     spawns,
     goldMines,
@@ -1203,6 +1234,464 @@ function generateArena(
     units,
     decorations,
     terrainFeatures,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Template: Canyon
+//
+// Narrow valley running north-south through the center.
+// High rock walls on east/west sides with 2-3 choke points.
+// Gold mines on both sides of the canyon (risk/reward).
+// Players spawn at opposite ends (north vs south).
+// For 3-4 players: additional bases on elevated plateaus east/west.
+// ---------------------------------------------------------------------------
+
+function generateCanyon(
+  rng: () => number,
+  getHeight: HeightCallback,
+  playerCount: 2 | 3 | 4,
+  halfMap: number,
+  mapSize: number = MAP_SIZE,
+  scale: number = 1,
+): GeneratedMap {
+  const margin = Math.round(15 * scale);
+  // Canyon width: narrow passage through center
+  const canyonHalfWidth = Math.round(12 * scale);
+  // Wall inset from map edge
+  const wallInset = Math.round(8 * scale);
+
+  // -----------------------------------------------------------------------
+  // 1. Spawn points
+  // -----------------------------------------------------------------------
+  const spawns: SpawnPoint[] = [];
+
+  if (playerCount === 2) {
+    // North and south ends of the canyon
+    spawns.push({ x: 0, z: -halfMap + margin, factionId: BASE_POSITIONS[0].factionId });
+    spawns.push({ x: 0, z: halfMap - margin, factionId: BASE_POSITIONS[1].factionId });
+  } else if (playerCount === 3) {
+    // North, south, and east plateau
+    spawns.push({ x: 0, z: -halfMap + margin, factionId: BASE_POSITIONS[0].factionId });
+    spawns.push({ x: 0, z: halfMap - margin, factionId: BASE_POSITIONS[1].factionId });
+    spawns.push({ x: halfMap - margin, z: 0, factionId: BASE_POSITIONS[2].factionId });
+  } else {
+    // North, south, east plateau, west plateau
+    spawns.push({ x: 0, z: -halfMap + margin, factionId: BASE_POSITIONS[0].factionId });
+    spawns.push({ x: 0, z: halfMap - margin, factionId: BASE_POSITIONS[1].factionId });
+    spawns.push({ x: halfMap - margin, z: 0, factionId: BASE_POSITIONS[2].factionId });
+    spawns.push({ x: -halfMap + margin, z: 0, factionId: BASE_POSITIONS[3].factionId });
+  }
+
+  // -----------------------------------------------------------------------
+  // 2. Gold mines
+  // -----------------------------------------------------------------------
+  const goldMines: GoldMineSpawn[] = [];
+
+  // 2 mines near each base
+  for (const sp of spawns) {
+    const towardsCentreZ = sp.z < 0 ? 1 : sp.z > 0 ? -1 : 0;
+    const towardsCentreX = sp.x < 0 ? 1 : sp.x > 0 ? -1 : 0;
+    if (Math.abs(sp.x) < halfMap * 0.3) {
+      // Canyon-axis base: mines along canyon walls
+      goldMines.push({ x: sp.x - canyonHalfWidth * 0.6, z: sp.z + towardsCentreZ * 8 * scale, amount: DEFAULT_GOLD_AMOUNT });
+      goldMines.push({ x: sp.x + canyonHalfWidth * 0.6, z: sp.z + towardsCentreZ * 8 * scale, amount: DEFAULT_GOLD_AMOUNT });
+    } else {
+      // Plateau base: mines nearby
+      goldMines.push({ x: sp.x + towardsCentreX * 8 * scale, z: sp.z - 6 * scale, amount: DEFAULT_GOLD_AMOUNT });
+      goldMines.push({ x: sp.x + towardsCentreX * 8 * scale, z: sp.z + 6 * scale, amount: DEFAULT_GOLD_AMOUNT });
+    }
+  }
+
+  // Risk/reward mines deep in the canyon on both sides of the walls
+  const canyonMineCount = Math.round(3 * scale);
+  for (let i = 0; i < canyonMineCount; i++) {
+    const z = -halfMap * 0.5 + (i / Math.max(canyonMineCount - 1, 1)) * mapSize * 0.5;
+    // West side of canyon (outside wall)
+    goldMines.push({ x: -canyonHalfWidth - wallInset * 0.5 + (rng() - 0.5) * 4, z: z + (rng() - 0.5) * 6, amount: DEFAULT_GOLD_AMOUNT * 1.5 });
+    // East side of canyon (outside wall)
+    goldMines.push({ x: canyonHalfWidth + wallInset * 0.5 + (rng() - 0.5) * 4, z: z + (rng() - 0.5) * 6, amount: DEFAULT_GOLD_AMOUNT * 1.5 });
+  }
+
+  // -----------------------------------------------------------------------
+  // 3. Buildings + Units
+  // -----------------------------------------------------------------------
+  const buildings: BuildingSpawn[] = spawns.map(sp => ({
+    factionId: sp.factionId, buildingType: BuildingTypeId.TownHall, x: sp.x, z: sp.z,
+  }));
+
+  const units: UnitSpawn[] = [];
+  for (const sp of spawns) {
+    for (let i = 0; i < STARTING_WORKERS; i++) {
+      units.push({ factionId: sp.factionId, unitType: UnitTypeId.Worker, x: sp.x + (i - 1) * WORKER_SPACING, z: sp.z + 3 });
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // 4. Tree resources
+  // -----------------------------------------------------------------------
+  const treeResources: TreeResourceSpawn[] = [];
+  for (const sp of spawns) {
+    const groveDir = Math.abs(sp.x) < halfMap * 0.3 ? 1 : 0;
+    for (let i = 0; i < 4; i++) {
+      treeResources.push({
+        x: sp.x + (rng() - 0.5) * 12 * scale + (groveDir === 0 ? (sp.x > 0 ? -10 : 10) * scale : 0),
+        z: sp.z + (sp.z < 0 ? 10 : -10) * scale + (rng() - 0.5) * 6 * scale,
+        amount: DEFAULT_WOOD_AMOUNT,
+      });
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // 5. Terrain features: canyon walls + choke points
+  // -----------------------------------------------------------------------
+
+  // East and west canyon walls (long rock walls running N-S)
+  const rockWalls: RockWallSpawn[] = [];
+  const wallSegments = Math.round(6 * scale);
+  const chokePointCount = playerCount <= 2 ? 2 : 3;
+  const chokePositions: number[] = [];
+  for (let c = 0; c < chokePointCount; c++) {
+    chokePositions.push(-halfMap * 0.5 + ((c + 1) / (chokePointCount + 1)) * mapSize * 0.5 + halfMap * 0.25);
+  }
+
+  // Build wall with gaps at choke points
+  for (const side of [-1, 1]) {
+    const wallX = side * canyonHalfWidth;
+    let segStart = -halfMap + 5;
+
+    for (let seg = 0; seg <= wallSegments; seg++) {
+      const segEnd = seg === wallSegments ? halfMap - 5 : segStart + (mapSize - 10) / (wallSegments + 1);
+
+      // Check if this segment overlaps a choke point
+      let skipSegment = false;
+      for (const chokeZ of chokePositions) {
+        if (segStart < chokeZ + 6 * scale && segEnd > chokeZ - 6 * scale) {
+          skipSegment = true;
+          // Add wall pieces before and after the gap
+          if (segStart < chokeZ - 6 * scale) {
+            rockWalls.push({
+              path: [
+                { x: wallX + (rng() - 0.5) * 2, z: segStart },
+                { x: wallX + (rng() - 0.5) * 2, z: chokeZ - 6 * scale },
+              ],
+              thickness: 3,
+            });
+          }
+          if (segEnd > chokeZ + 6 * scale) {
+            rockWalls.push({
+              path: [
+                { x: wallX + (rng() - 0.5) * 2, z: chokeZ + 6 * scale },
+                { x: wallX + (rng() - 0.5) * 2, z: segEnd },
+              ],
+              thickness: 3,
+            });
+          }
+          break;
+        }
+      }
+
+      if (!skipSegment) {
+        rockWalls.push({
+          path: [
+            { x: wallX + (rng() - 0.5) * 2, z: segStart },
+            { x: wallX + (rng() - 0.5) * 2, z: segEnd },
+          ],
+          thickness: 3,
+        });
+      }
+
+      segStart = segEnd;
+    }
+  }
+
+  // Roads through choke points
+  const roads: RoadSpawn[] = [];
+  for (const chokeZ of chokePositions) {
+    roads.push({
+      path: [
+        { x: -canyonHalfWidth - wallInset, z: chokeZ },
+        { x: -canyonHalfWidth, z: chokeZ },
+        { x: canyonHalfWidth, z: chokeZ },
+        { x: canyonHalfWidth + wallInset, z: chokeZ },
+      ],
+      width: 3,
+    });
+  }
+  // Main canyon road (N-S through center)
+  roads.push({
+    path: [
+      { x: 0, z: -halfMap + margin },
+      { x: (rng() - 0.5) * 4, z: -halfMap * 0.3 },
+      { x: (rng() - 0.5) * 4, z: 0 },
+      { x: (rng() - 0.5) * 4, z: halfMap * 0.3 },
+      { x: 0, z: halfMap - margin },
+    ],
+    width: 2.5,
+  });
+
+  // No rivers or bridges in canyon
+  const rivers: RiverSpawn[] = [];
+  const bridges: BridgeSpawn[] = [];
+  const tunnels: TunnelSpawn[] = [];
+
+  // -----------------------------------------------------------------------
+  // 6. Decorations
+  // -----------------------------------------------------------------------
+  const { decorations } = generateDecorations(
+    rng, getHeight, halfMap, Math.round(TREE_COUNT * 0.7 * scale * scale), Math.round(ROCK_COUNT * 1.5 * scale * scale),
+    [...spawns, ...goldMines, ...treeResources, ...buildings, ...units],
+    mapSize,
+  );
+
+  const flattenPositions = spawns.map(sp => ({ x: sp.x, z: sp.z }));
+
+  return {
+    size: mapSize,
+    heightScale: 10,
+    spawns,
+    goldMines,
+    treeResources,
+    buildings,
+    units,
+    decorations,
+    terrainFeatures: { biome: 'arid', rivers, bridges, rockWalls, roads, tunnels, flattenPositions },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Template: Archipelago
+//
+// Multiple islands/landmasses separated by rivers.
+// Connected by narrow bridges (BridgeSpawn).
+// Each player starts on their own island.
+// Contested center island with rich gold mines.
+// Bridge control is key strategy.
+// For 2 players: 2 main islands + 1 center.
+// For 3-4 players: 3-4 islands in a circle + center.
+// ---------------------------------------------------------------------------
+
+function generateArchipelago(
+  rng: () => number,
+  getHeight: HeightCallback,
+  playerCount: 2 | 3 | 4,
+  halfMap: number,
+  mapSize: number = MAP_SIZE,
+  scale: number = 1,
+): GeneratedMap {
+  const margin = Math.round(15 * scale);
+  // Island radius (how far spawns are from center)
+  const islandRadius = halfMap * 0.55;
+  // Channel width between islands
+  const channelWidth = Math.round(8 * scale);
+
+  // -----------------------------------------------------------------------
+  // 1. Spawn points -- each player on their own island
+  // -----------------------------------------------------------------------
+  const spawns: SpawnPoint[] = [];
+
+  for (let slot = 0; slot < playerCount; slot++) {
+    const angle = (slot / playerCount) * Math.PI * 2 - Math.PI / 2; // start from top
+    spawns.push({
+      x: Math.cos(angle) * islandRadius,
+      z: Math.sin(angle) * islandRadius,
+      factionId: BASE_POSITIONS[slot].factionId,
+    });
+  }
+
+  // -----------------------------------------------------------------------
+  // 2. Gold mines
+  // -----------------------------------------------------------------------
+  const goldMines: GoldMineSpawn[] = [];
+
+  // 2 mines per player on their island
+  for (let slot = 0; slot < playerCount; slot++) {
+    const sp = spawns[slot];
+    const angle = (slot / playerCount) * Math.PI * 2 - Math.PI / 2;
+    const outX = Math.cos(angle);
+    const outZ = Math.sin(angle);
+    // Mine towards center (closer to bridges)
+    goldMines.push({
+      x: sp.x - outX * 8 * scale + (rng() - 0.5) * 3,
+      z: sp.z - outZ * 8 * scale + (rng() - 0.5) * 3,
+      amount: DEFAULT_GOLD_AMOUNT,
+    });
+    // Mine away from center (safe but farther)
+    goldMines.push({
+      x: sp.x + outX * 6 * scale + (rng() - 0.5) * 3,
+      z: sp.z + outZ * 6 * scale + (rng() - 0.5) * 3,
+      amount: DEFAULT_GOLD_AMOUNT,
+    });
+  }
+
+  // Rich contested center island mines
+  const centerMineCount = playerCount <= 2 ? 3 : 4;
+  for (let i = 0; i < centerMineCount; i++) {
+    const angle = (i / centerMineCount) * Math.PI * 2 + rng() * 0.3;
+    const dist = 4 * scale + rng() * 3 * scale;
+    goldMines.push({
+      x: Math.cos(angle) * dist,
+      z: Math.sin(angle) * dist,
+      amount: DEFAULT_GOLD_AMOUNT * 2,
+    });
+  }
+
+  // -----------------------------------------------------------------------
+  // 3. Buildings + Units
+  // -----------------------------------------------------------------------
+  const buildings: BuildingSpawn[] = spawns.map(sp => ({
+    factionId: sp.factionId, buildingType: BuildingTypeId.TownHall, x: sp.x, z: sp.z,
+  }));
+
+  const units: UnitSpawn[] = [];
+  for (let slot = 0; slot < playerCount; slot++) {
+    const sp = spawns[slot];
+    const angle = (slot / playerCount) * Math.PI * 2 - Math.PI / 2;
+    const outX = Math.cos(angle);
+    const outZ = Math.sin(angle);
+    for (let i = 0; i < STARTING_WORKERS; i++) {
+      units.push({
+        factionId: sp.factionId,
+        unitType: UnitTypeId.Worker,
+        x: sp.x + outX * (3 + i * WORKER_SPACING),
+        z: sp.z + outZ * (3 + i * WORKER_SPACING),
+      });
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // 4. Tree resources -- on each island
+  // -----------------------------------------------------------------------
+  const treeResources: TreeResourceSpawn[] = [];
+  for (let slot = 0; slot < playerCount; slot++) {
+    const sp = spawns[slot];
+    const angle = (slot / playerCount) * Math.PI * 2 - Math.PI / 2;
+    // Perpendicular to outward direction for grove placement
+    const perpX = -Math.sin(angle);
+    const perpZ = Math.cos(angle);
+    for (let i = 0; i < 5; i++) {
+      treeResources.push({
+        x: sp.x + perpX * (rng() - 0.5) * 14 * scale,
+        z: sp.z + perpZ * (rng() - 0.5) * 14 * scale,
+        amount: DEFAULT_WOOD_AMOUNT,
+      });
+    }
+  }
+  // Small grove on center island
+  for (let i = 0; i < 3; i++) {
+    treeResources.push({
+      x: (rng() - 0.5) * 8 * scale,
+      z: (rng() - 0.5) * 8 * scale,
+      amount: DEFAULT_WOOD_AMOUNT,
+    });
+  }
+
+  // -----------------------------------------------------------------------
+  // 5. Terrain features: rivers (channels) + bridges
+  // -----------------------------------------------------------------------
+
+  // Create river channels between islands and center
+  const rivers: RiverSpawn[] = [];
+  const bridges: BridgeSpawn[] = [];
+
+  // Ring channel around center island
+  const centerIslandRadius = Math.round(16 * scale);
+  const ringPath: PathPoint[] = [];
+  const ringSegments = 24;
+  for (let i = 0; i <= ringSegments; i++) {
+    const a = (i / ringSegments) * Math.PI * 2;
+    const r = centerIslandRadius + (rng() - 0.5) * 2;
+    ringPath.push({ x: Math.cos(a) * r, z: Math.sin(a) * r });
+  }
+  rivers.push({ path: ringPath, width: channelWidth });
+
+  // Radial channels from ring outward between islands
+  for (let i = 0; i < playerCount; i++) {
+    const midAngle = ((i + 0.5) / playerCount) * Math.PI * 2 - Math.PI / 2;
+    const channelPath: PathPoint[] = [];
+    for (let s = 0; s <= 6; s++) {
+      const t = s / 6;
+      const r = centerIslandRadius + t * (halfMap - centerIslandRadius - 5);
+      channelPath.push({
+        x: Math.cos(midAngle) * r + (rng() - 0.5) * 4 * (t > 0.1 && t < 0.9 ? 1 : 0),
+        z: Math.sin(midAngle) * r + (rng() - 0.5) * 4 * (t > 0.1 && t < 0.9 ? 1 : 0),
+      });
+    }
+    rivers.push({ path: channelPath, width: channelWidth * 0.8 });
+  }
+
+  // Bridges: one from each island to center
+  for (let slot = 0; slot < playerCount; slot++) {
+    const angle = (slot / playerCount) * Math.PI * 2 - Math.PI / 2;
+    const bridgeR = centerIslandRadius;
+    bridges.push({
+      x: Math.cos(angle) * bridgeR,
+      z: Math.sin(angle) * bridgeR,
+      rotation: angle + Math.PI / 2,
+      width: 5,
+      length: channelWidth + 4,
+    });
+  }
+
+  // If 2 players: add a secondary bridge between each island (flanking route)
+  if (playerCount === 2) {
+    const flankAngle1 = Math.PI * 0.15;
+    const flankAngle2 = Math.PI * 1.15;
+    const flankR = centerIslandRadius + 4 * scale;
+    bridges.push({
+      x: Math.cos(flankAngle1) * flankR,
+      z: Math.sin(flankAngle1) * flankR,
+      rotation: flankAngle1 + Math.PI / 2,
+      width: 4,
+      length: channelWidth + 2,
+    });
+    bridges.push({
+      x: Math.cos(flankAngle2) * flankR,
+      z: Math.sin(flankAngle2) * flankR,
+      rotation: flankAngle2 + Math.PI / 2,
+      width: 4,
+      length: channelWidth + 2,
+    });
+  }
+
+  // Roads from spawns to nearest bridge
+  const roads: RoadSpawn[] = [];
+  for (let slot = 0; slot < playerCount; slot++) {
+    const sp = spawns[slot];
+    const bridge = bridges[slot];
+    roads.push({
+      path: generateRoadPath(rng, sp.x, sp.z, bridge.x, bridge.z, 4),
+      width: 2.5,
+    });
+  }
+
+  const rockWalls: RockWallSpawn[] = [];
+  const tunnels: TunnelSpawn[] = [];
+
+  // -----------------------------------------------------------------------
+  // 6. Decorations
+  // -----------------------------------------------------------------------
+  const { decorations } = generateDecorations(
+    rng, getHeight, halfMap, Math.round(TREE_COUNT * 0.8 * scale * scale), Math.round(ROCK_COUNT * 0.6 * scale * scale),
+    [...spawns, ...goldMines, ...treeResources, ...buildings, ...units],
+    mapSize,
+  );
+
+  const flattenPositions = [
+    ...spawns.map(sp => ({ x: sp.x, z: sp.z })),
+    ...bridges.map(b => ({ x: b.x, z: b.z })),
+  ];
+
+  return {
+    size: mapSize,
+    heightScale: 10,
+    spawns,
+    goldMines,
+    treeResources,
+    buildings,
+    units,
+    decorations,
+    terrainFeatures: { biome: 'aquatic', rivers, bridges, rockWalls, roads, tunnels, flattenPositions },
   };
 }
 
@@ -1217,13 +1706,14 @@ function generateDecorations(
   treeCount: number,
   rockCount: number,
   avoidSeed: { x: number; z: number }[],
+  mapSize: number = MAP_SIZE,
 ): { decorations: DecoSpawn[] } {
   const avoidPositions = [...avoidSeed];
   const decorations: DecoSpawn[] = [];
 
   // Trees
   for (let i = 0; i < treeCount; i++) {
-    const pos = findValidDecoPosition(rng, avoidPositions, halfMap, getHeight);
+    const pos = findValidDecoPosition(rng, avoidPositions, halfMap, getHeight, mapSize);
     if (pos) {
       decorations.push({
         type: DecoType.Tree,
@@ -1238,7 +1728,7 @@ function generateDecorations(
 
   // Rocks
   for (let i = 0; i < rockCount; i++) {
-    const pos = findValidDecoPosition(rng, avoidPositions, halfMap, getHeight);
+    const pos = findValidDecoPosition(rng, avoidPositions, halfMap, getHeight, mapSize);
     if (pos) {
       decorations.push({
         type: DecoType.Rock,
@@ -1271,12 +1761,13 @@ function findValidDecoPosition(
   avoidPositions: readonly { x: number; z: number }[],
   halfMap: number,
   getHeight: HeightCallback,
+  mapSize: number = MAP_SIZE,
 ): { x: number; z: number } | null {
   const margin = 5;
 
   for (let attempt = 0; attempt < 20; attempt++) {
-    const x = -halfMap + margin + rng() * (MAP_SIZE - margin * 2);
-    const z = -halfMap + margin + rng() * (MAP_SIZE - margin * 2);
+    const x = -halfMap + margin + rng() * (mapSize - margin * 2);
+    const z = -halfMap + margin + rng() * (mapSize - margin * 2);
 
     // Skip water areas
     const h = getHeight(x, z);

@@ -129,6 +129,10 @@ let activeMissionId: string | null = null;
 let selectedPlayerFaction: number = 0; // FactionId: 0=Brabanders, 1=Randstad, 2=Limburgers, 3=Belgen
 let selectedMapTemplate: string = 'classic';
 let selectedDifficulty: string = 'normal';
+let selectedPlayerCount: 2 | 3 | 4 = 2;
+let selectedMapSize: 'small' | 'medium' | 'large' = 'medium';
+let selectedStartingResources: 'low' | 'medium' | 'high' = 'medium';
+let selectedFogOfWar: boolean = true;
 
 // ---------------------------------------------------------------------------
 // Tutorial
@@ -217,7 +221,7 @@ setGameFlowDeps({
 
   startGame: async (isTutorial: boolean) => {
     if (!gameInitialized) {
-      await game.init(selectedPlayerFaction, selectedMapTemplate, selectedDifficulty);
+      await game.init(selectedPlayerFaction, selectedMapTemplate, selectedDifficulty, selectedPlayerCount, selectedMapSize, selectedStartingResources, selectedFogOfWar);
       gameInitialized = true;
     }
     tutorialActive = isTutorial;
@@ -431,11 +435,15 @@ menuScreens.init({
         break;
     }
   },
-  onFactionSelected: (faction, _startTutorial, mapTemplate, difficulty) => {
+  onFactionSelected: (faction, _startTutorial, mapTemplate, difficulty, playerCount, mapSize, startingResources, fogOfWar) => {
     const factionMap: Record<string, number> = { brabanders: 0, randstad: 1, limburgers: 2, belgen: 3 };
     selectedPlayerFaction = factionMap[faction] ?? 0;
     selectedMapTemplate = mapTemplate ?? 'classic';
     selectedDifficulty = difficulty ?? 'normal';
+    selectedPlayerCount = playerCount ?? 2;
+    selectedMapSize = mapSize ?? 'medium';
+    selectedStartingResources = startingResources ?? 'medium';
+    selectedFogOfWar = fogOfWar ?? true;
     stateMachine.requestTransition(GameStateId.LOADING, { tutorial: false });
   },
 });

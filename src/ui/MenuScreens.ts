@@ -15,12 +15,23 @@ import { MUSIC_IDS } from '../systems/MusicSystem';
 export type FactionChoice = 'brabanders' | 'randstad' | 'limburgers' | 'belgen';
 export type MenuAction = 'play' | 'campaign' | 'tutorial' | 'settings';
 
-export type MapTemplateChoice = 'classic' | 'crossroads' | 'islands' | 'arena' | 'fortress' | 'river-valley';
+export type MapTemplateChoice = 'classic' | 'crossroads' | 'islands' | 'arena' | 'fortress' | 'river-valley' | 'canyon' | 'archipelago';
 export type DifficultyChoice = 'easy' | 'normal' | 'hard';
+export type MapSizeChoice = 'small' | 'medium' | 'large';
+export type ResourcePresetChoice = 'low' | 'medium' | 'high';
 
 export interface MenuScreenEvents {
   onMenuAction: (action: MenuAction) => void;
-  onFactionSelected: (faction: FactionChoice, startTutorial: boolean, mapTemplate: MapTemplateChoice, difficulty: DifficultyChoice) => void;
+  onFactionSelected: (
+    faction: FactionChoice,
+    startTutorial: boolean,
+    mapTemplate: MapTemplateChoice,
+    difficulty: DifficultyChoice,
+    playerCount: 2 | 3 | 4,
+    mapSize: MapSizeChoice,
+    startingResources: ResourcePresetChoice,
+    fogOfWar: boolean,
+  ) => void;
 }
 
 interface MapTemplateData {
@@ -181,6 +192,18 @@ const MAP_TEMPLATES: MapTemplateData[] = [
     description: 'Brede rivier verdeelt de kaart. Wie de bruggen controleert, wint.',
     features: ['Brede rivier', '5 Bruggen', 'Flanken'],
   },
+  {
+    id: 'canyon',
+    name: 'Canyon',
+    description: 'Smalle kloof van noord naar zuid met hoge rotswanden. Chokepunten dwingen strategische gevechten af.',
+    features: ['Rotswanden', 'Chokepunten', 'Risico/beloning'],
+  },
+  {
+    id: 'archipelago',
+    name: 'Archipel',
+    description: 'Eilanden verbonden door bruggen. Beheers de bruggen om het centrum te domineren.',
+    features: ['Eilanden', 'Bruggen', 'Waterkanalen'],
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -192,6 +215,10 @@ export class MenuScreens {
   private selectedFaction: FactionChoice | null = null;
   private selectedMap: MapTemplateChoice = 'classic';
   private selectedDifficulty: DifficultyChoice = 'normal';
+  private selectedPlayerCount: 2 | 3 | 4 = 2;
+  private selectedMapSize: MapSizeChoice = 'medium';
+  private selectedResources: ResourcePresetChoice = 'medium';
+  private selectedFogOfWar: boolean = true;
   private currentTipIndex = 0;
   private tipIntervalId = 0;
   private loadingProgress = 0;
@@ -347,7 +374,16 @@ export class MenuScreens {
     const confirmBtn = document.getElementById('faction-confirm-btn');
     confirmBtn?.addEventListener('click', () => {
       if (this.selectedFaction) {
-        this.events?.onFactionSelected(this.selectedFaction, false, this.selectedMap, this.selectedDifficulty);
+        this.events?.onFactionSelected(
+          this.selectedFaction,
+          false,
+          this.selectedMap,
+          this.selectedDifficulty,
+          this.selectedPlayerCount,
+          this.selectedMapSize,
+          this.selectedResources,
+          this.selectedFogOfWar,
+        );
       }
     });
 
@@ -368,6 +404,40 @@ export class MenuScreens {
         this.updateDifficultySelection();
       });
     }
+
+    // Player count buttons
+    for (const count of [2, 3, 4] as const) {
+      const btn = document.getElementById(`players-${count}`);
+      btn?.addEventListener('click', () => {
+        this.selectedPlayerCount = count;
+        this.updatePlayerCountSelection();
+      });
+    }
+
+    // Map size buttons
+    for (const size of ['small', 'medium', 'large'] as MapSizeChoice[]) {
+      const btn = document.getElementById(`mapsize-${size}`);
+      btn?.addEventListener('click', () => {
+        this.selectedMapSize = size;
+        this.updateMapSizeSelection();
+      });
+    }
+
+    // Starting resources buttons
+    for (const res of ['low', 'medium', 'high'] as ResourcePresetChoice[]) {
+      const btn = document.getElementById(`resources-${res}`);
+      btn?.addEventListener('click', () => {
+        this.selectedResources = res;
+        this.updateResourcesSelection();
+      });
+    }
+
+    // Fog of war toggle
+    const fowBtn = document.getElementById('fow-toggle');
+    fowBtn?.addEventListener('click', () => {
+      this.selectedFogOfWar = !this.selectedFogOfWar;
+      this.updateFogOfWarToggle();
+    });
   }
 
   private updateMapCardSelection(): void {
@@ -385,6 +455,35 @@ export class MenuScreens {
     for (const diff of ['easy', 'normal', 'hard']) {
       const btn = document.getElementById(`diff-${diff}`);
       btn?.classList.toggle('is-selected', diff === this.selectedDifficulty);
+    }
+  }
+
+  private updatePlayerCountSelection(): void {
+    for (const count of [2, 3, 4]) {
+      const btn = document.getElementById(`players-${count}`);
+      btn?.classList.toggle('is-selected', count === this.selectedPlayerCount);
+    }
+  }
+
+  private updateMapSizeSelection(): void {
+    for (const size of ['small', 'medium', 'large']) {
+      const btn = document.getElementById(`mapsize-${size}`);
+      btn?.classList.toggle('is-selected', size === this.selectedMapSize);
+    }
+  }
+
+  private updateResourcesSelection(): void {
+    for (const res of ['low', 'medium', 'high']) {
+      const btn = document.getElementById(`resources-${res}`);
+      btn?.classList.toggle('is-selected', res === this.selectedResources);
+    }
+  }
+
+  private updateFogOfWarToggle(): void {
+    const btn = document.getElementById('fow-toggle');
+    if (btn) {
+      btn.classList.toggle('is-selected', this.selectedFogOfWar);
+      btn.textContent = this.selectedFogOfWar ? 'Aan' : 'Uit';
     }
   }
 

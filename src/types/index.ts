@@ -282,11 +282,69 @@ export const MAX_QUEUE_SLOTS = 5;
 // Map Constants
 // ---------------------------------------------------------------------------
 
-/** Map size in world units (128x128 flat terrain with hills). */
+/** Map size in world units (128x128 flat terrain with hills). Default for backwards compat. */
 export const MAP_SIZE = 128;
+
+/** Available map size options for skirmish mode. */
+export type MapSizeOption = 80 | 128 | 192;
+export const MAP_SIZES: Record<string, MapSizeOption> = {
+  small: 80,
+  medium: 128,
+  large: 192,
+} as const;
 
 /** Heightmap resolution matches map size. */
 export const HEIGHTMAP_RESOLUTION = 128;
+
+// ---------------------------------------------------------------------------
+// Skirmish Config
+// ---------------------------------------------------------------------------
+
+/** AI difficulty presets affecting grace period, production speed, and aggression. */
+export interface AIDifficultyConfig {
+  /** Seconds before AI starts attacking. Easy: 300, Normal: 180, Hard: 90. */
+  gracePeriodSeconds: number;
+  /** Multiplier on AI production speed. Easy: 0.7, Normal: 1.0, Hard: 1.3. */
+  productionSpeedMultiplier: number;
+  /** Aggression level 0-1. Easy: 0.3, Normal: 0.6, Hard: 0.9. */
+  aggressionLevel: number;
+}
+
+/** Predefined AI difficulty presets. */
+export const AI_DIFFICULTY_PRESETS: Record<string, AIDifficultyConfig> = {
+  easy: { gracePeriodSeconds: 300, productionSpeedMultiplier: 0.7, aggressionLevel: 0.3 },
+  normal: { gracePeriodSeconds: 180, productionSpeedMultiplier: 1.0, aggressionLevel: 0.6 },
+  hard: { gracePeriodSeconds: 90, productionSpeedMultiplier: 1.3, aggressionLevel: 0.9 },
+} as const;
+
+/** Starting resource presets for skirmish mode. */
+export type ResourcePreset = 'low' | 'medium' | 'high';
+export const RESOURCE_PRESETS: Record<ResourcePreset, number> = {
+  low: 200,
+  medium: 500,
+  high: 1000,
+} as const;
+
+/** Victory condition for skirmish mode. */
+export type VictoryCondition = 'elimination';
+
+/** Full skirmish configuration passed to map generation and game init. */
+export interface SkirmishConfig {
+  /** Number of players (1 human + N-1 AI). */
+  playerCount: 2 | 3 | 4;
+  /** Map size in world units. */
+  mapSize: MapSizeOption;
+  /** Map layout template. */
+  mapTemplate: string;
+  /** AI difficulty preset name. */
+  aiDifficulty: 'easy' | 'normal' | 'hard';
+  /** Starting gold amount. */
+  startingResources: ResourcePreset;
+  /** Whether fog of war is enabled. */
+  fogOfWar: boolean;
+  /** Victory condition. */
+  victoryCondition: VictoryCondition;
+}
 
 /** Max terrain height (simplex noise scale). */
 export const HEIGHT_SCALE = 10;

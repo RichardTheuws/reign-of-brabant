@@ -192,6 +192,180 @@ export const RANDSTAD_UNIT_ARCHETYPES: readonly UnitArchetype[] = [
 ] as const;
 
 // ---------------------------------------------------------------------------
+// Limburgers Unit Archetypes -- indexed by UnitTypeId
+// Mining/defense faction: tougher, slower, heavy armor.
+// ---------------------------------------------------------------------------
+
+export const LIMBURGERS_UNIT_ARCHETYPES: readonly UnitArchetype[] = [
+  // UnitTypeId.Worker = 0 -- Mijnwerker
+  {
+    typeId: UnitTypeId.Worker,
+    name: 'Worker',
+    brabantName: 'Mijnwerker',
+    hp: 65,
+    attack: 6,
+    attackSpeed: 1.5,
+    armor: 1,
+    armorType: ArmorType.Light,
+    speed: 4.5,
+    range: MINIMUM_MELEE_RANGE,
+    buildTime: 16,
+    costGold: 55,
+    costSecondary: 0,
+    population: 1,
+    sightRange: 8,
+    carryCapacity: 10,
+  },
+
+  // UnitTypeId.Infantry = 1 -- Schutterij
+  {
+    typeId: UnitTypeId.Infantry,
+    name: 'Infantry',
+    brabantName: 'Schutterij',
+    hp: 90,
+    attack: 10,
+    attackSpeed: 1.4,
+    armor: 2,
+    armorType: ArmorType.Medium,
+    speed: 4.5,
+    range: MINIMUM_MELEE_RANGE,
+    buildTime: 20,
+    costGold: 85,
+    costSecondary: 30,
+    population: 1,
+    sightRange: 8,
+    carryCapacity: 0,
+  },
+
+  // UnitTypeId.Ranged = 2 -- Vlaaienwerper
+  {
+    typeId: UnitTypeId.Ranged,
+    name: 'Ranged',
+    brabantName: 'Vlaaienwerper',
+    hp: 50,
+    attack: 12,
+    attackSpeed: 2.0,
+    armor: 0,
+    armorType: ArmorType.Unarmored,
+    speed: 5.0,
+    range: 9,
+    buildTime: 24,
+    costGold: 65,
+    costSecondary: 45,
+    population: 1,
+    sightRange: 10,
+    carryCapacity: 0,
+  },
+
+  // UnitTypeId.Heavy = 3 -- Mergelridder
+  {
+    typeId: UnitTypeId.Heavy,
+    name: 'Heavy',
+    brabantName: 'Mergelridder',
+    hp: 250,
+    attack: 22,
+    attackSpeed: 2.2,
+    armor: 4,
+    armorType: ArmorType.Heavy,
+    speed: 3.5,
+    range: MINIMUM_MELEE_RANGE,
+    buildTime: 40,
+    costGold: 180,
+    costSecondary: 120,
+    population: 2,
+    sightRange: 8,
+    carryCapacity: 0,
+  },
+] as const;
+
+// ---------------------------------------------------------------------------
+// Belgen Unit Archetypes -- indexed by UnitTypeId
+// Economy/diplomacy faction: balanced, good support, fast attack speed.
+// ---------------------------------------------------------------------------
+
+export const BELGEN_UNIT_ARCHETYPES: readonly UnitArchetype[] = [
+  // UnitTypeId.Worker = 0 -- Frietkraamhouder
+  {
+    typeId: UnitTypeId.Worker,
+    name: 'Worker',
+    brabantName: 'Frietkraamhouder',
+    hp: 55,
+    attack: 4,
+    attackSpeed: 1.5,
+    armor: 0,
+    armorType: ArmorType.Unarmored,
+    speed: 5.0,
+    range: MINIMUM_MELEE_RANGE,
+    buildTime: 14,
+    costGold: 45,
+    costSecondary: 0,
+    population: 1,
+    sightRange: 8,
+    carryCapacity: 10,
+  },
+
+  // UnitTypeId.Infantry = 1 -- Bierbouwer
+  {
+    typeId: UnitTypeId.Infantry,
+    name: 'Infantry',
+    brabantName: 'Bierbouwer',
+    hp: 85,
+    attack: 9,
+    attackSpeed: 1.2,
+    armor: 1,
+    armorType: ArmorType.Light,
+    speed: 5.0,
+    range: MINIMUM_MELEE_RANGE,
+    buildTime: 18,
+    costGold: 70,
+    costSecondary: 20,
+    population: 1,
+    sightRange: 8,
+    carryCapacity: 0,
+  },
+
+  // UnitTypeId.Ranged = 2 -- Chocolatier
+  {
+    typeId: UnitTypeId.Ranged,
+    name: 'Ranged',
+    brabantName: 'Chocolatier',
+    hp: 60,
+    attack: 11,
+    attackSpeed: 1.6,
+    armor: 0,
+    armorType: ArmorType.Light,
+    speed: 5.5,
+    range: 8,
+    buildTime: 20,
+    costGold: 55,
+    costSecondary: 35,
+    population: 1,
+    sightRange: 10,
+    carryCapacity: 0,
+  },
+
+  // UnitTypeId.Heavy = 3 -- Frituurridder
+  {
+    typeId: UnitTypeId.Heavy,
+    name: 'Heavy',
+    brabantName: 'Frituurridder',
+    hp: 180,
+    attack: 18,
+    attackSpeed: 1.8,
+    armor: 3,
+    armorType: ArmorType.Heavy,
+    speed: 4.0,
+    range: MINIMUM_MELEE_RANGE,
+    buildTime: 32,
+    costGold: 140,
+    costSecondary: 90,
+    population: 2,
+    sightRange: 8,
+    carryCapacity: 0,
+  },
+] as const;
+
+// ---------------------------------------------------------------------------
 // Building Archetypes -- indexed by BuildingTypeId
 // ---------------------------------------------------------------------------
 
@@ -381,6 +555,24 @@ export function getRandstadUnitArchetype(typeId: UnitTypeId): UnitArchetype {
   const archetype = RANDSTAD_UNIT_ARCHETYPES[typeId];
   if (!archetype) {
     throw new Error(`Unknown Randstad UnitTypeId: ${typeId}`);
+  }
+  return archetype;
+}
+
+/** Look up Limburgers unit archetype data by UnitTypeId. */
+export function getLimburgersUnitArchetype(typeId: UnitTypeId): UnitArchetype {
+  const archetype = LIMBURGERS_UNIT_ARCHETYPES[typeId];
+  if (!archetype) {
+    throw new Error(`Unknown Limburgers UnitTypeId: ${typeId}`);
+  }
+  return archetype;
+}
+
+/** Look up Belgen unit archetype data by UnitTypeId. */
+export function getBelgenUnitArchetype(typeId: UnitTypeId): UnitArchetype {
+  const archetype = BELGEN_UNIT_ARCHETYPES[typeId];
+  if (!archetype) {
+    throw new Error(`Unknown Belgen UnitTypeId: ${typeId}`);
   }
   return archetype;
 }

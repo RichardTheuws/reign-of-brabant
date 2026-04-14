@@ -66,6 +66,9 @@ import {
 
 import {
   UNIT_ARCHETYPES,
+  RANDSTAD_UNIT_ARCHETYPES,
+  LIMBURGERS_UNIT_ARCHETYPES,
+  BELGEN_UNIT_ARCHETYPES,
   BUILDING_ARCHETYPES,
   GOLD_MINE,
   TREE_RESOURCE,
@@ -107,8 +110,15 @@ function resolveUnitArchetype(factionId: FactionId, unitTypeId: UnitTypeId): Uni
   try {
     return getFactionUnitArchetype(factionId, unitTypeId);
   } catch {
-    // Fallback to legacy archetypes (indexed by UnitTypeId 0-2)
-    const legacy = UNIT_ARCHETYPES[unitTypeId];
+    // Fallback to faction-specific legacy archetypes (indexed by UnitTypeId)
+    let legacyArchetypes: readonly UnitArchetype[];
+    switch (factionId) {
+      case FactionId.Randstad: legacyArchetypes = RANDSTAD_UNIT_ARCHETYPES; break;
+      case FactionId.Limburgers: legacyArchetypes = LIMBURGERS_UNIT_ARCHETYPES; break;
+      case FactionId.Belgen: legacyArchetypes = BELGEN_UNIT_ARCHETYPES; break;
+      default: legacyArchetypes = UNIT_ARCHETYPES; break;
+    }
+    const legacy = legacyArchetypes[unitTypeId];
     if (legacy) return legacy;
     throw new Error(
       `No unit archetype found for factionId=${factionId}, unitTypeId=${unitTypeId}`,

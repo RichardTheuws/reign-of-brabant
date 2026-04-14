@@ -9,8 +9,11 @@ import { audioManager } from '../audio/AudioManager';
 import {
   UNIT_ARCHETYPES,
   BUILDING_ARCHETYPES,
+  RANDSTAD_UNIT_ARCHETYPES,
+  LIMBURGERS_UNIT_ARCHETYPES,
+  BELGEN_UNIT_ARCHETYPES,
 } from '../entities/archetypes';
-import { UnitTypeId, BuildingTypeId } from '../types/index';
+import { UnitTypeId, BuildingTypeId, type UnitArchetype } from '../types/index';
 import { createCommandIcon, replaceIconText } from './CommandIcons';
 import { createBuildingPortraitImg } from './BuildingPortraits';
 
@@ -1530,6 +1533,15 @@ export class HUD {
     this.rebuildBuildingLabels(faction);
   }
 
+  private getFactionUnitArchetypes(): readonly UnitArchetype[] {
+    switch (this.currentFaction) {
+      case 'randstad': return RANDSTAD_UNIT_ARCHETYPES;
+      case 'limburg': return LIMBURGERS_UNIT_ARCHETYPES;
+      case 'belgen': return BELGEN_UNIT_ARCHETYPES;
+      default: return UNIT_ARCHETYPES;
+    }
+  }
+
   /**
    * Rebuild the worker command panel buttons based on the active faction.
    * This replaces the static HTML buttons with faction-specific build options.
@@ -1968,7 +1980,7 @@ export class HUD {
 
     if (typeId === null) return null;
 
-    const arch = UNIT_ARCHETYPES[typeId];
+    const arch = this.getFactionUnitArchetypes()[typeId] as UnitArchetype | undefined;
     if (!arch) return null;
 
     const dps = (arch.attack / arch.attackSpeed).toFixed(1);
@@ -2010,8 +2022,9 @@ export class HUD {
     if (!arch) return null;
 
     const producesNames: string[] = [];
+    const factionArchetypes = this.getFactionUnitArchetypes();
     for (const unitType of arch.produces) {
-      const uArch = UNIT_ARCHETYPES[unitType];
+      const uArch = factionArchetypes[unitType] as UnitArchetype | undefined;
       if (uArch) producesNames.push(uArch.brabantName);
     }
 

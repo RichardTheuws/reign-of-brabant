@@ -12,8 +12,8 @@ import { addEntity, addComponent, hasComponent, query, entityExists } from 'bite
 import { world, resetGameWorld } from '../ecs/world';
 import { Position, Faction, Health, Attack, Armor, Movement, UnitType, UnitAI, Gatherer, Visibility, Building, Resource, Selected, Production, Rotation, GezeligheidBonus, Hero, HeroAbilities, RallyPoint, StatBuff, Stunned, Invincible } from '../ecs/components';
 import { IsUnit, IsBuilding, IsResource, IsWorker, IsDead, IsHero } from '../ecs/tags';
-import { FactionId, UnitTypeId, BuildingTypeId, HeroTypeId, UpgradeId, ResourceType, MAP_SIZE, UnitAIState, NO_PRODUCTION, NO_ENTITY, HERO_POPULATION_COST, type UnitArchetype } from '../types/index';
-import { UNIT_ARCHETYPES, BUILDING_ARCHETYPES } from '../entities/archetypes';
+import { FactionId, UnitTypeId, BuildingTypeId, HeroTypeId, UpgradeId, ResourceType, MAP_SIZE, MAP_SIZES, RESOURCE_PRESETS, UnitAIState, NO_PRODUCTION, NO_ENTITY, HERO_POPULATION_COST, type UnitArchetype, type MapSizeOption, type ResourcePreset } from '../types/index';
+import { UNIT_ARCHETYPES, RANDSTAD_UNIT_ARCHETYPES, LIMBURGERS_UNIT_ARCHETYPES, BELGEN_UNIT_ARCHETYPES, BUILDING_ARCHETYPES } from '../entities/archetypes';
 import { HERO_ARCHETYPES, getHeroTypesForFaction, getHeroArchetype } from '../entities/heroArchetypes';
 import { getFactionUnitArchetype } from '../data/factionData';
 import { getPortraitUrl } from '../data/portraitMap';
@@ -122,6 +122,12 @@ export class Game {
   private playerFactionId: FactionId = FactionId.Brabanders;
   private difficulty: string = 'normal';
 
+  // Skirmish configuration
+  private skirmishPlayerCount: 2 | 3 | 4 = 2;
+  private skirmishMapSize: MapSizeOption = 128;
+  private skirmishStartingResources: number = 500;
+  private skirmishFogOfWar: boolean = true;
+
   // Game over state
   private gameOver = false;
   private popCapAlertShown = false;
@@ -193,12 +199,29 @@ export class Game {
     this.playerState = playerState;
   }
 
-  async init(playerFaction: number = FactionId.Brabanders, mapTemplate: string = 'classic', difficulty: string = 'normal'): Promise<void> {
+  async init(
+    playerFaction: number = FactionId.Brabanders,
+    mapTemplate: string = 'classic',
+    difficulty: string = 'normal',
+    playerCount: 2 | 3 | 4 = 2,
+    mapSizeName: string = 'medium',
+    startingResources: string = 'medium',
+    fogOfWar: boolean = true,
+  ): Promise<void> {
     this.playerFactionId = playerFaction as FactionId;
     this.difficulty = difficulty;
 
-    // 1. Generate map layout (2 players for skirmish: player + 1 AI)
-    this.map = generateMap(42, (x, z) => this.terrain.getHeightAt(x, z), 2, mapTemplate as any);
+    // Resolve map size from name
+    const mapSize: MapSizeOption = (MAP_SIZES[mapSizeName] ?? MAP_SIZE) as MapSizeOption;
+
+    // Store skirmish config for later use
+    this.skirmishPlayerCount = playerCount;
+    this.skirmishMapSize = mapSize;
+    this.skirmishStartingResources = (RESOURCE_PRESETS[startingResources as ResourcePreset] ?? 500);
+    this.skirmishFogOfWar = fogOfWar;
+
+    // 1. Generate map layout
+    this.map = generateMap(42, (x, z) => this.terrain.getHeightAt(x, z), playerCount, mapTemplate as any, mapSize);
 
     // 1b. Rebuild terrain with map-specific features (biome, rivers, bridges, roads, tunnels)
     if (this.map.terrainFeatures) {
@@ -219,8 +242,8 @@ export class Game {
     gameConfig.setPlayerFaction(this.playerFactionId);
     AISystem.setFaction(this.getAIFactionId(), this.difficulty);
 
-    // 2. Load GLB models (only active factions for performance)
-    const activeFactions = new Set<number>([this.playerFactionId, this.getAIFactionId()]);
+    // 2. Load GLB models (all active factions for performance)
+    const activeFactions = new Set<number>(this.map.spawns.map(s => s.factionId));
 
     window.dispatchEvent(new CustomEvent('loading-progress', {
       detail: { progress: 0.1, label: 'Modellen laden...' },
@@ -654,9 +677,9 @@ export class Game {
       }
     }
 
-    // Starting resources for all active factions
+    // Starting resources for all active factions (uses skirmish config)
     for (const spawn of this.map.spawns) {
-      this.playerState.addGold(spawn.factionId, 200);
+      this.playerState.addGold(spawn.factionId, this.skirmishStartingResources);
     }
   }
 
@@ -950,9 +973,10 @@ export class Game {
   }
 
   private handleMinimapClick(normalizedX: number, normalizedY: number): void {
-    const halfMap = MAP_SIZE / 2;
-    const worldX = (normalizedX - 0.5) * MAP_SIZE;
-    const worldZ = (normalizedY - 0.5) * MAP_SIZE;
+    const currentMapSize = this.map?.size ?? MAP_SIZE;
+    const halfMap = currentMapSize / 2;
+    const worldX = (normalizedX - 0.5) * currentMapSize;
+    const worldZ = (normalizedY - 0.5) * currentMapSize;
     // Move camera to clicked position
     this.camera.setPosition(worldX, worldZ);
   }
@@ -2966,12 +2990,13 @@ export class Game {
    */
   private buildMinimapTerrainCache(w: number, h: number): ImageData {
     const img = new ImageData(w, h);
-    const halfMap = MAP_SIZE / 2;
+    const currentMapSize = this.map?.size ?? MAP_SIZE;
+    const halfMap = currentMapSize / 2;
 
     for (let py = 0; py < h; py++) {
       for (let px = 0; px < w; px++) {
-        const wx = (px / w) * MAP_SIZE - halfMap;
-        const wz = (py / h) * MAP_SIZE - halfMap;
+        const wx = (px / w) * currentMapSize - halfMap;
+        const wz = (py / h) * currentMapSize - halfMap;
         const height = this.terrain.getHeightAt(wx, wz);
 
         let r: number, g: number, b: number;
@@ -3011,7 +3036,8 @@ export class Game {
 
     const w = canvas.width;
     const h = canvas.height;
-    const halfMap = MAP_SIZE / 2;
+    const currentMapSize = this.map?.size ?? MAP_SIZE;
+    const halfMap = currentMapSize / 2;
 
     // Build terrain cache once
     if (!this.minimapTerrainCache || this.minimapTerrainCache.width !== w) {
@@ -3053,8 +3079,8 @@ export class Game {
     ctx.putImageData(fowImg, 0, 0);
 
     // Helper to convert world -> minimap coords
-    const toMiniX = (wx: number) => ((wx + halfMap) / MAP_SIZE) * w;
-    const toMiniY = (wz: number) => ((wz + halfMap) / MAP_SIZE) * h;
+    const toMiniX = (wx: number) => ((wx + halfMap) / currentMapSize) * w;
+    const toMiniY = (wz: number) => ((wz + halfMap) / currentMapSize) * h;
 
     // Draw resources (gold = yellow, wood = green, fog-filtered)
     for (const [eid] of this.entityMeshMap) {
@@ -3172,7 +3198,12 @@ export class Game {
     try {
       arch = getFactionUnitArchetype(faction, type);
     } catch {
-      arch = UNIT_ARCHETYPES[type];
+      switch (faction) {
+        case FactionId.Randstad: arch = RANDSTAD_UNIT_ARCHETYPES[type]; break;
+        case FactionId.Limburgers: arch = LIMBURGERS_UNIT_ARCHETYPES[type]; break;
+        case FactionId.Belgen: arch = BELGEN_UNIT_ARCHETYPES[type]; break;
+        default: arch = UNIT_ARCHETYPES[type]; break;
+      }
     }
     const y = this.terrain.getHeightAt(x, z);
 
