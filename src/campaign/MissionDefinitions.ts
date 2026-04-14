@@ -115,79 +115,69 @@ export interface MissionDefinition {
 }
 
 // ---------------------------------------------------------------------------
-// Missie 1: "De Oogst" (Tutorial)
+// Missie 1: "De Eerste Oogst" (Tutorial — 12 stappen)
 // ---------------------------------------------------------------------------
 
 const MISSION_1_DE_OOGST: MissionDefinition = {
   id: 'brabant-1-de-oogst',
   campaignId: 'brabanders',
   missionIndex: 0,
-  title: 'De Oogst',
+  title: 'De Eerste Oogst',
   playerFactionId: FactionId.Brabanders,
   aiFactionIds: [FactionId.Randstad],
-  briefingTitle: 'Tutorial: De Oogst',
+  briefingTitle: 'Tutorial: De Eerste Oogst',
   briefingText:
     'Welkom in Reusel, het hart van Brabant. Het is een rustige ochtend — de vogels zingen, ' +
     'de koeien loeien, en de geur van versgebakken worstenbroodjes hangt in de lucht.\n\n' +
-    'Jij bent de nieuwe opzichter van de boerderij. In deze tutorial leer je stap voor stap ' +
-    'de basis: camera besturen, grondstoffen verzamelen, gebouwen neerzetten, eenheden trainen ' +
-    'en je eerste gevecht winnen.\n\n' +
-    'Niets kan deze dag verpesten... toch?',
+    'Jij bent de nieuwe opzichter van de boerderij. Stap voor stap leer je alles wat je ' +
+    'moet weten: camera besturen, grondstoffen verzamelen, gebouwen neerzetten, eenheden ' +
+    'trainen en je eerste gevecht winnen.\n\n' +
+    'Neem de tijd — er is geen haast. Niets kan deze dag verpesten... toch?',
 
   mapSize: 64,
   startingGold: 0,
   startingGoldAI: 0,
 
   buildings: [
+    // Player: TownHall centraal
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: -20, z: -20, complete: true },
   ],
 
   units: [
+    // Player: 5 workers
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -17, z: -18 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -15, z: -18 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -13, z: -18 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -17, z: -16 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -15, z: -16 },
+    // NO enemy units at start — they are spawned by tutorial steps 10 and 11
   ],
 
   goldMines: [
+    // Closer gold mine for easy gathering
     { x: -10, z: -20, amount: 1500 },
     { x: -20, z: -10, amount: 1500 },
   ],
 
   objectives: [
-    { id: 'gather-500', type: 'gather-gold', description: 'Verzamel 500 goud', targetValue: 500, isBonus: false },
+    // Primary: gather 200 gold (reduced from 500, matches tutorial step 12)
+    { id: 'gather-200', type: 'gather-gold', description: 'Verzamel 200 goud', targetValue: 200, isBonus: false },
+    // Bonus: don't lose any workers
     { id: 'no-worker-loss', type: 'no-worker-loss', description: 'Verlies geen boeren', targetValue: 0, isBonus: true },
+    // Bonus: build a barracks
+    { id: 'build-barracks', type: 'build-building', description: 'Bouw een Kazerne', targetValue: 1, isBonus: true },
   ],
 
   triggers: [
-    {
-      id: 'tip-60s',
-      condition: { type: 'time', seconds: 60 },
-      actions: [{ type: 'message', text: 'Goed bezig! Stuur je Boeren naar de goudmijnen om sneller goud te verzamelen.' }],
-      once: true,
-    },
-    {
-      id: 'wolf-spawn',
-      condition: { type: 'time', seconds: 120 },
-      actions: [
-        { type: 'message', text: 'Wolven gesignaleerd bij de rand van het dorp! Bescherm je boeren!' },
-        {
-          type: 'spawn-units',
-          units: [
-            { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 25, z: 25 },
-            { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 27, z: 23 },
-            { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 23, z: 27 },
-          ],
-        },
-      ],
-      once: true,
-    },
+    // NO time-based wolf spawn (was at 120s — removed!)
+    // Enemy spawns are handled by the tutorial system at steps 10 and 11
+
+    // Victory when 200 gold reached
     {
       id: 'victory-gold',
-      condition: { type: 'gold-reached', amount: 500 },
+      condition: { type: 'gold-reached', amount: 200 },
       actions: [
-        { type: 'message', text: 'Uitstekend! Je hebt voldoende goud verzameld. De oogst is binnen!' },
+        { type: 'message', text: 'Uitstekend! Je hebt de eerste oogst binnengehaald. Brabant is trots op je!' },
         { type: 'victory' },
       ],
       once: true,
@@ -198,8 +188,8 @@ const MISSION_1_DE_OOGST: MissionDefinition = {
   hasAIProduction: false,
 
   starThresholds: {
-    threeStarTime: 180,  // 3 min
-    twoStarTime: 300,    // 5 min
+    threeStarTime: 600,   // 10 min (generous for tutorial)
+    twoStarTime: 900,     // 15 min
     allBonusesGrants3Stars: true,
   },
 };

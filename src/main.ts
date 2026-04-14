@@ -136,20 +136,42 @@ let selectedDifficulty: string = 'normal';
 const tutorial = new Tutorial();
 let tutorialActive = false;
 
-// Track tutorial state from game events
+// Track tutorial state from game events (matches new 12-step TutorialState interface)
 const tutorialState: TutorialStateData = {
   cameraMoved: false,
   workerSelected: false,
+  multiSelectDone: false,
   gatheringStarted: false,
-  barracksBuilt: false,
+  gold: 0,
+  barracksPlaced: false,
+  barracksComplete: false,
+  unitTrainingStarted: false,
   unitTrained: false,
   attackIssued: false,
-  gold: 0,
+  defendSurvived: false,
 };
+
+/** Whether tutorial-spawned enemies have been killed (for step 11 check). */
+let tutorialEnemyCount = 0;
 
 // Camera tracking for tutorial: detect if camera has been moved
 let initialCameraX = 0;
 let initialCameraZ = 0;
+
+function resetTutorialState(): void {
+  tutorialState.cameraMoved = false;
+  tutorialState.workerSelected = false;
+  tutorialState.multiSelectDone = false;
+  tutorialState.gatheringStarted = false;
+  tutorialState.gold = 0;
+  tutorialState.barracksPlaced = false;
+  tutorialState.barracksComplete = false;
+  tutorialState.unitTrainingStarted = false;
+  tutorialState.unitTrained = false;
+  tutorialState.attackIssued = false;
+  tutorialState.defendSurvived = false;
+  tutorialEnemyCount = 0;
+}
 
 // ---------------------------------------------------------------------------
 // State Machine
@@ -200,13 +222,7 @@ setGameFlowDeps({
     }
     tutorialActive = isTutorial;
     if (isTutorial) {
-      // Reset tutorial state
-      tutorialState.cameraMoved = false;
-      tutorialState.workerSelected = false;
-      tutorialState.gatheringStarted = false;
-      tutorialState.barracksBuilt = false;
-      tutorialState.unitTrained = false;
-      tutorialState.attackIssued = false;
+      resetTutorialState();
     }
   },
 
@@ -215,15 +231,10 @@ setGameFlowDeps({
     await game.initMission(missionId);
     gameInitialized = true;
 
-    // Auto-start tutorial on first campaign mission (De Oogst)
+    // Auto-start tutorial on first campaign mission (De Eerste Oogst)
     if (missionId === 'brabant-1-de-oogst') {
       tutorialActive = true;
-      tutorialState.cameraMoved = false;
-      tutorialState.workerSelected = false;
-      tutorialState.gatheringStarted = false;
-      tutorialState.barracksBuilt = false;
-      tutorialState.unitTrained = false;
-      tutorialState.attackIssued = false;
+      resetTutorialState();
     }
 
     // Wire up mission victory/defeat callbacks
@@ -264,15 +275,24 @@ setGameFlowDeps({
 
     // Update tutorial if active — only track the condition for the CURRENT step
     // to prevent auto-gather/auto-assign from skipping ahead
-    if (tutorialActive && tutorial.isActive) {
+    if (tutorialActive && tutorial.isActive && !tutorial.isPaused) {
       const step = tutorial.stepIndex;
-      // Step 0: cameraMoved (tracked above via camera position delta)
+      // Step 0: cameraMoved — tracked above via camera position delta
       if (step >= 1) tutorialState.workerSelected = game.hasWorkerSelected();
-      if (step >= 2) tutorialState.gold = game.getPlayerGold(); // gold >= 20 check
-      // Step 3: auto-advance (economy info)
-      if (step >= 4) tutorialState.barracksBuilt = game.hasBarracksBuilt();
-      if (step >= 5) tutorialState.unitTrained = game.hasUnitTrained();
-      if (step >= 6) tutorialState.attackIssued = game.hasAttackIssued();
+      if (step >= 2) tutorialState.multiSelectDone = game.hasMultipleUnitsSelected();
+      if (step >= 3) tutorialState.gatheringStarted = game.hasGatheringStarted();
+      if (step >= 4) tutorialState.gold = game.getPlayerGold();
+      if (step >= 5) tutorialState.barracksPlaced = game.hasBarracksPlaced();
+      if (step >= 6) tutorialState.barracksComplete = game.hasBarracksBuilt();
+      if (step >= 7) tutorialState.unitTrainingStarted = game.hasUnitTrainingStarted();
+      if (step >= 8) tutorialState.unitTrained = game.hasUnitTrained();
+      if (step >= 9) tutorialState.attackIssued = game.hasAttackIssued();
+      if (step >= 10) {
+        // Defend survived: all tutorial-spawned enemies dead
+        tutorialState.defendSurvived = tutorialEnemyCount > 0 && game.getAIUnitCount() === 0;
+      }
+      // Keep gold updated for step 12 check
+      if (step >= 11) tutorialState.gold = game.getPlayerGold();
 
       tutorial.update(dt, tutorialState);
     }
@@ -327,18 +347,15 @@ setGameFlowDeps({
     if (tutorialActive) {
       setTimeout(() => {
         // Reset state right before tutorial starts so auto-gather doesn't pre-fill
-        tutorialState.cameraMoved = false;
-        tutorialState.workerSelected = false;
-        tutorialState.gatheringStarted = false;
-        tutorialState.barracksBuilt = false;
-        tutorialState.unitTrained = false;
-        tutorialState.attackIssued = false;
+        resetTutorialState();
         // Re-record camera position so movement is tracked from here
         initialCameraX = rtsCamera.camera.position.x;
         initialCameraZ = rtsCamera.camera.position.z;
-        tutorial.start(() => {
-          tutorialActive = false;
-        });
+        tutorial.start(
+          () => { tutorialActive = false; },
+          (paused) => { gamePaused = paused; },
+          (count) => { game.spawnTutorialEnemies(count); tutorialEnemyCount += count; },
+        );
       }, 4000);
     }
   },

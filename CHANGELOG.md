@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.33.0] - 2026-04-14
+
+### Added
+- **12-step tutorial system** — Volledig herschreven tutorial met scenario-gedreven leerpad: camera → selectie → box-select → verzamelen → bouwen → trainen → gevecht → verdediging → overwinning
+- **Input lock per stap** — Blokkeert irrelevante acties zodat spelers niet vooruit kunnen skippen; progressief ontgrendeld per tutorial stap
+- **Pause overlay** — Informatieve stappen (5, 7, 9) pauzeren het spel met "Doorgaan" knop
+- **Tutorial highlights** — Pulserende gouden ring + pijl-indicator wijzen naar tutorial targets (workers, goudmijn, kazerne, vijanden)
+- **Hotkey tooltips** — Automatische sneltoets-hints bij B (bouwen), W (trainen), A (attack-move) met auto-hide na 10s
+- **Progress dots** — 12 voortgangspunten onder het tutorial paneel (voltooid/huidig/toekomstig)
+- **Tutorial enemy spawning** — Vijanden verschijnen alleen bij stap 10 (3 vijanden) en 11 (5 vijanden), niet meer op timer
+- **Meshy concept art plan** — Voorbereidingsdocument voor 26 nieuwe 3D modellen (Sprint 2-6) met fal.ai prompts
+
+### Changed
+- **Tutorial missie "De Eerste Oogst"** — Hernoemt van "De Oogst", goud-doel 500→200, wolf-spawn verwijderd, ruimere star thresholds (600s/900s), bonus objective "Bouw een Kazerne"
+- **Skip button** — Pas zichtbaar vanaf stap 8 (was altijd zichtbaar)
+
+### Technical
+- **6 nieuwe Game.ts query methods** — `hasMultipleUnitsSelected()`, `hasBarracksPlaced()`, `hasUnitTrainingStarted()`, `getAIUnitCount()`, `spawnTutorialEnemies()` voor tutorial state tracking
+- **TutorialState interface** — Uitgebreid van 6 naar 11 velden voor 12-step tracking
+- **AllowedAction type** — Nieuw type-systeem voor per-stap input filtering
+
 ## [0.32.0] - 2026-04-14
 
 ### Improved

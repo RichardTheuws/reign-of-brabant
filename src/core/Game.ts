@@ -3110,6 +3110,72 @@ export class Game {
     return false;
   }
 
+  /** Whether the player has 2+ units selected (box-select detection). */
+  hasMultipleUnitsSelected(): boolean {
+    let count = 0;
+    for (const eid of this.selectedEntities) {
+      if (entityExists(world, eid) && hasComponent(world, eid, IsUnit) && Faction.id[eid] === this.playerFactionId) {
+        count++;
+        if (count >= 2) return true;
+      }
+    }
+    return false;
+  }
+
+  /** Whether a barracks has been placed (may still be under construction). */
+  hasBarracksPlaced(): boolean {
+    for (const eid of this.knownBuildingEntities) {
+      if (!entityExists(world, eid)) continue;
+      if (Faction.id[eid] !== this.playerFactionId) continue;
+      if (Building.typeId[eid] === BuildingTypeId.Barracks) return true;
+    }
+    return false;
+  }
+
+  /** Whether any player barracks has a unit in production. */
+  hasUnitTrainingStarted(): boolean {
+    for (const eid of this.knownBuildingEntities) {
+      if (!entityExists(world, eid)) continue;
+      if (Faction.id[eid] !== this.playerFactionId) continue;
+      if (Building.typeId[eid] !== BuildingTypeId.Barracks) continue;
+      if (Building.complete[eid] !== 1) continue;
+      if (Production.unitType[eid] !== NO_PRODUCTION) return true;
+    }
+    return false;
+  }
+
+  /** Count living AI units on the map. */
+  getAIUnitCount(): number {
+    let count = 0;
+    for (const eid of this.knownUnitEntities) {
+      if (!entityExists(world, eid)) continue;
+      if (hasComponent(world, eid, IsDead)) continue;
+      if (Faction.id[eid] !== this.playerFactionId) count++;
+    }
+    return count;
+  }
+
+  /** Spawn enemy units for tutorial combat steps. */
+  spawnTutorialEnemies(count: number): void {
+    const base = this.getPlayerBasePosition();
+    const spawnDist = 30;
+    const angle = Math.PI * 0.25; // spawn from northeast
+    const spawnX = base.x + Math.cos(angle) * spawnDist;
+    const spawnZ = base.z + Math.sin(angle) * spawnDist;
+
+    const units: import('../campaign/MissionDefinitions').MissionUnitSpawn[] = [];
+    for (let i = 0; i < count; i++) {
+      const offset = (i - (count - 1) / 2) * 3;
+      units.push({
+        factionId: FactionId.Randstad,
+        unitType: UnitTypeId.Infantry,
+        x: spawnX + Math.cos(angle + Math.PI / 2) * offset,
+        z: spawnZ + Math.sin(angle + Math.PI / 2) * offset,
+      });
+    }
+    this._spawnMissionUnits(units);
+  }
+
   /** Get position of the player's Town Hall (base). */
   getPlayerBasePosition(): { x: number; z: number } {
     for (const eid of this.knownBuildingEntities) {
