@@ -193,6 +193,8 @@ import { createTertiaryResourceSystem } from './TertiaryResourceSystem';
 import { createUndergroundSystem } from './UndergroundSystem';
 import { createDiplomacySystem } from './DiplomacySystem';
 import { createSeparationSystem } from './SeparationSystem';
+import { createPopulationSystem } from './PopulationSystem';
+import { createTowerSystem } from './TowerSystem';
 import { createDeathSystem } from './DeathSystem';
 import { createUpkeepSystem } from './UpkeepSystem';
 import { createVisionSystem } from './VisionSystem';
@@ -244,11 +246,15 @@ export function createGamePipeline(terrain: Terrain, devMode = false): SystemPip
 
   // Phase 5: Combat & Economy
   pipeline.add('CombatSystem', createCombatSystem(), 'combat');
+  pipeline.add('TowerSystem', createTowerSystem(), 'combat');
   pipeline.add('GatherSystem', createGatherSystem(), 'economy');
   pipeline.add('ProductionSystem', createProductionSystem(), 'economy');
   pipeline.add('BuildSystem', createBuildSystem(), 'economy');
   pipeline.add('TechTreeSystem', createTechTreeSystem(), 'economy');
   pipeline.add('UpkeepSystem', createUpkeepSystem(), 'economy');
+
+  // Phase 5.5: Population (before cleanup -- must read building data before DeathSystem removes entities)
+  pipeline.add('PopulationSystem', createPopulationSystem(), 'economy');
 
   // Phase 6: Cleanup
   pipeline.add('DeathSystem', createDeathSystem(), 'cleanup');

@@ -207,6 +207,7 @@ export const BUILDING_ARCHETYPES: readonly BuildingArchetype[] = [
     buildTime: 0,         // instant (pre-placed at game start)
     sightRange: 12,
     produces: [UnitTypeId.Worker],
+    populationProvided: 10,
   },
 
   // BuildingTypeId.Barracks = 1 -- Cafe
@@ -246,6 +247,99 @@ export const BUILDING_ARCHETYPES: readonly BuildingArchetype[] = [
     buildTime: 20,        // 20 seconds to construct
     sightRange: 8,
     produces: [],          // Does not produce units; researches upgrades instead
+  },
+
+  // BuildingTypeId.Housing = 4 -- Woonhuis
+  {
+    typeId: BuildingTypeId.Housing,
+    name: 'Housing',
+    brabantName: 'Woonhuis',
+    hp: 400,
+    costGold: 100,
+    costSecondary: 0,
+    buildTime: 25,
+    sightRange: 6,
+    produces: [],
+    populationProvided: 10,
+  },
+
+  // BuildingTypeId.TertiaryResourceBuilding = 5 -- Factie-specifiek
+  {
+    typeId: BuildingTypeId.TertiaryResourceBuilding,
+    name: 'Tertiary Resource',
+    brabantName: 'Dorpsweide',
+    hp: 500,
+    costGold: 250,
+    costSecondary: 0,
+    buildTime: 35,
+    sightRange: 8,
+    produces: [],
+    tertiaryGenRate: 1.5,
+  },
+
+  // BuildingTypeId.UpgradeBuilding = 6 -- Geavanceerde Smederij (T2 unlock)
+  {
+    typeId: BuildingTypeId.UpgradeBuilding,
+    name: 'Advanced Blacksmith',
+    brabantName: 'Geavanceerde Smederij',
+    hp: 400,
+    costGold: 350,
+    costSecondary: 0,
+    buildTime: 40,
+    sightRange: 8,
+    produces: [],
+  },
+
+  // BuildingTypeId.FactionSpecial1 = 7 -- Factie-specifiek gebouw 1
+  {
+    typeId: BuildingTypeId.FactionSpecial1,
+    name: 'Faction Special 1',
+    brabantName: 'Dorpsweide',
+    hp: 600,
+    costGold: 300,
+    costSecondary: 0,
+    buildTime: 40,
+    sightRange: 10,
+    produces: [],
+  },
+
+  // BuildingTypeId.FactionSpecial2 = 8 -- Factie-specifiek gebouw 2 (T3)
+  {
+    typeId: BuildingTypeId.FactionSpecial2,
+    name: 'Faction Special 2',
+    brabantName: 'Feestzaal',
+    hp: 700,
+    costGold: 400,
+    costSecondary: 0,
+    buildTime: 45,
+    sightRange: 10,
+    produces: [UnitTypeId.Heavy],
+  },
+
+  // BuildingTypeId.DefenseTower = 9 -- Verdedigingstoren (T2)
+  {
+    typeId: BuildingTypeId.DefenseTower,
+    name: 'Defense Tower',
+    brabantName: 'Wachttoren',
+    hp: 500,
+    costGold: 200,
+    costSecondary: 0,
+    buildTime: 30,
+    sightRange: 14,
+    produces: [],
+  },
+
+  // BuildingTypeId.SiegeWorkshop = 10 -- Belegeringswerkplaats (T3)
+  {
+    typeId: BuildingTypeId.SiegeWorkshop,
+    name: 'Siege Workshop',
+    brabantName: 'Tractorschuur',
+    hp: 600,
+    costGold: 350,
+    costSecondary: 0,
+    buildTime: 40,
+    sightRange: 8,
+    produces: [UnitTypeId.Siege],
   },
 ] as const;
 

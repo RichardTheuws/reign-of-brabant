@@ -28,6 +28,7 @@ import {
   FactionId,
   UnitTypeId,
   UpgradeId,
+  BuildingTypeId,
 } from '../types/index';
 import type { GameWorld } from '../ecs/world';
 
@@ -167,6 +168,33 @@ export function getUpgradeDefinition(id: UpgradeId): UpgradeDefinition {
 }
 
 // ---------------------------------------------------------------------------
+// Building tier prerequisites
+// ---------------------------------------------------------------------------
+
+/** Buildings that are always buildable (Tier 1 + Blacksmith gateway). */
+const TIER_1_BUILDINGS: ReadonlySet<BuildingTypeId> = new Set([
+  BuildingTypeId.TownHall,
+  BuildingTypeId.Barracks,
+  BuildingTypeId.LumberCamp,
+  BuildingTypeId.Blacksmith,
+]);
+
+/** Tier 2 buildings -- require a completed Blacksmith. */
+const TIER_2_BUILDINGS: ReadonlySet<BuildingTypeId> = new Set([
+  BuildingTypeId.Housing,
+  BuildingTypeId.DefenseTower,
+  BuildingTypeId.TertiaryResourceBuilding,
+  BuildingTypeId.FactionSpecial1,
+  BuildingTypeId.UpgradeBuilding,
+]);
+
+/** Tier 3 buildings -- require a completed UpgradeBuilding. */
+const TIER_3_BUILDINGS: ReadonlySet<BuildingTypeId> = new Set([
+  BuildingTypeId.FactionSpecial2,
+  BuildingTypeId.SiegeWorkshop,
+]);
+
+// ---------------------------------------------------------------------------
 // Per-Blacksmith research state
 // ---------------------------------------------------------------------------
 
@@ -242,6 +270,51 @@ export class TechTreeSystem {
     if (state.completed.has(upgradeId)) return false;
     // Check prerequisite
     if (def.prerequisite !== null && !state.completed.has(def.prerequisite)) return false;
+    return true;
+  }
+
+  // -------------------------------------------------------------------------
+  // Building tier prerequisites
+  // -------------------------------------------------------------------------
+
+  /**
+   * Check if a faction meets the tech tree prerequisites to construct a building.
+   * T1 buildings (TownHall, Barracks, LumberCamp, Blacksmith) are always available.
+   * T2 buildings require a completed Blacksmith.
+   * T3 buildings require a completed UpgradeBuilding.
+   */
+  canBuildBuilding(factionId: number, buildingTypeId: BuildingTypeId, world: GameWorld): boolean {
+    // T1 + Blacksmith: always buildable
+    if (TIER_1_BUILDINGS.has(buildingTypeId)) return true;
+
+    // Query all completed buildings for this faction
+    const buildings = query(world, [Building, Faction, IsBuilding]);
+
+    if (TIER_2_BUILDINGS.has(buildingTypeId)) {
+      // Requires a completed Blacksmith
+      for (const eid of buildings) {
+        if (Faction.id[eid] !== factionId) continue;
+        if (hasComponent(world, eid, IsDead)) continue;
+        if (Building.typeId[eid] === BuildingTypeId.Blacksmith && Building.complete[eid] === 1) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    if (TIER_3_BUILDINGS.has(buildingTypeId)) {
+      // Requires a completed UpgradeBuilding
+      for (const eid of buildings) {
+        if (Faction.id[eid] !== factionId) continue;
+        if (hasComponent(world, eid, IsDead)) continue;
+        if (Building.typeId[eid] === BuildingTypeId.UpgradeBuilding && Building.complete[eid] === 1) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    // Unknown building type -- allow by default (don't block future additions)
     return true;
   }
 

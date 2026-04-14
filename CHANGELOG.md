@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.34.0] - 2026-04-14
+
+### Added
+- **3-tier tech tree** — Building prerequisites: T1 (TownHall/Barracks/LumberCamp) altijd beschikbaar, T2 (Housing/Tower/Tertiary/FactionSpecial1) vereist Blacksmith, T3 (FactionSpecial2/SiegeWorkshop) vereist UpgradeBuilding
+- **PopulationSystem** — Housing geeft +10 pop cap, dynamische cap-reductie bij vernietiging van gebouwen
+- **TowerSystem** — Defense Towers vallen automatisch vijanden aan binnen bereik (14 units, 15 dmg, 1.5s cooldown)
+- **Placement validatie** — Collision check (4x4 footprint), water check, minimum afstand vijandelijke gebouwen (8 units), LumberCamp bomenproximiteit (20 units)
+- **7 nieuwe gebouwtypes** — Housing, TertiaryResourceBuilding, UpgradeBuilding, FactionSpecial1/2, DefenseTower, SiegeWorkshop met volledige archetypes
+- **Build menu uitgebreid** — Alle 11 gebouwtypes bouwbaar via HUD commando's met factie-specifieke labels
+
+### Changed
+- **BuildingTypeId enum** — Uitgebreid met DefenseTower (9) en SiegeWorkshop (10)
+- **Population cap** — TownHall geeft 10, Housing geeft 10, overige gebouwen 5 (via archetype `populationProvided`)
+- **PlayerState** — Nieuwe `removePopulationCapacity()` methode voor dynamische cap bij gebouwvernietiging
+
 ## [0.33.0] - 2026-04-14
 
 ### Added

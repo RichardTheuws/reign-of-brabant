@@ -146,6 +146,14 @@ class PlayerStateManager {
     this.players[factionId].populationMax += amount;
   }
 
+  /** Decrease max population (when a housing/town hall building is destroyed). */
+  removePopulationCapacity(factionId: number, amount: number): void {
+    this.players[factionId].populationMax = Math.max(
+      0,
+      this.players[factionId].populationMax - amount,
+    );
+  }
+
   // -------------------------------------------------------------------------
   // Military Unit Count (for upkeep)
   // -------------------------------------------------------------------------

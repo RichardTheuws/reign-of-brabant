@@ -41,6 +41,7 @@ import { resetDiplomacy } from '../systems/DiplomacySystem';
 import { audioManager } from '../audio/AudioManager';
 import { playUnitVoice } from '../audio/UnitVoices';
 import { techTreeSystem, UPGRADE_DEFINITIONS, getUpgradeDefinition } from '../systems/TechTreeSystem';
+import { validateBuildingPlacement } from '../systems/BuildSystem';
 import { createMusicSystem, type MusicSystem } from '../systems/MusicSystem';
 import { getUpkeepPerTick, resetUpkeepTimers } from '../systems/UpkeepSystem';
 import { MissionSystem, type MissionCallbacks } from '../campaign/MissionSystem';
@@ -96,7 +97,7 @@ export class Game {
 
   // Building placement mode
   private buildMode = false;
-  private buildGhostType: 'barracks' | 'blacksmith' | 'lumbercamp' | 'mijnschacht' | 'chocolaterie' | null = null;
+  private buildGhostType: string | null = null;
 
   // Rally point placement mode
   private rallyPointMode = false;
@@ -764,6 +765,27 @@ export class Game {
         // Belgen faction-specific building -- maps to TertiaryResourceBuilding
         this.enterBuildMode('chocolaterie');
         break;
+      case 'build-housing':
+        this.enterBuildMode('housing');
+        break;
+      case 'build-tower':
+        this.enterBuildMode('tower');
+        break;
+      case 'build-tertiary':
+        this.enterBuildMode('tertiary');
+        break;
+      case 'build-upgrade':
+        this.enterBuildMode('upgrade');
+        break;
+      case 'build-faction1':
+        this.enterBuildMode('faction1');
+        break;
+      case 'build-faction2':
+        this.enterBuildMode('faction2');
+        break;
+      case 'build-siege-workshop':
+        this.enterBuildMode('siege-workshop');
+        break;
       case 'train-worker':
         this.trainFromSelectedBuilding(UnitTypeId.Worker);
         break;
@@ -802,7 +824,7 @@ export class Game {
     this.camera.setPosition(worldX, worldZ);
   }
 
-  private enterBuildMode(type: 'barracks' | 'lumbercamp' | 'blacksmith' | 'mijnschacht' | 'chocolaterie'): void {
+  private enterBuildMode(type: string): void {
     // Check if we have a worker selected
     const hasWorker = this.selectedEntities.some(eid =>
       hasComponent(world, eid, IsWorker) && Faction.id[eid] === this.playerFactionId
@@ -813,6 +835,13 @@ export class Game {
     }
     // Map ghost type to BuildingTypeId
     const buildingTypeId = this.getBuildingTypeIdForGhost(type);
+
+    // Tech tree check
+    if (!techTreeSystem.canBuildBuilding(this.playerFactionId, buildingTypeId, world)) {
+      this.hud?.showAlert('Vereist een hoger tier gebouw!', 'warning');
+      return;
+    }
+
     // Check cost -- use archetype if available, otherwise default 150g
     const arch = buildingTypeId < BUILDING_ARCHETYPES.length ? BUILDING_ARCHETYPES[buildingTypeId] : null;
     const cost = arch?.costGold ?? 150;
@@ -834,6 +863,13 @@ export class Game {
       case 'lumbercamp': return BuildingTypeId.LumberCamp;
       case 'mijnschacht': return BuildingTypeId.TertiaryResourceBuilding;
       case 'chocolaterie': return BuildingTypeId.TertiaryResourceBuilding;
+      case 'housing': return BuildingTypeId.Housing;
+      case 'tower': return BuildingTypeId.DefenseTower;
+      case 'tertiary': return BuildingTypeId.TertiaryResourceBuilding;
+      case 'upgrade': return BuildingTypeId.UpgradeBuilding;
+      case 'faction1': return BuildingTypeId.FactionSpecial1;
+      case 'faction2': return BuildingTypeId.FactionSpecial2;
+      case 'siege-workshop': return BuildingTypeId.SiegeWorkshop;
       default: return BuildingTypeId.Barracks;
     }
   }
@@ -841,10 +877,10 @@ export class Game {
   /** Get a faction-aware display label for a building ghost type. */
   private getBuildingLabel(ghostType: string): string {
     const factionLabels: Record<number, Record<string, string>> = {
-      [FactionId.Brabanders]: { barracks: 'Kazerne', lumbercamp: 'Houtzagerij', blacksmith: 'Smederij' },
-      [FactionId.Randstad]:   { barracks: 'Vergaderzaal', lumbercamp: 'Starbucks', blacksmith: 'CoworkingSpace' },
-      [FactionId.Limburgers]: { barracks: 'Schuttershal', lumbercamp: 'Vlaaibakkerij', blacksmith: 'Klooster', mijnschacht: 'Mijnschacht' },
-      [FactionId.Belgen]:     { barracks: 'Frituur', lumbercamp: 'Frietfabriek', blacksmith: 'EU-Parlement', chocolaterie: 'Chocolaterie' },
+      [FactionId.Brabanders]: { barracks: 'Kazerne', lumbercamp: 'Houtzagerij', blacksmith: 'Smederij', housing: 'Woonhuis', tower: 'Wachttoren', tertiary: 'Dorpsweide', upgrade: 'Geavanceerde Smederij', faction1: 'Dorpsweide', faction2: 'Feestzaal', 'siege-workshop': 'Tractorschuur' },
+      [FactionId.Randstad]:   { barracks: 'Vergaderzaal', lumbercamp: 'Starbucks', blacksmith: 'CoworkingSpace', housing: 'Flatgebouw', tower: 'Security Tower', tertiary: 'Kantoor', upgrade: 'Innovatielab', faction1: 'Starbucks HQ', faction2: 'Parkeergarage', 'siege-workshop': 'Bouwplaats', mijnschacht: 'Kantoor' },
+      [FactionId.Limburgers]: { barracks: 'Schuttershal', lumbercamp: 'Vlaaibakkerij', blacksmith: 'Klooster', housing: 'Huuske', tower: 'Wachttoren', tertiary: 'Kolenoven', upgrade: 'Geavanceerde Mijn', faction1: 'Mijnschacht', faction2: 'Mijnwerkerskamp', 'siege-workshop': 'Springstoflab', mijnschacht: 'Mijnschacht' },
+      [FactionId.Belgen]:     { barracks: 'Frituur', lumbercamp: 'Frietfabriek', blacksmith: 'EU-Parlement', housing: 'Brusselse Woning', tower: 'Wachttoren', tertiary: 'Chocolaterie', upgrade: 'Geavanceerd Parlement', faction1: 'Chocolaterie', faction2: 'Rijschool', 'siege-workshop': 'Atelier', chocolaterie: 'Chocolaterie' },
     };
     return factionLabels[this.playerFactionId]?.[ghostType]
       ?? ghostType.charAt(0).toUpperCase() + ghostType.slice(1);
@@ -1526,6 +1562,13 @@ export class Game {
       const goldCost = arch?.costGold ?? 150;
       const woodCost = arch?.costWood ?? 0;
       const buildingLabel = this.getBuildingLabel(this.buildGhostType);
+
+      // Placement validation
+      const placement = validateBuildingPlacement(world, buildingTypeId, this.playerFactionId, point.x, point.z, this.terrain);
+      if (!placement.valid) {
+        this.hud?.showAlert(placement.reason ?? 'Kan hier niet bouwen', 'warning');
+        return;
+      }
 
       if (!this.playerState.canAfford(this.playerFactionId, goldCost)) {
         this.hud?.showAlert(`Niet genoeg goud! (${goldCost} nodig)`, 'warning');
@@ -3003,7 +3046,7 @@ export class Game {
   private createBuildingEntity(type: BuildingTypeId, faction: FactionId, x: number, z: number): number {
     const eid = addEntity(world);
     // Fallback archetype for building types not in the base array (e.g. TertiaryResourceBuilding)
-    const defaultArch = { hp: 500, costGold: 150, costSecondary: 0, buildTime: 25, sightRange: 8, produces: [] as number[] };
+    const defaultArch = { hp: 500, costGold: 150, costSecondary: 0, buildTime: 25, sightRange: 8, produces: [] as number[], populationProvided: 5 };
     const arch = type < BUILDING_ARCHETYPES.length ? BUILDING_ARCHETYPES[type] : defaultArch;
     const y = this.terrain.getHeightAt(x, z);
 
@@ -3027,7 +3070,7 @@ export class Game {
       Production.queue4[eid] = NO_PRODUCTION;
     }
 
-    this.playerState.addPopulationCapacity(faction, type === BuildingTypeId.TownHall ? 10 : 5);
+    this.playerState.addPopulationCapacity(faction, arch.populationProvided ?? 5);
     return eid;
   }
 

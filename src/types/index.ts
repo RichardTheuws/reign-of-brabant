@@ -91,6 +91,10 @@ export enum BuildingTypeId {
   FactionSpecial1 = 7,
   /** Second faction-specific special building. */
   FactionSpecial2 = 8,
+  /** Defensive structure with ranged attack (T2). */
+  DefenseTower = 9,
+  /** Produces siege units (T3). */
+  SiegeWorkshop = 10,
 }
 
 /**
