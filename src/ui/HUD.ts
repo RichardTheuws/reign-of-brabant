@@ -15,6 +15,20 @@ import { createCommandIcon, replaceIconText } from './CommandIcons';
 import { createBuildingPortraitImg } from './BuildingPortraits';
 
 // ---------------------------------------------------------------------------
+// Command icon image mapping — fal.ai generated painted icons
+// ---------------------------------------------------------------------------
+
+const COMMAND_ICON_IMAGES: Record<string, string> = {
+  WRK: '/assets/ui/commands/cmd-worker.png',
+  INF: '/assets/ui/commands/cmd-infantry.png',
+  RNG: '/assets/ui/commands/cmd-ranged.png',
+  H1:  '/assets/ui/commands/cmd-hero.png',
+  H2:  '/assets/ui/commands/cmd-hero.png',
+  RLY: '/assets/ui/commands/cmd-rally.png',
+  UPG: '/assets/ui/commands/cmd-upgrade.png',
+};
+
+// ---------------------------------------------------------------------------
 // Types (from POC-UI.md section 5)
 // ---------------------------------------------------------------------------
 
@@ -771,11 +785,20 @@ export class HUD {
       const iconSpan = document.createElement('span');
       iconSpan.className = 'bcard-action-icon';
       if (act.iconClass) iconSpan.classList.add(act.iconClass);
-      const svgIcon = createCommandIcon(act.icon, 20);
-      if (svgIcon) {
-        iconSpan.appendChild(svgIcon);
+      const imgSrc = COMMAND_ICON_IMAGES[act.icon];
+      if (imgSrc) {
+        const img = document.createElement('img');
+        img.src = imgSrc;
+        img.alt = act.label;
+        img.draggable = false;
+        iconSpan.appendChild(img);
       } else {
-        iconSpan.textContent = act.icon;
+        const svgIcon = createCommandIcon(act.icon, 20);
+        if (svgIcon) {
+          iconSpan.appendChild(svgIcon);
+        } else {
+          iconSpan.textContent = act.icon;
+        }
       }
       btn.appendChild(iconSpan);
 

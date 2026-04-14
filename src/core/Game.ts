@@ -484,14 +484,14 @@ export class Game {
     if (document.getElementById('objectives-hud')) return;
     const ov = document.getElementById('ui-overlay'); if (!ov) return;
     const el = document.createElement('div'); el.id = 'objectives-hud';
-    el.style.cssText = 'position:absolute;top:60px;left:8px;max-width:280px;padding:12px 16px;background:rgba(20,15,10,0.85);border:1px solid rgba(212,168,83,0.25);border-radius:8px;font-size:0.8rem;z-index:10;pointer-events:none';
+    el.style.cssText = 'position:absolute;top:60px;left:8px;max-width:300px;padding:14px 18px 12px;background:linear-gradient(135deg,rgba(20,15,10,0.92) 0%,rgba(30,22,14,0.88) 100%);border:1px solid rgba(212,168,83,0.3);border-top:2px solid rgba(212,168,83,0.5);border-radius:4px 4px 10px 10px;font-size:0.8rem;z-index:10;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,0.4),inset 0 1px 0 rgba(212,168,83,0.08)';
     ov.appendChild(el);
   }
   private _updateObjHUD(): void {
     if (!this.missionSystem?.isActive) return;
     const el = document.getElementById('objectives-hud'); if (!el) return;
     const states = this.missionSystem.getObjectiveStates();
-    let h = '<div style="font-family:Cinzel,serif;font-weight:700;font-size:0.75rem;color:#d4a853;margin-bottom:8px;letter-spacing:0.05em">DOELSTELLINGEN</div>';
+    let h = '<div style="font-family:Cinzel,serif;font-weight:700;font-size:0.75rem;color:#d4a853;margin-bottom:10px;letter-spacing:0.08em;padding-bottom:6px;border-bottom:1px solid rgba(212,168,83,0.2);text-shadow:0 0 8px rgba(212,168,83,0.3)">DOELSTELLINGEN</div>';
     for (const s of states) {
       // Negative objectives (no-worker-loss, no-townhall-loss) that haven't failed yet
       // should show as "active/protected" rather than "completed" -- they are only truly
@@ -531,7 +531,13 @@ export class Game {
       } else if (!s.completed && !s.failed && s.objective.targetValue > 1) {
         pr = ' (' + Math.floor(s.currentValue) + '/' + s.objective.targetValue + ')';
       }
-      h += '<div style="display:flex;gap:6px;margin-bottom:4px;color:' + cl + ';opacity:' + opacity + (strikethrough ? ';text-decoration:line-through' : '') + '"><span>' + ic + '</span><span>' + lb + pr + '</span></div>';
+      // Build progress bar for multi-value objectives
+      let progressBar = '';
+      if (!s.completed && !s.failed && !isNegativeActive && s.objective.targetValue > 1) {
+        const pct = Math.min(100, Math.floor((s.currentValue / s.objective.targetValue) * 100));
+        progressBar = '<div style="width:100%;height:3px;background:rgba(255,255,255,0.06);border-radius:2px;margin-top:3px;overflow:hidden"><div style="width:' + pct + '%;height:100%;background:linear-gradient(90deg,' + cl + ',' + cl + 'cc);border-radius:2px;transition:width 0.4s ease"></div></div>';
+      }
+      h += '<div style="margin-bottom:6px;color:' + cl + ';opacity:' + opacity + (strikethrough ? ';text-decoration:line-through' : '') + '"><div style="display:flex;gap:6px;align-items:center"><span style="font-size:0.65rem;opacity:0.7;flex-shrink:0">' + ic + '</span><span style="font-size:0.78rem;line-height:1.3">' + lb + pr + '</span></div>' + progressBar + '</div>';
     }
     const wp = this.missionSystem.getWaveProgress();
     if (wp.total > 0) h += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(212,168,83,.15);color:#d4a853;font-size:.75rem">Golven: ' + wp.defeated + '/' + wp.total + '</div>';

@@ -99,7 +99,7 @@ function createSkyDome(scene: THREE.Scene): void {
 // ---------------------------------------------------------------------------
 
 function createFog(scene: THREE.Scene): void {
-  scene.fog = new THREE.FogExp2(0xc8d8e8, 0.012);
+  scene.fog = new THREE.FogExp2(0xc8d8e8, 0.003);
 }
 
 // ---------------------------------------------------------------------------

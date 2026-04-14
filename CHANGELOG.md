@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.32.0] - 2026-04-14
+
+### Improved
+- **Fog density reduced** — Exponential fog density 0.012 → 0.003, veel minder waas zodat het slagveld helder zichtbaar is
+- **Action panel icons** — 6 fal.ai geschilderde WarCraft-stijl command icons (worker, infantry, ranged, hero, rally, upgrade) vervangen SVG iconen
+- **Action hotkey badges** — Hotkeys (Q/W/E/R/T/Y) nu als duidelijke badges met achtergrond over de action buttons
+- **Objectives panel redesign** — Gradient achtergrond, gold top-border, header separator met text-shadow, progress bars voor multi-value objectives
+- **Version/FPS overlay** — Verplaatst van rechts-boven (overlap met SND/pause) naar rechts-onder, subtielere styling
+
 ## [0.31.1] - 2026-04-14
 
 ### Improved
