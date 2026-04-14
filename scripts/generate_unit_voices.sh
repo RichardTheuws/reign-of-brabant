@@ -45,6 +45,7 @@ mkdir -p "$OUTPUT_DIR/brabanders"
 mkdir -p "$OUTPUT_DIR/randstad/stagiair"
 mkdir -p "$OUTPUT_DIR/randstad/manager"
 mkdir -p "$OUTPUT_DIR/randstad/consultant"
+mkdir -p "$OUTPUT_DIR/randstad/advocaat"
 mkdir -p "$OUTPUT_DIR/randstad"
 
 # ---------------------------------------------------------------------------
@@ -223,14 +224,92 @@ generate_voice "Ik pak het"    "$OUTPUT_DIR/brabanders/gather_2.mp3" "$BRABANT_V
 generate_voice "Mooi zo"       "$OUTPUT_DIR/brabanders/gather_3.mp3" "$BRABANT_VOICE_ID"
 
 # ===========================================================================
-# RANDSTAD — Generic (per-unit coming later)
+# RANDSTAD — Per Unit Type + Generic
 # ===========================================================================
 
 echo ""
 echo "╔══════════════════════════════════════════════════╗"
 echo "║  RANDSTAD — Unit Voice Generation                ║"
 echo "╚══════════════════════════════════════════════════╝"
+
+# ---------------------------------------------------------------------------
+# Manager (Infantry) — formal, measured, corporate
+# Voice settings: stability 0.4, similarity 0.75, style 0.3
+# ---------------------------------------------------------------------------
+
 echo ""
+echo "--- Manager (Infantry) — corporate middle management ---"
+M_STAB=0.4; M_SIM=0.75; M_STYLE=0.3
+
+generate_voice "Wat heb je nodig?"                    "$OUTPUT_DIR/randstad/manager/select_1.mp3"  "$RANDSTAD_VOICE_ID" $M_STAB $M_SIM $M_STYLE
+generate_voice "Ja, ik heb even vijf minuten."        "$OUTPUT_DIR/randstad/manager/select_2.mp3"  "$RANDSTAD_VOICE_ID" $M_STAB $M_SIM $M_STYLE
+generate_voice "Mijn agenda staat open."              "$OUTPUT_DIR/randstad/manager/select_3.mp3"  "$RANDSTAD_VOICE_ID" $M_STAB $M_SIM $M_STYLE
+
+generate_voice "Ik loop even mee."                    "$OUTPUT_DIR/randstad/manager/move_1.mp3"    "$RANDSTAD_VOICE_ID" $M_STAB $M_SIM $M_STYLE
+generate_voice "Even kijken op locatie."              "$OUTPUT_DIR/randstad/manager/move_2.mp3"    "$RANDSTAD_VOICE_ID" $M_STAB $M_SIM $M_STYLE
+generate_voice "Prima, onderweg."                     "$OUTPUT_DIR/randstad/manager/move_3.mp3"    "$RANDSTAD_VOICE_ID" $M_STAB $M_SIM $M_STYLE
+
+generate_voice "Dit wordt een hostile takeover!"      "$OUTPUT_DIR/randstad/manager/attack_1.mp3"  "$RANDSTAD_VOICE_ID" $M_STAB $M_SIM $M_STYLE
+generate_voice "Vijandige overname!"                  "$OUTPUT_DIR/randstad/manager/attack_2.mp3"  "$RANDSTAD_VOICE_ID" $M_STAB $M_SIM $M_STYLE
+generate_voice "Agressief uitbreiden!"                "$OUTPUT_DIR/randstad/manager/attack_3.mp3"  "$RANDSTAD_VOICE_ID" $M_STAB $M_SIM $M_STYLE
+
+generate_voice "Mijn... contract..."                  "$OUTPUT_DIR/randstad/manager/death_1.mp3"   "$RANDSTAD_VOICE_ID" $M_STAB $M_SIM $M_STYLE
+generate_voice "Severance... package..."              "$OUTPUT_DIR/randstad/manager/death_2.mp3"   "$RANDSTAD_VOICE_ID" $M_STAB $M_SIM $M_STYLE
+
+# ---------------------------------------------------------------------------
+# Consultant (Ranged) — formal, condescending, billable hours
+# Voice settings: stability 0.4, similarity 0.75, style 0.3
+# ---------------------------------------------------------------------------
+
+echo ""
+echo "--- Consultant (Ranged) — billable hours warrior ---"
+CO_STAB=0.4; CO_SIM=0.75; CO_STYLE=0.3
+
+generate_voice "Pro bono of tegen uurtarief?"         "$OUTPUT_DIR/randstad/consultant/select_1.mp3"  "$RANDSTAD_VOICE_ID" $CO_STAB $CO_SIM $CO_STYLE
+generate_voice "Mijn expertise staat klaar."          "$OUTPUT_DIR/randstad/consultant/select_2.mp3"  "$RANDSTAD_VOICE_ID" $CO_STAB $CO_SIM $CO_STYLE
+generate_voice "Ik zit er bovenop."                   "$OUTPUT_DIR/randstad/consultant/select_3.mp3"  "$RANDSTAD_VOICE_ID" $CO_STAB $CO_SIM $CO_STYLE
+
+generate_voice "Ik factureer de reistijd."            "$OUTPUT_DIR/randstad/consultant/move_1.mp3"    "$RANDSTAD_VOICE_ID" $CO_STAB $CO_SIM $CO_STYLE
+generate_voice "Naar de klant toe."                   "$OUTPUT_DIR/randstad/consultant/move_2.mp3"    "$RANDSTAD_VOICE_ID" $CO_STAB $CO_SIM $CO_STYLE
+generate_voice "Even een site visit."                 "$OUTPUT_DIR/randstad/consultant/move_3.mp3"    "$RANDSTAD_VOICE_ID" $CO_STAB $CO_SIM $CO_STYLE
+
+generate_voice "Hier is mijn advies!"                 "$OUTPUT_DIR/randstad/consultant/attack_1.mp3"  "$RANDSTAD_VOICE_ID" $CO_STAB $CO_SIM $CO_STYLE
+generate_voice "Rapport ingeleverd!"                  "$OUTPUT_DIR/randstad/consultant/attack_2.mp3"  "$RANDSTAD_VOICE_ID" $CO_STAB $CO_SIM $CO_STYLE
+generate_voice "Scherpe analyse!"                     "$OUTPUT_DIR/randstad/consultant/attack_3.mp3"  "$RANDSTAD_VOICE_ID" $CO_STAB $CO_SIM $CO_STYLE
+
+generate_voice "Te veel... overuren..."               "$OUTPUT_DIR/randstad/consultant/death_1.mp3"   "$RANDSTAD_VOICE_ID" $CO_STAB $CO_SIM $CO_STYLE
+generate_voice "Mijn declaratie..."                   "$OUTPUT_DIR/randstad/consultant/death_2.mp3"   "$RANDSTAD_VOICE_ID" $CO_STAB $CO_SIM $CO_STYLE
+
+# ---------------------------------------------------------------------------
+# Advocaat (Heavy) — authoritative, legal jargon, commanding
+# Voice settings: stability 0.4, similarity 0.75, style 0.3
+# ---------------------------------------------------------------------------
+
+echo ""
+echo "--- Advocaat (Heavy) — legal heavy hitter ---"
+A_STAB=0.4; A_SIM=0.75; A_STYLE=0.3
+
+generate_voice "Alles is juridisch gedekt."           "$OUTPUT_DIR/randstad/advocaat/select_1.mp3"  "$RANDSTAD_VOICE_ID" $A_STAB $A_SIM $A_STYLE
+generate_voice "Ik sta paraat."                       "$OUTPUT_DIR/randstad/advocaat/select_2.mp3"  "$RANDSTAD_VOICE_ID" $A_STAB $A_SIM $A_STYLE
+generate_voice "Bezwaar afgewezen."                   "$OUTPUT_DIR/randstad/advocaat/select_3.mp3"  "$RANDSTAD_VOICE_ID" $A_STAB $A_SIM $A_STYLE
+
+generate_voice "Naar de rechtbank."                   "$OUTPUT_DIR/randstad/advocaat/move_1.mp3"    "$RANDSTAD_VOICE_ID" $A_STAB $A_SIM $A_STYLE
+generate_voice "Op weg naar de zitting."              "$OUTPUT_DIR/randstad/advocaat/move_2.mp3"    "$RANDSTAD_VOICE_ID" $A_STAB $A_SIM $A_STYLE
+generate_voice "Dossier onder de arm."                "$OUTPUT_DIR/randstad/advocaat/move_3.mp3"    "$RANDSTAD_VOICE_ID" $A_STAB $A_SIM $A_STYLE
+
+generate_voice "Aanklacht ingediend!"                 "$OUTPUT_DIR/randstad/advocaat/attack_1.mp3"  "$RANDSTAD_VOICE_ID" $A_STAB $A_SIM $A_STYLE
+generate_voice "Objectie!"                            "$OUTPUT_DIR/randstad/advocaat/attack_2.mp3"  "$RANDSTAD_VOICE_ID" $A_STAB $A_SIM $A_STYLE
+generate_voice "Orde! Orde!"                          "$OUTPUT_DIR/randstad/advocaat/attack_3.mp3"  "$RANDSTAD_VOICE_ID" $A_STAB $A_SIM $A_STYLE
+
+generate_voice "Case... dismissed..."                 "$OUTPUT_DIR/randstad/advocaat/death_1.mp3"   "$RANDSTAD_VOICE_ID" $A_STAB $A_SIM $A_STYLE
+generate_voice "Verjaard..."                          "$OUTPUT_DIR/randstad/advocaat/death_2.mp3"   "$RANDSTAD_VOICE_ID" $A_STAB $A_SIM $A_STYLE
+
+# ---------------------------------------------------------------------------
+# Randstad — Generic fallback (used when no per-unit file exists)
+# ---------------------------------------------------------------------------
+
+echo ""
+echo "--- Randstad generic fallback ---"
 
 generate_voice "Ja, wat is het?"  "$OUTPUT_DIR/randstad/select_1.mp3" "$RANDSTAD_VOICE_ID"
 generate_voice "Moment..."        "$OUTPUT_DIR/randstad/select_2.mp3" "$RANDSTAD_VOICE_ID"
