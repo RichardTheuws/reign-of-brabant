@@ -9,6 +9,11 @@
 - **Objectives panel redesign** — Gradient achtergrond, gold top-border, header separator met text-shadow, progress bars voor multi-value objectives
 - **Version/FPS overlay** — Verplaatst van rechts-boven (overlap met SND/pause) naar rechts-onder, subtielere styling
 
+### Added
+- **Bridge GLB model** — Meshy v6 3D model van stenen boogbrug vervangt procedurele BoxGeometry
+- **Tunnel entrance GLB model** — Meshy v6 3D mijnschacht-ingang vervangt complexe procedurele geometry (torus + stenen + lantaarns)
+- **GLB fallback system** — Terrain laadt GLB modellen met automatische fallback naar procedurele geometry als bestanden niet beschikbaar zijn
+
 ## [0.31.1] - 2026-04-14
 
 ### Improved
