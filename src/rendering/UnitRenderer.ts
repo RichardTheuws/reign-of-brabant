@@ -14,7 +14,7 @@ import { clone as skeletonClone } from 'three/addons/utils/SkeletonUtils.js';
 // ---------------------------------------------------------------------------
 
 /** Unit types available for rendering (includes hero sub-types per faction). */
-export type UnitTypeName = 'worker' | 'infantry' | 'ranged' | 'heavy' | 'hero0' | 'hero1';
+export type UnitTypeName = 'worker' | 'infantry' | 'ranged' | 'heavy' | 'siege' | 'support' | 'hero0' | 'hero1';
 
 /** Faction identifier as stored in the ECS Faction.id component. */
 export const FACTION_ORANGE = 0;
@@ -46,6 +46,16 @@ const UNIT_MODEL_PATHS: Record<string, string> = {
   heavy_1: '/assets/models/v02/randstad/heavy.glb',     // CorporateAdvocaat
   heavy_2: '/assets/models/v02/limburgers/heavy.glb',   // Mergelridder
   heavy_3: '/assets/models/v02/belgen/heavy.glb',       // Frituurridder
+  // Siege (Meshy v6 image-to-3D)
+  siege_0: '/assets/models/v02/brabanders/siege.glb',   // Tractorrijder kanon
+  siege_1: '/assets/models/v02/randstad/siege.glb',      // Vastgoedmakelaar sloopkogel
+  siege_2: '/assets/models/v02/limburgers/siege.glb',    // Kolenbrander mijnkar
+  siege_3: '/assets/models/v02/belgen/siege.glb',        // Manneken Pis kanon
+  // Support (Meshy v6 image-to-3D)
+  support_0: '/assets/models/v02/brabanders/support.glb', // Boerinne
+  support_1: '/assets/models/v02/randstad/support.glb',   // HR-Medewerker
+  support_2: '/assets/models/v02/limburgers/support.glb', // Sjpion
+  support_3: '/assets/models/v02/belgen/support.glb',     // Wafelzuster
   // Heroes (static fallback = same as animated path, they are self-contained GLBs)
   hero0_0: '/assets/models/heroes/brabant-prins.glb',
   hero1_0: '/assets/models/heroes/brabant-boer.glb',
@@ -77,6 +87,16 @@ const UNIT_MODEL_FALLBACKS: Record<string, string> = {
   heavy_1: '/assets/models/v02/randstad/heavy.glb',
   heavy_2: '/assets/models/v02/limburgers/heavy.glb',
   heavy_3: '/assets/models/v02/belgen/heavy.glb',
+  // Siege (fallback to heavy)
+  siege_0: '/assets/models/v02/brabanders/heavy.glb',
+  siege_1: '/assets/models/v02/randstad/heavy.glb',
+  siege_2: '/assets/models/v02/limburgers/heavy.glb',
+  siege_3: '/assets/models/v02/belgen/heavy.glb',
+  // Support (fallback to worker)
+  support_0: '/assets/models/v02/brabanders/worker.glb',
+  support_1: '/assets/models/v02/randstad/worker.glb',
+  support_2: '/assets/models/v02/limburgers/worker.glb',
+  support_3: '/assets/models/v02/belgen/worker.glb',
   // Heroes (fallback to infantry of same faction)
   hero0_0: '/assets/models/v02/brabanders/infantry.glb',
   hero1_0: '/assets/models/v02/brabanders/infantry.glb',

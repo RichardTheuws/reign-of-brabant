@@ -12,7 +12,7 @@ import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 // Types
 // ---------------------------------------------------------------------------
 
-export type BuildingTypeName = 'townhall' | 'barracks' | 'blacksmith' | 'lumbercamp';
+export type BuildingTypeName = 'townhall' | 'barracks' | 'blacksmith' | 'lumbercamp' | 'housing' | 'tower';
 
 const BUILDING_MODEL_PATHS: Record<string, string> = {
   townhall_0: '/assets/models/v02/brabanders/townhall.glb',
@@ -33,6 +33,16 @@ const BUILDING_MODEL_PATHS: Record<string, string> = {
   barracks_3: '/assets/models/v02/belgen/barracks.glb',
   lumbercamp_3: '/assets/models/v02/belgen/lumbercamp.glb',
   blacksmith_3: '/assets/models/v02/belgen/blacksmith.glb',
+  // Housing (Meshy v6 image-to-3D)
+  housing_0: '/assets/models/v02/brabanders/housing.glb',
+  housing_1: '/assets/models/v02/randstad/housing.glb',
+  housing_2: '/assets/models/v02/limburgers/housing.glb',
+  housing_3: '/assets/models/v02/belgen/housing.glb',
+  // Defense Tower (Meshy v6 image-to-3D)
+  tower_0: '/assets/models/v02/brabanders/tower.glb',
+  tower_1: '/assets/models/v02/randstad/tower.glb',
+  tower_2: '/assets/models/v02/limburgers/tower.glb',
+  tower_3: '/assets/models/v02/belgen/tower.glb',
 };
 
 const BUILDING_MODEL_FALLBACKS: Record<string, string> = {
@@ -54,6 +64,16 @@ const BUILDING_MODEL_FALLBACKS: Record<string, string> = {
   barracks_3: '/assets/models/v01/brabanders/barracks.glb',
   lumbercamp_3: '/assets/models/v02/belgen/lumbercamp.glb',
   blacksmith_3: '/assets/models/v02/belgen/blacksmith.glb',
+  // Housing (fallback to lumbercamp)
+  housing_0: '/assets/models/v02/brabanders/lumbercamp.glb',
+  housing_1: '/assets/models/v02/randstad/lumbercamp.glb',
+  housing_2: '/assets/models/v02/limburgers/lumbercamp.glb',
+  housing_3: '/assets/models/v02/belgen/lumbercamp.glb',
+  // Defense Tower (fallback to blacksmith)
+  tower_0: '/assets/models/v02/brabanders/blacksmith.glb',
+  tower_1: '/assets/models/v02/randstad/blacksmith.glb',
+  tower_2: '/assets/models/v02/limburgers/blacksmith.glb',
+  tower_3: '/assets/models/v02/belgen/blacksmith.glb',
 };
 
 type ModelCacheKey = `${BuildingTypeName}_${number}`;

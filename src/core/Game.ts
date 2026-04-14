@@ -66,10 +66,12 @@ const FACTION_DEATH_COLORS: Record<number, number> = {
   [FactionId.Belgen]: 0xa01030,
 };
 
-function unitTypeName(unitType: number): 'worker' | 'infantry' | 'ranged' | 'heavy' {
+function unitTypeName(unitType: number): 'worker' | 'infantry' | 'ranged' | 'heavy' | 'siege' | 'support' {
   if (unitType === UnitTypeId.Worker) return 'worker';
   if (unitType === UnitTypeId.Ranged) return 'ranged';
   if (unitType === UnitTypeId.Heavy) return 'heavy';
+  if (unitType === UnitTypeId.Siege) return 'siege';
+  if (unitType === UnitTypeId.Support) return 'support';
   return 'infantry';
 }
 
@@ -2238,11 +2240,13 @@ export class Game {
   }
 
   /** Map BuildingTypeId to BuildingRenderer type name. Falls back to 'barracks' for unknown types. */
-  private getBuildingRendererType(buildingType: number): 'townhall' | 'barracks' | 'lumbercamp' | 'blacksmith' {
+  private getBuildingRendererType(buildingType: number): 'townhall' | 'barracks' | 'lumbercamp' | 'blacksmith' | 'housing' | 'tower' {
     switch (buildingType) {
       case BuildingTypeId.TownHall: return 'townhall';
       case BuildingTypeId.LumberCamp: return 'lumbercamp';
       case BuildingTypeId.Blacksmith: return 'blacksmith';
+      case BuildingTypeId.Housing: return 'housing';
+      case BuildingTypeId.DefenseTower: return 'tower';
       default: return 'barracks';
     }
   }
