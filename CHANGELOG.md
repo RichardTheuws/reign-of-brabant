@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.31.1] - 2026-04-14
+
+### Improved
+- **"Het Ontstaan" cinematic v2** -- Volledig opnieuw geproduceerd met LoRA face model (geen face-swap meer), hybride Seedance/Kling pipeline, nieuwe keyframes
+
 ## [0.31.0] - 2026-04-13
 
 ### Improved
