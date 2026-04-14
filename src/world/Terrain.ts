@@ -1,6 +1,13 @@
 import * as THREE from 'three';
 import { createNoise2D } from 'simplex-noise';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import type { BiomeType, RiverSpawn, BridgeSpawn, RockWallSpawn, RoadSpawn, TunnelSpawn, PathPoint } from '../types/index';
+
+// ---------------------------------------------------------------------------
+// GLB model paths for terrain features
+// ---------------------------------------------------------------------------
+const BRIDGE_MODEL_PATH = '/assets/models/v02/shared/bridge.glb';
+const TUNNEL_MODEL_PATH = '/assets/models/v02/shared/tunnel_entrance.glb';
 
 const MAP_SIZE = 128;
 const SEGMENTS = 256;
@@ -809,197 +816,196 @@ export class Terrain {
    * These get added to featureMeshes array for the Game to add to the scene.
    */
   private buildFeatureVisuals(): void {
-    // Bridge visuals: flat stone-colored planes spanning the river
-    for (const bridge of this.features.bridges) {
-      const bridgeGeo = new THREE.BoxGeometry(bridge.width, 0.3, bridge.length);
-      const bridgeMat = new THREE.MeshStandardMaterial({
-        color: '#8a7a6a',
-        roughness: 0.9,
-        metalness: 0.1,
-      });
-      const bridgeMesh = new THREE.Mesh(bridgeGeo, bridgeMat);
-      const bridgeY = this.getHeightAt(bridge.x, bridge.z);
-      bridgeMesh.position.set(bridge.x, Math.max(bridgeY, WATER_LEVEL + 0.3), bridge.z);
-      bridgeMesh.rotation.y = bridge.rotation;
-      bridgeMesh.castShadow = true;
-      bridgeMesh.receiveShadow = true;
-      this.featureMeshes.push(bridgeMesh);
+    const loader = new GLTFLoader();
 
-      // Bridge railings (two thin boxes on each side)
-      for (const side of [-1, 1]) {
-        const railGeo = new THREE.BoxGeometry(0.2, 0.6, bridge.length);
-        const railMat = new THREE.MeshStandardMaterial({
-          color: '#6a5a4a',
-          roughness: 0.85,
-          metalness: 0.05,
+    // --- Bridge GLB models ---
+    for (const bridge of this.features.bridges) {
+      const bridgeY = this.getHeightAt(bridge.x, bridge.z);
+      const yPos = Math.max(bridgeY, WATER_LEVEL + 0.3);
+
+      loader.load(BRIDGE_MODEL_PATH, (gltf) => {
+        const model = gltf.scene;
+        model.position.set(bridge.x, yPos, bridge.z);
+        model.rotation.y = bridge.rotation;
+        model.scale.setScalar(bridge.width * 0.5);
+        model.traverse((child) => {
+          if ((child as THREE.Mesh).isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
         });
-        const railMesh = new THREE.Mesh(railGeo, railMat);
-        const offsetX = Math.cos(bridge.rotation) * side * (bridge.width / 2 - 0.15);
-        const offsetZ = Math.sin(bridge.rotation) * side * (bridge.width / 2 - 0.15);
-        railMesh.position.set(
-          bridge.x + offsetX,
-          bridgeMesh.position.y + 0.4,
-          bridge.z + offsetZ,
-        );
-        railMesh.rotation.y = bridge.rotation;
-        railMesh.castShadow = true;
-        this.featureMeshes.push(railMesh);
-      }
+        this.featureMeshes.push(model);
+        this.mesh.parent?.add(model);
+      }, undefined, () => {
+        // Fallback: procedural bridge if GLB fails to load
+        this.buildProceduralBridge(bridge, yPos);
+      });
     }
 
-    // Tunnel entrance visuals: cave/mine entrance with vertical archway
+    // --- Tunnel entrance GLB models ---
     for (const tunnel of this.features.tunnels) {
       for (const point of [tunnel.entrance, tunnel.exit]) {
         const tunnelY = this.getHeightAt(point.x, point.z);
-
-        // Calculate rotation so the arch faces toward map center (0, 0)
         const facingAngle = Math.atan2(-point.z, -point.x);
-
-        // Parent group for the entire tunnel entrance (rotated as a unit)
-        const tunnelGroup = new THREE.Group();
-        tunnelGroup.position.set(point.x, tunnelY, point.z);
-        tunnelGroup.rotation.y = facingAngle;
-
-        // --- 1. Stone archway (vertical half-torus) ---
-        const archGeo = new THREE.TorusGeometry(1.4, 0.25, 8, 16, Math.PI);
-        const archMat = new THREE.MeshStandardMaterial({
-          color: '#6a5a4a',
-          roughness: 0.85,
-          metalness: 0.1,
-        });
-        const archMesh = new THREE.Mesh(archGeo, archMat);
-        // Stand the half-torus upright: rotate so the arch rises vertically
-        archMesh.rotation.z = Math.PI; // Flip so open side faces down
-        archMesh.position.set(0, 1.4, 0); // Centered, raised to ground level
-        archMesh.castShadow = true;
-        tunnelGroup.add(archMesh);
-
-        // --- 2. Stone blocks along the arch frame ---
-        const stoneColors = ['#6a5a4a', '#7a6a5a', '#5e5248', '#74644e'];
-        const numStones = 9;
-        for (let i = 0; i < numStones; i++) {
-          // Distribute stones along the arch (from left base to right base)
-          const t = (i / (numStones - 1)) * Math.PI; // 0 to PI
-          const stoneX = Math.cos(t) * 1.4;
-          const stoneY = Math.sin(t) * 1.4;
-          const stoneGeo = new THREE.BoxGeometry(
-            0.35 + Math.random() * 0.15,
-            0.3 + Math.random() * 0.1,
-            0.4 + Math.random() * 0.1,
-          );
-          const stoneMat = new THREE.MeshStandardMaterial({
-            color: stoneColors[i % stoneColors.length],
-            roughness: 0.9,
-            metalness: 0.05,
-          });
-          const stoneMesh = new THREE.Mesh(stoneGeo, stoneMat);
-          stoneMesh.position.set(stoneX, stoneY, 0);
-          // Rotate each stone to follow the arch curvature
-          stoneMesh.rotation.z = t - Math.PI / 2;
-          stoneMesh.castShadow = true;
-          tunnelGroup.add(stoneMesh);
-        }
-
-        // --- 3. Vertical dark opening (the cave depth) ---
-        const openingGeo = new THREE.CircleGeometry(1.1, 20);
-        const openingMat = new THREE.MeshStandardMaterial({
-          color: '#0e0e0e',
-          roughness: 1.0,
-          metalness: 0.0,
-          side: THREE.DoubleSide,
-        });
-        const openingMesh = new THREE.Mesh(openingGeo, openingMat);
-        // Place it vertical, slightly behind the arch
-        openingMesh.rotation.y = Math.PI / 2;
-        openingMesh.position.set(-0.15, 0.9, 0);
-        tunnelGroup.add(openingMesh);
-
-        // Inner darker circle for depth illusion
-        const innerGeo = new THREE.CircleGeometry(0.7, 16);
-        const innerMat = new THREE.MeshStandardMaterial({
-          color: '#050505',
-          roughness: 1.0,
-          metalness: 0.0,
-          side: THREE.DoubleSide,
-        });
-        const innerMesh = new THREE.Mesh(innerGeo, innerMat);
-        innerMesh.rotation.y = Math.PI / 2;
-        innerMesh.position.set(-0.25, 0.85, 0);
-        tunnelGroup.add(innerMesh);
-
-        // --- 4. Ground stone ring marking (visible from above) ---
-        const groundRingGeo = new THREE.RingGeometry(1.6, 2.2, 24);
-        const groundRingMat = new THREE.MeshStandardMaterial({
-          color: '#8a7a6a',
-          roughness: 0.9,
-          metalness: 0.05,
-          side: THREE.DoubleSide,
-        });
-        const groundRingMesh = new THREE.Mesh(groundRingGeo, groundRingMat);
-        groundRingMesh.rotation.x = -Math.PI / 2;
-        groundRingMesh.position.set(0, 0.06, 0);
-        groundRingMesh.receiveShadow = true;
-        tunnelGroup.add(groundRingMesh);
-
-        // Subtle glow ring on the ground
-        const glowGeo = new THREE.RingGeometry(1.2, 1.7, 24);
-        const glowMat = new THREE.MeshBasicMaterial({
-          color: tunnel.factionOwner !== null ? '#88aaff' : '#88ff88',
-          transparent: true,
-          opacity: 0.25,
-          side: THREE.DoubleSide,
-        });
-        const glowMesh = new THREE.Mesh(glowGeo, glowMat);
-        glowMesh.rotation.x = -Math.PI / 2;
-        glowMesh.position.set(0, 0.08, 0);
-        tunnelGroup.add(glowMesh);
-
-        // --- 5. Lantern spheres on either side of the entrance ---
         const lanternColor = tunnel.factionOwner !== null ? '#6688cc' : '#66cc66';
-        for (const side of [-1, 1]) {
-          const lanternGeo = new THREE.SphereGeometry(0.15, 8, 8);
-          const lanternMat = new THREE.MeshStandardMaterial({
-            color: lanternColor,
-            emissive: lanternColor,
-            emissiveIntensity: 0.8,
-            roughness: 0.3,
-            metalness: 0.1,
-          });
-          const lanternMesh = new THREE.Mesh(lanternGeo, lanternMat);
-          lanternMesh.position.set(0.1, 1.8, side * 1.5);
-          lanternMesh.castShadow = true;
-          tunnelGroup.add(lanternMesh);
+        const glowColor = tunnel.factionOwner !== null ? '#88aaff' : '#88ff88';
 
-          // Small post/pole under each lantern
-          const postGeo = new THREE.CylinderGeometry(0.06, 0.06, 1.6, 6);
-          const postMat = new THREE.MeshStandardMaterial({
-            color: '#4a3a2a',
-            roughness: 0.9,
-            metalness: 0.1,
+        loader.load(TUNNEL_MODEL_PATH, (gltf) => {
+          const model = gltf.scene;
+          model.position.set(point.x, tunnelY, point.z);
+          model.rotation.y = facingAngle;
+          model.scale.setScalar(1.4);
+          model.traverse((child) => {
+            if ((child as THREE.Mesh).isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+            }
           });
-          const postMesh = new THREE.Mesh(postGeo, postMat);
-          postMesh.position.set(0.1, 0.9, side * 1.5);
-          postMesh.castShadow = true;
-          tunnelGroup.add(postMesh);
-        }
+          this.featureMeshes.push(model);
 
-        // --- 6. Side wall pillars for structure ---
-        for (const side of [-1, 1]) {
-          const pillarGeo = new THREE.BoxGeometry(0.35, 2.0, 0.35);
-          const pillarMat = new THREE.MeshStandardMaterial({
-            color: '#5e5248',
-            roughness: 0.85,
-            metalness: 0.1,
+          // Glow ring (gameplay indicator, always procedural)
+          const glowGeo = new THREE.RingGeometry(1.2, 1.7, 24);
+          const glowMat = new THREE.MeshBasicMaterial({
+            color: glowColor,
+            transparent: true,
+            opacity: 0.25,
+            side: THREE.DoubleSide,
           });
-          const pillarMesh = new THREE.Mesh(pillarGeo, pillarMat);
-          pillarMesh.position.set(0, 1.0, side * 1.15);
-          pillarMesh.castShadow = true;
-          tunnelGroup.add(pillarMesh);
-        }
+          const glowMesh = new THREE.Mesh(glowGeo, glowMat);
+          glowMesh.rotation.x = -Math.PI / 2;
+          glowMesh.position.set(point.x, tunnelY + 0.08, point.z);
+          this.featureMeshes.push(glowMesh);
 
-        this.featureMeshes.push(tunnelGroup);
+          this.mesh.parent?.add(model);
+          this.mesh.parent?.add(glowMesh);
+        }, undefined, () => {
+          // Fallback: procedural tunnel if GLB fails to load
+          this.buildProceduralTunnel(point, tunnelY, facingAngle, lanternColor, glowColor);
+        });
       }
     }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Procedural fallbacks (used when GLB models are not available)
+  // ---------------------------------------------------------------------------
+
+  private buildProceduralBridge(bridge: BridgeSpawn, yPos: number): void {
+    const bridgeGeo = new THREE.BoxGeometry(bridge.width, 0.3, bridge.length);
+    const bridgeMat = new THREE.MeshStandardMaterial({
+      color: '#8a7a6a',
+      roughness: 0.9,
+      metalness: 0.1,
+    });
+    const bridgeMesh = new THREE.Mesh(bridgeGeo, bridgeMat);
+    bridgeMesh.position.set(bridge.x, yPos, bridge.z);
+    bridgeMesh.rotation.y = bridge.rotation;
+    bridgeMesh.castShadow = true;
+    bridgeMesh.receiveShadow = true;
+    this.featureMeshes.push(bridgeMesh);
+    this.mesh.parent?.add(bridgeMesh);
+
+    for (const side of [-1, 1]) {
+      const railGeo = new THREE.BoxGeometry(0.2, 0.6, bridge.length);
+      const railMat = new THREE.MeshStandardMaterial({
+        color: '#6a5a4a',
+        roughness: 0.85,
+        metalness: 0.05,
+      });
+      const railMesh = new THREE.Mesh(railGeo, railMat);
+      const offsetX = Math.cos(bridge.rotation) * side * (bridge.width / 2 - 0.15);
+      const offsetZ = Math.sin(bridge.rotation) * side * (bridge.width / 2 - 0.15);
+      railMesh.position.set(
+        bridge.x + offsetX,
+        yPos + 0.4,
+        bridge.z + offsetZ,
+      );
+      railMesh.rotation.y = bridge.rotation;
+      railMesh.castShadow = true;
+      this.featureMeshes.push(railMesh);
+      this.mesh.parent?.add(railMesh);
+    }
+  }
+
+  private buildProceduralTunnel(
+    point: PathPoint, tunnelY: number, facingAngle: number,
+    lanternColor: string, glowColor: string,
+  ): void {
+    const tunnelGroup = new THREE.Group();
+    tunnelGroup.position.set(point.x, tunnelY, point.z);
+    tunnelGroup.rotation.y = facingAngle;
+
+    const archGeo = new THREE.TorusGeometry(1.4, 0.25, 8, 16, Math.PI);
+    const archMat = new THREE.MeshStandardMaterial({ color: '#6a5a4a', roughness: 0.85, metalness: 0.1 });
+    const archMesh = new THREE.Mesh(archGeo, archMat);
+    archMesh.rotation.z = Math.PI;
+    archMesh.position.set(0, 1.4, 0);
+    archMesh.castShadow = true;
+    tunnelGroup.add(archMesh);
+
+    const stoneColors = ['#6a5a4a', '#7a6a5a', '#5e5248', '#74644e'];
+    for (let i = 0; i < 9; i++) {
+      const t = (i / 8) * Math.PI;
+      const stoneGeo = new THREE.BoxGeometry(0.35 + Math.random() * 0.15, 0.3 + Math.random() * 0.1, 0.4 + Math.random() * 0.1);
+      const stoneMat = new THREE.MeshStandardMaterial({ color: stoneColors[i % 4], roughness: 0.9, metalness: 0.05 });
+      const stoneMesh = new THREE.Mesh(stoneGeo, stoneMat);
+      stoneMesh.position.set(Math.cos(t) * 1.4, Math.sin(t) * 1.4, 0);
+      stoneMesh.rotation.z = t - Math.PI / 2;
+      stoneMesh.castShadow = true;
+      tunnelGroup.add(stoneMesh);
+    }
+
+    const openingGeo = new THREE.CircleGeometry(1.1, 20);
+    const openingMat = new THREE.MeshStandardMaterial({ color: '#0e0e0e', roughness: 1.0, side: THREE.DoubleSide });
+    const openingMesh = new THREE.Mesh(openingGeo, openingMat);
+    openingMesh.rotation.y = Math.PI / 2;
+    openingMesh.position.set(-0.15, 0.9, 0);
+    tunnelGroup.add(openingMesh);
+
+    const innerGeo = new THREE.CircleGeometry(0.7, 16);
+    const innerMat = new THREE.MeshStandardMaterial({ color: '#050505', roughness: 1.0, side: THREE.DoubleSide });
+    const innerMesh = new THREE.Mesh(innerGeo, innerMat);
+    innerMesh.rotation.y = Math.PI / 2;
+    innerMesh.position.set(-0.25, 0.85, 0);
+    tunnelGroup.add(innerMesh);
+
+    const groundRingGeo = new THREE.RingGeometry(1.6, 2.2, 24);
+    const groundRingMat = new THREE.MeshStandardMaterial({ color: '#8a7a6a', roughness: 0.9, side: THREE.DoubleSide });
+    const groundRingMesh = new THREE.Mesh(groundRingGeo, groundRingMat);
+    groundRingMesh.rotation.x = -Math.PI / 2;
+    groundRingMesh.position.set(0, 0.06, 0);
+    groundRingMesh.receiveShadow = true;
+    tunnelGroup.add(groundRingMesh);
+
+    const glowGeo = new THREE.RingGeometry(1.2, 1.7, 24);
+    const glowMat = new THREE.MeshBasicMaterial({ color: glowColor, transparent: true, opacity: 0.25, side: THREE.DoubleSide });
+    const glowMesh = new THREE.Mesh(glowGeo, glowMat);
+    glowMesh.rotation.x = -Math.PI / 2;
+    glowMesh.position.set(0, 0.08, 0);
+    tunnelGroup.add(glowMesh);
+
+    for (const side of [-1, 1]) {
+      const lanternGeo = new THREE.SphereGeometry(0.15, 8, 8);
+      const lanternMat = new THREE.MeshStandardMaterial({ color: lanternColor, emissive: lanternColor, emissiveIntensity: 0.8, roughness: 0.3 });
+      const lanternMesh = new THREE.Mesh(lanternGeo, lanternMat);
+      lanternMesh.position.set(0.1, 1.8, side * 1.5);
+      tunnelGroup.add(lanternMesh);
+
+      const postGeo = new THREE.CylinderGeometry(0.06, 0.06, 1.6, 6);
+      const postMat = new THREE.MeshStandardMaterial({ color: '#4a3a2a', roughness: 0.9 });
+      const postMesh = new THREE.Mesh(postGeo, postMat);
+      postMesh.position.set(0.1, 0.9, side * 1.5);
+      tunnelGroup.add(postMesh);
+
+      const pillarGeo = new THREE.BoxGeometry(0.35, 2.0, 0.35);
+      const pillarMat = new THREE.MeshStandardMaterial({ color: '#5e5248', roughness: 0.85 });
+      const pillarMesh = new THREE.Mesh(pillarGeo, pillarMat);
+      pillarMesh.position.set(0, 1.0, side * 1.15);
+      tunnelGroup.add(pillarMesh);
+    }
+
+    this.featureMeshes.push(tunnelGroup);
+    this.mesh.parent?.add(tunnelGroup);
   }
 
   private createGridOverlay(): THREE.LineSegments {
