@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.37.0] - 2026-04-15
+
+### Fixed
+- **[S1] destroy-building global counter** — Objectives now filter by targetFactionId + targetBuildingType. 7 missies (incl. 4 finales) waren instant winbaar door 1 building te vernietigen — gefixed
+- **[S2] Military count** — Heavy, Support en Siege units tellen nu mee voor train-units objectives en army-count triggers
+- **[S3] Wave defeat tracking** — Waves worden nu per-entity getrackt i.p.v. globale AI count. Missies met pre-placed enemies + waves werken nu correct
+- **[S4] AI state leak** — AISystem.reset() toegevoegd aan cleanup, voorkomt stale AI behavior na game switch
+- **[S5] Terrain dynamic mapSize** — Terrain accepteert nu dynamische map grootte (80-192), niet meer hardcoded 128x128
+- **[S7] Inverted bonus logic** — Mission 11 "low losses" bonus gebruikt nu comparator '<' (train minder dan 20 = succes)
+- **[H1] Victory messages** — 6 missies (incl. 4 campaign finales) hebben nu narratieve victory messages i.p.v. stille auto-victory
+- **[H2] Premature victory triggers** — M9 en M10 victory triggers geconverteerd naar message-only, auto-victory handelt de echte win af
+- **[H3] build-building defaults** — B2 (TertiaryResourceBuilding), B3 (FactionSpecial1), R4 (Barracks) hebben nu correcte targetBuildingType
+- **[H4] R1 train-workers** — Objective description gecorrigeerd naar "militaire eenheden"
+- **[H5] Defeat priority** — Trigger-based victory checkt nu TownHall status voordat victory fires. Post-victory triggers worden onderdrukt
+- **[H6] Fallback river collision** — NavMesh fallback movement checkt nu isRiver() met slide-along-edge physics
+- **[H7] M10 saboteurs** — Verplaatst naar wave 2 units array zodat ze correct getrackt worden
+- **[H8] M7 survive-raids** — Nu required objective (was bonus), voorkomt instant-win via gold gathering
+- **[H9] Bridge carving** — Oriented rectangle check i.p.v. circulaire check, respecteert bridge length + rotation
+- **[H10] Resource river validation** — Gold mines en trees worden nu gevalideerd tegen river paths, met nudge-away fallback
+- **Grace period** — Defeat grace period 10s→3s, voorkomt soft-lock in commando missies
+- **Test updates** — Mock callbacks uitgebreid, grace period tests aangepast
+
 ## [0.36.0] - 2026-04-15
 
 ### Changed

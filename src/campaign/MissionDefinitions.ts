@@ -32,7 +32,7 @@ export interface MissionBuildingSpawn {
   readonly complete: boolean;
 }
 
-export type ObjectiveType = 'gather-gold' | 'destroy-building' | 'survive-waves' | 'train-units' | 'build-building' | 'no-worker-loss' | 'no-townhall-loss' | 'have-units-at-end';
+export type ObjectiveType = 'gather-gold' | 'destroy-building' | 'survive-waves' | 'train-units' | 'train-workers' | 'build-building' | 'no-worker-loss' | 'no-townhall-loss' | 'have-units-at-end';
 
 export interface MissionObjective {
   readonly id: string;
@@ -44,6 +44,10 @@ export interface MissionObjective {
   readonly targetBuildingType?: BuildingTypeId;
   /** For 'build-building' objectives: how many of this building the player needs. Defaults to 1. */
   readonly targetBuildingCount?: number;
+  /** For 'destroy-building' objectives: filter by faction (disambiguate multi-faction destroy). */
+  readonly targetFactionId?: FactionId;
+  /** For 'train-units' objectives: '<' means below target is success, '>=' means at-or-above (default). */
+  readonly comparator?: '<' | '>=';
 }
 
 export type TriggerCondition =
@@ -1044,7 +1048,7 @@ const MISSION_7_MARKT: MissionDefinition = {
 
   objectives: [
     { id: 'gather-500', type: 'gather-gold', description: 'Verzamel 500 goud voor de markteconomie', targetValue: 500, isBonus: false },
-    { id: 'survive-raids', type: 'survive-waves', description: 'Overleef alle 3 Randstad-raids', targetValue: 3, isBonus: true },
+    { id: 'survive-raids', type: 'survive-waves', description: 'Overleef alle 3 Randstad-raids', targetValue: 3, isBonus: false },
     { id: 'no-building-loss', type: 'no-townhall-loss', description: 'Verlies geen enkel gebouw', targetValue: 0, isBonus: true },
     { id: 'have-10-units', type: 'have-units-at-end', description: 'Heb 10+ eenheden aan het einde', targetValue: 10, isBonus: true },
   ],
@@ -1542,7 +1546,6 @@ const MISSION_9_RAAD: MissionDefinition = {
       condition: { type: 'building-destroyed', factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall },
       actions: [
         { type: 'message', text: 'BEIDE BASISSEN VERNIETIGD! De CEO vlucht in een Uber! "Ik ga naar een coworking space in Bali!" Brabant is gered! De Prins en de Boer omhelzen elkaar. Vandaag is een dag die nooit vergeten wordt.' },
-        { type: 'victory' },
       ],
       once: true,
     },
@@ -1735,22 +1738,7 @@ const MISSION_10_RAAD: MissionDefinition = {
       ],
       once: true,
     },
-    // Hidden saboteurs at wave 2
-    {
-      id: 'hidden-saboteurs',
-      condition: { type: 'time', seconds: 725 },
-      actions: [
-        { type: 'message', text: 'VERRAAD! Verborgen saboteurs op het marktplein worden vijandig!' },
-        {
-          type: 'spawn-units',
-          units: [
-            { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -3, z: 3 },
-            { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 3, z: 3 },
-          ],
-        },
-      ],
-      once: true,
-    },
+    // Hidden saboteurs moved into wave 2 unit list so they are tracked as wave entities
     // Sabotage Wave 3 (minute 20 = 1200s) — De Politicus + full assault
     {
       id: 'wave-3-warning',
@@ -1793,16 +1781,15 @@ const MISSION_10_RAAD: MissionDefinition = {
       }],
       once: true,
     },
-    // Victory: all objectives met (gold + waves + army)
+    // Victory: all objectives met (gold + waves + army) — let auto-victory handle actual victory
     {
       id: 'victory-alliance',
       condition: { type: 'gold-reached', amount: 800 },
       actions: [
         {
           type: 'message',
-          text: 'De oorlogskas is gevuld! De alliantie is gesmeed in vuur en vertrouwen. En de Randstad... de Randstad had geen idee wat er op hen af kwam.',
+          text: 'De oorlogskas vult zich! De alliantie is gesmeed in vuur en vertrouwen. En de Randstad... de Randstad had geen idee wat er op hen af kwam.',
         },
-        { type: 'victory' },
       ],
       once: true,
     },
@@ -1819,7 +1806,7 @@ const MISSION_10_RAAD: MissionDefinition = {
       ],
       message: 'Sabotage Golf 1 van 3',
     },
-    // Sabotage Wave 2 (T=720s): 3 Ranged (Influencers) + 8 Infantry (Managers) + 2 Infantry (Consultants) from all directions
+    // Sabotage Wave 2 (T=720s): 3 Ranged (Influencers) + 8 Infantry (Managers) + 2 Infantry (Consultants) + 2 Saboteurs from all directions
     {
       index: 1,
       spawnTime: 720,
@@ -1828,8 +1815,11 @@ const MISSION_10_RAAD: MissionDefinition = {
         ...createWaveUnits(4, UnitTypeId.Infantry, M10_SABOTAGE_WEST_X + 20, M10_SABOTAGE_WEST_Z, 4),
         ...createWaveUnits(4, UnitTypeId.Infantry, M10_SABOTAGE_EAST_X - 20, M10_SABOTAGE_EAST_Z, 4),
         ...createWaveUnits(2, UnitTypeId.Ranged, M10_SABOTAGE_EAST_X, M10_SABOTAGE_EAST_Z, 2),
+        // Hidden saboteurs (previously a separate T=725s trigger — now tracked as wave entities)
+        { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -3, z: 3 },
+        { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 3, z: 3 },
       ],
-      message: 'Sabotage Golf 2 van 3',
+      message: 'Sabotage Golf 2 van 3 — VERRAAD! Verborgen saboteurs op het marktplein!',
     },
     // Sabotage Wave 3 (T=1200s): De Politicus + 12 Infantry + 4 Ranged + 2 Infantry (Vastgoedmakelaars)
     {
@@ -1996,7 +1986,7 @@ const MISSION_11_A2: MissionDefinition = {
     { id: 'destroy-veldkwartier', type: 'destroy-building', description: 'Vernietig het Randstad Veldkwartier', targetValue: 1, isBonus: false },
     { id: 'no-th-loss', type: 'no-townhall-loss', description: 'Alle 3 forten moeten overleven', targetValue: 0, isBonus: false },
     { id: 'forts-healthy', type: 'have-units-at-end', description: 'Alle forten boven 50% HP (heb 40+ eenheden over)', targetValue: 40, isBonus: true },
-    { id: 'low-losses', type: 'train-units', description: 'Train minder dan 20 vervangende eenheden (meester strateeg)', targetValue: 20, isBonus: true },
+    { id: 'low-losses', type: 'train-units', description: 'Train minder dan 20 vervangende eenheden', targetValue: 20, isBonus: true, comparator: '<' },
   ],
 
   triggers: [
@@ -2977,7 +2967,7 @@ const MISSION_B2_CHOCOLADE_VERDRAG: MissionDefinition = {
   ],
 
   objectives: [
-    { id: 'b2-build-chocolaterie', type: 'build-building', description: 'Bouw een Chocolaterie (Tertiaire Resource Gebouw)', targetValue: 1, isBonus: false },
+    { id: 'b2-build-chocolaterie', type: 'build-building', description: 'Bouw een Chocolaterie (Tertiaire Resource Gebouw)', targetValue: 1, isBonus: false, targetBuildingType: BuildingTypeId.TertiaryResourceBuilding },
     { id: 'b2-gather-800', type: 'gather-gold', description: 'Verzamel 800 Frieten voor het Chocolade Verdrag', targetValue: 800, isBonus: false },
     { id: 'b2-destroy-enemy-th', type: 'destroy-building', description: 'Vernietig het Randstad Hoofdkantoor (als het verdrag mislukt)', targetValue: 1, isBonus: false },
     { id: 'b2-train-10', type: 'train-units', description: 'Train 10 militaire eenheden', targetValue: 10, isBonus: true },
@@ -3179,7 +3169,7 @@ const MISSION_B3_COMMISSIEVERGADERING: MissionDefinition = {
   ],
 
   objectives: [
-    { id: 'b3-build-special', type: 'build-building', description: 'Richt een Commissie op (Factie Speciaal Gebouw)', targetValue: 1, isBonus: false },
+    { id: 'b3-build-special', type: 'build-building', description: 'Richt een Commissie op (Factie Speciaal Gebouw)', targetValue: 1, isBonus: false, targetBuildingType: BuildingTypeId.FactionSpecial1 },
     { id: 'b3-destroy-enemy-th', type: 'destroy-building', description: 'Vernietig de Brabanders Boerderij', targetValue: 1, isBonus: false },
     { id: 'b3-train-15', type: 'train-units', description: 'Train 15 militaire eenheden', targetValue: 15, isBonus: false },
     { id: 'b3-no-worker-loss', type: 'no-worker-loss', description: 'Verlies geen Frietkraamhouders (Bonus: "Frieten voor Iedereen")', targetValue: 0, isBonus: true },
@@ -3480,6 +3470,12 @@ const LIMBURGERS_MISSION_1_EERSTE_SCHACHT: MissionDefinition = {
       actions: [
         { type: 'message', text: 'Genoeg Vlaai verzameld! Bouw nu een Heuvelfort en train Schutterij-soldaten om je missie te voltooien.' },
       ],
+      once: true,
+    },
+    {
+      id: 'l1-victory-msg',
+      condition: { type: 'army-count', count: 3 },
+      actions: [{ type: 'message', text: 'De Mijnbaas: "De eerste schacht draait. De tunnels zijn actief. En we hebben een leger. Limburg is klaar voor wat er ook komt."' }],
       once: true,
     },
   ],
@@ -4325,7 +4321,7 @@ const RANDSTAD_MISSION_1_EERSTE_VERGADERING: MissionDefinition = {
 
   objectives: [
     { id: 'r1-gather-500', type: 'gather-gold', description: 'Verzamel 500 PowerPoints', targetValue: 500, isBonus: false },
-    { id: 'r1-train-3-workers', type: 'train-units', description: 'Rekruteer 3 extra Stagiairs', targetValue: 3, isBonus: false },
+    { id: 'r1-train-3-workers', type: 'train-units', description: 'Rekruteer 3 militaire eenheden', targetValue: 3, isBonus: false },
     { id: 'r1-no-worker-loss', type: 'no-worker-loss', description: 'Verlies geen Stagiairs (nul ontslagen)', targetValue: 0, isBonus: true },
   ],
 
@@ -4569,8 +4565,7 @@ const RANDSTAD_MISSION_3_VIJANDIGE_OVERNAME: MissionDefinition = {
   ],
 
   objectives: [
-    { id: 'r3-destroy-mine1', type: 'destroy-building', description: 'Vernietig het Limburgse Hoofdkwartier (Noord)', targetValue: 1, isBonus: false },
-    { id: 'r3-destroy-mine2', type: 'destroy-building', description: 'Vernietig het Limburgse Hoofdkwartier (Oost)', targetValue: 1, isBonus: false },
+    { id: 'r3-destroy-mines', type: 'destroy-building', description: 'Vernietig beide Limburgse mijnschachten', targetValue: 2, isBonus: false, targetFactionId: FactionId.Limburgers, targetBuildingType: BuildingTypeId.TownHall },
     { id: 'r3-gather-1000', type: 'gather-gold', description: 'Verzamel 1000 PowerPoints (marktwaarde aantonen)', targetValue: 1000, isBonus: true },
     { id: 'r3-no-th-loss', type: 'no-townhall-loss', description: 'Verlies je Hoofdkantoor niet', targetValue: 0, isBonus: true },
   ],
@@ -4621,6 +4616,12 @@ const RANDSTAD_MISSION_3_VIJANDIGE_OVERNAME: MissionDefinition = {
           ],
         },
       ],
+      once: true,
+    },
+    {
+      id: 'r3-victory-msg',
+      condition: { type: 'building-destroyed', factionId: FactionId.Limburgers, buildingType: BuildingTypeId.TownHall },
+      actions: [{ type: 'message', text: 'Vijandige overname geslaagd! De Limburgse mijnbouw-operaties zijn nu eigendom van Randstad Corporation. De Board applaudisseert.' }],
       once: true,
     },
   ],
@@ -4698,7 +4699,7 @@ const RANDSTAD_MISSION_4_GENTRIFICATIE: MissionDefinition = {
 
   objectives: [
     { id: 'r4-survive-waves', type: 'survive-waves', description: 'Overleef 4 golven Belgische tegenaanvallen', targetValue: 4, isBonus: false },
-    { id: 'r4-build-3-buildings', type: 'build-building', description: 'Bouw minimaal 3 extra gebouwen (gentrificatie)', targetValue: 3, isBonus: false },
+    { id: 'r4-build-3-buildings', type: 'build-building', description: 'Bouw 3 Vergaderzalen (gentrificatie)', targetValue: 3, isBonus: false, targetBuildingType: BuildingTypeId.Barracks, targetBuildingCount: 3 },
     { id: 'r4-gather-1500', type: 'gather-gold', description: 'Verzamel 1500 PowerPoints (ROI aantonen)', targetValue: 1500, isBonus: true },
     { id: 'r4-no-th-loss', type: 'no-townhall-loss', description: 'Verlies je Hoofdkantoor niet', targetValue: 0, isBonus: true },
   ],
@@ -4944,9 +4945,9 @@ const RANDSTAD_MISSION_5_BOARDROOM_BESLISSING: MissionDefinition = {
   ],
 
   objectives: [
-    { id: 'r5-destroy-brab', type: 'destroy-building', description: 'Vernietig het Brabantse Hoofdkwartier (zuidoost)', targetValue: 1, isBonus: false },
-    { id: 'r5-destroy-limb', type: 'destroy-building', description: 'Vernietig het Limburgse Hoofdkwartier (noordoost)', targetValue: 1, isBonus: false },
-    { id: 'r5-destroy-belg', type: 'destroy-building', description: 'Vernietig het Belgische Hoofdkwartier (noordwest)', targetValue: 1, isBonus: false },
+    { id: 'r5-destroy-brab', type: 'destroy-building', description: 'Vernietig het Brabantse Hoofdkwartier (zuidoost)', targetValue: 1, isBonus: false, targetFactionId: FactionId.Brabanders, targetBuildingType: BuildingTypeId.TownHall },
+    { id: 'r5-destroy-limb', type: 'destroy-building', description: 'Vernietig het Limburgse Hoofdkwartier (noordoost)', targetValue: 1, isBonus: false, targetFactionId: FactionId.Limburgers, targetBuildingType: BuildingTypeId.TownHall },
+    { id: 'r5-destroy-belg', type: 'destroy-building', description: 'Vernietig het Belgische Hoofdkwartier (noordwest)', targetValue: 1, isBonus: false, targetFactionId: FactionId.Belgen, targetBuildingType: BuildingTypeId.TownHall },
     { id: 'r5-have-30-units', type: 'have-units-at-end', description: 'Heb 30+ eenheden aan het einde (marktdominantie)', targetValue: 30, isBonus: true },
     { id: 'r5-no-th-loss', type: 'no-townhall-loss', description: 'Verlies je Hoofdkantoor niet', targetValue: 0, isBonus: true },
   ],
@@ -5040,6 +5041,12 @@ const RANDSTAD_MISSION_5_BOARDROOM_BESLISSING: MissionDefinition = {
           ],
         },
       ],
+      once: true,
+    },
+    {
+      id: 'r5-victory-msg',
+      condition: { type: 'building-destroyed', factionId: FactionId.Belgen, buildingType: BuildingTypeId.TownHall },
+      actions: [{ type: 'message', text: 'De boardroom is van jou! Alle drie de concurrenten zijn uitgeschakeld. De CEO: "Noem het een feestje. Noem het een fusie. Noem het hoe je wilt."' }],
       once: true,
     },
   ],
@@ -5140,8 +5147,7 @@ const LIMBURGERS_MISSION_6_TUNNELOORLOG: MissionDefinition = {
   ],
 
   objectives: [
-    { id: 'l6-destroy-post1', type: 'destroy-building', description: 'Vernietig commandopost 1 (noordoost)', targetValue: 1, isBonus: false },
-    { id: 'l6-destroy-post2', type: 'destroy-building', description: 'Vernietig commandopost 2 (oost)', targetValue: 1, isBonus: false },
+    { id: 'l6-destroy-posts', type: 'destroy-building', description: 'Vernietig beide commandoposten', targetValue: 2, isBonus: false, targetFactionId: FactionId.Randstad, targetBuildingType: BuildingTypeId.Barracks },
     { id: 'l6-no-th-loss', type: 'no-townhall-loss', description: 'Verlies je Grottentempel niet', targetValue: 0, isBonus: true },
     { id: 'l6-have-15-units', type: 'have-units-at-end', description: 'Heb 15+ eenheden aan het einde', targetValue: 15, isBonus: true },
   ],
@@ -5651,8 +5657,8 @@ const LIMBURGERS_MISSION_8_KONINGIN_VAN_DE_MIJN: MissionDefinition = {
   ],
 
   objectives: [
-    { id: 'l8-destroy-brab-th', type: 'destroy-building', description: 'Vernietig de Brabanders Boerderij (west)', targetValue: 1, isBonus: false },
-    { id: 'l8-destroy-rand-th', type: 'destroy-building', description: 'Vernietig het Randstad Hoofdkantoor (oost)', targetValue: 1, isBonus: false },
+    { id: 'l8-destroy-brab-th', type: 'destroy-building', description: 'Vernietig de Brabanders Boerderij (west)', targetValue: 1, isBonus: false, targetFactionId: FactionId.Brabanders, targetBuildingType: BuildingTypeId.TownHall },
+    { id: 'l8-destroy-rand-th', type: 'destroy-building', description: 'Vernietig het Randstad Hoofdkantoor (oost)', targetValue: 1, isBonus: false, targetFactionId: FactionId.Randstad, targetBuildingType: BuildingTypeId.TownHall },
     { id: 'l8-no-th-loss', type: 'no-townhall-loss', description: 'Verlies je Grottentempel niet', targetValue: 0, isBonus: true },
     { id: 'l8-have-35-units', type: 'have-units-at-end', description: 'Heb 35+ eenheden aan het einde (mijnimperium)', targetValue: 35, isBonus: true },
   ],
@@ -5746,6 +5752,12 @@ const LIMBURGERS_MISSION_8_KONINGIN_VAN_DE_MIJN: MissionDefinition = {
           ],
         },
       ],
+      once: true,
+    },
+    {
+      id: 'l8-victory-msg',
+      condition: { type: 'building-destroyed', factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall },
+      actions: [{ type: 'message', text: 'Limburg is bevrijd! De Mijnbaas heft zijn houweel: "Van de grotten tot de heuvels — dit land is van ONS."' }],
       once: true,
     },
   ],
@@ -6671,8 +6683,8 @@ const MISSION_B8_HET_LAATSTE_BIER: MissionDefinition = {
   ],
 
   objectives: [
-    { id: 'b8-destroy-rand-th', type: 'destroy-building', description: 'Vernietig het Randstad Hoofdkantoor (noord)', targetValue: 1, isBonus: false },
-    { id: 'b8-destroy-brab-th', type: 'destroy-building', description: 'Vernietig de Brabanders Boerderij (oost)', targetValue: 1, isBonus: false },
+    { id: 'b8-destroy-rand-th', type: 'destroy-building', description: 'Vernietig het Randstad Hoofdkantoor (noord)', targetValue: 1, isBonus: false, targetFactionId: FactionId.Randstad, targetBuildingType: BuildingTypeId.TownHall },
+    { id: 'b8-destroy-brab-th', type: 'destroy-building', description: 'Vernietig de Brabanders Boerderij (oost)', targetValue: 1, isBonus: false, targetFactionId: FactionId.Brabanders, targetBuildingType: BuildingTypeId.TownHall },
     { id: 'b8-no-th-loss', type: 'no-townhall-loss', description: 'Verlies het Belgisch Raadhuis niet', targetValue: 0, isBonus: true },
     { id: 'b8-have-35-units', type: 'have-units-at-end', description: 'Heb 35+ eenheden aan het einde (Belgisch imperium)', targetValue: 35, isBonus: true },
   ],
@@ -6765,6 +6777,12 @@ const MISSION_B8_HET_LAATSTE_BIER: MissionDefinition = {
           ],
         },
       ],
+      once: true,
+    },
+    {
+      id: 'b8-victory-msg',
+      condition: { type: 'building-destroyed', factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall },
+      actions: [{ type: 'message', text: 'Het laatste bier is getapt — Belgie is vrij! De Frietkoning heft zijn pintje: "SANTE! Dit bier smaakt naar overwinning."' }],
       once: true,
     },
   ],
@@ -7014,8 +7032,8 @@ const RANDSTAD_MISSION_7_REORGANISATIE: MissionDefinition = {
   ],
 
   objectives: [
-    { id: 'r7-destroy-th', type: 'destroy-building', description: 'Vernietig de Brabantse Boerderij', targetValue: 1, isBonus: false },
-    { id: 'r7-destroy-barracks', type: 'destroy-building', description: 'Vernietig beide Brabantse Kazernes', targetValue: 2, isBonus: false },
+    { id: 'r7-destroy-th', type: 'destroy-building', description: 'Vernietig de Brabantse Boerderij', targetValue: 1, isBonus: false, targetFactionId: FactionId.Brabanders, targetBuildingType: BuildingTypeId.TownHall },
+    { id: 'r7-destroy-barracks', type: 'destroy-building', description: 'Vernietig beide Brabantse Kazernes', targetValue: 2, isBonus: false, targetFactionId: FactionId.Brabanders, targetBuildingType: BuildingTypeId.Barracks },
     { id: 'r7-keep-4-alive', type: 'have-units-at-end', description: 'Houd minstens 4 eenheden in leven', targetValue: 4, isBonus: true },
   ],
 
@@ -7199,9 +7217,9 @@ const RANDSTAD_MISSION_8_IPO_DAY: MissionDefinition = {
   ],
 
   objectives: [
-    { id: 'r8-destroy-brab', type: 'destroy-building', description: 'Vernietig de Brabantse Boerderij (zuidwest)', targetValue: 1, isBonus: false },
-    { id: 'r8-destroy-limb', type: 'destroy-building', description: 'Vernietig de Limburgse Grottentempel (noordwest)', targetValue: 1, isBonus: false },
-    { id: 'r8-destroy-belg', type: 'destroy-building', description: 'Vernietig het Belgisch Raadhuis (noordoost)', targetValue: 1, isBonus: false },
+    { id: 'r8-destroy-brab', type: 'destroy-building', description: 'Vernietig de Brabantse Boerderij (zuidwest)', targetValue: 1, isBonus: false, targetFactionId: FactionId.Brabanders, targetBuildingType: BuildingTypeId.TownHall },
+    { id: 'r8-destroy-limb', type: 'destroy-building', description: 'Vernietig de Limburgse Grottentempel (noordwest)', targetValue: 1, isBonus: false, targetFactionId: FactionId.Limburgers, targetBuildingType: BuildingTypeId.TownHall },
+    { id: 'r8-destroy-belg', type: 'destroy-building', description: 'Vernietig het Belgisch Raadhuis (noordoost)', targetValue: 1, isBonus: false, targetFactionId: FactionId.Belgen, targetBuildingType: BuildingTypeId.TownHall },
     { id: 'r8-have-35-units', type: 'have-units-at-end', description: 'Heb 35+ eenheden aan het einde (marktdominantie)', targetValue: 35, isBonus: true },
     { id: 'r8-no-th-loss', type: 'no-townhall-loss', description: 'Verlies je Hoofdkantoor niet', targetValue: 0, isBonus: true },
   ],
@@ -7314,6 +7332,12 @@ const RANDSTAD_MISSION_8_IPO_DAY: MissionDefinition = {
           ],
         },
       ],
+      once: true,
+    },
+    {
+      id: 'r8-victory-msg',
+      condition: { type: 'building-destroyed', factionId: FactionId.Belgen, buildingType: BuildingTypeId.TownHall },
+      actions: [{ type: 'message', text: 'IPO GESLAAGD! Alle concurrenten zijn uitgeschakeld! De CEO luidt de beursbel. Randstad Corporation is nu de enige macht die ertoe doet.' }],
       once: true,
     },
   ],

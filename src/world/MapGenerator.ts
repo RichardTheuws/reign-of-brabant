@@ -465,9 +465,20 @@ function generateRiverValley(
 
   const flattenPositions = spawns.map(sp => ({ x: sp.x, z: sp.z }));
 
+  // Validate resources are not in the river
+  const rvRiverPts = riverPath as Array<{ x: number; z: number }>;
+  const rvValidatedMines: GoldMineSpawn[] = goldMines.map(m => {
+    const pos = nudgeFromRiver(m.x, m.z, getHeight, rvRiverPts);
+    return { ...m, x: pos.x, z: pos.z };
+  });
+  const rvValidatedTrees: TreeResourceSpawn[] = treeResources.map(t => {
+    const pos = nudgeFromRiver(t.x, t.z, getHeight, rvRiverPts);
+    return { ...t, x: pos.x, z: pos.z };
+  });
+
   return {
     size: mapSize, heightScale: 10,
-    spawns, goldMines, buildings, units, decorations, treeResources,
+    spawns, goldMines: rvValidatedMines, buildings, units, decorations, treeResources: rvValidatedTrees,
     terrainFeatures: { biome: 'aquatic', rivers: [{ path: riverPath, width: 12 }], bridges, rockWalls, roads, tunnels: [], flattenPositions },
   };
 }
@@ -632,12 +643,26 @@ function generateClassic(
   const terrainFeatures = generateClassicFeatures(rng, halfMap, spawns);
 
   // -----------------------------------------------------------------------
+  // 6b. Validate resources are not in rivers
+  // -----------------------------------------------------------------------
+
+  const classicRiverPts = terrainFeatures.rivers.flatMap(r => r.path as Array<{ x: number; z: number }>);
+  const validatedGoldMines: GoldMineSpawn[] = goldMines.map(m => {
+    const pos = nudgeFromRiver(m.x, m.z, getHeight, classicRiverPts);
+    return { ...m, x: pos.x, z: pos.z };
+  });
+  const validatedTreeResources: TreeResourceSpawn[] = treeResources.map(t => {
+    const pos = nudgeFromRiver(t.x, t.z, getHeight, classicRiverPts);
+    return { ...t, x: pos.x, z: pos.z };
+  });
+
+  // -----------------------------------------------------------------------
   // 7. Decoration props (trees and rocks)
   // -----------------------------------------------------------------------
 
   const { decorations } = generateDecorations(
     rng, getHeight, halfMap, Math.round(TREE_COUNT * scale * scale), Math.round(ROCK_COUNT * scale * scale),
-    [...spawns, ...goldMines, ...treeResources, ...buildings, ...units],
+    [...spawns, ...validatedGoldMines, ...validatedTreeResources, ...buildings, ...units],
     mapSize,
   );
 
@@ -649,8 +674,8 @@ function generateClassic(
     size: mapSize,
     heightScale: 10,
     spawns,
-    goldMines,
-    treeResources,
+    goldMines: validatedGoldMines,
+    treeResources: validatedTreeResources,
     buildings,
     units,
     decorations,
@@ -1033,12 +1058,26 @@ function generateIslands(
   const terrainFeatures = generateIslandsFeatures(rng, halfMap, spawns);
 
   // -----------------------------------------------------------------------
+  // 6b. Validate resources are not in rivers
+  // -----------------------------------------------------------------------
+
+  const islandsRiverPts = terrainFeatures.rivers.flatMap(r => r.path as Array<{ x: number; z: number }>);
+  const islandsValidatedMines: GoldMineSpawn[] = goldMines.map(m => {
+    const pos = nudgeFromRiver(m.x, m.z, getHeight, islandsRiverPts);
+    return { ...m, x: pos.x, z: pos.z };
+  });
+  const islandsValidatedTrees: TreeResourceSpawn[] = treeResources.map(t => {
+    const pos = nudgeFromRiver(t.x, t.z, getHeight, islandsRiverPts);
+    return { ...t, x: pos.x, z: pos.z };
+  });
+
+  // -----------------------------------------------------------------------
   // 7. Decorations -- fewer trees (open centre), normal rocks
   // -----------------------------------------------------------------------
 
   const { decorations } = generateDecorations(
     rng, getHeight, halfMap, Math.round(TREE_COUNT * 0.6 * scale * scale), Math.round(ROCK_COUNT * scale * scale),
-    [...spawns, ...goldMines, ...treeResources, ...buildings, ...units],
+    [...spawns, ...islandsValidatedMines, ...islandsValidatedTrees, ...buildings, ...units],
     mapSize,
   );
 
@@ -1046,8 +1085,8 @@ function generateIslands(
     size: mapSize,
     heightScale: 10,
     spawns,
-    goldMines,
-    treeResources,
+    goldMines: islandsValidatedMines,
+    treeResources: islandsValidatedTrees,
     buildings,
     units,
     decorations,
@@ -1669,11 +1708,24 @@ function generateArchipelago(
   const tunnels: TunnelSpawn[] = [];
 
   // -----------------------------------------------------------------------
+  // 5b. Validate resources are not in rivers
+  // -----------------------------------------------------------------------
+  const archRiverPts = rivers.flatMap(r => r.path as Array<{ x: number; z: number }>);
+  const archValidatedMines: GoldMineSpawn[] = goldMines.map(m => {
+    const pos = nudgeFromRiver(m.x, m.z, getHeight, archRiverPts);
+    return { ...m, x: pos.x, z: pos.z };
+  });
+  const archValidatedTrees: TreeResourceSpawn[] = treeResources.map(t => {
+    const pos = nudgeFromRiver(t.x, t.z, getHeight, archRiverPts);
+    return { ...t, x: pos.x, z: pos.z };
+  });
+
+  // -----------------------------------------------------------------------
   // 6. Decorations
   // -----------------------------------------------------------------------
   const { decorations } = generateDecorations(
     rng, getHeight, halfMap, Math.round(TREE_COUNT * 0.8 * scale * scale), Math.round(ROCK_COUNT * 0.6 * scale * scale),
-    [...spawns, ...goldMines, ...treeResources, ...buildings, ...units],
+    [...spawns, ...archValidatedMines, ...archValidatedTrees, ...buildings, ...units],
     mapSize,
   );
 
@@ -1686,13 +1738,103 @@ function generateArchipelago(
     size: mapSize,
     heightScale: 10,
     spawns,
-    goldMines,
-    treeResources,
+    goldMines: archValidatedMines,
+    treeResources: archValidatedTrees,
     buildings,
     units,
     decorations,
     terrainFeatures: { biome: 'aquatic', rivers, bridges, rockWalls, roads, tunnels, flattenPositions },
   };
+}
+
+// ---------------------------------------------------------------------------
+// River proximity validation for resource placement
+// ---------------------------------------------------------------------------
+
+/**
+ * Check if a position is valid for resource placement (not in or near a river).
+ * Uses height callback and river path proximity to reject positions that would
+ * end up in water.
+ *
+ * @param x - World X coordinate.
+ * @param z - World Z coordinate.
+ * @param getHeight - Terrain height callback.
+ * @param riverPaths - Array of river path points to check proximity against.
+ * @param minRiverDist - Minimum squared distance from river center (default 36 = 6 units).
+ */
+function isValidResourcePosition(
+  x: number,
+  z: number,
+  getHeight: HeightCallback,
+  riverPaths: Array<{ x: number; z: number }>,
+  minRiverDist: number = 36,
+): boolean {
+  // Check height (water/river areas are low)
+  if (getHeight(x, z) < 0.15) return false;
+
+  // Check proximity to river path points
+  for (const rp of riverPaths) {
+    const dx = x - rp.x;
+    const dz = z - rp.z;
+    if (dx * dx + dz * dz < minRiverDist) return false; // within 6-unit buffer from river center
+  }
+  return true;
+}
+
+/**
+ * Nudge a resource position away from river paths if it fails validation.
+ * Tries up to 8 offset directions (cardinal + diagonal) at increasing distances.
+ * Returns the original position if no valid offset is found.
+ */
+function nudgeFromRiver(
+  x: number,
+  z: number,
+  getHeight: HeightCallback,
+  riverPaths: Array<{ x: number; z: number }>,
+): { x: number; z: number } {
+  if (isValidResourcePosition(x, z, getHeight, riverPaths)) return { x, z };
+
+  // Find closest river point to determine nudge direction
+  let closestDx = 0;
+  let closestDz = 0;
+  let closestDist = Infinity;
+  for (const rp of riverPaths) {
+    const dx = x - rp.x;
+    const dz = z - rp.z;
+    const d = dx * dx + dz * dz;
+    if (d < closestDist) {
+      closestDist = d;
+      closestDx = dx;
+      closestDz = dz;
+    }
+  }
+
+  // Nudge away from the closest river point
+  const len = Math.sqrt(closestDx * closestDx + closestDz * closestDz);
+  if (len > 0.01) {
+    const nx = closestDx / len;
+    const nz = closestDz / len;
+    for (const offset of [8, 10, 12]) {
+      const testX = x + nx * offset;
+      const testZ = z + nz * offset;
+      if (isValidResourcePosition(testX, testZ, getHeight, riverPaths)) {
+        return { x: testX, z: testZ };
+      }
+    }
+  }
+
+  // Fallback: try cardinal/diagonal offsets
+  const offsets = [
+    [8, 0], [-8, 0], [0, 8], [0, -8],
+    [6, 6], [-6, 6], [6, -6], [-6, -6],
+  ];
+  for (const [ox, oz] of offsets) {
+    if (isValidResourcePosition(x + ox, z + oz, getHeight, riverPaths)) {
+      return { x: x + ox, z: z + oz };
+    }
+  }
+
+  return { x, z }; // No valid offset found, return original
 }
 
 // ---------------------------------------------------------------------------

@@ -9,8 +9,8 @@ import type { BiomeType, RiverSpawn, BridgeSpawn, RockWallSpawn, RoadSpawn, Tunn
 const BRIDGE_MODEL_PATH = '/assets/models/v02/shared/bridge.glb';
 const TUNNEL_MODEL_PATH = '/assets/models/v02/shared/tunnel_entrance.glb';
 
-const MAP_SIZE = 128;
-const SEGMENTS = 256;
+const DEFAULT_MAP_SIZE = 128;
+const SEGMENTS_PER_UNIT = 2; // 256 segments for 128 units = 2 per unit
 const MAX_HEIGHT = 4.5;
 const WATER_LEVEL = -1;
 const NOISE_SCALE = 0.012;
@@ -176,7 +176,10 @@ const DEFAULT_FEATURES: TerrainFeatures = {
 export class Terrain {
   readonly mesh: THREE.Mesh;
   readonly waterMesh: THREE.Mesh;
-  readonly mapSize = MAP_SIZE;
+  readonly mapSize: number;
+
+  /** Number of geometry segments (computed from mapSize). */
+  private segments: number;
 
   /** Optional grid overlay, toggled with G key. */
   private gridOverlay: THREE.LineSegments | null = null;
@@ -199,14 +202,16 @@ export class Terrain {
   /** Road mask: true for grid cells on a road. */
   private roadMask: Uint8Array;
 
-  constructor(features?: TerrainFeatures) {
+  constructor(features?: TerrainFeatures, mapSize: number = DEFAULT_MAP_SIZE) {
+    this.mapSize = mapSize;
+    this.segments = Math.round(mapSize * SEGMENTS_PER_UNIT);
     this.features = features ?? DEFAULT_FEATURES;
     activePalette = BIOME_PALETTES[this.features.biome] ?? BIOME_PALETTES.meadow;
 
-    this.geometry = new THREE.PlaneGeometry(MAP_SIZE, MAP_SIZE, SEGMENTS, SEGMENTS);
+    this.geometry = new THREE.PlaneGeometry(this.mapSize, this.mapSize, this.segments, this.segments);
     this.geometry.rotateX(-Math.PI / 2);
 
-    const vertexCount = (SEGMENTS + 1) * (SEGMENTS + 1);
+    const vertexCount = (this.segments + 1) * (this.segments + 1);
     this.heightData = new Float32Array(vertexCount);
     this.detailNoise = new Float32Array(vertexCount);
     this.riverMask = new Uint8Array(vertexCount);
@@ -241,24 +246,24 @@ export class Terrain {
   }
 
   getHeightAt(worldX: number, worldZ: number): number {
-    const halfSize = MAP_SIZE / 2;
+    const halfSize = this.mapSize / 2;
     const localX = worldX + halfSize;
     const localZ = worldZ + halfSize;
 
-    const gridX = (localX / MAP_SIZE) * SEGMENTS;
-    const gridZ = (localZ / MAP_SIZE) * SEGMENTS;
+    const gridX = (localX / this.mapSize) * this.segments;
+    const gridZ = (localZ / this.mapSize) * this.segments;
 
     const ix = Math.floor(gridX);
     const iz = Math.floor(gridZ);
 
-    if (ix < 0 || ix >= SEGMENTS || iz < 0 || iz >= SEGMENTS) {
+    if (ix < 0 || ix >= this.segments || iz < 0 || iz >= this.segments) {
       return 0;
     }
 
     const fx = gridX - ix;
     const fz = gridZ - iz;
 
-    const stride = SEGMENTS + 1;
+    const stride = this.segments + 1;
     const h00 = this.heightData[iz * stride + ix];
     const h10 = this.heightData[iz * stride + ix + 1];
     const h01 = this.heightData[(iz + 1) * stride + ix];
@@ -299,7 +304,7 @@ export class Terrain {
     activePalette = BIOME_PALETTES[features.biome] ?? BIOME_PALETTES.meadow;
 
     // Reset masks
-    const vertexCount = (SEGMENTS + 1) * (SEGMENTS + 1);
+    const vertexCount = (this.segments + 1) * (this.segments + 1);
     this.riverMask = new Uint8Array(vertexCount);
     this.roadMask = new Uint8Array(vertexCount);
 
@@ -338,20 +343,20 @@ export class Terrain {
 
   /** Check if a world position is on a road (for speed bonus). */
   isOnRoad(worldX: number, worldZ: number): boolean {
-    const halfSize = MAP_SIZE / 2;
-    const ix = Math.round(((worldX + halfSize) / MAP_SIZE) * SEGMENTS);
-    const iz = Math.round(((worldZ + halfSize) / MAP_SIZE) * SEGMENTS);
-    if (ix < 0 || ix > SEGMENTS || iz < 0 || iz > SEGMENTS) return false;
-    return this.roadMask[iz * (SEGMENTS + 1) + ix] === 1;
+    const halfSize = this.mapSize / 2;
+    const ix = Math.round(((worldX + halfSize) / this.mapSize) * this.segments);
+    const iz = Math.round(((worldZ + halfSize) / this.mapSize) * this.segments);
+    if (ix < 0 || ix > this.segments || iz < 0 || iz > this.segments) return false;
+    return this.roadMask[iz * (this.segments + 1) + ix] === 1;
   }
 
   /** Check if a world position is in a river (impassable except at bridges). */
   isRiver(worldX: number, worldZ: number): boolean {
-    const halfSize = MAP_SIZE / 2;
-    const ix = Math.round(((worldX + halfSize) / MAP_SIZE) * SEGMENTS);
-    const iz = Math.round(((worldZ + halfSize) / MAP_SIZE) * SEGMENTS);
-    if (ix < 0 || ix > SEGMENTS || iz < 0 || iz > SEGMENTS) return false;
-    return this.riverMask[iz * (SEGMENTS + 1) + ix] === 1;
+    const halfSize = this.mapSize / 2;
+    const ix = Math.round(((worldX + halfSize) / this.mapSize) * this.segments);
+    const iz = Math.round(((worldZ + halfSize) / this.mapSize) * this.segments);
+    if (ix < 0 || ix > this.segments || iz < 0 || iz > this.segments) return false;
+    return this.riverMask[iz * (this.segments + 1) + ix] === 1;
   }
 
   dispose(): void {
@@ -387,14 +392,14 @@ export class Terrain {
     // Third noise for plateau detection
     const plateauNoise2D = createNoise2D();
     const positions = this.geometry.attributes.position;
-    const stride = SEGMENTS + 1;
+    const stride = this.segments + 1;
 
-    for (let iz = 0; iz <= SEGMENTS; iz++) {
-      for (let ix = 0; ix <= SEGMENTS; ix++) {
+    for (let iz = 0; iz <= this.segments; iz++) {
+      for (let ix = 0; ix <= this.segments; ix++) {
         const idx = iz * stride + ix;
 
-        const nx = ix / SEGMENTS;
-        const nz = iz / SEGMENTS;
+        const nx = ix / this.segments;
+        const nz = iz / this.segments;
 
         let amplitude = 1;
         let frequency = 1;
@@ -455,13 +460,13 @@ export class Terrain {
     ];
     const flattenRadiusInner = 8;
     const flattenRadiusOuter = 15;
-    const halfSize = MAP_SIZE / 2;
+    const halfSize = this.mapSize / 2;
 
-    for (let iz = 0; iz <= SEGMENTS; iz++) {
-      for (let ix = 0; ix <= SEGMENTS; ix++) {
+    for (let iz = 0; iz <= this.segments; iz++) {
+      for (let ix = 0; ix <= this.segments; ix++) {
         const idx = iz * stride + ix;
-        const worldX = (ix / SEGMENTS) * MAP_SIZE - halfSize;
-        const worldZ = (iz / SEGMENTS) * MAP_SIZE - halfSize;
+        const worldX = (ix / this.segments) * this.mapSize - halfSize;
+        const worldZ = (iz / this.segments) * this.mapSize - halfSize;
 
         for (const sp of spawnPositions) {
           const dx = worldX - sp.x;
@@ -501,7 +506,7 @@ export class Terrain {
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
     const tmpColor = new THREE.Color();
-    const stride = SEGMENTS + 1;
+    const stride = this.segments + 1;
 
     // Use active biome palette
     const pal = activePalette;
@@ -671,8 +676,8 @@ export class Terrain {
   private carveRivers(): void {
     if (this.features.rivers.length === 0) return;
 
-    const stride = SEGMENTS + 1;
-    const halfSize = MAP_SIZE / 2;
+    const stride = this.segments + 1;
+    const halfSize = this.mapSize / 2;
     const positions = this.geometry.attributes.position;
 
     // Build set of bridge positions for exclusion
@@ -683,19 +688,30 @@ export class Terrain {
       const halfWidth = riverWidth / 2;
 
       // For each vertex, check distance to the river path
-      for (let iz = 0; iz <= SEGMENTS; iz++) {
-        for (let ix = 0; ix <= SEGMENTS; ix++) {
+      for (let iz = 0; iz <= this.segments; iz++) {
+        for (let ix = 0; ix <= this.segments; ix++) {
           const idx = iz * stride + ix;
-          const worldX = (ix / SEGMENTS) * MAP_SIZE - halfSize;
-          const worldZ = (iz / SEGMENTS) * MAP_SIZE - halfSize;
+          const worldX = (ix / this.segments) * this.mapSize - halfSize;
+          const worldZ = (iz / this.segments) * this.mapSize - halfSize;
 
           // Check if this point is under a bridge (skip carving there)
+          // Uses oriented rectangle check accounting for bridge length and rotation
           let underBridge = false;
           for (const bridge of bridges) {
             const bdx = worldX - bridge.x;
             const bdz = worldZ - bridge.z;
-            const bDist = Math.sqrt(bdx * bdx + bdz * bdz);
-            if (bDist < bridge.width * 0.8) {
+
+            // Rotate into bridge-local space
+            const rot = -(bridge.rotation ?? 0);
+            const cos = Math.cos(rot);
+            const sin = Math.sin(rot);
+            const localX = bdx * cos - bdz * sin;
+            const localZ = bdx * sin + bdz * cos;
+
+            // Check if within bridge rectangle (length along local X, width along local Z)
+            const halfLength = (bridge.length ?? bridge.width) * 0.5;
+            const halfBridgeWidth = bridge.width * 0.5;
+            if (Math.abs(localX) < halfLength && Math.abs(localZ) < halfBridgeWidth) {
               underBridge = true;
               break;
             }
@@ -736,19 +752,19 @@ export class Terrain {
   private raiseRockWalls(): void {
     if (this.features.rockWalls.length === 0) return;
 
-    const stride = SEGMENTS + 1;
-    const halfSize = MAP_SIZE / 2;
+    const stride = this.segments + 1;
+    const halfSize = this.mapSize / 2;
     const positions = this.geometry.attributes.position;
 
     for (const wall of this.features.rockWalls) {
       const halfThick = wall.thickness / 2;
       const wallHeight = MAX_HEIGHT * 1.2; // Walls are taller than natural terrain
 
-      for (let iz = 0; iz <= SEGMENTS; iz++) {
-        for (let ix = 0; ix <= SEGMENTS; ix++) {
+      for (let iz = 0; iz <= this.segments; iz++) {
+        for (let ix = 0; ix <= this.segments; ix++) {
           const idx = iz * stride + ix;
-          const worldX = (ix / SEGMENTS) * MAP_SIZE - halfSize;
-          const worldZ = (iz / SEGMENTS) * MAP_SIZE - halfSize;
+          const worldX = (ix / this.segments) * this.mapSize - halfSize;
+          const worldZ = (iz / this.segments) * this.mapSize - halfSize;
 
           const dist = distanceToPath(worldX, worldZ, wall.path);
 
@@ -780,18 +796,18 @@ export class Terrain {
   private markRoads(): void {
     if (this.features.roads.length === 0) return;
 
-    const stride = SEGMENTS + 1;
-    const halfSize = MAP_SIZE / 2;
+    const stride = this.segments + 1;
+    const halfSize = this.mapSize / 2;
     const positions = this.geometry.attributes.position;
 
     for (const road of this.features.roads) {
       const halfWidth = road.width / 2;
 
-      for (let iz = 0; iz <= SEGMENTS; iz++) {
-        for (let ix = 0; ix <= SEGMENTS; ix++) {
+      for (let iz = 0; iz <= this.segments; iz++) {
+        for (let ix = 0; ix <= this.segments; ix++) {
           const idx = iz * stride + ix;
-          const worldX = (ix / SEGMENTS) * MAP_SIZE - halfSize;
-          const worldZ = (iz / SEGMENTS) * MAP_SIZE - halfSize;
+          const worldX = (ix / this.segments) * this.mapSize - halfSize;
+          const worldZ = (iz / this.segments) * this.mapSize - halfSize;
 
           const dist = distanceToPath(worldX, worldZ, road.path);
 
@@ -1010,7 +1026,7 @@ export class Terrain {
 
   private createGridOverlay(): THREE.LineSegments {
     const gridSize = 4; // 4 world units per grid cell (good for building placement)
-    const halfMap = MAP_SIZE / 2;
+    const halfMap = this.mapSize / 2;
     const lines: number[] = [];
 
     // Horizontal lines (along X)
@@ -1162,13 +1178,13 @@ export class Terrain {
         const v = y / size;
 
         // Map to world space for height sampling
-        const worldX = u * MAP_SIZE - MAP_SIZE / 2;
-        const worldZ = v * MAP_SIZE - MAP_SIZE / 2;
+        const worldX = u * this.mapSize - this.mapSize / 2;
+        const worldZ = v * this.mapSize - this.mapSize / 2;
 
         // Sample height at this point for terrain-type-aware normals
-        const gridX = Math.floor(u * SEGMENTS);
-        const gridZ = Math.floor(v * SEGMENTS);
-        const heightIdx = Math.min(gridZ, SEGMENTS) * (SEGMENTS + 1) + Math.min(gridX, SEGMENTS);
+        const gridX = Math.floor(u * this.segments);
+        const gridZ = Math.floor(v * this.segments);
+        const heightIdx = Math.min(gridZ, this.segments) * (this.segments + 1) + Math.min(gridX, this.segments);
         const height = this.heightData[heightIdx] ?? 0;
         const t = Math.min(1, height / MAX_HEIGHT);
         const isRiver = this.riverMask[heightIdx] === 1;
@@ -1263,9 +1279,9 @@ export class Terrain {
         const v = y / size;
 
         // Sample terrain type
-        const gridX = Math.floor(u * SEGMENTS);
-        const gridZ = Math.floor(v * SEGMENTS);
-        const heightIdx = Math.min(gridZ, SEGMENTS) * (SEGMENTS + 1) + Math.min(gridX, SEGMENTS);
+        const gridX = Math.floor(u * this.segments);
+        const gridZ = Math.floor(v * this.segments);
+        const heightIdx = Math.min(gridZ, this.segments) * (this.segments + 1) + Math.min(gridX, this.segments);
         const height = this.heightData[heightIdx] ?? 0;
         const t = Math.min(1, height / MAX_HEIGHT);
         const isRiver = this.riverMask[heightIdx] === 1;
@@ -1311,7 +1327,7 @@ export class Terrain {
   }
 
   private createWaterPlane(): THREE.Mesh {
-    const waterGeo = new THREE.PlaneGeometry(MAP_SIZE * 1.5, MAP_SIZE * 1.5, 80, 80);
+    const waterGeo = new THREE.PlaneGeometry(this.mapSize * 1.5, this.mapSize * 1.5, 80, 80);
     waterGeo.rotateX(-Math.PI / 2);
 
     waterGeometry = waterGeo;
@@ -1330,7 +1346,7 @@ export class Terrain {
     const colors = new Float32Array(waterGeo.attributes.position.count * 3);
     const deepColor = new THREE.Color('#0d4a6a');
     const shallowColor = new THREE.Color('#3a9ab8');
-    const halfSize = MAP_SIZE * 0.75;
+    const halfSize = this.mapSize * 0.75;
     for (let i = 0; i < waterGeo.attributes.position.count; i++) {
       const x = waterGeo.attributes.position.getX(i);
       const z = waterGeo.attributes.position.getZ(i);

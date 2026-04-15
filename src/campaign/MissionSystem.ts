@@ -45,6 +45,10 @@ export interface MissionCallbacks {
   isEnemyBuildingDestroyed: (factionId: FactionId, buildingType: BuildingTypeId) => boolean;
   /** Query: how many enemy buildings of any type have been destroyed? */
   getDestroyedEnemyBuildingCount: () => number;
+  /** Query: how many enemy buildings have been destroyed, filtered by faction and/or building type? */
+  getDestroyedEnemyBuildingCountFiltered: (targetFactionId?: FactionId, targetBuildingType?: BuildingTypeId) => number;
+  /** Query: is a specific entity (by ECS id) still alive? */
+  isEntityAlive: (eid: number) => boolean;
   /** Query: how many player workers are alive? */
   getPlayerWorkerCount: () => number;
   /** Query: is the player Town Hall alive? */
@@ -250,12 +254,15 @@ export class MissionSystem {
           }
           break;
 
-        case 'destroy-building':
-          state.currentValue = this.callbacks.getDestroyedEnemyBuildingCount();
+        case 'destroy-building': {
+          const fid = state.objective.targetFactionId;
+          const bt = state.objective.targetBuildingType;
+          state.currentValue = this.callbacks.getDestroyedEnemyBuildingCountFiltered(fid, bt);
           if (state.currentValue >= state.objective.targetValue) {
             state.completed = true;
           }
           break;
+        }
 
         case 'survive-waves':
           state.currentValue = this.wavesDefeated;
@@ -264,12 +271,20 @@ export class MissionSystem {
           }
           break;
 
-        case 'train-units':
+        case 'train-units': {
           state.currentValue = this.callbacks.getPlayerMilitaryTrained();
-          if (state.currentValue >= state.objective.targetValue) {
-            state.completed = true;
+          const cmp = state.objective.comparator ?? '>=';
+          if (cmp === '<') {
+            // "train fewer than X" — stays completed until threshold is exceeded
+            state.completed = state.currentValue < state.objective.targetValue;
+            state.failed = state.currentValue >= state.objective.targetValue;
+          } else {
+            if (state.currentValue >= state.objective.targetValue) {
+              state.completed = true;
+            }
           }
           break;
+        }
 
         case 'build-building': {
           const targetBt = state.objective.targetBuildingType ?? BuildingTypeId.Barracks;
@@ -310,6 +325,7 @@ export class MissionSystem {
     if (!this.callbacks || !this.mission) return;
 
     for (const trigger of this.mission.triggers) {
+      if (this.victoryTriggered || this.defeatTriggered) break;
       if (trigger.once && this.firedTriggers.has(trigger.id)) continue;
 
       if (this.evaluateCondition(trigger.condition)) {
@@ -379,6 +395,11 @@ export class MissionSystem {
         }
 
         case 'victory':
+          // Defeat takes priority: check if player is already dead before granting victory
+          if (!this.mission?.noPlayerTownHall && !this.callbacks!.isPlayerTownHallAlive()) {
+            console.log('[MissionSystem] Victory trigger blocked: TownHall destroyed');
+            break;
+          }
           this.handleVictory();
           break;
       }
@@ -395,18 +416,14 @@ export class MissionSystem {
     for (const waveState of this.waveStates) {
       if (!waveState.spawned || waveState.defeated) continue;
 
-      // Check if all spawned wave units are dead
-      // We check by querying if AI has any units from this wave alive
-      // Simple approach: if AI total units from this wave = 0
-      const aliveCount = this.callbacks.getAITotalUnits();
-
-      // A wave is defeated when no AI units remain on the map
-      // Since we don't track individual wave entities perfectly in ECS,
-      // we consider a wave defeated when ALL AI units are dead after it spawned
-      if (aliveCount === 0) {
-        waveState.defeated = true;
-        this.wavesDefeated++;
-        console.log(`[MissionSystem] Wave ${waveState.wave.index + 1} defeated! (${this.wavesDefeated}/${this.waveStates.length})`);
+      // Check if ALL spawned wave entities are dead (per-wave tracking)
+      if (waveState.spawnedEntityIds.length > 0) {
+        const allDead = waveState.spawnedEntityIds.every(eid => !this.callbacks!.isEntityAlive(eid));
+        if (allDead) {
+          waveState.defeated = true;
+          this.wavesDefeated++;
+          console.log(`[MissionSystem] Wave ${waveState.wave.index + 1} defeated! (${this.wavesDefeated}/${this.waveStates.length})`);
+        }
       }
     }
   }
@@ -479,7 +496,7 @@ export class MissionSystem {
 
     // All units dead AND no gold to rebuild = defeat
     // Only check after a grace period (10s) so early-game doesn't instantly defeat
-    if (this.elapsed > 10) {
+    if (this.elapsed > 3) {
       const totalUnits = this.callbacks.getPlayerTotalUnits();
       const gold = this.callbacks.getPlayerGold();
       if (totalUnits === 0 && gold < 50) {

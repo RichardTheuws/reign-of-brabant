@@ -99,6 +99,9 @@ interface FallbackAgent {
 
 const fallbackAgents = new Map<number, FallbackAgent>();
 
+/** Optional terrain reference for river checks in fallback mode. */
+let terrainRef: { isRiver: (x: number, z: number) => boolean } | null = null;
+
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -112,6 +115,14 @@ export const NavMeshManager = {
   /** True if running without real pathfinding (recast init failed). */
   get isFallback(): boolean {
     return !recastReady;
+  },
+
+  /**
+   * Provide a terrain reference for river collision checks in fallback mode.
+   * When Recast WASM is unavailable, fallback agents use this to avoid rivers.
+   */
+  setTerrain(terrain: { isRiver: (x: number, z: number) => boolean }): void {
+    terrainRef = terrain;
   },
 
   // -----------------------------------------------------------------------
@@ -351,8 +362,22 @@ export const NavMeshManager = {
         const dx = agent.targetX - agent.x;
         const dz = agent.targetZ - agent.z;
         const step = Math.min(agent.speed * dt, dist);
-        agent.x += (dx / dist) * step;
-        agent.z += (dz / dist) * step;
+        const newX = agent.x + (dx / dist) * step;
+        const newZ = agent.z + (dz / dist) * step;
+
+        // Block movement into rivers (slide along edges if possible)
+        if (terrainRef?.isRiver(newX, newZ)) {
+          // Try sliding along edges: test X-only and Z-only movement
+          if (!terrainRef.isRiver(newX, agent.z)) {
+            agent.x = newX;
+          } else if (!terrainRef.isRiver(agent.x, newZ)) {
+            agent.z = newZ;
+          }
+          // else: blocked on all sides, don't move
+        } else {
+          agent.x = newX;
+          agent.z = newZ;
+        }
       }
     }
   },
@@ -514,6 +539,7 @@ export const NavMeshManager = {
     rcNavMesh = null;
     rcNavMeshQuery = null;
     rcTileCache = null;
+    terrainRef = null;
     recastReady = false;
   },
 

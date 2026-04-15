@@ -54,6 +54,8 @@ function createMockCallbacks(overrides: Partial<MissionCallbacks> = {}): Mission
     getPlayerArmyCount: () => 0,
     isEnemyBuildingDestroyed: () => false,
     getDestroyedEnemyBuildingCount: () => 0,
+    getDestroyedEnemyBuildingCountFiltered: () => 0,
+    isEntityAlive: () => true,
     getPlayerWorkerCount: () => 3,
     isPlayerTownHallAlive: () => true,
     getPlayerTotalUnits: () => 6,
@@ -171,7 +173,7 @@ describe('CampaignManager — Objective Tracking', () => {
         { id: 'obj1', type: 'destroy-building', description: 'Destroy 2 buildings', targetValue: 2, isBonus: false },
       ],
     });
-    const callbacks = createMockCallbacks({ getDestroyedEnemyBuildingCount: () => 2 });
+    const callbacks = createMockCallbacks({ getDestroyedEnemyBuildingCountFiltered: () => 2 });
     ms.start(mission, callbacks, 3);
     ms.update(0.1);
 
@@ -430,7 +432,7 @@ describe('CampaignManager — Defeat Conditions', () => {
     expect(defeatTriggered).toBe(true);
   });
 
-  it('does NOT defeat during grace period (first 10 seconds)', () => {
+  it('does NOT defeat during grace period (first 3 seconds)', () => {
     let defeatTriggered = false;
     const mission = createMinimalMission();
     const callbacks = createMockCallbacks({
@@ -440,8 +442,8 @@ describe('CampaignManager — Defeat Conditions', () => {
     });
 
     ms.start(mission, callbacks, 3);
-    // Only advance 5 seconds
-    for (let i = 0; i < 50; i++) {
+    // Only advance 2 seconds (within 3s grace period)
+    for (let i = 0; i < 20; i++) {
       ms.update(0.1);
     }
     expect(defeatTriggered).toBe(false);
