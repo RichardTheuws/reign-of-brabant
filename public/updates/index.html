@@ -491,13 +491,152 @@
                             <span class="tag tag--gameplay">Balance</span>
                             <span class="tag tag--feat">Skirmish</span>
                         </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">De eerste beta is een feit. Negen sprints, honderden uren werk, en een game die van tech-demo naar een volwaardig speelbare RTS is gegroeid. Dit is waar we naartoe hebben gewerkt.</p>
                         <ul class="update__highlights">
-                            <li><strong>36 campaign missies</strong> -- Alle vier de facties hebben nu een volledige campagne. Limburgers van 5 naar 8 missies (Tunneloorlog, De Grote Sjtoelgang, Koningin van de Mijn), Belgen van 3 naar 8 (Wafeltjeswar, De Friettent, Diplomatiek Incident, Konvooi naar Brussel, Het Laatste Bier), Randstad van 5 naar 8 (Marktmanipulatie, De Reorganisatie, IPO Day)</li>
-                            <li><strong>8 map templates</strong> -- Twee nieuwe slagvelden: Canyon (smalle vallei met choke points en rotswanden) en Archipelago (eilanden verbonden door bruggen, verovering van het centrale eiland is de sleutel)</li>
-                            <li><strong>Variable map sizes</strong> -- Kies uit Klein (80x80) voor snelle potjes, Medium (128x128) als standaard, of Groot (192x192) voor epische veldslagen</li>
-                            <li><strong>Skirmish 2-4 spelers</strong> -- Speel tegen 1 tot 3 AI-tegenstanders. Nieuwe opties: AI moeilijkheidsgraad (Makkelijk/Normaal/Moeilijk), startgoud (200/500/1000), en Fog of War aan/uit</li>
-                            <li><strong>Factie-specifieke unit stats</strong> -- Limburgers (taai, langzaam, zware pantser: Mijnwerker, Schutterij, Vlaaienwerper, Mergelridder) en Belgen (goedkoop, snelle aanvalssnelheid: Frietkraamhouder, Bierbouwer, Chocolatier, Frituurridder) hebben nu hun eigen gebalanceerde stats naast Brabanders en Randstad</li>
-                            <li><strong>618 tests groen</strong> -- Volledige QA-pass: TypeScript clean, alle tests slagen, productie-build succesvol. Alle missies gevalideerd tegen de campaign mission rules</li>
+                            <li><strong>36 campaign missies over 4 facties</strong> -- Elke factie heeft nu een volledige campagne met 8-12 missies. De Limburgers graven zich door vijandelijke linies in "Tunneloorlog", vechten zich door een totale belegering in "De Grote Sjtoelgang" en verdedigen hun mijnrijk op twee fronten in "Koningin van de Mijn". De Belgen beschermen hun wafelfabriek, overleven een verraad van bondgenoten in "Diplomatiek Incident", escorteren een konvooi door vijandelijk gebied naar Brussel, en geven alles in "Het Laatste Bier". De Randstad-campagne eindigt met "IPO Day" — een driehoeksgevecht tegen alle facties tegelijk</li>
+                            <li><strong>8 map templates</strong> -- Twee nieuwe slagvelden: <em>Canyon</em> dwingt legers door een smalle kloof met rotswanden en dodelijke choke points — wie de toegangen controleert, wint. <em>Archipelago</em> verspreidt spelers over eilanden verbonden door bruggen, met een rijke centrale eiland als ultieme prijs</li>
+                            <li><strong>Variable map sizes</strong> -- Klein (80x80) voor een intense 10-minuten skirmish, Medium (128x128) als standaard, of Groot (192x192) voor epische veldslagen met ruimte voor flankaanvallen en verborgen expansies</li>
+                            <li><strong>Skirmish tot 4 spelers</strong> -- Speel nu tegen 1, 2 of 3 AI-tegenstanders. Kies je moeilijkheidsgraad (Makkelijk geeft je 5 minuten rust, Moeilijk laat de AI na 90 seconden al aanvallen), je startgoud (200/500/1000), en schakel Fog of War in of uit</li>
+                            <li><strong>Vier unieke speelstijlen</strong> -- Elke factie heeft nu volledig gebalanceerde, unieke unit stats. Limburgers zijn traag maar gepantserd als tanks (de Mergelridder heeft 250 HP en 4 armor). Belgen zijn goedkoop en snel (de Bierbouwer slaat elke 1.2 seconden). Randstad is duur maar dodelijk (de Manager schiet op afstand). Brabanders zijn de veelzijdige all-rounders</li>
+                            <li><strong>618 tests, alles groen</strong> -- Volledige kwaliteitscontrole: TypeScript foutloos, alle 618 tests slagen, productie-build succesvol. Elke missie gevalideerd op speelbaarheid, victory-paden en AI-configuratie</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.34.0 ─────────────────────────────── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.34.0</span>
+                        <span class="update__date">14 april 2026</span>
+                        <h2 class="update__title">Het Fundament — Tech Tree, Combat, Heroes &amp; 16 Nieuwe 3D Modellen</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Tech Tree</span>
+                            <span class="tag tag--gameplay">Combat</span>
+                            <span class="tag tag--feat">Heroes</span>
+                            <span class="tag tag--feat">3D Assets</span>
+                            <span class="tag tag--audio">Audio</span>
+                        </div>
+                        <p style="color: var(--text-secondary); margin-bottom: var(--space-md);">Vier sprints in &eacute;&eacute;n mega-update. Het volledige gebouwen-, combat- en heldsysteem is herschreven van placeholder naar productiekwaliteit. Plus 16 gloednieuwe Meshy v6 3D-modellen en 6 geluidseffecten.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">GEBOUWEN &amp; TECH TREE</h3>
+                        <ul class="update__highlights">
+                            <li><strong>3-tier tech tree</strong> -- Niet alles is meer direct beschikbaar. Tier 1 (Boerderij, Kazerne, Houtzagerij) staat vanaf het begin klaar. Tier 2 (Woonhuis, Wachttoren, Factiegebouw) vereist een Smederij. Tier 3 (Belegeringswerkplaats, Feestzaal) vereist een Geavanceerde Smederij. Progressie die je dwingt om na te denken over je bouwvolgorde</li>
+                            <li><strong>7 nieuwe gebouwtypes</strong> -- Woonhuis (+10 populatie), Verdedigingstoren (vuurt automatisch op vijanden), Factiegebouwen met unieke abilities, Belegeringswerkplaats voor siege units. Elk gebouw met volledige stats, bouwkosten en factie-specifieke namen</li>
+                            <li><strong>PopulationSystem</strong> -- Huizen geven populatieruimte. Wordt je Woonhuis vernietigd? Dan daalt je cap mee, en kun je geen nieuwe eenheden trainen tot je herbouwt</li>
+                            <li><strong>Verdedigingstorens</strong> -- Automatische aanval op vijanden binnen 14 units bereik. Essentieel voor basisbescherming terwijl je leger op pad is</li>
+                            <li><strong>Placement validatie</strong> -- Gebouwen checken nu op collisions, waterzones, minimale afstand tot vijandelijke structuren, en houtzagerijen moeten dicht bij bomen staan</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">COMBAT &amp; HEROES</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Armor type systeem</strong> -- Rock-paper-scissors schadecalculatie: melee doet +50% tegen licht pantser, ranged +50% tegen medium, siege +100% tegen gebouwen, magie +50% tegen zwaar. Elke gevechtskeuze telt nu</li>
+                            <li><strong>24 hero abilities</strong> -- Alle 8 heroes (2 per factie) hebben nu 3 volledig werkende abilities (Q/W/E). De Mijnbaas heeft een AoE grondschok, de Frietkoning gooit exploderende frietbommen, de Maasridder is onstopbaar met zijn charge. Framework met 8 executietypes: AoE, cone, line, projectiel, teleport, buff, summon, passief</li>
+                            <li><strong>HealingSystem</strong> -- Support units genezen automatisch nabije bondgenoten. Elke factie heeft een unieke healer: de Boerinne, HR-Medewerker, Sjpion en Wafelzuster</li>
+                            <li><strong>Siege bonus</strong> -- Belegeringseenheden doen +100% schade aan gebouwen. De Tractorrijder, Vastgoedmakelaar, Kolenbrander en het Manneken Pis-kanon zijn gebouwd om forten te slopen</li>
+                            <li><strong>Production queue cancel</strong> -- Annuleer eenheden in de trainingsrij met goudteruggave. Tech tree viewer toont alle beschikbare upgrades en hun vereisten</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">VISUELE EFFECTEN &amp; DESTRUCTIE</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Gebouw-destructie animatie</strong> -- Gebouwen kantelen, zakken langzaam weg en vervagen over 1.8 seconden bij vernietiging. Vuurparticles, puin en camera shake maken elke verwoesting bevredigend</li>
+                            <li><strong>Hero ability effecten</strong> -- Elke ability heeft nu een uniek visueel effect: AoE ringen, cone sprays, teleport flashes, heal aura's, stun-sterren boven verdoofde units</li>
+                            <li><strong>Buff/debuff indicators</strong> -- Gebuffde units gloeien goudkleurig, gestunde units worden grijs, onkwetsbare units stralen helder. Geen UI-element nodig — je ziet het direct op het slagveld</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">16 NIEUWE 3D MODELLEN &amp; 6 SFX</h3>
+                        <ul class="update__highlights">
+                            <li><strong>8 siege &amp; support units</strong> -- Tractorrijder met kanon, Vastgoedmakelaar met sloopkogel, Kolenbrander met mijnkar, Manneken Pis-kanon. Plus healers: Boerinne, HR-Medewerker, Sjpion, Wafelzuster. Alle via Meshy v6 production mode</li>
+                            <li><strong>8 gebouwen</strong> -- Per factie een uniek Woonhuis (Brabantse boerderij, Randstad appartement, Limburgs grottenwoning, Belgisch rijhuis) en Verdedigingstoren (windmolen, kantoortoren, mijnschacht, belfort)</li>
+                            <li><strong>6 nieuwe geluidseffecten</strong> -- Gebouwvernietiging (instortend hout/steen), upgrade voltooiing (fanfare), hero spawn (epische hoorn), hero dood (dramatische stinger), siege impact (explosie), heal tick. Via ElevenLabs SFX</li>
+                            <li><strong>33 Randstad voice lines</strong> -- Manager, Consultant en Advocaat spreken nu met overtuiging. "Ik wil een status-update!" en "Dit staat niet in mijn contract" klinken over het slagveld</li>
+                        </ul>
+                        <div class="update__media">
+                            <div class="media-item">
+                                <model-viewer
+                                    src="/assets/models/v02/brabanders/siege.glb"
+                                    alt="Brabanders Tractorrijder siege unit"
+                                    auto-rotate camera-controls touch-action="pan-y"
+                                    style="width:100%; height:220px; border-radius:8px; border:1px solid var(--border); background: var(--bg-card);">
+                                </model-viewer>
+                                <p class="media-item__caption">Tractorrijder — Brabanders siege unit</p>
+                            </div>
+                            <div class="media-item">
+                                <model-viewer
+                                    src="/assets/models/v02/belgen/siege.glb"
+                                    alt="Belgen Manneken Pis-kanon siege unit"
+                                    auto-rotate camera-controls touch-action="pan-y"
+                                    style="width:100%; height:220px; border-radius:8px; border:1px solid var(--border); background: var(--bg-card);">
+                                </model-viewer>
+                                <p class="media-item__caption">Manneken Pis-kanon — Belgen siege unit</p>
+                            </div>
+                            <div class="media-item">
+                                <model-viewer
+                                    src="/assets/models/v02/limburgers/tower.glb"
+                                    alt="Limburgers Mijnschacht verdedigingstoren"
+                                    auto-rotate camera-controls touch-action="pan-y"
+                                    style="width:100%; height:220px; border-radius:8px; border:1px solid var(--border); background: var(--bg-card);">
+                                </model-viewer>
+                                <p class="media-item__caption">Mijnschacht — Limburgers verdedigingstoren</p>
+                            </div>
+                            <div class="media-item">
+                                <model-viewer
+                                    src="/assets/models/v02/brabanders/support.glb"
+                                    alt="Brabanders Boerinne support unit"
+                                    auto-rotate camera-controls touch-action="pan-y"
+                                    style="width:100%; height:220px; border-radius:8px; border:1px solid var(--border); background: var(--bg-card);">
+                                </model-viewer>
+                                <p class="media-item__caption">Boerinne — Brabanders support healer</p>
+                            </div>
+                            <div class="media-item">
+                                <model-viewer
+                                    src="/assets/models/v02/randstad/housing.glb"
+                                    alt="Randstad appartementencomplex"
+                                    auto-rotate camera-controls touch-action="pan-y"
+                                    style="width:100%; height:220px; border-radius:8px; border:1px solid var(--border); background: var(--bg-card);">
+                                </model-viewer>
+                                <p class="media-item__caption">Appartement — Randstad woonhuis</p>
+                            </div>
+                            <div class="media-item">
+                                <model-viewer
+                                    src="/assets/models/v02/limburgers/housing.glb"
+                                    alt="Limburgers grottenwoning"
+                                    auto-rotate camera-controls touch-action="pan-y"
+                                    style="width:100%; height:220px; border-radius:8px; border:1px solid var(--border); background: var(--bg-card);">
+                                </model-viewer>
+                                <p class="media-item__caption">Grottenwoning — Limburgers woonhuis</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.33.0 ─────────────────────────────── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.33.0</span>
+                        <span class="update__date">14 april 2026</span>
+                        <h2 class="update__title">De Nieuwe Tutorial — Leren Zonder Frustratie</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Tutorial</span>
+                            <span class="tag tag--gameplay">Onboarding</span>
+                        </div>
+                        <p style="color: var(--text-secondary); margin-bottom: var(--space-md);">De oude tutorial gooide je in het diepe en liet de AI na 2 minuten aanvallen terwijl je nog leerde hoe de camera werkt. Dat is voorbij. De nieuwe tutorial is een complete herschrijving: 12 stappen die je rustig door elk concept leiden, zonder haast, zonder stress.</p>
+                        <ul class="update__highlights">
+                            <li><strong>12-staps leerpad</strong> -- Van camera bewegen tot je eerste overwinning. Elke stap focust op precies &eacute;&eacute;n concept: camera → unit selecteren → box-select → goud verzamelen → wachten op resources → gebouw plaatsen → constructie → unit trainen → productie → aanvallen → verdedigen → missie voltooien. Geen informatie-overload meer</li>
+                            <li><strong>Input lock per stap</strong> -- Je k&aacute;n niet meer per ongeluk vooruit skippen. Alleen de acties die bij de huidige stap horen zijn toegankelijk. Wil je een gebouw plaatsen? Dat kan pas als je genoeg goud hebt verzameld</li>
+                            <li><strong>Visuele highlights</strong> -- Een pulserende gouden ring en een pijl wijzen precies naar waar je moet klikken. Goudmijn, kazerne, vijand — je hoeft nooit te zoeken</li>
+                            <li><strong>Pauze bij nieuwe concepten</strong> -- Bij stappen over resources, bouwsnelheid en productie pauzeert het spel automatisch. Een overlay legt uit wat er gebeurt, en je klikt "Doorgaan" als je er klaar voor bent</li>
+                            <li><strong>Geen vijanden tot stap 10</strong> -- De eerste 9 stappen zijn een veilige leeromgeving. Pas bij stap 10 verschijnen 3 vijanden, en bij stap 11 komen er 5. Je hebt dan al een leger</li>
+                            <li><strong>Sneltoets-tooltips</strong> -- Bij het eerste gebruik van B (bouwen), W (trainen) of A (attack-move) verschijnt automatisch een tooltip die na 10 seconden verdwijnt</li>
+                            <li><strong>Skip-knop pas bij stap 8</strong> -- Ervaren spelers kunnen na de basis-stappen direct naar het gevecht, maar beginners worden niet verleid om te vroeg te skippen</li>
+                            <li><strong>Voortgangsindicator</strong> -- 12 stippen onder het tutorial-paneel tonen waar je bent: voltooid (goud), huidig (pulserend), en toekomstig (grijs)</li>
                         </ul>
                     </div>
                 </div>
