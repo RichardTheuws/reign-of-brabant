@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.35.1] - 2026-04-15
+
+### Fixed
+- **Tutorial goud-thresholds** — Stap 5 vroeg om 50 goud voor een kazerne die 200 kost; nu wacht stap 5 op 200 goud. Einddoel verhoogd van 200 naar 500 zodat de missie niet eindigt voordat je door alle tutorial-stappen heen bent
+
 ## [0.35.0] - 2026-04-14
 
 ### Added
