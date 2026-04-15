@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.37.1] - 2026-04-15
+
+### Fixed
+- **Worker build menu**: Uitgebreid van 3 naar 7-8 buildings per factie — housing, feestzaal/parkeergarage (heavy units), siege workshop, defense tower nu beschikbaar
+- **Building portraits**: Elk building type heeft nu een uniek canvas-drawn icoon i.p.v. generiek 'BLD' label
+- **Kosten zichtbaar**: Inline kosten op worker build buttons en building train buttons (bijv. "200g+150h")
+- **Heavy/Siege/Support productie**: Units waren niet trainbaar — train-heavy/train-siege/train-support commando's toegevoegd, Barracks produceert nu Support, FactionSpecial2 produceert Heavy, SiegeWorkshop produceert Siege
+- **Tooltip systeem**: Alle building types en unit types worden nu herkend met volledige stats + kosten
+- **Blacksmith panel UI**: Verbeterde layout, hover effecten, goud kostprijs badges, progress bar styling
+- **Menu responsive scaling**: Sticky "Start Gevecht" button, breakpoints voor tablets/kleine schermen, faction select scrollbaar
+- **Hotkey systeem**: Dynamische building card hotkeys, geen WASD camera conflict, build hotkeys Q/E/R/T/F/G/Z/X
+- **BuildingPortraits**: DefenseTower en SiegeWorkshop portraits toegevoegd
+
 ## [0.37.0] - 2026-04-15
 
 ### Fixed

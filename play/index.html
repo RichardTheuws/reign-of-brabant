@@ -385,8 +385,12 @@
     /* ================================================================ FACTION SELECT */
     #faction-select {
       position: absolute; inset: 0; z-index: 60; display: none; flex-direction: column;
+      align-items: center;
       background: linear-gradient(135deg, rgba(10,8,6,0.94) 0%, rgba(20,15,10,0.88) 100%);
       padding: 24px; overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(212, 168, 83, 0.3) transparent;
     }
     .faction-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
     .faction-back-btn {
@@ -463,7 +467,14 @@
     .faction-card-sub {
       font-size: 0.7rem; color: var(--color-text-dim); font-style: italic; margin-top: 2px;
     }
-    .faction-confirm-area { text-align: center; }
+    .faction-confirm-area {
+      text-align: center;
+      position: sticky; bottom: 0;
+      padding: 16px 0 8px;
+      background: linear-gradient(transparent 0%, rgba(10,8,6,0.95) 30%);
+      z-index: 5;
+      width: 100%; max-width: 700px;
+    }
     .faction-confirm-btn {
       padding: 14px 48px; border: 2px solid var(--color-gold); border-radius: 8px;
       background: rgba(212,168,83,0.12); color: var(--color-gold);
@@ -511,23 +522,71 @@
     }
     .diff-desc { font-size: 0.65rem; color: var(--color-text-dim); }
 
+    /* Tablet landscape & small laptops */
+    @media (max-width: 900px) {
+      #faction-select { padding: 16px; }
+      .faction-header { margin-bottom: 16px; }
+      .faction-header-title { font-size: clamp(1.1rem, 2.5vw, 1.6rem); }
+      .faction-card { width: 130px; padding: 12px; }
+      .faction-card-portrait { width: 60px; height: 60px; }
+      #faction-preview { margin-bottom: 16px; min-height: auto; }
+      .faction-preview-content { padding: 14px; gap: 16px; }
+      .faction-preview-image { width: 140px; height: 180px; }
+      .faction-confirm-btn { padding: 12px 36px; font-size: 1rem; }
+    }
     @media (max-width: 640px) {
+      #faction-select { padding: 12px 8px; }
       .faction-preview-content { flex-direction: column; align-items: center; }
-      .faction-preview-image { width: 140px; height: 170px; }
-      .faction-card { width: 120px; padding: 12px; }
-      .map-card { width: 80px; padding: 8px 6px; }
-      .map-card-name { font-size: 0.7rem; }
-      .diff-btn { padding: 8px; }
+      .faction-preview-image { width: 120px; height: 150px; }
+      .faction-card { width: 80px; padding: 8px; }
+      .faction-card-portrait { width: 48px; height: 48px; }
+      .faction-card-name { font-size: 0.75rem; }
+      .faction-card-sub { font-size: 0.6rem; }
+      .faction-cards-row { gap: 8px; margin-bottom: 16px; }
+      .map-card { width: 70px; padding: 6px 4px; }
+      .map-card-name { font-size: 0.65rem; }
+      .map-card-desc { font-size: 0.55rem; }
+      .diff-btn { padding: 6px 8px; }
+      .diff-label { font-size: 0.75rem; }
+      .diff-desc { font-size: 0.55rem; }
+      .faction-header { margin-bottom: 12px; gap: 8px; }
+      .faction-confirm-btn { padding: 10px 28px; font-size: 0.9rem; }
+    }
+    /* Short viewports (landscape mobile, small laptops) */
+    @media (max-height: 700px) {
+      #main-menu { padding: 12px; justify-content: flex-start; padding-top: 5vh; }
+      .menu-panel { padding: 16px 24px; }
+      .menu-logo img { max-width: min(280px, 60vw); }
+      .menu-subtitle { margin-bottom: 12px; font-size: 0.7rem; }
+      .menu-buttons { gap: 6px; }
+      .menu-btn { padding: 8px 14px; font-size: 0.85rem; min-height: 38px; }
+      #faction-select { padding: 12px; }
+      .faction-header { margin-bottom: 10px; }
+      .faction-card { width: 110px; padding: 10px; }
+      .faction-card-portrait { width: 50px; height: 50px; }
+      #faction-preview { min-height: auto; margin-bottom: 12px; }
+      .faction-preview-image { width: 120px; height: 150px; }
     }
     @media (max-height: 600px) {
-      #main-menu { padding: 12px; }
+      #main-menu { padding: 8px; justify-content: flex-start; padding-top: 2vh; }
       .menu-panel { padding: 12px 20px; }
       .menu-logo img { max-width: min(200px, 50vw); }
       .menu-title { font-size: 1.4rem; margin-bottom: 0; }
-      .menu-subtitle { margin-bottom: 10px; font-size: 0.65rem; }
-      .menu-buttons { gap: 6px; }
-      .menu-btn { padding: 8px 14px; font-size: 0.8rem; min-height: 36px; }
+      .menu-subtitle { margin-bottom: 8px; font-size: 0.65rem; }
+      .menu-buttons { gap: 4px; }
+      .menu-btn { padding: 6px 12px; font-size: 0.8rem; min-height: 34px; }
       .logo-ember { display: none; }
+      #faction-select { padding: 8px; }
+      .faction-header { margin-bottom: 8px; }
+      .faction-card { width: 90px; padding: 8px; }
+      .faction-card-portrait { width: 40px; height: 40px; }
+      .faction-card-name { font-size: 0.7rem; }
+      .faction-cards-row { gap: 6px; margin-bottom: 10px; }
+      #faction-preview { margin-bottom: 10px; min-height: auto; }
+      .faction-preview-content { padding: 10px; gap: 10px; }
+      .faction-preview-image { width: 100px; height: 120px; }
+      .faction-preview-description { font-size: 0.8rem; }
+      .faction-confirm-btn { padding: 8px 24px; font-size: 0.85rem; }
     }
 
     /* ================================================================ LOADING SCREEN */
@@ -896,6 +955,21 @@
     .bcard-action-btn--rally {
       border-color: rgba(126, 200, 227, 0.4);
     }
+    .bcard-action-cost {
+      position: absolute;
+      top: 2px; left: 3px;
+      font-size: 0.5rem;
+      font-weight: 600;
+      color: #f0d060;
+      font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+      line-height: 1;
+      pointer-events: none;
+      z-index: 3;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 1px 3px;
+      border-radius: 2px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    }
     @media (max-width: 768px) {
       #building-card {
         width: 260px;
@@ -1134,8 +1208,15 @@
       border-radius: 8px; z-index: 15;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     }
+    /* Worker panel uses grid for expanded building menu */
+    #cmd-worker {
+      display: flex; flex-wrap: wrap; gap: 4px;
+      max-width: 400px; justify-content: center;
+    }
+    #cmd-worker[hidden] { display: none !important; }
     .command-panel[hidden] { display: none !important; }
     .cmd-btn {
+      position: relative;
       width: 44px; height: 44px;
       background: rgba(40, 35, 25, 0.9);
       border: 1px solid rgba(212, 168, 83, 0.3);
@@ -1144,15 +1225,39 @@
       display: flex; flex-direction: column;
       align-items: center; justify-content: center; gap: 1px;
       transition: all 0.15s;
+      overflow: hidden;
     }
     .cmd-btn:hover:not(:disabled) {
       background: rgba(212, 168, 83, 0.2);
       border-color: rgba(212, 168, 83, 0.6);
     }
     .cmd-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .cmd-btn .hotkey { font-size: 0.55rem; color: #a0a0a0; margin-top: 2px; }
+    .cmd-btn .hotkey {
+      position: absolute; top: 1px; right: 2px;
+      font-size: 0.5rem; color: rgba(212, 168, 83, 0.8);
+      font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+      font-weight: 700; line-height: 1; z-index: 2;
+    }
     .cmd-btn .btn-icon { font-size: 0.65rem; font-weight: 700; line-height: 1; text-transform: uppercase; letter-spacing: -0.02em; display: flex; align-items: center; justify-content: center; }
     .cmd-btn .btn-icon svg { width: 20px; height: 20px; }
+    .cmd-btn .btn-icon img { width: 28px; height: 28px; image-rendering: pixelated; border-radius: 2px; }
+    .cmd-btn__label {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      font-size: 0.4rem; line-height: 1.1;
+      color: #fff; text-align: center;
+      background: linear-gradient(transparent, rgba(0,0,0,0.75));
+      padding: 2px 1px 1px; z-index: 2;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .cmd-btn__cost {
+      position: absolute; top: 1px; left: 2px;
+      font-size: 0.4rem; font-weight: 600;
+      color: #f0d060; line-height: 1;
+      font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+      z-index: 2; pointer-events: none;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 0px 2px; border-radius: 1px;
+    }
 
     /* ---- Icon color styling ---- */
     .btn-icon--move { color: #7ec8e3; }

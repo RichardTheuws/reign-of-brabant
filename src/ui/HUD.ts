@@ -52,7 +52,7 @@ export type UnitStatus = 'idle' | 'moving' | 'attacking' | 'gathering' | 'buildi
 export type BuildingType = 'townhall' | 'barracks' | 'lumbercamp' | 'blacksmith';
 export type CommandAction =
   | 'move' | 'attack' | 'stop' | 'hold'
-  | 'train-worker' | 'train-infantry' | 'train-ranged' | 'rally-point'
+  | 'train-worker' | 'train-infantry' | 'train-ranged' | 'train-heavy' | 'train-siege' | 'train-support' | 'rally-point'
   | 'build-townhall' | 'build-barracks' | 'build-lumbercamp' | 'build-blacksmith'
   | 'build-mijnschacht' | 'build-chocolaterie'
   | 'build-housing' | 'build-tower' | 'build-tertiary' | 'build-upgrade'
@@ -217,37 +217,62 @@ const BASE_WORKER_CMDS: WorkerBuildCmd[] = [
   { action: 'stop', icon: 'STP', label: '', hotkey: 'E', iconClass: 'btn-icon--stop' },
 ];
 
-const FACTION_WORKER_BUILDS: Record<Faction, WorkerBuildCmd[]> = {
+// Worker build commands per faction. Each building has:
+// - Unique BuildingTypeId-based icon via BuildingPortraits canvas rendering
+// - Consistent hotkey grid: Q/W/E (row 1), A/S/D (row 2), Z/X (row 3)
+// - buildingTypeId for portrait lookup and inline cost display
+interface WorkerBuildCmdExt extends WorkerBuildCmd {
+  buildingTypeId?: BuildingTypeId;
+}
+
+// Hotkey grid avoids WASD (camera): Q/E/R (row 1), T/F/G (row 2), Z/X (row 3)
+const FACTION_WORKER_BUILDS: Record<Faction, WorkerBuildCmdExt[]> = {
   brabant: [
-    { action: 'build-barracks',    icon: 'BLD', label: 'Kazerne',      hotkey: 'Q', iconClass: 'btn-icon--build' },
-    { action: 'build-lumbercamp',  icon: 'BLD', label: 'Houtzagerij',               iconClass: 'btn-icon--build' },
-    { action: 'build-blacksmith',  icon: 'BLD', label: 'Smederij',     hotkey: 'R', iconClass: 'btn-icon--build' },
+    { action: 'build-barracks',        icon: 'BRK', label: 'Kazerne',         hotkey: 'Q', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Barracks },
+    { action: 'build-lumbercamp',      icon: 'LMB', label: 'Houtzagerij',     hotkey: 'E', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.LumberCamp },
+    { action: 'build-blacksmith',      icon: 'BSM', label: 'Smederij',        hotkey: 'R', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Blacksmith },
+    { action: 'build-housing',         icon: 'HSE', label: 'Boerenhoeve',     hotkey: 'T', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Housing },
+    { action: 'build-faction2',        icon: 'ADV', label: 'Feestzaal',       hotkey: 'F', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial2 },
+    { action: 'build-siege-workshop',  icon: 'SWK', label: 'Tractorschuur',   hotkey: 'G', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.SiegeWorkshop },
+    { action: 'build-tower',           icon: 'TWR', label: 'Kerk',            hotkey: 'Z', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.DefenseTower },
   ],
   randstad: [
-    { action: 'build-barracks',    icon: 'BLD', label: 'Vergaderzaal',  hotkey: 'Q', iconClass: 'btn-icon--build' },
-    { action: 'build-lumbercamp',  icon: 'BLD', label: 'Starbucks',                  iconClass: 'btn-icon--build' },
-    { action: 'build-blacksmith',  icon: 'BLD', label: 'CoworkingSpace', hotkey: 'R', iconClass: 'btn-icon--build' },
+    { action: 'build-barracks',        icon: 'BRK', label: 'Vergaderzaal',    hotkey: 'Q', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Barracks },
+    { action: 'build-lumbercamp',      icon: 'LMB', label: 'Starbucks',       hotkey: 'E', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.LumberCamp },
+    { action: 'build-blacksmith',      icon: 'BSM', label: 'CoworkingSpace',  hotkey: 'R', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Blacksmith },
+    { action: 'build-housing',         icon: 'HSE', label: 'Vinex-wijk',      hotkey: 'T', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Housing },
+    { action: 'build-faction2',        icon: 'ADV', label: 'Parkeergarage',   hotkey: 'F', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial2 },
+    { action: 'build-siege-workshop',  icon: 'SWK', label: 'Sloopwerf',      hotkey: 'G', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.SiegeWorkshop },
+    { action: 'build-tower',           icon: 'TWR', label: 'Kantoor-toren',   hotkey: 'Z', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.DefenseTower },
   ],
   limburg: [
-    { action: 'build-barracks',    icon: 'BLD', label: 'Schuttershal',  hotkey: 'Q', iconClass: 'btn-icon--build' },
-    { action: 'build-lumbercamp',  icon: 'BLD', label: 'Vlaaibakkerij',              iconClass: 'btn-icon--build' },
-    { action: 'build-blacksmith',  icon: 'BLD', label: 'Klooster',     hotkey: 'R',  iconClass: 'btn-icon--build' },
-    { action: 'build-mijnschacht', icon: 'BLD', label: 'Mijnschacht',                iconClass: 'btn-icon--build' },
+    { action: 'build-barracks',        icon: 'BRK', label: 'Schuttershal',    hotkey: 'Q', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Barracks },
+    { action: 'build-lumbercamp',      icon: 'LMB', label: 'Vlaaibakkerij',   hotkey: 'E', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.LumberCamp },
+    { action: 'build-blacksmith',      icon: 'BSM', label: 'Klooster',        hotkey: 'R', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Blacksmith },
+    { action: 'build-housing',         icon: 'HSE', label: 'Huuske',          hotkey: 'T', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Housing },
+    { action: 'build-faction2',        icon: 'ADV', label: 'Mijnwerkerskamp', hotkey: 'F', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial2 },
+    { action: 'build-siege-workshop',  icon: 'SWK', label: 'Steengroeve',     hotkey: 'G', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.SiegeWorkshop },
+    { action: 'build-tower',           icon: 'TWR', label: 'Wachttoren',      hotkey: 'Z', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.DefenseTower },
+    { action: 'build-mijnschacht',     icon: 'TRT', label: 'Mijnschacht',     hotkey: 'X', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.TertiaryResourceBuilding },
   ],
   belgen: [
-    { action: 'build-barracks',    icon: 'BLD', label: 'Frituur',       hotkey: 'Q', iconClass: 'btn-icon--build' },
-    { action: 'build-lumbercamp',  icon: 'BLD', label: 'Frietfabriek',               iconClass: 'btn-icon--build' },
-    { action: 'build-blacksmith',  icon: 'BLD', label: 'EU-Parlement',  hotkey: 'R', iconClass: 'btn-icon--build' },
-    { action: 'build-chocolaterie', icon: 'BLD', label: 'Chocolaterie',              iconClass: 'btn-icon--build' },
+    { action: 'build-barracks',        icon: 'BRK', label: 'Frituur',         hotkey: 'Q', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Barracks },
+    { action: 'build-lumbercamp',      icon: 'LMB', label: 'Frietfabriek',    hotkey: 'E', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.LumberCamp },
+    { action: 'build-blacksmith',      icon: 'BSM', label: 'EU-Parlement',    hotkey: 'R', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Blacksmith },
+    { action: 'build-housing',         icon: 'HSE', label: 'Brusselse Woning', hotkey: 'T', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Housing },
+    { action: 'build-faction2',        icon: 'ADV', label: 'Rijschool',       hotkey: 'F', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial2 },
+    { action: 'build-siege-workshop',  icon: 'SWK', label: 'Frituurkanon-werkplaats', hotkey: 'G', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.SiegeWorkshop },
+    { action: 'build-tower',           icon: 'TWR', label: 'Commissiegebouw', hotkey: 'Z', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.DefenseTower },
+    { action: 'build-chocolaterie',    icon: 'TRT', label: 'Chocolaterie',    hotkey: 'X', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.TertiaryResourceBuilding },
   ],
 };
 
 // Faction-specific building command labels (train panel)
-const FACTION_BUILDING_LABELS: Record<Faction, { worker: string; infantry: string; ranged: string }> = {
-  brabant:  { worker: 'Boer',               infantry: 'Infanterie', ranged: 'Sluiper' },
-  randstad: { worker: 'Stagiair',           infantry: 'Manager',    ranged: 'Consultant' },
-  limburg:  { worker: 'Mijnwerker',         infantry: 'Schutterij', ranged: 'Vlaaienwerper' },
-  belgen:   { worker: 'Frietkraamhouder',   infantry: 'Bierbouwer', ranged: 'Chocolatier' },
+const FACTION_BUILDING_LABELS: Record<Faction, { worker: string; infantry: string; ranged: string; heavy: string; siege: string; support: string }> = {
+  brabant:  { worker: 'Boer',               infantry: 'Carnavalvierder', ranged: 'Sluiper',        heavy: 'Tractorrijder',     siege: 'Frituurmeester',  support: 'Boerinne' },
+  randstad: { worker: 'Stagiair',           infantry: 'Manager',         ranged: 'Consultant',     heavy: 'CorporateAdvocaat', siege: 'Sloopkogel',      support: 'HR-Medewerker' },
+  limburg:  { worker: 'Mijnwerker',         infantry: 'Schutterij',      ranged: 'Vlaaienwerper',  heavy: 'Mergelridder',      siege: 'Mijnkarretje',    support: 'Heuvelwacht' },
+  belgen:   { worker: 'Frietkraamhouder',   infantry: 'Bierbouwer',      ranged: 'Chocolatier',    heavy: 'Rijexaminator',     siege: 'Frituurkanon',    support: 'Pralinemaker' },
 };
 
 // ---------------------------------------------------------------------------
@@ -842,6 +867,17 @@ export class HUD {
       labelSpan.className = 'bcard-action-label';
       labelSpan.textContent = act.label;
       btn.appendChild(labelSpan);
+
+      // Inline cost for unit training buttons
+      if (act.action.startsWith('train-') && !act.isRally) {
+        const costSpan = document.createElement('span');
+        costSpan.className = 'bcard-action-cost';
+        const costText = this.getInlineUnitCost(act.action);
+        if (costText) {
+          costSpan.textContent = costText;
+          btn.appendChild(costSpan);
+        }
+      }
 
       const hotkeySpan = document.createElement('span');
       hotkeySpan.className = 'bcard-action-hotkey';
@@ -1511,6 +1547,30 @@ export class HUD {
   }
 
   // -----------------------------------------------------------------------
+  // Inline cost helper for train buttons
+  // -----------------------------------------------------------------------
+
+  private getInlineUnitCost(action: string): string | null {
+    const actionToTypeId: Record<string, UnitTypeId> = {
+      'train-worker': UnitTypeId.Worker,
+      'train-infantry': UnitTypeId.Infantry,
+      'train-ranged': UnitTypeId.Ranged,
+      'train-heavy': UnitTypeId.Heavy,
+      'train-siege': UnitTypeId.Siege,
+      'train-support': UnitTypeId.Support,
+    };
+    const typeId = actionToTypeId[action];
+    if (typeId === undefined) return null;
+    const archetypes = this.getFactionUnitArchetypes();
+    const arch = archetypes[typeId] as UnitArchetype | undefined;
+    if (!arch) return null;
+    const parts: string[] = [];
+    if (arch.costGold > 0) parts.push(`${arch.costGold}g`);
+    if (arch.costSecondary > 0) parts.push(`${arch.costSecondary}h`);
+    return parts.join('+') || null;
+  }
+
+  // -----------------------------------------------------------------------
   // FPS counter
   // -----------------------------------------------------------------------
 
@@ -1600,20 +1660,44 @@ export class HUD {
     btn.dataset.action = cmd.action;
     if (cmd.hotkey) btn.dataset.hotkey = cmd.hotkey;
 
+    // Use building portrait for build commands when buildingTypeId is available
+    const extCmd = cmd as WorkerBuildCmdExt;
     const iconSpan = document.createElement('span');
     iconSpan.className = 'btn-icon' + (cmd.iconClass ? ` ${cmd.iconClass}` : '');
-    const svgIcon = createCommandIcon(cmd.icon, 20);
-    if (svgIcon) {
-      iconSpan.appendChild(svgIcon);
+
+    if (extCmd.buildingTypeId !== undefined && cmd.action.startsWith('build-')) {
+      const portraitImg = createBuildingPortraitImg(extCmd.buildingTypeId, 28, 28);
+      portraitImg.style.display = 'block';
+      iconSpan.appendChild(portraitImg);
     } else {
-      iconSpan.textContent = cmd.icon;
+      const svgIcon = createCommandIcon(cmd.icon, 20);
+      if (svgIcon) {
+        iconSpan.appendChild(svgIcon);
+      } else {
+        iconSpan.textContent = cmd.icon;
+      }
     }
     btn.appendChild(iconSpan);
 
     if (cmd.label) {
       const labelSpan = document.createElement('span');
+      labelSpan.className = 'cmd-btn__label';
       labelSpan.textContent = cmd.label;
       btn.appendChild(labelSpan);
+    }
+
+    // Inline cost display for build commands
+    if (extCmd.buildingTypeId !== undefined) {
+      const arch = BUILDING_ARCHETYPES[extCmd.buildingTypeId];
+      if (arch && (arch.costGold > 0 || arch.costSecondary > 0)) {
+        const costSpan = document.createElement('span');
+        costSpan.className = 'cmd-btn__cost';
+        const parts: string[] = [];
+        if (arch.costGold > 0) parts.push(`${arch.costGold}g`);
+        if (arch.costSecondary > 0) parts.push(`${arch.costSecondary}h`);
+        costSpan.textContent = parts.join('+');
+        btn.appendChild(costSpan);
+      }
     }
 
     if (cmd.hotkey) {
@@ -1777,10 +1861,10 @@ export class HUD {
 
   private bindHotkeys(): void {
     // Hotkeys are resolved dynamically based on which command panel is visible.
-    // Q/E/R are context-sensitive: unit, worker, or building panel.
-    // W is excluded — conflicts with WASD camera forward.
+    // WASD is reserved for camera — build/train hotkeys use Q, E, R, T, F, G, Z, X.
     // V is handled by Game.ts for Carnavalsrage.
-    const hotkeyCodes = ['KeyQ', 'KeyE', 'KeyR'];
+    // T/Y are hero training hotkeys.
+    const hotkeyCodes = ['KeyQ', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyF', 'KeyG', 'KeyZ', 'KeyX'];
 
     const handler = (e: Event) => {
       const ke = e as KeyboardEvent;
@@ -1977,29 +2061,45 @@ export class HUD {
     if (action === 'train-worker') typeId = UnitTypeId.Worker;
     else if (action === 'train-infantry') typeId = UnitTypeId.Infantry;
     else if (action === 'train-ranged') typeId = UnitTypeId.Ranged;
+    else if (action === 'train-heavy') typeId = UnitTypeId.Heavy;
+    else if (action === 'train-siege') typeId = UnitTypeId.Siege;
+    else if (action === 'train-support') typeId = UnitTypeId.Support;
 
     if (typeId === null) return null;
 
-    const arch = this.getFactionUnitArchetypes()[typeId] as UnitArchetype | undefined;
+    const archetypes = this.getFactionUnitArchetypes();
+    const arch = archetypes[typeId] as UnitArchetype | undefined;
     if (!arch) return null;
 
     const dps = (arch.attack / arch.attackSpeed).toFixed(1);
+    const costParts: string[] = [];
+    if (arch.costGold > 0) costParts.push(`${arch.costGold} goud`);
+    if (arch.costSecondary > 0) costParts.push(`${arch.costSecondary} hout`);
+
+    const descMap: Record<number, string> = {
+      [UnitTypeId.Worker]: 'Verzamelt grondstoffen en bouwt gebouwen.',
+      [UnitTypeId.Infantry]: 'Melee gevechtsunit. Sterk tegen schutters.',
+      [UnitTypeId.Ranged]: 'Afstandsunit. Sterk op afstand, zwak in melee.',
+      [UnitTypeId.Heavy]: 'Zware gepantserde unit. Hoge HP, langzaam.',
+      [UnitTypeId.Siege]: 'Belegeringsunit. Extra schade tegen gebouwen.',
+      [UnitTypeId.Support]: 'Ondersteuningsunit. Heelt nabijgelegen eenheden.',
+    };
+
+    const stats: Array<[string, string]> = [
+      ['HP', String(arch.hp)],
+      ['Aanval', String(arch.attack)],
+      ['DPS', dps],
+      ['Pantser', String(arch.armor)],
+      ['Snelheid', String(arch.speed)],
+      ['Bouw', `${arch.buildTime}s`],
+    ];
+    if (arch.population > 1) stats.push(['Pop', String(arch.population)]);
+
     return {
       name: label || arch.brabantName,
-      cost: `${arch.costGold} goud`,
-      stats: [
-        ['HP', String(arch.hp)],
-        ['Aanval', String(arch.attack)],
-        ['DPS', dps],
-        ['Pantser', String(arch.armor)],
-        ['Snelheid', String(arch.speed)],
-        ['Bouw', `${arch.buildTime}s`],
-      ],
-      desc: typeId === UnitTypeId.Worker
-        ? 'Verzamelt grondstoffen en bouwt gebouwen.'
-        : typeId === UnitTypeId.Infantry
-          ? 'Melee gevechtsunit. Sterk tegen schutters.'
-          : 'Afstandsunit. Sterk op afstand, zwak in melee.',
+      cost: costParts.join(' + ') || 'Gratis',
+      stats,
+      desc: descMap[typeId] ?? '',
       hotkey,
     };
   }
@@ -2010,12 +2110,23 @@ export class HUD {
   private getBuildingTooltipData(action: string, label: string, hotkey?: string): {
     name: string; cost?: string; stats?: Array<[string, string]>; desc?: string; hotkey?: string;
   } | null {
-    let typeId: BuildingTypeId | null = null;
-    if (action === 'build-barracks') typeId = BuildingTypeId.Barracks;
-    else if (action === 'build-lumbercamp') typeId = BuildingTypeId.LumberCamp;
-    else if (action === 'build-blacksmith') typeId = BuildingTypeId.Blacksmith;
-    else if (action === 'build-townhall') typeId = BuildingTypeId.TownHall;
+    const actionToTypeId: Record<string, BuildingTypeId> = {
+      'build-barracks': BuildingTypeId.Barracks,
+      'build-lumbercamp': BuildingTypeId.LumberCamp,
+      'build-blacksmith': BuildingTypeId.Blacksmith,
+      'build-townhall': BuildingTypeId.TownHall,
+      'build-housing': BuildingTypeId.Housing,
+      'build-tower': BuildingTypeId.DefenseTower,
+      'build-tertiary': BuildingTypeId.TertiaryResourceBuilding,
+      'build-upgrade': BuildingTypeId.UpgradeBuilding,
+      'build-faction1': BuildingTypeId.FactionSpecial1,
+      'build-faction2': BuildingTypeId.FactionSpecial2,
+      'build-siege-workshop': BuildingTypeId.SiegeWorkshop,
+      'build-mijnschacht': BuildingTypeId.TertiaryResourceBuilding,
+      'build-chocolaterie': BuildingTypeId.TertiaryResourceBuilding,
+    };
 
+    const typeId = actionToTypeId[action] ?? null;
     if (typeId === null) return null;
 
     const arch = BUILDING_ARCHETYPES[typeId];
@@ -2028,17 +2139,29 @@ export class HUD {
       if (uArch) producesNames.push(uArch.brabantName);
     }
 
+    const descMap: Partial<Record<BuildingTypeId, string>> = {
+      [BuildingTypeId.Blacksmith]: 'Onderzoekt upgrades voor je leger.',
+      [BuildingTypeId.LumberCamp]: 'Hout afzetpunt. Versnelt hout verzamelen.',
+      [BuildingTypeId.Housing]: 'Verhoogt je populatielimiet met 10.',
+      [BuildingTypeId.DefenseTower]: 'Verdedigingstoren. Valt vijanden automatisch aan.',
+      [BuildingTypeId.TertiaryResourceBuilding]: 'Genereert je factie-specifieke grondstof.',
+      [BuildingTypeId.UpgradeBuilding]: 'Geavanceerde upgrades en technologie.',
+      [BuildingTypeId.FactionSpecial1]: 'Factie-specifiek gebouw met unieke functie.',
+      [BuildingTypeId.FactionSpecial2]: 'Geavanceerd militair gebouw. Traint zware eenheden.',
+      [BuildingTypeId.SiegeWorkshop]: 'Produceert belegeringswapens.',
+    };
+
     const desc = producesNames.length > 0
       ? `Traint: ${producesNames.join(', ')}.`
-      : typeId === BuildingTypeId.Blacksmith
-        ? 'Onderzoekt upgrades voor je leger.'
-        : typeId === BuildingTypeId.LumberCamp
-          ? 'Hout afzetpunt. Versnelt hout verzamelen.'
-          : '';
+      : descMap[typeId] ?? '';
+
+    const costParts: string[] = [];
+    if (arch.costGold > 0) costParts.push(`${arch.costGold} goud`);
+    if (arch.costSecondary > 0) costParts.push(`${arch.costSecondary} hout`);
 
     return {
       name: label || arch.brabantName,
-      cost: arch.costGold > 0 ? `${arch.costGold} goud` : 'Gratis',
+      cost: costParts.join(' + ') || 'Gratis',
       stats: [
         ['HP', String(arch.hp)],
         ['Bouw', `${arch.buildTime}s`],

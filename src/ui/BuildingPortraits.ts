@@ -149,6 +149,12 @@ export function drawBuildingPortrait(
     case BuildingTypeId.FactionSpecial2:
       drawFactionSpecial2(ctx, width, height);
       break;
+    case BuildingTypeId.DefenseTower:
+      drawDefenseTower(ctx, width, height);
+      break;
+    case BuildingTypeId.SiegeWorkshop:
+      drawSiegeWorkshop(ctx, width, height);
+      break;
     default:
       drawGenericBuilding(ctx, width, height);
       break;
@@ -177,6 +183,8 @@ function getBuildingTypeName(type: BuildingTypeId): string {
     case BuildingTypeId.UpgradeBuilding: return 'Upgrade Building';
     case BuildingTypeId.FactionSpecial1: return 'Special Building';
     case BuildingTypeId.FactionSpecial2: return 'Special Building';
+    case BuildingTypeId.DefenseTower: return 'Defense Tower';
+    case BuildingTypeId.SiegeWorkshop: return 'Siege Workshop';
     default: return 'Building';
   }
 }
@@ -916,6 +924,116 @@ function drawFactionSpecial2(ctx: CanvasRenderingContext2D, w: number, h: number
 /**
  * Generic building: Simple house silhouette (fallback for unmapped types).
  */
+/**
+ * Defense Tower: Tall stone tower with crenellations and arrow slits.
+ */
+function drawDefenseTower(ctx: CanvasRenderingContext2D, w: number, h: number): void {
+  const cx = w / 2;
+
+  // Ground
+  ctx.fillStyle = C.brownDark;
+  ctx.fillRect(0, h * 0.88, w, h * 0.12);
+
+  // Tower body (tall, narrow)
+  ctx.fillStyle = C.stone;
+  ctx.fillRect(w * 0.25, h * 0.18, w * 0.50, h * 0.70);
+
+  // Stone lines
+  ctx.strokeStyle = C.stoneDark;
+  ctx.lineWidth = 0.5;
+  ctx.beginPath();
+  for (let y = 0.30; y <= 0.80; y += 0.15) {
+    ctx.moveTo(w * 0.25, h * y);
+    ctx.lineTo(w * 0.75, h * y);
+  }
+  ctx.stroke();
+
+  // Crenellations (battlements)
+  ctx.fillStyle = C.stoneLight;
+  const crenW = w * 0.10;
+  const crenH = h * 0.08;
+  for (let i = 0; i < 4; i++) {
+    const x = w * 0.22 + i * (crenW + w * 0.04);
+    ctx.fillRect(x, h * 0.10, crenW, crenH);
+  }
+
+  // Arrow slits
+  ctx.fillStyle = C.brownDark;
+  ctx.fillRect(cx - w * 0.03, h * 0.38, w * 0.06, h * 0.12);
+  ctx.fillRect(cx - w * 0.03, h * 0.58, w * 0.06, h * 0.12);
+
+  // Red flag at top
+  ctx.fillStyle = C.flag;
+  ctx.beginPath();
+  ctx.moveTo(cx, h * 0.04);
+  ctx.lineTo(cx + w * 0.14, h * 0.08);
+  ctx.lineTo(cx, h * 0.13);
+  ctx.closePath();
+  ctx.fill();
+
+  // Flagpole
+  ctx.strokeStyle = C.brownDark;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(cx, h * 0.02);
+  ctx.lineTo(cx, h * 0.18);
+  ctx.stroke();
+}
+
+/**
+ * Siege Workshop: Wide building with open front, siege engine silhouette.
+ */
+function drawSiegeWorkshop(ctx: CanvasRenderingContext2D, w: number, h: number): void {
+  // Ground
+  ctx.fillStyle = C.brownDark;
+  ctx.fillRect(0, h * 0.88, w, h * 0.12);
+
+  // Wide workshop building
+  ctx.fillStyle = C.wood;
+  ctx.fillRect(w * 0.08, h * 0.35, w * 0.84, h * 0.53);
+
+  // Sloped roof
+  ctx.fillStyle = C.roof;
+  ctx.beginPath();
+  ctx.moveTo(w * 0.04, h * 0.35);
+  ctx.lineTo(w * 0.50, h * 0.14);
+  ctx.lineTo(w * 0.96, h * 0.35);
+  ctx.closePath();
+  ctx.fill();
+
+  // Open front (dark entrance)
+  ctx.fillStyle = 'rgba(20, 15, 10, 0.8)';
+  ctx.fillRect(w * 0.20, h * 0.50, w * 0.60, h * 0.38);
+
+  // Catapult/siege engine silhouette inside
+  ctx.fillStyle = C.brownLight;
+  // Wheel
+  ctx.beginPath();
+  ctx.arc(w * 0.40, h * 0.78, w * 0.08, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(w * 0.60, h * 0.78, w * 0.08, 0, Math.PI * 2);
+  ctx.fill();
+  // Frame
+  ctx.fillRect(w * 0.35, h * 0.60, w * 0.30, h * 0.10);
+  // Arm (catapult arm)
+  ctx.strokeStyle = C.brownLight;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(w * 0.50, h * 0.65);
+  ctx.lineTo(w * 0.38, h * 0.48);
+  ctx.stroke();
+
+  // Smoke from forge
+  ctx.fillStyle = C.smoke;
+  ctx.beginPath();
+  ctx.arc(w * 0.80, h * 0.22, w * 0.05, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(w * 0.78, h * 0.14, w * 0.04, 0, Math.PI * 2);
+  ctx.fill();
+}
+
 function drawGenericBuilding(ctx: CanvasRenderingContext2D, w: number, h: number): void {
   const cx = w / 2;
 

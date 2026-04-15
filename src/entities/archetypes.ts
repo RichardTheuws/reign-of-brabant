@@ -394,7 +394,7 @@ export const BUILDING_ARCHETYPES: readonly BuildingArchetype[] = [
     costSecondary: 0,
     buildTime: 30,        // 30 seconds to construct
     sightRange: 10,
-    produces: [UnitTypeId.Infantry, UnitTypeId.Ranged],
+    produces: [UnitTypeId.Infantry, UnitTypeId.Ranged, UnitTypeId.Support],
   },
 
   // BuildingTypeId.LumberCamp = 2 -- Houtzagerij

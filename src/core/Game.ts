@@ -825,6 +825,15 @@ export class Game {
       case 'train-ranged':
         this.trainFromSelectedBuilding(UnitTypeId.Ranged);
         break;
+      case 'train-heavy':
+        this.trainFromSelectedBuilding(UnitTypeId.Heavy);
+        break;
+      case 'train-siege':
+        this.trainFromSelectedBuilding(UnitTypeId.Siege);
+        break;
+      case 'train-support':
+        this.trainFromSelectedBuilding(UnitTypeId.Support);
+        break;
       case 'train-hero-0':
         this.trainFactionHero(0);
         break;
@@ -1524,17 +1533,34 @@ export class Game {
         Faction.id[this.selectedEntities[0]] === this.playerFactionId
         ? this.selectedEntities[0] : null;
 
-      // Q/W/E/T/R: context-sensitive — building production OR unit commands
+      // Building production hotkeys: dynamically resolved from building card buttons
+      // Q=Worker, W=Infantry, E=Ranged, A=Heavy, S=Siege, D=Support, T/Y=Heroes, R=Rally
       if (selectedBuilding && Building.complete[selectedBuilding] === 1) {
-        if (e.code === 'KeyQ') { this.trainFromSelectedBuilding(UnitTypeId.Worker); return; }
-        if (e.code === 'KeyW') { this.trainFromSelectedBuilding(UnitTypeId.Infantry); return; }
-        if (e.code === 'KeyE') { this.trainFromSelectedBuilding(UnitTypeId.Ranged); return; }
+        // Find the matching button in the building card by hotkey
+        const hotkeyChar = e.code.replace('Key', '');
+        const bcardBtn = document.querySelector<HTMLButtonElement>(
+          `#building-card:not([hidden]) .bcard-action-btn[data-hotkey="${hotkeyChar}"]`,
+        );
+        if (bcardBtn && !bcardBtn.hidden && !bcardBtn.disabled) {
+          const action = bcardBtn.dataset.action;
+          if (action === 'train-worker')   { this.trainFromSelectedBuilding(UnitTypeId.Worker);   return; }
+          if (action === 'train-infantry') { this.trainFromSelectedBuilding(UnitTypeId.Infantry); return; }
+          if (action === 'train-ranged')   { this.trainFromSelectedBuilding(UnitTypeId.Ranged);   return; }
+          if (action === 'train-heavy')    { this.trainFromSelectedBuilding(UnitTypeId.Heavy);    return; }
+          if (action === 'train-siege')    { this.trainFromSelectedBuilding(UnitTypeId.Siege);    return; }
+          if (action === 'train-support')  { this.trainFromSelectedBuilding(UnitTypeId.Support);  return; }
+          if (action === 'rally-point' && hasComponent(world, selectedBuilding, RallyPoint)) {
+            this.enterRallyPointMode();
+            return;
+          }
+          if (action?.startsWith('train-hero-')) {
+            const heroIdx = parseInt(action.replace('train-hero-', ''), 10);
+            if (!isNaN(heroIdx)) { this.trainFactionHero(heroIdx); return; }
+          }
+        }
+        // Fallback for legacy hardcoded hotkeys (T/Y for heroes when no bcard button found)
         if (e.code === 'KeyT') { this.trainFactionHero(0); return; }
         if (e.code === 'KeyY') { this.trainFactionHero(1); return; }
-        if (e.code === 'KeyR' && hasComponent(world, selectedBuilding, RallyPoint)) {
-          this.enterRallyPointMode();
-          return;
-        }
       }
 
       // A key: enter attack-move mode (only if units are selected)
@@ -2324,10 +2350,10 @@ export class Game {
     if (!isBlacksmith) {
       // Faction-specific unit names
       const unitNames: Record<number, Record<string, string>> = {
-        0: { worker: 'Boer', infantry: 'Carnavalvierder', ranged: 'Sluiper' },
-        1: { worker: 'Stagiair', infantry: 'Manager', ranged: 'Consultant' },
-        2: { worker: 'Mijnwerker', infantry: 'Schutterij', ranged: 'Vlaaienwerper' },
-        3: { worker: 'Frietkraamhouder', infantry: 'Bierbouwer', ranged: 'Chocolatier' },
+        0: { worker: 'Boer', infantry: 'Carnavalvierder', ranged: 'Sluiper', heavy: 'Tractorrijder', siege: 'Frituurmeester', support: 'Boerinne' },
+        1: { worker: 'Stagiair', infantry: 'Manager', ranged: 'Consultant', heavy: 'CorporateAdvocaat', siege: 'Sloopkogel', support: 'HR-Medewerker' },
+        2: { worker: 'Mijnwerker', infantry: 'Schutterij', ranged: 'Vlaaienwerper', heavy: 'Mergelridder', siege: 'Mijnkarretje', support: 'Heuvelwacht' },
+        3: { worker: 'Frietkraamhouder', infantry: 'Bierbouwer', ranged: 'Chocolatier', heavy: 'Rijexaminator', siege: 'Frituurkanon', support: 'Pralinemaker' },
       };
       const names = unitNames[this.playerFactionId] ?? unitNames[0];
 
@@ -2335,6 +2361,8 @@ export class Game {
       const arch = BUILDING_ARCHETYPES[buildingType];
       const canProduce = arch ? new Set(arch.produces) : new Set<number>();
       const isBarracks = buildingType === BuildingTypeId.Barracks;
+      const isFactionSpecial2 = buildingType === BuildingTypeId.FactionSpecial2;
+      const isSiegeWorkshop = buildingType === BuildingTypeId.SiegeWorkshop;
 
       if (canProduce.has(UnitTypeId.Worker)) {
         actions.push({
@@ -2363,6 +2391,36 @@ export class Game {
           label: names.ranged,
           hotkey: 'E',
           iconClass: 'btn-icon--attack',
+        });
+      }
+
+      if (canProduce.has(UnitTypeId.Heavy)) {
+        actions.push({
+          action: 'train-heavy',
+          icon: 'HVY',
+          label: names.heavy,
+          hotkey: isFactionSpecial2 ? 'Q' : 'A',
+          iconClass: 'btn-icon--attack',
+        });
+      }
+
+      if (canProduce.has(UnitTypeId.Siege)) {
+        actions.push({
+          action: 'train-siege',
+          icon: 'SIE',
+          label: names.siege,
+          hotkey: isSiegeWorkshop ? 'Q' : 'S',
+          iconClass: 'btn-icon--attack',
+        });
+      }
+
+      if (canProduce.has(UnitTypeId.Support)) {
+        actions.push({
+          action: 'train-support',
+          icon: 'SUP',
+          label: names.support,
+          hotkey: 'D',
+          iconClass: 'btn-icon--train',
         });
       }
 
