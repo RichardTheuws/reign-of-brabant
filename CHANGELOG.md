@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.36.0] - 2026-04-15
+
+### Changed
+- **Siege unit balance** — Praalwagen attack 60→15, siegeBonus 4→8 (building DPS 30, was 60; anti-unit DPS 3.75, was 15). Manneken Pis-kanon attack 55→12, siegeBonus 4→6 (building DPS 24, was 73; anti-unit DPS 4, was 18). Siege units zijn nu dedicated building destroyers, niet ook anti-unit monsters
+- **Kamerdebat nerf** — De Politicus E ability: radius 20→14, duur 12s→8s. Was een instant-win button in mid-game fights
+- **Verkiezingsbelofte nerf** — De Politicus Q ability: cooldown 30s→50s. Uptime van 50% naar 30%, vergelijkbaar met andere buff abilities
+- **Gezelligheid 20+ tier nerf** — Max bonus 50%→40% attack/speed/armor, damage reduction 20%→15%. Deathball-strategie nog steeds sterk maar niet meer dominantnit
+
+### Fixed
+- **archetypes.ts data sync** — Brabanders Infantry (attack 9→10, attackSpeed 1.3→1.2), Ranged (attack 14→12), Heavy (attack 20→22, armor 3→4) gesynchroniseerd met canonieke factionData.ts waarden
+- **Vastgoedmakelaar comment** — "5x siegeBonus" comment gecorrigeerd naar "4x siegeBonus" (code was al correct)
+
 ## [0.35.1] - 2026-04-15
 
 ### Fixed

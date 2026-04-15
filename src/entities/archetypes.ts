@@ -49,8 +49,8 @@ export const UNIT_ARCHETYPES: readonly UnitArchetype[] = [
     name: 'Infantry',
     brabantName: 'Carnavalvierder',
     hp: 80,
-    attack: 9,
-    attackSpeed: 1.3,     // 1.3s between attacks (DPS 6.92, was 8.33)
+    attack: 10,
+    attackSpeed: 1.2,     // 1.2s between attacks — synced with factionData.ts
     armor: 1,
     armorType: ArmorType.Light,
     speed: 5.5,
@@ -69,8 +69,8 @@ export const UNIT_ARCHETYPES: readonly UnitArchetype[] = [
     name: 'Ranged',
     brabantName: 'Sluiper',
     hp: 55,
-    attack: 14,
-    attackSpeed: 1.8,     // 1.8s between attacks (DPS 7.78, was 6.67)
+    attack: 12,
+    attackSpeed: 1.8,     // 1.8s between attacks — synced with factionData.ts
     armor: 0,
     armorType: ArmorType.Light,
     speed: 6.0,
@@ -89,9 +89,9 @@ export const UNIT_ARCHETYPES: readonly UnitArchetype[] = [
     name: 'Heavy',
     brabantName: 'Tractorrijder',
     hp: 200,
-    attack: 20,
-    attackSpeed: 2.0,     // 2.0s between attacks — slow but hard-hitting
-    armor: 3,
+    attack: 22,
+    attackSpeed: 2.0,     // 2.0s between attacks — synced with factionData.ts
+    armor: 4,
     armorType: ArmorType.Heavy,
     speed: 4.0,
     range: MINIMUM_MELEE_RANGE,

@@ -300,12 +300,13 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       splashRadius: 3,
     },
     // Praalwagen (Super Siege) [Tier 3] -- slow, expensive, building-destroyer
+    // Low base attack (anti-unit weak), high siegeBonus compensates vs buildings
     {
       typeId: UnitTypeId.Siege,
       name: 'Praalwagen',
       brabantName: 'Praalwagen',
       hp: 300,
-      attack: 60, // buildings only
+      attack: 15,
       attackSpeed: 4.0,
       armor: 3,
       armorType: ArmorType.Heavy,
@@ -317,7 +318,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       population: 4,
       sightRange: 10,
       carryCapacity: 0,
-      siegeBonus: 4.0,
+      siegeBonus: 8.0,
       splashRadius: 5,
     },
   ],
@@ -467,7 +468,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       name: 'Vastgoedmakelaar',
       brabantName: 'Vastgoedmakelaar',
       hp: 90,
-      attack: 10, // 10 vs units, 50 vs buildings (5x siegeBonus per PRD)
+      attack: 10, // 10 vs units, 40 vs buildings (4x siegeBonus)
       attackSpeed: 3.5,
       armor: 1,
       armorType: ArmorType.Medium,
@@ -727,13 +728,14 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       sightRange: 8,
       carryCapacity: 0,
     },
-    // Manneken Pis-kanon (Siege) -- highest building DPS, fragile
+    // Manneken Pis-kanon (Siege) -- highest building DPS, fragile glass cannon
+    // Low base attack (anti-unit weak), high siegeBonus compensates vs buildings
     {
       typeId: UnitTypeId.Siege,
       name: 'Manneken Pis-kanon',
       brabantName: 'Manneken Pis-kanon',
       hp: 80,
-      attack: 55, // anti-building only per PRD
+      attack: 12,
       attackSpeed: 3.0,
       armor: 0,
       armorType: ArmorType.Light,
@@ -745,7 +747,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       population: 3,
       sightRange: 10,
       carryCapacity: 0,
-      siegeBonus: 4.0,
+      siegeBonus: 6.0,
       splashRadius: 3,
     },
     // Wafelzuster (Support / Healer) -- fast heal cycle, fragile

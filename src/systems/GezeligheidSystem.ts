@@ -58,7 +58,7 @@ interface BonusTier {
 }
 
 const BONUS_TIERS: BonusTier[] = [
-  { minCount: 20, attackMult: 1.50, speedMult: 1.50, armorMult: 1.50, passiveHeal: true, damageReduction: 0.20 },
+  { minCount: 20, attackMult: 1.40, speedMult: 1.40, armorMult: 1.40, passiveHeal: true, damageReduction: 0.15 },
   { minCount: 11, attackMult: 1.30, speedMult: 1.30, armorMult: 1.30, passiveHeal: true, damageReduction: 0.0 },
   { minCount: 6,  attackMult: 1.20, speedMult: 1.20, armorMult: 1.20, passiveHeal: false, damageReduction: 0.0 },
   { minCount: 2,  attackMult: 1.10, speedMult: 1.10, armorMult: 1.10, passiveHeal: false, damageReduction: 0.0 },
