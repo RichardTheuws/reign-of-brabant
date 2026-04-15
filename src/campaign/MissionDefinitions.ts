@@ -160,8 +160,8 @@ const MISSION_1_DE_OOGST: MissionDefinition = {
   ],
 
   objectives: [
-    // Primary: gather 200 gold (reduced from 500, matches tutorial step 12)
-    { id: 'gather-200', type: 'gather-gold', description: 'Verzamel 200 goud', targetValue: 200, isBonus: false },
+    // Primary: gather 500 gold — gives room to build barracks (200g), train units, fight, then finish
+    { id: 'gather-500', type: 'gather-gold', description: 'Verzamel 500 goud', targetValue: 500, isBonus: false },
     // Bonus: don't lose any workers
     { id: 'no-worker-loss', type: 'no-worker-loss', description: 'Verlies geen boeren', targetValue: 0, isBonus: true },
     // Bonus: build a barracks
@@ -172,10 +172,10 @@ const MISSION_1_DE_OOGST: MissionDefinition = {
     // NO time-based wolf spawn (was at 120s — removed!)
     // Enemy spawns are handled by the tutorial system at steps 10 and 11
 
-    // Victory when 200 gold reached
+    // Victory when 500 gold reached — enough room to build barracks (200g), train, fight, then finish
     {
       id: 'victory-gold',
-      condition: { type: 'gold-reached', amount: 200 },
+      condition: { type: 'gold-reached', amount: 500 },
       actions: [
         { type: 'message', text: 'Uitstekend! Je hebt de eerste oogst binnengehaald. Brabant is trots op je!' },
         { type: 'victory' },

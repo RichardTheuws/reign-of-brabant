@@ -109,10 +109,10 @@ const TUTORIAL_STEPS: TutorialStep[] = [
     highlight: 'goldmine',
     allowedActions: new Set<AllowedAction>(['camera', 'select', 'box-select', 'right-click']),
   },
-  // Step 5/12 — Wachten op gold (50) — pause overlay
+  // Step 5/12 — Wachten op gold (200) — pause overlay
   {
-    message: 'Het goud komt binnen! Linksboven zie je je grondstoffen. Wacht tot je 50 goud hebt \u2014 dan kun je bouwen.',
-    condition: (s) => s.gold >= 50,
+    message: 'Het goud komt binnen! Linksboven zie je je grondstoffen. Wacht tot je 200 goud hebt \u2014 dat is genoeg voor een Kazerne.',
+    condition: (s) => s.gold >= 200,
     pauseOnEntry: true,
     allowedActions: new Set<AllowedAction>(['camera', 'select', 'box-select', 'right-click']),
   },
@@ -160,10 +160,10 @@ const TUTORIAL_STEPS: TutorialStep[] = [
     condition: (s) => s.defendSurvived,
     allowedActions: new Set<AllowedAction>(['all']),
   },
-  // Step 12/12 — Missie voltooien (200 gold)
+  // Step 12/12 — Missie voltooien (500 gold)
   {
-    message: 'Uitstekend! Verzamel nu 200 goud om de missie te voltooien. Je kent de basis \u2014 succes, opzichter!',
-    condition: (s) => s.gold >= 200,
+    message: 'Uitstekend! Verzamel nu 500 goud om de missie te voltooien. Je kent de basis \u2014 succes, opzichter!',
+    condition: (s) => s.gold >= 500,
     allowedActions: new Set<AllowedAction>(['all']),
   },
 ];
