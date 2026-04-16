@@ -47,12 +47,12 @@ const BUILDING_MODEL_PATHS: Record<string, string> = {
   'advanced_0': '/assets/models/v02/brabanders/advanced.glb',
   'advanced_1': '/assets/models/v02/randstad/barracks.glb',    // TODO: replace with Parkeergarage model
   'advanced_2': '/assets/models/v02/limburgers/advanced.glb',
-  'advanced_3': '/assets/models/v02/belgen/barracks.glb',      // TODO: replace with Rijschool model
+  'advanced_3': '/assets/models/v02/belgen/advanced.glb',
   // Siege Workshop — dedicated Meshy v6 models where available
   'siege-workshop_0': '/assets/models/v02/brabanders/siege-workshop.glb',
   'siege-workshop_1': '/assets/models/v02/randstad/siege-workshop.glb',
-  'siege-workshop_2': '/assets/models/v02/limburgers/blacksmith.glb', // TODO: replace with dedicated model
-  'siege-workshop_3': '/assets/models/v02/belgen/blacksmith.glb',     // TODO: replace with dedicated model
+  'siege-workshop_2': '/assets/models/v02/limburgers/siege-workshop.glb',
+  'siege-workshop_3': '/assets/models/v02/belgen/siege-workshop.glb',
   // Tertiary resource building — fallback to lumbercamp
   'tertiary_0': '/assets/models/v02/brabanders/lumbercamp.glb',
   'tertiary_1': '/assets/models/v02/randstad/lumbercamp.glb',
