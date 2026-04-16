@@ -476,6 +476,169 @@
     <div class="content">
         <div class="timeline">
 
+            <!-- ── v0.37.2 ─────────────────────────────── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.37.2</span>
+                        <span class="update__date">16 april 2026</span>
+                        <h2 class="update__title">Worker Overhaul &amp; 9 Nieuwe Meshy Modellen</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Buildings</span>
+                            <span class="tag tag--feat">3D Modellen</span>
+                            <span class="tag tag--ui">UI/UX</span>
+                            <span class="tag tag--gameplay">Gameplay</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Een playtest van enkele minuten onthulde een cascade aan problemen: workers konden maar 3 buildings bouwen, heavy units waren onbereikbaar, kosten nergens zichtbaar. Deze update herstelt het volledige building- en productiesysteem.</p>
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">WORKER BUILD MENU</h3>
+                        <ul class="update__highlights">
+                            <li><strong>7-8 buildings per factie</strong> -- Het worker menu is uitgebreid van 3 naar 7-8 buildings. Housing voor populatie, Feestzaal/Parkeergarage voor heavy units, Tractorschuur/Sloopwerf voor siege units, en verdedigingstorens zijn nu allemaal bouwbaar</li>
+                            <li><strong>Tier lock systeem</strong> -- Tier 2 buildings (housing, toren) verschijnen gegreyed out met een slot-icoon totdat je een Smederij hebt gebouwd. Tier 3 (feestzaal, siege workshop) vereist een Geavanceerde Smederij. Hover toont de vereiste</li>
+                            <li><strong>Inline kosten</strong> -- Elke build-knop toont nu direct de kosten (bijv. "200g+150h"). Geen hover nodig om te weten wat iets kost. Ook op unit train-knoppen in het building panel</li>
+                            <li><strong>Building portraits</strong> -- Elk building type heeft een uniek canvas-drawn icoon in plaats van het generieke 'BLD' label. Verdedigingstorens, siege workshops en advanced buildings zijn nu visueel herkenbaar</li>
+                        </ul>
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">HEAVY, SIEGE &amp; SUPPORT PRODUCTIE</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Heavy units trainbaar</strong> -- De Tractorrijder (Brabanders), CorporateAdvocaat (Randstad), Mergelridder (Limburgers) en Rijexaminator (Belgen) zijn nu produceerbaar vanuit de Feestzaal/Parkeergarage/Mijnwerkerskamp/Rijschool</li>
+                            <li><strong>Siege units trainbaar</strong> -- Frituurmeester, Sloopkogel, Mijnkarretje en Frituurkanon komen uit de nieuwe siege workshops. Gespecialiseerd in het vernietigen van vijandelijke gebouwen</li>
+                            <li><strong>Support units</strong> -- Boerinne, HR-Medewerker, Heuvelwacht en Pralinemaker zijn nu trainbaar vanuit de kazerne. Ze helen nabijgelegen eenheden</li>
+                        </ul>
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">9 NIEUWE 3D MODELLEN</h3>
+                        <ul class="update__highlights">
+                            <li><strong>8 building modellen</strong> -- Via Meshy v6 text-to-3D: Feestzaal, Tractorschuur, Parkeergarage, Sloopwerf, Mijnwerkerskamp, Steengroeve, Rijschool en Frituurkanon-werkplaats. Elk gebouw heeft nu een uniek 3D model per factie</li>
+                            <li><strong>Randstad Manager v2</strong> -- Het corporate manager infantry model is volledig vernieuwd: scherp pak, tablet in de hand, autoritaire houding. Past beter bij de Randstad-factie</li>
+                        </ul>
+                        <div class="update__media">
+                            <div class="media-item">
+                                <model-viewer
+                                    src="/assets/models/v02/brabanders/advanced.glb"
+                                    alt="Brabanders Feestzaal"
+                                    auto-rotate camera-controls touch-action="pan-y"
+                                    style="width:100%; height:220px; border-radius:8px; border:1px solid var(--border); background: var(--bg-card);">
+                                </model-viewer>
+                                <p class="media-item__caption">Feestzaal — Brabanders advanced building</p>
+                            </div>
+                            <div class="media-item">
+                                <model-viewer
+                                    src="/assets/models/v02/randstad/siege-workshop.glb"
+                                    alt="Randstad Sloopwerf"
+                                    auto-rotate camera-controls touch-action="pan-y"
+                                    style="width:100%; height:220px; border-radius:8px; border:1px solid var(--border); background: var(--bg-card);">
+                                </model-viewer>
+                                <p class="media-item__caption">Sloopwerf — Randstad siege workshop</p>
+                            </div>
+                            <div class="media-item">
+                                <model-viewer
+                                    src="/assets/models/v02/limburgers/advanced.glb"
+                                    alt="Limburgers Mijnwerkerskamp"
+                                    auto-rotate camera-controls touch-action="pan-y"
+                                    style="width:100%; height:220px; border-radius:8px; border:1px solid var(--border); background: var(--bg-card);">
+                                </model-viewer>
+                                <p class="media-item__caption">Mijnwerkerskamp — Limburgers advanced building</p>
+                            </div>
+                            <div class="media-item">
+                                <model-viewer
+                                    src="/assets/models/v02/belgen/siege-workshop.glb"
+                                    alt="Belgen Frituurkanon-werkplaats"
+                                    auto-rotate camera-controls touch-action="pan-y"
+                                    style="width:100%; height:220px; border-radius:8px; border:1px solid var(--border); background: var(--bg-card);">
+                                </model-viewer>
+                                <p class="media-item__caption">Frituurkanon-werkplaats — Belgen siege workshop</p>
+                            </div>
+                            <div class="media-item">
+                                <model-viewer
+                                    src="/assets/models/v02/randstad/infantry-v2.glb"
+                                    alt="Randstad Manager v2"
+                                    auto-rotate camera-controls touch-action="pan-y"
+                                    style="width:100%; height:220px; border-radius:8px; border:1px solid var(--border); background: var(--bg-card);">
+                                </model-viewer>
+                                <p class="media-item__caption">Manager v2 — Randstad infantry unit</p>
+                            </div>
+                        </div>
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">UI &amp; RESPONSIVE</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Responsive menu</strong> -- De "Start Gevecht" knop is nu sticky aan de onderkant van het scherm, altijd bereikbaar. Betere breakpoints voor tablets en kleine schermen</li>
+                            <li><strong>Blacksmith panel</strong> -- Verbeterde layout met betere hover effecten, goud kostprijs badges en een stijlvolle progress bar voor lopend onderzoek</li>
+                            <li><strong>Hotkeys zonder WASD-conflict</strong> -- Build hotkeys gebruiken nu Q/E/R/T/F/G/Z/X, zodat ze niet conflicteren met de WASD-camera</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.37.0 ─────────────────────────────── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.37.0</span>
+                        <span class="update__date">15 april 2026</span>
+                        <h2 class="update__title">Playtest Fixes — 17 Engine &amp; Mission Bugs</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--fix">Bugfixes</span>
+                            <span class="tag tag--gameplay">Missies</span>
+                            <span class="tag tag--feat">Engine</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Eerste echte playtest-ronde ontdekte 17 bugs in de engine, missie-logica en combat balance. Van instant-win exploits tot onzichtbare vijanden: alles gefixed.</p>
+                        <ul class="update__highlights">
+                            <li><strong>7 missies waren instant te winnen</strong> -- Het destroy-building objective telde globaal in plaats van per factie. Eén gebouw vernietigen van willekeurig wie gaf je de overwinning. Nu gefilterd op targetFactionId en targetBuildingType</li>
+                            <li><strong>Wave tracking per entity</strong> -- Missie-waves werden geteld via de globale AI unit counter. Als pre-placed vijanden stierven, telde dat af van de wave count. Nu per-entity tracking zodat waves correct functioneren naast pre-placed enemies</li>
+                            <li><strong>AI state leak</strong> -- Na een game-switch bleef de AI van de vorige match actief. AISystem.reset() opgezet zodat de AI-staat schoon begint bij elke nieuwe game</li>
+                            <li><strong>Dynamische map grootte</strong> -- Terrain was hardcoded op 128x128 en negeerde de gekozen kaartgrootte. Nu accepteert het 80-192 dynamisch</li>
+                            <li><strong>Victory/defeat prioriteit</strong> -- Trigger-based victory controleerde niet of je Town Hall nog stond. Je kon winnen terwijl je eigenlijk verslagen was. Nu checkt defeat altijd eerst</li>
+                            <li><strong>Rivier-collision</strong> -- Pathfinding fallback gleed door rivieren heen. Nu slide-along-edge physics met isRiver() check</li>
+                            <li><strong>Bridge carving</strong> -- Bruggen werden als cirkels behandeld in de NavMesh. Nu oriented rectangles die de werkelijke brug-lengte en rotatie respecteren</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.36.0 ─────────────────────────────── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.36.0</span>
+                        <span class="update__date">15 april 2026</span>
+                        <h2 class="update__title">Balance Patch — Siege, Heroes &amp; Gezelligheid</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--gameplay">Balance</span>
+                            <span class="tag tag--fix">Bugfixes</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Siege units waren anti-alles monsters. Randstad heroes domineerden elke teamfight. Brabanders deathball was onoverwinnelijk. Deze balance patch maakt het slagveld eerlijker.</p>
+                        <ul class="update__highlights">
+                            <li><strong>Siege units zijn nu building specialists</strong> -- Praalwagen attack 60 naar 15 (siegeBonus 4 naar 8). Manneken Pis-kanon attack 55 naar 12 (siegeBonus 4 naar 6). Ze vernietigen gebouwen even snel, maar verliezen nu van gewone troepen</li>
+                            <li><strong>Kamerdebat radius nerf</strong> -- De Politicus E ability: radius 20 naar 14, duur 12s naar 8s. Was een instant-win knop in mid-game gevechten</li>
+                            <li><strong>Verkiezingsbelofte cooldown</strong> -- De Politicus Q ability: cooldown 30s naar 50s. Uptime van 50% naar 30%, vergelijkbaar met andere buff abilities</li>
+                            <li><strong>Gezelligheid deathball nerf</strong> -- Brabanders 20+ tier: max bonus 50% naar 40% attack/speed/armor, damage reduction 20% naar 15%. Deathball nog steeds sterk, niet meer onstopbaar</li>
+                            <li><strong>Data sync fix</strong> -- archetypes.ts gesynchroniseerd met factionData.ts canonieke waarden. Brabanders Infantry, Ranged en Heavy hadden afwijkende stats</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.35.1 ─────────────────────────────── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.35.1</span>
+                        <span class="update__date">15 april 2026</span>
+                        <h2 class="update__title">Tutorial Fix — Goud-thresholds</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--fix">Bugfix</span>
+                        </div>
+                        <ul class="update__highlights">
+                            <li><strong>Tutorial goud-mismatch</strong> -- Stap 5 vroeg om 50 goud voor een kazerne die 200 kost. Nu wacht stap 5 op 200 goud. Einddoel verhoogd van 200 naar 500 zodat de missie niet eindigt voordat je door alle stappen heen bent</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
             <!-- ── v0.35.0 ─────────────────────────────── -->
             <article class="update">
                 <div class="update__card">
