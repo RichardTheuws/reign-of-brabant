@@ -45,7 +45,7 @@ const BUILDING_MODEL_PATHS: Record<string, string> = {
   tower_3: '/assets/models/v02/belgen/tower.glb',
   // Advanced military (FactionSpecial2) — Meshy v6 dedicated models
   'advanced_0': '/assets/models/v02/brabanders/advanced.glb',
-  'advanced_1': '/assets/models/v02/randstad/barracks.glb',    // TODO: replace with Parkeergarage model
+  'advanced_1': '/assets/models/v02/randstad/advanced.glb',
   'advanced_2': '/assets/models/v02/limburgers/advanced.glb',
   'advanced_3': '/assets/models/v02/belgen/advanced.glb',
   // Siege Workshop — dedicated Meshy v6 models where available
