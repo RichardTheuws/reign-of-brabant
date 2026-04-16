@@ -43,13 +43,13 @@ const BUILDING_MODEL_PATHS: Record<string, string> = {
   tower_1: '/assets/models/v02/randstad/tower.glb',
   tower_2: '/assets/models/v02/limburgers/tower.glb',
   tower_3: '/assets/models/v02/belgen/tower.glb',
-  // Advanced military (FactionSpecial2) — fallback to barracks until Meshy models generated
-  'advanced_0': '/assets/models/v02/brabanders/barracks.glb',
-  'advanced_1': '/assets/models/v02/randstad/barracks.glb',
-  'advanced_2': '/assets/models/v02/limburgers/barracks.glb',
-  'advanced_3': '/assets/models/v02/belgen/barracks.glb',
+  // Advanced military (FactionSpecial2) — Meshy v6 dedicated models
+  'advanced_0': '/assets/models/v02/brabanders/advanced.glb',
+  'advanced_1': '/assets/models/v02/randstad/barracks.glb',    // TODO: replace with Parkeergarage model
+  'advanced_2': '/assets/models/v02/limburgers/advanced.glb',
+  'advanced_3': '/assets/models/v02/belgen/barracks.glb',      // TODO: replace with Rijschool model
   // Siege Workshop — dedicated Meshy v6 models where available
-  'siege-workshop_0': '/assets/models/v02/brabanders/blacksmith.glb', // TODO: replace with dedicated model
+  'siege-workshop_0': '/assets/models/v02/brabanders/siege-workshop.glb',
   'siege-workshop_1': '/assets/models/v02/randstad/siege-workshop.glb',
   'siege-workshop_2': '/assets/models/v02/limburgers/blacksmith.glb', // TODO: replace with dedicated model
   'siege-workshop_3': '/assets/models/v02/belgen/blacksmith.glb',     // TODO: replace with dedicated model
