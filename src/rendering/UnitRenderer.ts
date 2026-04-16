@@ -30,7 +30,7 @@ const UNIT_MODEL_PATHS: Record<string, string> = {
   worker_0: '/assets/models/v02/brabanders/worker.glb',
   worker_1: '/assets/models/v02/randstad/worker.glb',
   infantry_0: '/assets/models/v02/brabanders/infantry.glb',
-  infantry_1: '/assets/models/v02/randstad/infantry.glb',
+  infantry_1: '/assets/models/v02/randstad/infantry-v2.glb',
   ranged_0: '/assets/models/v02/brabanders/ranged.glb',
   ranged_1: '/assets/models/v02/randstad/ranged.glb',
   // Limburgers
