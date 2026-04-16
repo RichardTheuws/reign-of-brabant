@@ -12,7 +12,7 @@ import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 // Types
 // ---------------------------------------------------------------------------
 
-export type BuildingTypeName = 'townhall' | 'barracks' | 'blacksmith' | 'lumbercamp' | 'housing' | 'tower';
+export type BuildingTypeName = 'townhall' | 'barracks' | 'blacksmith' | 'lumbercamp' | 'housing' | 'tower' | 'advanced' | 'siege-workshop' | 'tertiary' | 'upgrade' | 'special1';
 
 const BUILDING_MODEL_PATHS: Record<string, string> = {
   townhall_0: '/assets/models/v02/brabanders/townhall.glb',
@@ -43,6 +43,31 @@ const BUILDING_MODEL_PATHS: Record<string, string> = {
   tower_1: '/assets/models/v02/randstad/tower.glb',
   tower_2: '/assets/models/v02/limburgers/tower.glb',
   tower_3: '/assets/models/v02/belgen/tower.glb',
+  // Advanced military (FactionSpecial2) — fallback to barracks until Meshy models generated
+  'advanced_0': '/assets/models/v02/brabanders/barracks.glb',
+  'advanced_1': '/assets/models/v02/randstad/barracks.glb',
+  'advanced_2': '/assets/models/v02/limburgers/barracks.glb',
+  'advanced_3': '/assets/models/v02/belgen/barracks.glb',
+  // Siege Workshop — fallback to blacksmith until Meshy models generated
+  'siege-workshop_0': '/assets/models/v02/brabanders/blacksmith.glb',
+  'siege-workshop_1': '/assets/models/v02/randstad/blacksmith.glb',
+  'siege-workshop_2': '/assets/models/v02/limburgers/blacksmith.glb',
+  'siege-workshop_3': '/assets/models/v02/belgen/blacksmith.glb',
+  // Tertiary resource building — fallback to lumbercamp
+  'tertiary_0': '/assets/models/v02/brabanders/lumbercamp.glb',
+  'tertiary_1': '/assets/models/v02/randstad/lumbercamp.glb',
+  'tertiary_2': '/assets/models/v02/limburgers/lumbercamp.glb',
+  'tertiary_3': '/assets/models/v02/belgen/lumbercamp.glb',
+  // Upgrade building — fallback to blacksmith
+  'upgrade_0': '/assets/models/v02/brabanders/blacksmith.glb',
+  'upgrade_1': '/assets/models/v02/randstad/blacksmith.glb',
+  'upgrade_2': '/assets/models/v02/limburgers/blacksmith.glb',
+  'upgrade_3': '/assets/models/v02/belgen/blacksmith.glb',
+  // FactionSpecial1 — fallback to lumbercamp
+  'special1_0': '/assets/models/v02/brabanders/lumbercamp.glb',
+  'special1_1': '/assets/models/v02/randstad/lumbercamp.glb',
+  'special1_2': '/assets/models/v02/limburgers/lumbercamp.glb',
+  'special1_3': '/assets/models/v02/belgen/lumbercamp.glb',
 };
 
 const BUILDING_MODEL_FALLBACKS: Record<string, string> = {
@@ -74,6 +99,29 @@ const BUILDING_MODEL_FALLBACKS: Record<string, string> = {
   tower_1: '/assets/models/v02/randstad/blacksmith.glb',
   tower_2: '/assets/models/v02/limburgers/blacksmith.glb',
   tower_3: '/assets/models/v02/belgen/blacksmith.glb',
+  // Advanced military (fallback chain)
+  'advanced_0': '/assets/models/v02/brabanders/barracks.glb',
+  'advanced_1': '/assets/models/v02/randstad/barracks.glb',
+  'advanced_2': '/assets/models/v02/limburgers/barracks.glb',
+  'advanced_3': '/assets/models/v02/belgen/barracks.glb',
+  // Siege Workshop (fallback chain)
+  'siege-workshop_0': '/assets/models/v02/brabanders/blacksmith.glb',
+  'siege-workshop_1': '/assets/models/v02/randstad/blacksmith.glb',
+  'siege-workshop_2': '/assets/models/v02/limburgers/blacksmith.glb',
+  'siege-workshop_3': '/assets/models/v02/belgen/blacksmith.glb',
+  // Tertiary / Upgrade / Special1 (fallback chain)
+  'tertiary_0': '/assets/models/v02/brabanders/lumbercamp.glb',
+  'tertiary_1': '/assets/models/v02/randstad/lumbercamp.glb',
+  'tertiary_2': '/assets/models/v02/limburgers/lumbercamp.glb',
+  'tertiary_3': '/assets/models/v02/belgen/lumbercamp.glb',
+  'upgrade_0': '/assets/models/v02/brabanders/blacksmith.glb',
+  'upgrade_1': '/assets/models/v02/randstad/blacksmith.glb',
+  'upgrade_2': '/assets/models/v02/limburgers/blacksmith.glb',
+  'upgrade_3': '/assets/models/v02/belgen/blacksmith.glb',
+  'special1_0': '/assets/models/v02/brabanders/lumbercamp.glb',
+  'special1_1': '/assets/models/v02/randstad/lumbercamp.glb',
+  'special1_2': '/assets/models/v02/limburgers/lumbercamp.glb',
+  'special1_3': '/assets/models/v02/belgen/lumbercamp.glb',
 };
 
 type ModelCacheKey = `${BuildingTypeName}_${number}`;

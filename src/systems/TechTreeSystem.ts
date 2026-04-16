@@ -318,6 +318,29 @@ export class TechTreeSystem {
     return true;
   }
 
+  /**
+   * Get the highest unlocked building tier for a faction.
+   * Returns 1, 2, or 3.
+   */
+  getUnlockedTier(factionId: number, world: GameWorld): number {
+    const buildings = query(world, [Building, Faction, IsBuilding]);
+    let hasBlacksmith = false;
+    let hasUpgradeBuilding = false;
+
+    for (const eid of buildings) {
+      if (Faction.id[eid] !== factionId) continue;
+      if (hasComponent(world, eid, IsDead)) continue;
+      if (Building.complete[eid] !== 1) continue;
+
+      if (Building.typeId[eid] === BuildingTypeId.Blacksmith) hasBlacksmith = true;
+      if (Building.typeId[eid] === BuildingTypeId.UpgradeBuilding) hasUpgradeBuilding = true;
+    }
+
+    if (hasUpgradeBuilding) return 3;
+    if (hasBlacksmith) return 2;
+    return 1;
+  }
+
   // -------------------------------------------------------------------------
   // Commands
   // -------------------------------------------------------------------------

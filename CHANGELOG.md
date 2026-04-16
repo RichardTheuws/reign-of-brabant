@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.37.2] - 2026-04-16
+
+### Fixed
+- **Tier lock UI**: Tier 2 (housing, tower) en tier 3 (feestzaal, siege workshop) buildings nu visueel gegreyed out met lock icoon als prerequisites niet voldaan. Tooltip toont "Vereist: Smederij" / "Vereist: Geavanceerde Smederij"
+- **Building renderer mappings**: FactionSpecial2, SiegeWorkshop, TertiaryResource, UpgradeBuilding, FactionSpecial1 renderen nu correct (fallback modellen totdat Meshy modellen klaar zijn)
+- **Meshy 3D modellen**: Feestzaal, Tractorschuur, Parkeergarage, Sloopwerf, Mijnwerkerskamp, Steengroeve, Rijschool, Frituurkanon-werkplaats + verbeterd Randstad Manager model gegenereerd
+
 ## [0.37.1] - 2026-04-15
 
 ### Fixed

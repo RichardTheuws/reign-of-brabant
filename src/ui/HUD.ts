@@ -219,51 +219,60 @@ const BASE_WORKER_CMDS: WorkerBuildCmd[] = [
 
 // Worker build commands per faction. Each building has:
 // - Unique BuildingTypeId-based icon via BuildingPortraits canvas rendering
-// - Consistent hotkey grid: Q/W/E (row 1), A/S/D (row 2), Z/X (row 3)
+// - Consistent hotkey grid avoiding WASD: Q/E/R, T/F/G, Z/X
 // - buildingTypeId for portrait lookup and inline cost display
+// - tier: 1 (always available), 2 (requires Blacksmith), 3 (requires UpgradeBuilding)
 interface WorkerBuildCmdExt extends WorkerBuildCmd {
   buildingTypeId?: BuildingTypeId;
+  tier?: 1 | 2 | 3;
 }
 
+// Tier requirement labels for locked building tooltips
+const TIER_REQUIREMENT_LABELS: Record<number, string> = {
+  2: 'Smederij',    // Requires completed Blacksmith
+  3: 'Geavanceerde Smederij', // Requires completed UpgradeBuilding
+};
+
 // Hotkey grid avoids WASD (camera): Q/E/R (row 1), T/F/G (row 2), Z/X (row 3)
+// Tier: 1=always, 2=requires Blacksmith, 3=requires UpgradeBuilding
 const FACTION_WORKER_BUILDS: Record<Faction, WorkerBuildCmdExt[]> = {
   brabant: [
-    { action: 'build-barracks',        icon: 'BRK', label: 'Kazerne',         hotkey: 'Q', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Barracks },
-    { action: 'build-lumbercamp',      icon: 'LMB', label: 'Houtzagerij',     hotkey: 'E', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.LumberCamp },
-    { action: 'build-blacksmith',      icon: 'BSM', label: 'Smederij',        hotkey: 'R', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Blacksmith },
-    { action: 'build-housing',         icon: 'HSE', label: 'Boerenhoeve',     hotkey: 'T', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Housing },
-    { action: 'build-faction2',        icon: 'ADV', label: 'Feestzaal',       hotkey: 'F', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial2 },
-    { action: 'build-siege-workshop',  icon: 'SWK', label: 'Tractorschuur',   hotkey: 'G', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.SiegeWorkshop },
-    { action: 'build-tower',           icon: 'TWR', label: 'Kerk',            hotkey: 'Z', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.DefenseTower },
+    { action: 'build-barracks',        icon: 'BRK', label: 'Kazerne',         hotkey: 'Q', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Barracks,                 tier: 1 },
+    { action: 'build-lumbercamp',      icon: 'LMB', label: 'Houtzagerij',     hotkey: 'E', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.LumberCamp,               tier: 1 },
+    { action: 'build-blacksmith',      icon: 'BSM', label: 'Smederij',        hotkey: 'R', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Blacksmith,                tier: 1 },
+    { action: 'build-housing',         icon: 'HSE', label: 'Boerenhoeve',     hotkey: 'T', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Housing,                   tier: 2 },
+    { action: 'build-tower',           icon: 'TWR', label: 'Kerk',            hotkey: 'F', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.DefenseTower,              tier: 2 },
+    { action: 'build-faction2',        icon: 'ADV', label: 'Feestzaal',       hotkey: 'G', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial2,           tier: 3 },
+    { action: 'build-siege-workshop',  icon: 'SWK', label: 'Tractorschuur',   hotkey: 'Z', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.SiegeWorkshop,             tier: 3 },
   ],
   randstad: [
-    { action: 'build-barracks',        icon: 'BRK', label: 'Vergaderzaal',    hotkey: 'Q', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Barracks },
-    { action: 'build-lumbercamp',      icon: 'LMB', label: 'Starbucks',       hotkey: 'E', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.LumberCamp },
-    { action: 'build-blacksmith',      icon: 'BSM', label: 'CoworkingSpace',  hotkey: 'R', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Blacksmith },
-    { action: 'build-housing',         icon: 'HSE', label: 'Vinex-wijk',      hotkey: 'T', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Housing },
-    { action: 'build-faction2',        icon: 'ADV', label: 'Parkeergarage',   hotkey: 'F', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial2 },
-    { action: 'build-siege-workshop',  icon: 'SWK', label: 'Sloopwerf',      hotkey: 'G', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.SiegeWorkshop },
-    { action: 'build-tower',           icon: 'TWR', label: 'Kantoor-toren',   hotkey: 'Z', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.DefenseTower },
+    { action: 'build-barracks',        icon: 'BRK', label: 'Vergaderzaal',    hotkey: 'Q', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Barracks,                 tier: 1 },
+    { action: 'build-lumbercamp',      icon: 'LMB', label: 'Starbucks',       hotkey: 'E', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.LumberCamp,               tier: 1 },
+    { action: 'build-blacksmith',      icon: 'BSM', label: 'CoworkingSpace',  hotkey: 'R', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Blacksmith,                tier: 1 },
+    { action: 'build-housing',         icon: 'HSE', label: 'Vinex-wijk',      hotkey: 'T', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Housing,                   tier: 2 },
+    { action: 'build-tower',           icon: 'TWR', label: 'Kantoor-toren',   hotkey: 'F', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.DefenseTower,              tier: 2 },
+    { action: 'build-faction2',        icon: 'ADV', label: 'Parkeergarage',   hotkey: 'G', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial2,           tier: 3 },
+    { action: 'build-siege-workshop',  icon: 'SWK', label: 'Sloopwerf',      hotkey: 'Z', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.SiegeWorkshop,             tier: 3 },
   ],
   limburg: [
-    { action: 'build-barracks',        icon: 'BRK', label: 'Schuttershal',    hotkey: 'Q', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Barracks },
-    { action: 'build-lumbercamp',      icon: 'LMB', label: 'Vlaaibakkerij',   hotkey: 'E', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.LumberCamp },
-    { action: 'build-blacksmith',      icon: 'BSM', label: 'Klooster',        hotkey: 'R', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Blacksmith },
-    { action: 'build-housing',         icon: 'HSE', label: 'Huuske',          hotkey: 'T', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Housing },
-    { action: 'build-faction2',        icon: 'ADV', label: 'Mijnwerkerskamp', hotkey: 'F', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial2 },
-    { action: 'build-siege-workshop',  icon: 'SWK', label: 'Steengroeve',     hotkey: 'G', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.SiegeWorkshop },
-    { action: 'build-tower',           icon: 'TWR', label: 'Wachttoren',      hotkey: 'Z', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.DefenseTower },
-    { action: 'build-mijnschacht',     icon: 'TRT', label: 'Mijnschacht',     hotkey: 'X', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.TertiaryResourceBuilding },
+    { action: 'build-barracks',        icon: 'BRK', label: 'Schuttershal',    hotkey: 'Q', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Barracks,                 tier: 1 },
+    { action: 'build-lumbercamp',      icon: 'LMB', label: 'Vlaaibakkerij',   hotkey: 'E', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.LumberCamp,               tier: 1 },
+    { action: 'build-blacksmith',      icon: 'BSM', label: 'Klooster',        hotkey: 'R', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Blacksmith,                tier: 1 },
+    { action: 'build-housing',         icon: 'HSE', label: 'Huuske',          hotkey: 'T', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Housing,                   tier: 2 },
+    { action: 'build-tower',           icon: 'TWR', label: 'Wachttoren',      hotkey: 'F', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.DefenseTower,              tier: 2 },
+    { action: 'build-faction2',        icon: 'ADV', label: 'Mijnwerkerskamp', hotkey: 'G', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial2,           tier: 3 },
+    { action: 'build-siege-workshop',  icon: 'SWK', label: 'Steengroeve',     hotkey: 'Z', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.SiegeWorkshop,             tier: 3 },
+    { action: 'build-mijnschacht',     icon: 'TRT', label: 'Mijnschacht',     hotkey: 'X', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.TertiaryResourceBuilding,  tier: 2 },
   ],
   belgen: [
-    { action: 'build-barracks',        icon: 'BRK', label: 'Frituur',         hotkey: 'Q', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Barracks },
-    { action: 'build-lumbercamp',      icon: 'LMB', label: 'Frietfabriek',    hotkey: 'E', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.LumberCamp },
-    { action: 'build-blacksmith',      icon: 'BSM', label: 'EU-Parlement',    hotkey: 'R', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Blacksmith },
-    { action: 'build-housing',         icon: 'HSE', label: 'Brusselse Woning', hotkey: 'T', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Housing },
-    { action: 'build-faction2',        icon: 'ADV', label: 'Rijschool',       hotkey: 'F', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial2 },
-    { action: 'build-siege-workshop',  icon: 'SWK', label: 'Frituurkanon-werkplaats', hotkey: 'G', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.SiegeWorkshop },
-    { action: 'build-tower',           icon: 'TWR', label: 'Commissiegebouw', hotkey: 'Z', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.DefenseTower },
-    { action: 'build-chocolaterie',    icon: 'TRT', label: 'Chocolaterie',    hotkey: 'X', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.TertiaryResourceBuilding },
+    { action: 'build-barracks',        icon: 'BRK', label: 'Frituur',         hotkey: 'Q', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Barracks,                 tier: 1 },
+    { action: 'build-lumbercamp',      icon: 'LMB', label: 'Frietfabriek',    hotkey: 'E', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.LumberCamp,               tier: 1 },
+    { action: 'build-blacksmith',      icon: 'BSM', label: 'EU-Parlement',    hotkey: 'R', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Blacksmith,                tier: 1 },
+    { action: 'build-housing',         icon: 'HSE', label: 'Brusselse Woning', hotkey: 'T', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Housing,                  tier: 2 },
+    { action: 'build-tower',           icon: 'TWR', label: 'Commissiegebouw', hotkey: 'F', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.DefenseTower,              tier: 2 },
+    { action: 'build-faction2',        icon: 'ADV', label: 'Rijschool',       hotkey: 'G', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial2,           tier: 3 },
+    { action: 'build-siege-workshop',  icon: 'SWK', label: 'Frituurkanon-werkplaats', hotkey: 'Z', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.SiegeWorkshop,    tier: 3 },
+    { action: 'build-chocolaterie',    icon: 'TRT', label: 'Chocolaterie',    hotkey: 'X', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.TertiaryResourceBuilding,  tier: 2 },
   ],
 };
 
@@ -1660,8 +1669,11 @@ export class HUD {
     btn.dataset.action = cmd.action;
     if (cmd.hotkey) btn.dataset.hotkey = cmd.hotkey;
 
-    // Use building portrait for build commands when buildingTypeId is available
+    // Store tier for dynamic lock/unlock
     const extCmd = cmd as WorkerBuildCmdExt;
+    if (extCmd.tier) btn.dataset.tier = String(extCmd.tier);
+
+    // Use building portrait for build commands when buildingTypeId is available
     const iconSpan = document.createElement('span');
     iconSpan.className = 'btn-icon' + (cmd.iconClass ? ` ${cmd.iconClass}` : '');
 
@@ -1715,11 +1727,21 @@ export class HUD {
     btn.addEventListener('click', handler);
     this.boundHandlers.push({ el: btn, event: 'click', handler: handler as EventListener });
 
-    // Attach tooltip for building commands
+    // Attach tooltip for building commands (includes tier lock info)
     const cmdAction = cmd.action;
     const cmdLabel = cmd.label;
     const cmdHotkey = cmd.hotkey;
-    this.attachTooltipHandlers(btn, () => this.getBuildingTooltipData(cmdAction, cmdLabel, cmdHotkey));
+    const cmdTier = extCmd.tier ?? 1;
+    this.attachTooltipHandlers(btn, () => {
+      const baseData = this.getBuildingTooltipData(cmdAction, cmdLabel, cmdHotkey);
+      if (!baseData) return null;
+      // Add tier lock info if building is locked
+      if (btn.classList.contains('cmd-btn--locked') && cmdTier > 1) {
+        const reqLabel = TIER_REQUIREMENT_LABELS[cmdTier] ?? `Tier ${cmdTier}`;
+        baseData.desc = `Vereist: ${reqLabel}`;
+      }
+      return baseData;
+    });
 
     return btn;
   }
@@ -1727,6 +1749,21 @@ export class HUD {
   // -----------------------------------------------------------------------
   // Command enable/disable (hide instead of gray out)
   // -----------------------------------------------------------------------
+
+  /**
+   * Update the locked/unlocked state of worker build buttons based on tech tree.
+   * @param unlockedTier The highest tier currently unlocked (1, 2, or 3).
+   */
+  updateBuildLocks(unlockedTier: number): void {
+    if (!this.cmdWorker) return;
+    const buttons = this.cmdWorker.querySelectorAll<HTMLButtonElement>('.cmd-btn[data-tier]');
+    for (const btn of buttons) {
+      const btnTier = parseInt(btn.dataset.tier ?? '1', 10);
+      const locked = btnTier > unlockedTier;
+      btn.classList.toggle('cmd-btn--locked', locked);
+      btn.disabled = locked;
+    }
+  }
 
   setCommandEnabled(action: CommandAction, enabled: boolean): void {
     const buttons = document.querySelectorAll<HTMLButtonElement>(`[data-action="${action}"]`);

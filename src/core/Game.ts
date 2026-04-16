@@ -1992,6 +1992,9 @@ export class Game {
         const hasWorker = entityIds.some(eid => hasComponent(world, eid, IsWorker));
         if (hasWorker) {
           this.hud.showWorkerCommands();
+          // Update tier lock state for build buttons
+          const unlockedTier = techTreeSystem.getUnlockedTier(this.playerFactionId, world);
+          this.hud.updateBuildLocks(unlockedTier);
         }
         // Show hero ability panel if a hero is selected
         const heroEid = entityIds.find(eid => hasComponent(world, eid, IsHero));
@@ -2293,13 +2296,18 @@ export class Game {
   }
 
   /** Map BuildingTypeId to BuildingRenderer type name. Falls back to 'barracks' for unknown types. */
-  private getBuildingRendererType(buildingType: number): 'townhall' | 'barracks' | 'lumbercamp' | 'blacksmith' | 'housing' | 'tower' {
+  private getBuildingRendererType(buildingType: number): import('../rendering/BuildingRenderer').BuildingTypeName {
     switch (buildingType) {
       case BuildingTypeId.TownHall: return 'townhall';
       case BuildingTypeId.LumberCamp: return 'lumbercamp';
       case BuildingTypeId.Blacksmith: return 'blacksmith';
       case BuildingTypeId.Housing: return 'housing';
       case BuildingTypeId.DefenseTower: return 'tower';
+      case BuildingTypeId.FactionSpecial2: return 'advanced';
+      case BuildingTypeId.SiegeWorkshop: return 'siege-workshop';
+      case BuildingTypeId.TertiaryResourceBuilding: return 'tertiary';
+      case BuildingTypeId.UpgradeBuilding: return 'upgrade';
+      case BuildingTypeId.FactionSpecial1: return 'special1';
       default: return 'barracks';
     }
   }
