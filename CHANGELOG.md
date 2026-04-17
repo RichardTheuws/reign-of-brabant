@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.37.7] - 2026-04-17 — user's map-brug-bug gefixt (268/268 groen)
+
+### Fixed — P1 Bug 6 (map-gen)
+- **Pre-gegenereerde bruggen snappen nu naar river-paths** in `river-valley` en `archipelago` templates. Voorheen werden bruggen geplaatst op aangenomen coördinaten (`z=0` of `centerIslandRadius`), terwijl de werkelijke river-paths per RNG wiggleden — resultaat: bruggen naast in plaats van over de rivier.
+- Nieuwe helper `snapBridgeToRiver()` kiest voor elke brug het dichtstbijzijnde river-path-punt en berekent de rotation loodrecht op de river-tangent, zodat bruggen visueel en functioneel kloppen.
+- **15 nieuwe tests** (`map-bridge-river-alignment.test.ts`): asserteren dat elke brug ≤ 4 units van z'n dichtstbijzijnde river-path ligt, over meerdere seeds + playercounts, plus een regressieguard dat geen template bruggen zonder rivieren mag shippen.
+- Hiermee is de user-gemelde bug "bruggen random verdeeld over het terrein" volledig afgedekt.
+
 ## [0.37.6] - 2026-04-17 — P0 SWEEP COMPLEET (253/253 groen)
 
 ### Fixed — P0 Fase 3 (UX-transparantie)

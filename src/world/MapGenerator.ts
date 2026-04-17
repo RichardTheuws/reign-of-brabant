@@ -431,11 +431,12 @@ function generateRiverValley(
     });
   }
 
-  // 5 bridges
+  // 5 bridges, snapped onto the wiggly river path so they always cross it.
   const bridges: BridgeSpawn[] = [];
   const allBridgeXs = [...bridgeXs, 0];
   for (const bx of allBridgeXs) {
-    bridges.push({ x: bx, z: 0, rotation: 0, width: 4, length: 14 });
+    const raw: BridgeSpawn = { x: bx, z: 0, rotation: 0, width: 4, length: 14 };
+    bridges.push(snapBridgeToRiver(raw, riverPath));
   }
 
   // Roads along banks
@@ -1659,38 +1660,41 @@ function generateArchipelago(
     rivers.push({ path: channelPath, width: channelWidth * 0.8 });
   }
 
-  // Bridges: one from each island to center
+  // Bridges: one from each island to center, snapped to the ring channel.
   for (let slot = 0; slot < playerCount; slot++) {
     const angle = (slot / playerCount) * Math.PI * 2 - Math.PI / 2;
     const bridgeR = centerIslandRadius;
-    bridges.push({
+    const raw: BridgeSpawn = {
       x: Math.cos(angle) * bridgeR,
       z: Math.sin(angle) * bridgeR,
       rotation: angle + Math.PI / 2,
       width: 5,
       length: channelWidth + 4,
-    });
+    };
+    bridges.push(snapBridgeToRiver(raw, ringPath));
   }
 
-  // If 2 players: add a secondary bridge between each island (flanking route)
+  // If 2 players: add secondary flanking bridges, also snapped to the ring.
   if (playerCount === 2) {
     const flankAngle1 = Math.PI * 0.15;
     const flankAngle2 = Math.PI * 1.15;
     const flankR = centerIslandRadius + 4 * scale;
-    bridges.push({
+    const raw1: BridgeSpawn = {
       x: Math.cos(flankAngle1) * flankR,
       z: Math.sin(flankAngle1) * flankR,
       rotation: flankAngle1 + Math.PI / 2,
       width: 4,
       length: channelWidth + 2,
-    });
-    bridges.push({
+    };
+    const raw2: BridgeSpawn = {
       x: Math.cos(flankAngle2) * flankR,
       z: Math.sin(flankAngle2) * flankR,
       rotation: flankAngle2 + Math.PI / 2,
       width: 4,
       length: channelWidth + 2,
-    });
+    };
+    bridges.push(snapBridgeToRiver(raw1, ringPath));
+    bridges.push(snapBridgeToRiver(raw2, ringPath));
   }
 
   // Roads from spawns to nearest bridge
@@ -1835,6 +1839,44 @@ function nudgeFromRiver(
   }
 
   return { x, z }; // No valid offset found, return original
+}
+
+/**
+ * Snap a bridge onto its closest river-path point and orient it perpendicular
+ * to the local tangent. Templates often place bridges at assumed coordinates
+ * (e.g. z=0) while river paths wiggle via RNG; without snapping the bridge
+ * drifts next to the river instead of crossing it.
+ *
+ * Pure helper -- does not mutate the inputs.
+ */
+function snapBridgeToRiver<T extends BridgeSpawn>(
+  bridge: T,
+  riverPath: ReadonlyArray<{ x: number; z: number }>,
+): T {
+  if (riverPath.length === 0) return bridge;
+
+  let bestI = 0;
+  let bestDistSq = Infinity;
+  for (let i = 0; i < riverPath.length; i++) {
+    const p = riverPath[i];
+    const dx = bridge.x - p.x;
+    const dz = bridge.z - p.z;
+    const d = dx * dx + dz * dz;
+    if (d < bestDistSq) {
+      bestDistSq = d;
+      bestI = i;
+    }
+  }
+
+  const closest = riverPath[bestI];
+  const before = riverPath[Math.max(0, bestI - 1)];
+  const after = riverPath[Math.min(riverPath.length - 1, bestI + 1)];
+  const tangentX = after.x - before.x;
+  const tangentZ = after.z - before.z;
+  // Rotation faces across the river -> perpendicular to tangent.
+  const rotation = Math.atan2(tangentZ, tangentX) + Math.PI / 2;
+
+  return { ...bridge, x: closest.x, z: closest.z, rotation };
 }
 
 // ---------------------------------------------------------------------------
