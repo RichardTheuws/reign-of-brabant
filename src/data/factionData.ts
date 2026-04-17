@@ -873,9 +873,9 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       sightRange: 10,
       produces: [],
     },
-    // Feestzaal (Advanced unit building)
+    // Feestzaal (Advanced unit building -- trains Heavy units, Tier 3)
     {
-      typeId: BuildingTypeId.Barracks,
+      typeId: BuildingTypeId.FactionSpecial2,
       name: 'Feestzaal',
       brabantName: 'Feestzaal',
       hp: 800,
@@ -883,7 +883,19 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       costSecondary: 200,
       buildTime: 45,
       sightRange: 10,
-      produces: [UnitTypeId.Infantry, UnitTypeId.Ranged],
+      produces: [UnitTypeId.Heavy],
+    },
+    // Tractorschuur (Siege workshop -- trains Siege units, Tier 3)
+    {
+      typeId: BuildingTypeId.SiegeWorkshop,
+      name: 'Tractorschuur',
+      brabantName: 'Tractorschuur',
+      hp: 750,
+      costGold: 325,
+      costSecondary: 225,
+      buildTime: 45,
+      sightRange: 9,
+      produces: [UnitTypeId.Siege],
     },
     // Dorpsweide (Special -- Gezelligheid burst)
     {
@@ -999,9 +1011,9 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       sightRange: 8,
       produces: [],
     },
-    // Parkeergarage (Advanced unit building)
+    // Parkeergarage (Advanced unit building -- trains Heavy units, Tier 3)
     {
-      typeId: BuildingTypeId.Barracks,
+      typeId: BuildingTypeId.FactionSpecial2,
       name: 'Parkeergarage',
       brabantName: 'Parkeergarage',
       hp: 900,
@@ -1009,7 +1021,19 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       costSecondary: 250,
       buildTime: 50,
       sightRange: 10,
-      produces: [UnitTypeId.Infantry, UnitTypeId.Ranged],
+      produces: [UnitTypeId.Heavy],
+    },
+    // Sloopwerf (Siege workshop -- trains Siege units, Tier 3)
+    {
+      typeId: BuildingTypeId.SiegeWorkshop,
+      name: 'Sloopwerf',
+      brabantName: 'Sloopwerf',
+      hp: 850,
+      costGold: 375,
+      costSecondary: 275,
+      buildTime: 50,
+      sightRange: 9,
+      produces: [UnitTypeId.Siege],
     },
     // Vinex-wijk (Housing)
     {
@@ -1137,9 +1161,9 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       sightRange: 12,
       produces: [],
     },
-    // Mijnwerkerskamp (Advanced unit building) -- cheaper than Randstad equivalent
+    // Mijnwerkerskamp (Advanced unit building -- trains Heavy units, Tier 3)
     {
-      typeId: BuildingTypeId.Barracks,
+      typeId: BuildingTypeId.FactionSpecial2,
       name: 'Mijnwerkerskamp',
       brabantName: 'Mijnwerkerskamp',
       hp: 950,
@@ -1147,7 +1171,19 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       costSecondary: 200,
       buildTime: 46,
       sightRange: 10,
-      produces: [UnitTypeId.Infantry, UnitTypeId.Ranged],
+      produces: [UnitTypeId.Heavy],
+    },
+    // Steengroeve (Siege workshop -- trains Siege units, Tier 3)
+    {
+      typeId: BuildingTypeId.SiegeWorkshop,
+      name: 'Steengroeve',
+      brabantName: 'Steengroeve',
+      hp: 900,
+      costGold: 325,
+      costSecondary: 225,
+      buildTime: 46,
+      sightRange: 9,
+      produces: [UnitTypeId.Siege],
     },
     // Huuske (Housing) -- sturdy but cheap housing
     {
@@ -1239,17 +1275,29 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       sightRange: 8,
       produces: [],
     },
-    // Rijschool (Advanced unit building)
+    // Rijschool (Advanced unit building -- trains Heavy units, Tier 3)
     {
-      typeId: BuildingTypeId.Barracks,
+      typeId: BuildingTypeId.FactionSpecial2,
       name: 'Rijschool',
       brabantName: 'Rijschool',
       hp: 700,
       costGold: 275,
       costSecondary: 175,
-      buildTime: 38,
+      buildTime: 42,
       sightRange: 10,
-      produces: [UnitTypeId.Infantry, UnitTypeId.Ranged],
+      produces: [UnitTypeId.Heavy],
+    },
+    // Frituurkanon-werkplaats (Siege workshop -- trains Siege units, Tier 3)
+    {
+      typeId: BuildingTypeId.SiegeWorkshop,
+      name: 'Frituurkanon-werkplaats',
+      brabantName: 'Frituurkanon-werkplaats',
+      hp: 700,
+      costGold: 300,
+      costSecondary: 200,
+      buildTime: 42,
+      sightRange: 9,
+      produces: [UnitTypeId.Siege],
     },
     // Wafelkraam (Support -- mobile heal) -- cheap, fragile
     {

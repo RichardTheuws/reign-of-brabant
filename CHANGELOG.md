@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.37.4] - 2026-04-17
+
+### Fixed — P0 Fase 1 (data-unlock)
+- **Bug 4 — FactionSpecial2 produceert nu Heavy units** per factie (was Infantry/Ranged = duplicaat van Barracks). Entries Feestzaal / Parkeergarage / Mijnwerkerskamp / Rijschool kregen ook de correcte `typeId: FactionSpecial2` (was ten onrechte `Barracks`). Rijschool buildTime bijgetuned naar 42s om T3 pricing-gate te halen.
+- **Bug 5 — SiegeWorkshop data-entries toegevoegd** voor alle 4 facties (Tractorschuur / Sloopwerf / Steengroeve / Frituurkanon-werkplaats). Produceren Siege units, T3 prijs, HUD-labels in sync met data.name. Ghost-button werkt nu als echt gebouw.
+- **37 RED tests → GREEN** in `faction-special2-produces.test.ts` + `siege-workshop-data-parity.test.ts`. Totaal: 245/253 groen.
+
+### Impact
+- T3-progressie eindelijk speelbaar: spelers kunnen nu Heavy + Siege units trainen.
+- HUD-buttons voor SiegeWorkshop zijn geen ghost meer.
+
 ## [0.37.3] - 2026-04-17
 
 ### Added
