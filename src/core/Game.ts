@@ -34,6 +34,7 @@ import { visionData } from '../systems/VisionSystem';
 import { playerState } from '../core/PlayerState';
 import { eventBus } from '../core/EventBus';
 import { findEntityAtPosition } from '../core/entityPicking';
+import { spawnBuildingEntity } from '../entities/buildingSpawn';
 import { HUD, type SelectedUnit, type CommandAction, type HeroAbilityData, type BuildingCardData, type BuildingCardAction } from '../ui/HUD';
 import { activateCarnavalsrage, getCarnavalsrageState, getCarnavalsrageConfig, resetAbilitySystem } from '../systems/AbilitySystem';
 import { activateHeroAbility, resetHeroSystem } from '../systems/HeroSystem';
@@ -3304,32 +3305,17 @@ export class Game {
   }
 
   private createBuildingEntity(type: BuildingTypeId, faction: FactionId, x: number, z: number): number {
-    const eid = addEntity(world);
-    // Fallback archetype for building types not in the base array (e.g. TertiaryResourceBuilding)
-    const defaultArch = { hp: 500, costGold: 150, costSecondary: 0, buildTime: 25, sightRange: 8, produces: [] as number[], populationProvided: 5 };
-    const arch = type < BUILDING_ARCHETYPES.length ? BUILDING_ARCHETYPES[type] : defaultArch;
-    const y = this.terrain.getHeightAt(x, z);
+    // All ECS components (Position, Health, Faction, Building, Visibility,
+    // Selected, IsBuilding, Production+RallyPoint for producers) come from
+    // the shared helper so every spawn path stays in sync with the contract.
+    const eid = spawnBuildingEntity(world, type, faction, x, z, {
+      getHeightAt: (px, pz) => this.terrain.getHeightAt(px, pz),
+    });
 
-    addComponent(world, eid, Position); Position.x[eid] = x; Position.y[eid] = y; Position.z[eid] = z;
-    addComponent(world, eid, Health); Health.current[eid] = arch.hp; Health.max[eid] = arch.hp;
-    addComponent(world, eid, Faction); Faction.id[eid] = faction;
-    addComponent(world, eid, Building); Building.typeId[eid] = type; Building.complete[eid] = 1;
-    addComponent(world, eid, Visibility); Visibility.range[eid] = arch.sightRange || 12;
-    addComponent(world, eid, Selected); Selected.by[eid] = 255;
-    addComponent(world, eid, IsBuilding);
-
-    // Add Production component to buildings that can produce
-    if (arch.produces.length > 0) {
-      addComponent(world, eid, Production);
-      Production.unitType[eid] = NO_PRODUCTION;
-      Production.progress[eid] = 0;
-      Production.queue0[eid] = NO_PRODUCTION;
-      Production.queue1[eid] = NO_PRODUCTION;
-      Production.queue2[eid] = NO_PRODUCTION;
-      Production.queue3[eid] = NO_PRODUCTION;
-      Production.queue4[eid] = NO_PRODUCTION;
-    }
-
+    // Game-level bookkeeping that's not part of the pure ECS spawn.
+    const arch = type < BUILDING_ARCHETYPES.length
+      ? BUILDING_ARCHETYPES[type]
+      : { populationProvided: 5 };
     this.playerState.addPopulationCapacity(faction, arch.populationProvided ?? 5);
     return eid;
   }

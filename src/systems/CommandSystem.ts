@@ -282,7 +282,7 @@ function handleGather(world: GameWorld, units: number[], cmd: GatherCommand): vo
   }
 }
 
-function handleBuild(world: GameWorld, units: number[], cmd: BuildCommand): void {
+export function handleBuild(world: GameWorld, units: number[], cmd: BuildCommand): void {
   // Find nearest worker among selected units
   let nearestWorker = -1;
   let nearestDist = Infinity;
@@ -307,6 +307,11 @@ function handleBuild(world: GameWorld, units: number[], cmd: BuildCommand): void
 
   UnitAI.state[nearestWorker] = UnitAIState.Moving;
   addComponent(world, nearestWorker, NeedsPathfinding);
+
+  // Reset gather state so a mid-harvest worker doesn't get yanked back to
+  // the resource by GatherSystem before it reaches the build site.
+  Gatherer.state[nearestWorker] = 0; // NONE
+  Gatherer.targetEid[nearestWorker] = NO_ENTITY;
 }
 
 function handleTrain(world: GameWorld, cmd: TrainCommand): void {

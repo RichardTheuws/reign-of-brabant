@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.37.8] - 2026-04-17 — browser-feedback ronde 1 (284/284 groen)
+
+### Fixed
+- **Bug 7 — worker bouwt nu daadwerkelijk af** i.p.v. direct weer harvesten. `CommandSystem.handleBuild` reset nu `Gatherer.state` naar NONE (parallel aan move/attack). Voorheen hield de worker z'n gather-state, GatherSystem sleepte hem terug naar de boom en het gebouw kwam nooit af.
+- **Bug 8 — rally-button werkt op alle productiegebouwen** (ook skirmish-pre-placed). `createBuildingEntity` in Game.ts miste de `RallyPoint` component (alleen `Production` werd toegevoegd); de `factories.ts`-pad deed het wel. Opgelost door een shared `spawnBuildingEntity` helper die beide paden garandeert te synchroniseren. Regressie-test (`building-spawn-rally-contract.test.ts`) lockt dat beide paden het contract respecteren.
+- **+13 contract-tests** (RallyPoint, building spawn) en **+3 gather-reset tests** (Bug 7). Totaal: 284/284 groen.
+
+### Pending diagnostiek
+- **Bug 9 (skirmish: klikken voelt maar selectie onduidelijk/commands werken niet)** — geen reproduceerbare root cause zonder browser-console-logs. Fix volgt na meer diagnostiek.
+
 ## [0.37.7] - 2026-04-17 — user's map-brug-bug gefixt (268/268 groen)
 
 ### Fixed — P1 Bug 6 (map-gen)
