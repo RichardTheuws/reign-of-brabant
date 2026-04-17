@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.37.10] - 2026-04-17 — skirmish menu polish
+
+### Fixed — Bug 10
+- **Faction preview image laadde niet** — `FACTIONS` array in MenuScreens.ts gebruikte relatieve paden (`assets/factions/...`) terwijl de game op `/play/` draait. Paden nu absoluut (`/assets/factions/...`).
+- **Start Gevecht-knop overlapte de onderste opties** — sticky positioning mengde met inhoud; nu vast positioneerd onderaan viewport met backdrop-blur + extra padding-bottom op scrollable container zodat alle opties vrij bereikbaar zijn.
+- **Broken-image "?" placeholder** vervangen door een styled fallback (factie-initiaal in goud) voor als een portret-bestand ontbreekt. Geen browser-native placeholder iconen meer.
+
+### Added
+- Asset Generator agent draait parallel om nieuwe hi-res factie-portretten te genereren (v2) via fal.ai Flux Pro. Output landt in `public/assets/factions/*-v2.png` en wordt in een volgende bump ingeschakeld.
+
 ## [0.37.9] - 2026-04-17 — shader crash gefixt
 
 ### Fixed — Critical

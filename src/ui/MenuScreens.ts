@@ -123,7 +123,7 @@ const FACTIONS: FactionData[] = [
     subtitle: 'De Gezelligen',
     description: 'Gezelligheid maakt sterk. Brabantse eenheden worden sterker naarmate ze dichter bij elkaar staan. Tot +50% stats bij 20+ units samen.',
     traits: ['Gezelligheid', 'Sterk in groep', 'Carnaval'],
-    image: 'assets/factions/brabanders-prins.png',
+    image: '/assets/factions/brabanders-prins.png',
     available: true,
   },
   {
@@ -132,7 +132,7 @@ const FACTIONS: FactionData[] = [
     subtitle: 'De Efficienten',
     description: 'Bureaucratie overwint alles. Elke actie bouwt Efficientie-stacks op. Na 20 acties zijn ze sneller dan alle andere facties.',
     traits: ['Bureaucratie', 'Efficientie', 'Werkoverleg'],
-    image: 'assets/factions/randstad-ceo.png',
+    image: '/assets/factions/randstad-ceo.png',
     available: true,
   },
   {
@@ -141,7 +141,7 @@ const FACTIONS: FactionData[] = [
     subtitle: 'Meesters van de Ondergrond',
     description: 'Vanuit hun uitgebreide mijnnetwerk beheersen de Limburgers het ondergrondse. Hun tunnels maken verrassingsaanvallen mogelijk die geen vijand ziet aankomen. Met Kolen als brandstof voor hun industrie bouwen ze een onzichtbaar imperium.',
     traits: ['Tunnelnetwerk', 'Verrassingsaanvallen', 'Kolen-economie', 'Defensief sterk'],
-    image: 'assets/factions/limburgers-mijnbaas.png',
+    image: '/assets/factions/limburgers-mijnbaas.png',
     available: true,
   },
   {
@@ -150,7 +150,7 @@ const FACTIONS: FactionData[] = [
     subtitle: 'Diplomaten en Compromismeesters',
     description: 'Waarom vechten als ge kunt onderhandelen? De Belgen winnen oorlogen met woorden, Chocolade en eindeloos overleg. Hun Commissies vertragen vijanden, hun Compromissen kopen tijd, en hun Chocolade-Overtuiging steelt vijandelijke eenheden.',
     traits: ['Diplomatie', 'Compromis-abilities', 'Chocolade-overtuiging', 'Commissie-sabotage'],
-    image: 'assets/factions/belgen-frietkoning.png',
+    image: '/assets/factions/belgen-frietkoning.png',
     available: true,
   },
 ];
@@ -514,7 +514,8 @@ export class MenuScreens {
     preview.innerHTML = `
       <div class="faction-preview-content">
         <div class="faction-preview-image">
-          <img src="${faction.image}" alt="${faction.name}" />
+          <img src="${faction.image}" alt="${faction.name}" onerror="this.parentElement.classList.add('is-missing'); this.remove();" />
+          <span class="faction-preview-image-fallback">${faction.name.charAt(0)}</span>
         </div>
         <div class="faction-preview-info">
           <h3 class="faction-preview-name">${faction.name}</h3>
