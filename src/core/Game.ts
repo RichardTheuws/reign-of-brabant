@@ -33,6 +33,7 @@ import { FogOfWarRenderer } from '../rendering/FogOfWarRenderer';
 import { visionData } from '../systems/VisionSystem';
 import { playerState } from '../core/PlayerState';
 import { eventBus } from '../core/EventBus';
+import { findEntityAtPosition } from '../core/entityPicking';
 import { HUD, type SelectedUnit, type CommandAction, type HeroAbilityData, type BuildingCardData, type BuildingCardAction } from '../ui/HUD';
 import { activateCarnavalsrage, getCarnavalsrageState, getCarnavalsrageConfig, resetAbilitySystem } from '../systems/AbilitySystem';
 import { activateHeroAbility, resetHeroSystem } from '../systems/HeroSystem';
@@ -2210,20 +2211,7 @@ export class Game {
   }
 
   private findEntityAtPosition(x: number, z: number): number | null {
-    let closest: number | null = null;
-    let closestDist = 5.0; // 5 unit click radius (generous for buildings)
-
-    for (const [eid, mesh] of this.entityMeshMap) {
-      const dx = mesh.position.x - x;
-      const dz = mesh.position.z - z;
-      const dist = Math.sqrt(dx * dx + dz * dz);
-      if (dist < closestDist) {
-        closestDist = dist;
-        closest = eid;
-      }
-    }
-
-    return closest;
+    return findEntityAtPosition(world, this.entityMeshMap, x, z);
   }
 
   private boxSelectUnits(x1: number, y1: number, x2: number, y2: number): number[] {

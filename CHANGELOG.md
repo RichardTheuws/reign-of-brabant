@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.37.3] - 2026-04-17
+
+### Added
+- **Audit suite** (`audits/01-08.md`): parallelle gameplay-audit (6 diepgaande rapporten + test-inventaris + red-test recepten) op basis van 3 beta-bugs. Resultaat: 5 geprioriteerde P0 bugs (rally-target-pick, bridge/river, lumbercamp-UX, FactionSpecial2-produces, SiegeWorkshop-ghost).
+- **5 nieuwe RED test-bestanden** (45 falende tests, 38 expects): `rally-point-resource`, `placement-river-constraint`, `placement-lumbercamp-structured`, `faction-special2-produces`, `siege-workshop-data-parity`. Lock de post-fix contracten voor iteratie 2.
+
+### Changed
+- **`findEntityAtPosition` geextraheerd** uit `Game.ts` naar `src/core/entityPicking.ts` zodat entity-picking unit-testbaar is zonder volledige Game-instance. Geen gedragswijziging in deze commit — logica-fix (Position-component i.p.v. mesh.position) komt in iter-2 green.
+
+### Notes
+- 208 bestaande test-cases blijven groen. Typecheck schoon.
+- Test-telling eerder genoteerd als "618 tests" in memory was fout: werkelijk 206 `it()` blocks / 253 vitest test-cases / 277 expects (pre-iter-1). Memory gecorrigeerd.
+
 ## [0.37.2] - 2026-04-16
 
 ### Fixed
