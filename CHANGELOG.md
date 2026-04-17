@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.37.6] - 2026-04-17 — P0 SWEEP COMPLEET (253/253 groen)
+
+### Fixed — P0 Fase 3 (UX-transparantie)
+- **Bug 3 — LumberCamp placement-feedback toont distance**. `PlacementResult` heeft nu optional `code` + `details` (`nearestWoodEid`, `nearestWoodDistance`, `nearestWoodPosition`, `requiredMaxDistance`). De error-message die de speler ziet is upgraded van *"Houtkamp moet binnen 20 eenheden van bomen staan"* naar *"Houtkamp moet binnen 20 eenheden van bomen staan (dichtste: 34)"* — en een aparte `LUMBERCAMP_NO_WOOD_ON_MAP` code voor kaarten zonder wood.
+- **4 RED tests → GREEN** (placement-lumbercamp-structured). **Volledige suite: 253/253 groen.**
+
+### Samenvatting P0 Sweep (v0.37.3 → v0.37.6)
+| Bug | Status | Speler-effect |
+|-----|--------|---------------|
+| 1. Rally-point pickt resource | GREEN | Right-click op boom/mine werkt nu |
+| 2. Bridge op rivier | GREEN | `BuildingTypeId.Bridge` + river-rule |
+| 3. LumberCamp error met context | GREEN | Speler ziet afstand tot dichtste boom |
+| 4. FactionSpecial2 produceert Heavy | GREEN | T3 Heavy units nu trainbaar |
+| 5. SiegeWorkshop data-parity | GREEN | Siege-button is geen ghost meer |
+
+### Follow-ups genoteerd
+- **Bug 6 (P1)**: Pre-gegenereerde map-bridges in MapGenerator moeten aan river-paths gekoppeld worden (user-gemeld "bruggen random verdeeld").
+- **UX quick-win (P1)**: Ghost-placement-preview met groen/rood + nearby-wood highlight (audit 05 #1). De `details.nearestWoodPosition` uit Bug 3-fix levert al de data-hook.
+
 ## [0.37.5] - 2026-04-17
 
 ### Fixed — P0 Fase 2 (core feel)

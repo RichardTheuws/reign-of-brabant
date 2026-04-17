@@ -35,9 +35,24 @@ const MIN_ENEMY_DISTANCE = 8;
 /** Maximum distance from a tree resource for LumberCamp placement. */
 const LUMBERCAMP_TREE_RANGE = 20;
 
+export interface PlacementFailureDetails {
+  /** ECS entity id of the nearest wood resource, if any exists on the map. */
+  nearestWoodEid?: number;
+  /** Euclidean distance (world units) to the nearest wood resource. */
+  nearestWoodDistance?: number;
+  /** World-space position of the nearest wood resource. */
+  nearestWoodPosition?: { x: number; z: number };
+  /** The proximity threshold that was enforced (e.g. 20 units for LumberCamp). */
+  requiredMaxDistance?: number;
+}
+
 export interface PlacementResult {
   valid: boolean;
   reason?: string;
+  /** Stable machine-readable failure code so UI can localize / render hints. */
+  code?: string;
+  /** Structured context for UX (ghost preview, tooltips, distance hints). */
+  details?: PlacementFailureDetails;
 }
 
 /**
@@ -117,23 +132,43 @@ export function validateBuildingPlacement(
   if (buildingTypeId === BuildingTypeId.LumberCamp) {
     const resources = query(world, [Position, Resource, IsResource]);
     const treeRangeSq = LUMBERCAMP_TREE_RANGE * LUMBERCAMP_TREE_RANGE;
-    let hasNearbyTree = false;
+
+    let nearestEid: number | undefined;
+    let nearestDistSq = Infinity;
 
     for (const rEid of resources) {
       if (Resource.type[rEid] !== ResourceType.Wood) continue;
-
       const dx = x - Position.x[rEid];
       const dz = z - Position.z[rEid];
       const distSq = dx * dx + dz * dz;
-
-      if (distSq <= treeRangeSq) {
-        hasNearbyTree = true;
-        break;
+      if (distSq < nearestDistSq) {
+        nearestDistSq = distSq;
+        nearestEid = rEid;
       }
     }
 
-    if (!hasNearbyTree) {
-      return { valid: false, reason: 'Houtkamp moet binnen 20 eenheden van bomen staan' };
+    if (nearestEid === undefined) {
+      return {
+        valid: false,
+        reason: 'Geen bomen op de kaart -- Houtkamp kan nergens staan',
+        code: 'LUMBERCAMP_NO_WOOD_ON_MAP',
+        details: { requiredMaxDistance: LUMBERCAMP_TREE_RANGE },
+      };
+    }
+
+    if (nearestDistSq > treeRangeSq) {
+      const dist = Math.sqrt(nearestDistSq);
+      return {
+        valid: false,
+        reason: `Houtkamp moet binnen ${LUMBERCAMP_TREE_RANGE} eenheden van bomen staan (dichtste: ${dist.toFixed(0)})`,
+        code: 'LUMBERCAMP_TOO_FAR_FROM_WOOD',
+        details: {
+          nearestWoodEid: nearestEid,
+          nearestWoodDistance: dist,
+          nearestWoodPosition: { x: Position.x[nearestEid], z: Position.z[nearestEid] },
+          requiredMaxDistance: LUMBERCAMP_TREE_RANGE,
+        },
+      };
     }
   }
 
