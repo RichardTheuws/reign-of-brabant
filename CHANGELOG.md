@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.37.9] - 2026-04-17 — shader crash gefixt
+
+### Fixed — Critical
+- **Terrain fragment shader compileerde niet** in Three.js r183: "`vUv` undeclared identifier". `Terrain.createTerrainMaterial` gebruikte `vUv` in een `onBeforeCompile` injection, maar sinds Three.js r150+ wordt `vUv` alleen auto-gedeclareerd als bepaalde UV-features actief zijn — iets dat we niet kunnen garanderen. Opgelost door onze eigen `vTerrainUv` varying te declareren in vertex + fragment injectie. Shader compileert nu betrouwbaar ongeacht welke materiaal-features actief zijn.
+- Dit kan ook Bug 9 (skirmish selectie onduidelijk) verklaren: bij een half-kapotte render-pass is raycasting en selectie-rendering inconsistent.
+
 ## [0.37.8] - 2026-04-17 — browser-feedback ronde 1 (284/284 groen)
 
 ### Fixed

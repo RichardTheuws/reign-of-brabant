@@ -1083,29 +1083,48 @@ export class Terrain {
     // Inject custom shader code for per-fragment micro-detail noise.
     // This adds tiny normal perturbations that break up the flat-shaded look
     // without requiring image textures.
+    //
+    // We carry our own `vTerrainUv` varying rather than rely on Three.js's
+    // built-in `vUv`, because in Three.js r150+ `vUv` is only declared when
+    // certain UV-consuming features (channels, transforms) are active and
+    // we can't guarantee that stays true across material edits.
     material.onBeforeCompile = (shader) => {
-      // Add uniforms for terrain detail
       shader.uniforms.uDetailScale = { value: 48.0 };
       shader.uniforms.uDetailStrength = { value: 0.12 };
 
-      // Insert noise function before main() in fragment shader
+      // --- Vertex shader: declare + write vTerrainUv ---
+      shader.vertexShader = shader.vertexShader.replace(
+        '#include <common>',
+        /* glsl */ `
+        #include <common>
+        varying vec2 vTerrainUv;
+        `,
+      );
+      shader.vertexShader = shader.vertexShader.replace(
+        '#include <uv_vertex>',
+        /* glsl */ `
+        #include <uv_vertex>
+        vTerrainUv = uv;
+        `,
+      );
+
+      // --- Fragment shader: declare vTerrainUv + noise helpers ---
       shader.fragmentShader = shader.fragmentShader.replace(
         '#include <normal_pars_fragment>',
         /* glsl */ `
         #include <normal_pars_fragment>
+        varying vec2 vTerrainUv;
 
-        // Simple 2D hash for per-fragment noise
         float terrainHash(vec2 p) {
           vec3 p3 = fract(vec3(p.xyx) * 0.1031);
           p3 += dot(p3, p3.yzx + 33.33);
           return fract((p3.x + p3.y) * p3.z);
         }
 
-        // Value noise with smooth interpolation
         float terrainNoise(vec2 p) {
           vec2 i = floor(p);
           vec2 f = fract(p);
-          f = f * f * (3.0 - 2.0 * f); // smoothstep
+          f = f * f * (3.0 - 2.0 * f);
           float a = terrainHash(i);
           float b = terrainHash(i + vec2(1.0, 0.0));
           float c = terrainHash(i + vec2(0.0, 1.0));
@@ -1113,7 +1132,6 @@ export class Terrain {
           return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
         }
 
-        // Fractal Brownian Motion for multi-scale detail
         float terrainFBM(vec2 p) {
           float v = 0.0;
           float a = 0.5;
@@ -1130,15 +1148,12 @@ export class Terrain {
         `,
       );
 
-      // Perturb the normal after normal map is applied
       shader.fragmentShader = shader.fragmentShader.replace(
         '#include <normal_fragment_maps>',
         /* glsl */ `
         #include <normal_fragment_maps>
-
-        // Per-fragment micro-detail: perturb normal with FBM noise
         {
-          vec2 detailUV = vUv * uDetailScale;
+          vec2 detailUV = vTerrainUv * uDetailScale;
           float nx = terrainFBM(detailUV + vec2(0.37, 0.0)) - terrainFBM(detailUV - vec2(0.37, 0.0));
           float nz = terrainFBM(detailUV + vec2(0.0, 0.37)) - terrainFBM(detailUV - vec2(0.0, 0.37));
           vec3 detailPerturbation = vec3(nx, nz, 0.0) * uDetailStrength;
