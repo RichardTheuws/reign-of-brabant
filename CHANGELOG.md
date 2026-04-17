@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.37.5] - 2026-04-17
+
+### Fixed — P0 Fase 2 (core feel)
+- **Bug 1 — Rally-point pickt resource correct** bij right-click. `findEntityAtPosition` gebruikt nu `Position.x/z[eid]` uit de ECS world, niet `mesh.position` (die lagged tijdens frame-interpolatie en deed rally-targets missen).
+- **Bug 2 — Bridge-placement respecteert river-tiles**. Nieuw: `BuildingTypeId.Bridge = 11`. `validateBuildingPlacement` accepteert nu optional `terrain.isRiver(x,z)` en blokkeert bridge-placement op alles behalve river-tiles. Andere gebouwen rejecteren rivers als bouwgrond (net als water).
+- **6 RED tests → GREEN** (rally-point-resource + placement-river-constraint). Totaal: 250/253 groen. Alleen Bug 3 resteert.
+
+### Notes
+- DefenseTower placement ongewijzigd (blijft toegestaan op land) — river-constraint is nu expliciet Bridge-only, niet `DefenseTower-als-placeholder-voor-bridge`.
+- **Bug 6 (follow-up, P1)**: pre-gegenereerde map-bridges in `MapGenerator.ts` / `Terrain.ts:838` staan nog los van river-paths. User-gemelde "bruggen random verdeeld" wordt in aparte commit aangepakt.
+
 ## [0.37.4] - 2026-04-17
 
 ### Fixed — P0 Fase 1 (data-unlock)

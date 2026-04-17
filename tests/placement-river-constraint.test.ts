@@ -1,21 +1,23 @@
-// RED test for P0 Bug 2 — Bridge/DefenseTower placement ignores river-tile rule.
+// Test for P0 Bug 2 — Bridge placement must respect river tiles.
 //
-// Current state (v0.37.2): `validateBuildingPlacement` in
-// src/systems/BuildSystem.ts accepts a DefenseTower on any non-water land tile.
-// The terrain API exposes `isRiver(x,z)` (src/world/Terrain.ts:354-360), but
-// `validateBuildingPlacement` never calls it, and its `terrain` param type does
-// not include `isRiver`. As a result players can place bridges/towers anywhere,
-// defeating the river-crossing map strategy.
+// Before the fix (v0.37.2): `validateBuildingPlacement` in BuildSystem.ts
+// had no concept of rivers — its `terrain` param type didn't even include
+// `isRiver`, so bridges/crossings could be placed on any non-water tile.
+// `Terrain.isRiver(x,z)` existed (src/world/Terrain.ts:354-360) but was
+// never wired in. This broke river-crossing map strategy entirely.
 //
-// These tests lock the post-fix contract: DefenseTower (and any future Bridge
-// type) MUST be placed on a river tile. The validator MUST call terrain.isRiver.
+// After the fix (v0.37.5):
+//   - `BuildingTypeId.Bridge = 11` added.
+//   - terrain param accepts optional `isRiver(x,z)`.
+//   - Bridge placement requires isRiver === true; other buildings reject
+//     river tiles as well (rivers are non-buildable like water).
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { replaceWorld } from '../src/ecs/world';
 import { validateBuildingPlacement } from '../src/systems/BuildSystem';
 import { BuildingTypeId, FactionId } from '../src/types/index';
 
-describe('Bug 2 — DefenseTower/Bridge requires river tile', () => {
+describe('Bug 2 — Bridge requires river tile', () => {
   beforeEach(() => {
     replaceWorld();
   });
@@ -27,11 +29,11 @@ describe('Bug 2 — DefenseTower/Bridge requires river tile', () => {
     isRiver: (x: number, z: number) => x >= 20 && x <= 30 && z >= -2 && z <= 2,
   };
 
-  it('rejects DefenseTower on land (not on river)', () => {
+  it('rejects Bridge on land (not on river)', () => {
     const world = replaceWorld();
     const result = validateBuildingPlacement(
       world,
-      BuildingTypeId.DefenseTower,
+      BuildingTypeId.Bridge,
       FactionId.Brabanders,
       50,
       0,
@@ -41,11 +43,11 @@ describe('Bug 2 — DefenseTower/Bridge requires river tile', () => {
     expect(result.reason ?? '').toMatch(/rivier/i);
   });
 
-  it('accepts DefenseTower on river tile', () => {
+  it('accepts Bridge on river tile', () => {
     const world = replaceWorld();
     const result = validateBuildingPlacement(
       world,
-      BuildingTypeId.DefenseTower,
+      BuildingTypeId.Bridge,
       FactionId.Brabanders,
       25,
       0,
@@ -67,7 +69,7 @@ describe('Bug 2 — DefenseTower/Bridge requires river tile', () => {
     };
     validateBuildingPlacement(
       world,
-      BuildingTypeId.DefenseTower,
+      BuildingTypeId.Bridge,
       FactionId.Brabanders,
       50,
       0,

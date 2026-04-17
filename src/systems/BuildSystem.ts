@@ -56,14 +56,30 @@ export function validateBuildingPlacement(
   factionId: number,
   x: number,
   z: number,
-  terrain: { getHeightAt(x: number, z: number): number; isWater?(x: number, z: number): boolean },
+  terrain: {
+    getHeightAt(x: number, z: number): number;
+    isWater?(x: number, z: number): boolean;
+    isRiver?(x: number, z: number): boolean;
+  },
 ): PlacementResult {
-  // --- Rule 2: Terrain check (water) ---
+  const onRiver = terrain.isRiver ? terrain.isRiver(x, z) : false;
+
+  // --- Rule 2a: Bridge MUST be on a river tile (and skips the water rule). ---
+  if (buildingTypeId === BuildingTypeId.Bridge) {
+    if (!onRiver) {
+      return { valid: false, reason: 'Bruggen kunnen alleen over een rivier gebouwd worden' };
+    }
+    // Bridges do not participate in the generic water/collision/enemy rules
+    // below -- they are a river-exclusive structure.
+    return { valid: true };
+  }
+
+  // --- Rule 2b: Other buildings cannot stand on water/rivers ---
   const onWater = terrain.isWater
     ? terrain.isWater(x, z)
     : terrain.getHeightAt(x, z) < 0.1;
 
-  if (onWater) {
+  if (onWater || onRiver) {
     return { valid: false, reason: 'Kan niet bouwen op water' };
   }
 

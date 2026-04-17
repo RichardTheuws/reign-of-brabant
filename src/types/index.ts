@@ -95,6 +95,8 @@ export enum BuildingTypeId {
   DefenseTower = 9,
   /** Produces siege units (T3). */
   SiegeWorkshop = 10,
+  /** Crossable structure over a river (placement must be on a river tile). */
+  Bridge = 11,
 }
 
 /**
