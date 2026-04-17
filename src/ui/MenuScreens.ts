@@ -123,7 +123,7 @@ const FACTIONS: FactionData[] = [
     subtitle: 'De Gezelligen',
     description: 'Gezelligheid maakt sterk. Brabantse eenheden worden sterker naarmate ze dichter bij elkaar staan. Tot +50% stats bij 20+ units samen.',
     traits: ['Gezelligheid', 'Sterk in groep', 'Carnaval'],
-    image: '/assets/factions/brabanders-prins.png',
+    image: '/assets/factions/brabanders-prins-v2.png',
     available: true,
   },
   {
@@ -132,7 +132,7 @@ const FACTIONS: FactionData[] = [
     subtitle: 'De Efficienten',
     description: 'Bureaucratie overwint alles. Elke actie bouwt Efficientie-stacks op. Na 20 acties zijn ze sneller dan alle andere facties.',
     traits: ['Bureaucratie', 'Efficientie', 'Werkoverleg'],
-    image: '/assets/factions/randstad-ceo.png',
+    image: '/assets/factions/randstad-ceo-v2.png',
     available: true,
   },
   {
@@ -141,7 +141,7 @@ const FACTIONS: FactionData[] = [
     subtitle: 'Meesters van de Ondergrond',
     description: 'Vanuit hun uitgebreide mijnnetwerk beheersen de Limburgers het ondergrondse. Hun tunnels maken verrassingsaanvallen mogelijk die geen vijand ziet aankomen. Met Kolen als brandstof voor hun industrie bouwen ze een onzichtbaar imperium.',
     traits: ['Tunnelnetwerk', 'Verrassingsaanvallen', 'Kolen-economie', 'Defensief sterk'],
-    image: '/assets/factions/limburgers-mijnbaas.png',
+    image: '/assets/factions/limburgers-mijnbaas-v2.png',
     available: true,
   },
   {
@@ -150,7 +150,7 @@ const FACTIONS: FactionData[] = [
     subtitle: 'Diplomaten en Compromismeesters',
     description: 'Waarom vechten als ge kunt onderhandelen? De Belgen winnen oorlogen met woorden, Chocolade en eindeloos overleg. Hun Commissies vertragen vijanden, hun Compromissen kopen tijd, en hun Chocolade-Overtuiging steelt vijandelijke eenheden.',
     traits: ['Diplomatie', 'Compromis-abilities', 'Chocolade-overtuiging', 'Commissie-sabotage'],
-    image: '/assets/factions/belgen-frietkoning.png',
+    image: '/assets/factions/belgen-frietkoning-v2.png',
     available: true,
   },
 ];

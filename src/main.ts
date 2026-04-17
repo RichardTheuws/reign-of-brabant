@@ -21,8 +21,11 @@ import { ParticleSystem } from './rendering/ParticleSystem';
 // ---------------------------------------------------------------------------
 // Version (injected by Vite from package.json)
 // ---------------------------------------------------------------------------
-declare const __APP_VERSION__: string;
-const appVersion = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev';
+// Pull version directly from package.json — Vite serves JSON imports in
+// both dev and build. Earlier we used a `define: { __APP_VERSION__ }`
+// substitution which silently failed in dev serve for this project.
+import pkgJson from '../package.json';
+const appVersion: string = (pkgJson as { version: string }).version;
 document.querySelectorAll('.menu-version, .loading-version').forEach(el => {
   el.textContent = `v${appVersion}`;
 });
@@ -383,7 +386,7 @@ stateMachine.register(new GameOverState());
 const FACTION_NAMES = ['Brabanders', 'Randstad', 'Limburgers', 'Belgen'];
 feedbackReporter.init(
   () => ({
-    version: typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'unknown',
+    version: appVersion,
     faction: FACTION_NAMES[selectedPlayerFaction] ?? 'unknown',
     difficulty: selectedDifficulty,
     elapsedSeconds: Math.floor(game.getElapsedTime()),

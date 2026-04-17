@@ -1,14 +1,15 @@
 # Changelog
 
-## [0.37.10] - 2026-04-17 — skirmish menu polish
+## [0.37.10] - 2026-04-17 — skirmish menu polish + version-display fix
 
 ### Fixed — Bug 10
 - **Faction preview image laadde niet** — `FACTIONS` array in MenuScreens.ts gebruikte relatieve paden (`assets/factions/...`) terwijl de game op `/play/` draait. Paden nu absoluut (`/assets/factions/...`).
 - **Start Gevecht-knop overlapte de onderste opties** — sticky positioning mengde met inhoud; nu vast positioneerd onderaan viewport met backdrop-blur + extra padding-bottom op scrollable container zodat alle opties vrij bereikbaar zijn.
 - **Broken-image "?" placeholder** vervangen door een styled fallback (factie-initiaal in goud) voor als een portret-bestand ontbreekt. Geen browser-native placeholder iconen meer.
+- **Versie op game-scherm toonde v0.31.1** terwijl package.json al weken verder was. Vite's `define: { __APP_VERSION__ }` werkte niet betrouwbaar in dev-serve hier; vervangen door directe JSON-import van `package.json`, wat in zowel dev als build altijd de actuele waarde levert.
 
-### Added
-- Asset Generator agent draait parallel om nieuwe hi-res factie-portretten te genereren (v2) via fal.ai Flux Pro. Output landt in `public/assets/factions/*-v2.png` en wordt in een volgende bump ingeschakeld.
+### Added — nieuwe factie-portretten
+- Vier hi-res factie-leader portretten gegenereerd via fal.ai Flux Pro (oil-painting, Rembrandt style, 768x1024, ornate gold frames). Gewired in de skirmish preview: `brabanders-prins-v2.png`, `randstad-ceo-v2.png`, `limburgers-mijnbaas-v2.png`, `belgen-frietkoning-v2.png`.
 
 ## [0.37.9] - 2026-04-17 — shader crash gefixt
 

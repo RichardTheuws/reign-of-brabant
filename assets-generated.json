@@ -10,6 +10,38 @@
         "public/assets/og/og-landing.png",
         "public/assets/og/og-play.png"
       ]
+    },
+    {
+      "file": "public/assets/factions/brabanders-prins-v2.png",
+      "model": "fal-ai/flux-pro/v1.1",
+      "prompt": "oil painting portrait of a cheerful Brabant prince wearing a crown decorated with beer foam, holding a large sausage-roll (worstenbroodje) like a scepter, golden royal robes, carnival garlands in background, mischievous smile, chest-up composition, ornate gold frame, dramatic chiaroscuro, dark moody background, Rembrandt style, photoreal",
+      "size": "768x1024",
+      "generated": "2026-04-17",
+      "use_case": "faction-select card preview"
+    },
+    {
+      "file": "public/assets/factions/randstad-ceo-v2.png",
+      "model": "fal-ai/flux-pro/v1.1",
+      "prompt": "oil painting portrait of a stressed Dutch CEO in tailored suit, bluetooth earpiece, looking at smartphone, hectic corporate office in background with graphs and monitors, dark suit, commanding posture, chest-up composition, ornate gold frame, dramatic chiaroscuro, dark moody background, Rembrandt style, photoreal",
+      "size": "768x1024",
+      "generated": "2026-04-17",
+      "use_case": "faction-select card preview"
+    },
+    {
+      "file": "public/assets/factions/limburgers-mijnbaas-v2.png",
+      "model": "fal-ai/flux-pro/v1.1",
+      "prompt": "oil painting portrait of a proud Limburg miner-baron, coal-dust stained face but proud expression, vintage mining helmet with lamp, holding a piece of Limburgse vlaai like a holy relic, rolling hills and slag heap in background, chest-up composition, ornate gold frame, dramatic chiaroscuro, dark moody background, Rembrandt style, photoreal",
+      "size": "768x1024",
+      "generated": "2026-04-17",
+      "use_case": "faction-select card preview"
+    },
+    {
+      "file": "public/assets/factions/belgen-frietkoning-v2.png",
+      "model": "fal-ai/flux-pro/v1.1",
+      "prompt": "oil painting portrait of a Belgian diplomat-king, balancing a tower of chocolate bonbons in one hand and a cone of frietjes in the other, ornate medieval-meets-modern Brussels attire, EU-parliament architecture in background, mustache and diplomatic smile, chest-up composition, ornate gold frame, dramatic chiaroscuro, dark moody background, Rembrandt style, photoreal",
+      "size": "768x1024",
+      "generated": "2026-04-17",
+      "use_case": "faction-select card preview"
     }
   ]
 }
