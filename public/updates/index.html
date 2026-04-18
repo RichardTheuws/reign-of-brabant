@@ -476,6 +476,34 @@
     <div class="content">
         <div class="timeline">
 
+            <!-- ── v0.37.17 (Full-Playthrough Audit — Fase 1) ──────── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.37.17</span>
+                        <span class="update__date">18 april 2026</span>
+                        <h2 class="update__title">Full-Playthrough Audit gestart — Fase 1 (boot &amp; menu) clean</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Audit</span>
+                            <span class="tag tag--fix">Cleanup</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Volgende stap na de audit-sprint: een systematische, stap-voor-stap doorloop van de complete game-flow (33 stappen, 7 fases) in de juiste volgorde. Geen cherry-picking meer — elke gameplay-stap krijgt een mini-audit. Fase 1 (boot &amp; menu, 5 stappen) is afgerond zonder P0/P1 bugs; vier dead-code restanten uit de v0.31-v0.32 periode zijn meteen opgeruimd.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">FASE 1 — BOOT &amp; MENU</h3>
+                        <ul class="update__highlights">
+                            <li><strong>App-boot, main menu, settings, factie-select, skirmish opties</strong> — Alle DOM-bindings, persistentie via localStorage en Start Gevecht-gating gevalideerd. 287/287 tests groen, typecheck clean, geen P0/P1 bugs.</li>
+                            <li><strong>Dood <code>__APP_VERSION__</code> opgeruimd</strong> — De Vite <code>define</code>-substitutie en <code>declare const</code> in <code>FeedbackReporter</code> bleven hangen sinds v0.31.2 (toen de versie-injectie verving door directe <code>import pkgJson</code> in <code>main.ts</code>). Beide weg.</li>
+                            <li><strong>Dode menu-cases verwijderd</strong> — <code>case 'tutorial'</code> (tutorial loopt sinds v0.32 in eerste campagnemissie, geen menu-knop meer) en <code>case 'settings'</code> (opent direct via <code>MenuScreens.showSettings()</code>) verwijderd uit <code>main.ts</code>. <code>btn-tutorial</code> binding weg uit <code>MenuScreens</code>; <code>MenuAction</code> type krimpt naar <code>'play' | 'campaign'</code>.</li>
+                            <li><strong>tsconfig hardening</strong> — macOS Finder duplicaten (<code>* 2.ts</code>, <code>* [0-9].ts</code>) worden nu uitgesloten zodat <code>tsc --noEmit</code> niet struikelt over per-ongeluk-gesynchroniseerde rommel.</li>
+                        </ul>
+
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--space-md);">Volgende fases: <strong>Map &amp; spawn</strong> → <strong>Economy</strong> → <strong>Training</strong> → <strong>Combat</strong> → <strong>Tier 2/3 &amp; research</strong> → <strong>Endgame</strong>. Na elke fase: bump + push + (indien nodig) deploy.</p>
+                    </div>
+                </div>
+            </article>
+
             <!-- ── v0.37.3 – v0.37.16 (Audit Sprint) ──────────────── -->
             <article class="update">
                 <div class="update__card">
