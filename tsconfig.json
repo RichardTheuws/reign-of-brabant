@@ -38,5 +38,5 @@
     "types": ["vite/client"]
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts"],
-  "exclude": ["node_modules", "dist", "scripts"]
+  "exclude": ["node_modules", "dist", "scripts", "**/* 2.ts", "**/* 3.ts", "**/* [0-9].ts"]
 }

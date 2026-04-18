@@ -434,13 +434,6 @@ menuScreens.init({
       case 'campaign':
         stateMachine.requestTransition(GameStateId.CAMPAIGN_SELECT);
         break;
-      case 'tutorial':
-        // Tutorial is now integrated into first campaign mission (De Oogst)
-        stateMachine.requestTransition(GameStateId.CAMPAIGN_SELECT);
-        break;
-      case 'settings':
-        // Settings not implemented yet
-        break;
     }
   },
   onFactionSelected: (faction, _startTutorial, mapTemplate, difficulty, playerCount, mapSize, startingResources, fogOfWar) => {

@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.37.17] - 2026-04-18 — Audit Fase 1 (boot &amp; menu) + dead-code opruimen
+
+### Audit
+- Systematische full-playthrough audit gestart (33 stappen, 7 fases). Fase 1 (boot &amp; menu, 5 stappen) afgerond — geen P0/P1 bugs, 4 dead-code findings opgelost.
+
+### Removed (dead code uit v0.31.x periode)
+- `vite.config.ts`: `define: { __APP_VERSION__ }` block + `readFileSync`/`pkg` JSON-load. Werd vervangen door directe `import pkgJson from '../package.json'` in `main.ts` (CHANGELOG v0.31.2), maar de oude define + bijbehorende `declare const __APP_VERSION__` in `FeedbackReporter.ts` bleven achter.
+- `src/main.ts`: dead `case 'tutorial'` (tutorial draait sinds v0.32.x in eerste campagnemissie, geen menu-knop meer) en `case 'settings'` (settings opent direct via `MenuScreens.showSettings()`, niet via `onMenuAction`).
+- `src/ui/MenuScreens.ts`: `btn-tutorial` lookup + listener (DOM-element bestaat niet meer); `MenuAction` type krimpt naar `'play' | 'campaign'`.
+
+### Tooling
+- `tsconfig.json`: exclude macOS Finder duplicaten (`* 2.ts`, `* [0-9].ts`) zodat `tsc --noEmit` niet struikelt over per ongeluk gesynchroniseerde `index 2.html` / `main 2.ts` rommel.
+
 ## [0.37.16] - 2026-04-18 — Boerinneke, wood-deductie, Kerktoren, Smederij-paneel
 
 ### Fixed

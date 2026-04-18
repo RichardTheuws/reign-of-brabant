@@ -6,8 +6,6 @@
  * POSTs to /api/feedback server endpoint which creates GitHub Issues.
  */
 
-declare const __APP_VERSION__: string;
-
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------

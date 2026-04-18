@@ -13,7 +13,7 @@ import { MUSIC_IDS } from '../systems/MusicSystem';
 // ---------------------------------------------------------------------------
 
 export type FactionChoice = 'brabanders' | 'randstad' | 'limburgers' | 'belgen';
-export type MenuAction = 'play' | 'campaign' | 'tutorial' | 'settings';
+export type MenuAction = 'play' | 'campaign';
 
 export type MapTemplateChoice = 'classic' | 'crossroads' | 'islands' | 'arena' | 'fortress' | 'river-valley' | 'canyon' | 'archipelago';
 export type DifficultyChoice = 'easy' | 'normal' | 'hard';
@@ -339,12 +339,10 @@ export class MenuScreens {
   private bindMainMenu(): void {
     const btnPlay = document.getElementById('btn-play');
     const btnCampaign = document.getElementById('btn-campaign');
-    const btnTutorial = document.getElementById('btn-tutorial');
     const btnSettings = document.getElementById('btn-settings');
 
     btnPlay?.addEventListener('click', () => this.events?.onMenuAction('play'));
     btnCampaign?.addEventListener('click', () => this.events?.onMenuAction('campaign'));
-    btnTutorial?.addEventListener('click', () => this.events?.onMenuAction('tutorial'));
     btnSettings?.addEventListener('click', () => this.showSettings());
   }
 
