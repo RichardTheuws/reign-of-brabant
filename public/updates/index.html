@@ -476,6 +476,34 @@
     <div class="content">
         <div class="timeline">
 
+            <!-- ── v0.37.18 (Audit Fase 2 — Map &amp; spawn, +359 tests) ─ -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.37.18</span>
+                        <span class="update__date">18 april 2026</span>
+                        <h2 class="update__title">Audit Fase 2 — Map &amp; spawn clean, test-suite +125% (287 → 646)</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Audit</span>
+                            <span class="tag tag--feat">Tests</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Fase 2 van de full-playthrough audit (4 stappen — mapgen, terrain, spawn, camera) volledig doorgelopen. Geen P0/P1 bugs gevonden, maar wel een aanzienlijke test-coverage gap: **4 van de 8 map-templates hadden helemaal geen tests**. Die gap is gedicht, plus een cross-template robustness-suite, plus camera-tests, plus een refactor + tests voor het slot-0 spawn-contract.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">FASE 2 — MAP &amp; SPAWN</h3>
+                        <ul class="update__highlights">
+                            <li><strong>+330 mapgen-tests</strong> — Fortress, River-Valley, Canyon en Archipelago hadden geen directe test-coverage. Plus cross-template invariants voor elke combinatie van 8 templates × 3 player counts: counts, building↔spawn match, bounds, faction-uniqueness, biome-validatie. Plus robustness: 7 "rare" seeds (0, 1, -1, 42, MAX_INT, MIN_INT, willekeurig groot getal) crashen geen template. Plus determinisme + map-size scaling (80/128/192).</li>
+                            <li><strong>+9 spawn-slot tests</strong> — Het slot-0 contract is nu permanent vastgelegd: na <code>remapMapPlayerFaction</code> zit de speler-factie altijd in slot 0, de oude slot-0-factie verschuift naar de slot van de speler's keuze, alle coordinates blijven gelijk, geen mutatie van input. Voor elke template × elke factie.</li>
+                            <li><strong>+20 camera-tests</strong> — RTSCamera pan (WASD + arrows), edge-scroll, zoom-clamp (MIN=8 / MAX=80), map-bounds clamping, <code>setPosition</code> snap, <code>screenToWorld</code> raycast (zowel hit als legitiem null bij sky), resize en shake decay.</li>
+                            <li><strong>Mini-refactor: <code>factionRemap.ts</code></strong> — Pure helper geëxtraheerd uit <code>Game.ts</code>. <code>Game.remapFactions</code> is nu een 1-liner die het helper aanroept; de oude inline-logica met <code>as any</code> cast op <code>this.map</code> is weg. Geen gedragsverandering, wel directe testbaarheid.</li>
+                        </ul>
+
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--space-md);">Test-suite groeide van 287 naar <strong>646</strong> in deze sessie (+125%). Volgende fases: Economy → Training → Combat → Tier 2/3 → Endgame.</p>
+                    </div>
+                </div>
+            </article>
+
             <!-- ── v0.37.17 (Full-Playthrough Audit — Fase 1) ──────── -->
             <article class="update">
                 <div class="update__card">

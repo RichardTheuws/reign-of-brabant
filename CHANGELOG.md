@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.37.18] - 2026-04-18 — Audit Fase 2 (map &amp; spawn) — +359 tests, factionRemap geëxtraheerd
+
+### Audit
+- Fase 2 (map &amp; spawn, 4 stappen) afgerond. Geen P0/P1 bugs. Test-coverage massief uitgebreid: **287 → 646 tests** in 1 sessie (+359 tests, +2 testbestanden).
+
+### Added (test coverage)
+- `tests/MapGenerator-templates.test.ts` (+330 tests) — vult de gap voor `fortress`, `river-valley`, `canyon`, `archipelago` (4 templates die geen directe coverage hadden). Plus een cross-template invariants suite die voor elke combinatie van **8 templates × 3 player counts** valideert: spawns/townhalls/workers counts, building↔spawn position-match, spawn-bounds binnen ±halfMap, faction-uniqueness, biome-validatie en defined terrainFeatures arrays. Plus robustness-suite: 7 weird seeds (0, 1, -1, 42, MAX_INT, MIN_INT, 1234567890) crashen geen template. Plus determinisme-tests (zelfde seed → identieke layout) en map-size scaling (80/128/192).
+- `tests/factionRemap.test.ts` (+9 tests) — locks het slot-0-contract: na remap zit player-factie altijd in slot 0, oude slot-0-factie verschuift naar de slot van player's keuze. Spawns/buildings/units worden in lockstep ge-remapped, coordinaten blijven onaangetast, input wordt niet gemuteerd. Voor elke template × elke factie.
+- `tests/RTSCamera.test.ts` (+20 tests) — pan (WASD + arrows), edge-scroll (mouse aan rand), zoom-clamp (MIN_ZOOM=8, MAX_ZOOM=80), map-bounds clamping, `setPosition` snap, `screenToWorld` raycast (zowel hit als legitiem null bij sky), resize, en shake decay.
+
+### Changed (kleine refactor)
+- `src/world/factionRemap.ts` (nieuw) — pure helper `remapMapPlayerFaction(map, newPlayerFaction)`. `Game.remapFactions` is nu een 1-liner die het helper aanroept i.p.v. inline-logica met `as any` cast op `this.map`. Geen gedragsverandering, wel directe testbaarheid van het slot-0-contract.
+
 ## [0.37.17] - 2026-04-18 — Audit Fase 1 (boot &amp; menu) + dead-code opruimen
 
 ### Audit

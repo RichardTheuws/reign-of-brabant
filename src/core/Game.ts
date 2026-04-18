@@ -20,6 +20,7 @@ import { getPortraitUrl } from '../data/portraitMap';
 import { createHero, isHeroActive } from '../entities/heroFactory';
 import { createGamePipeline, type SystemPipeline } from '../systems/SystemPipeline';
 import { generateMap, type GeneratedMap, DecoType } from '../world/MapGenerator';
+import { remapMapPlayerFaction } from '../world/factionRemap';
 import { createMapTunnelSystem } from '../systems/MapTunnelSystem';
 import { queueCommand } from '../systems/CommandSystem';
 import { NavMeshManager } from '../pathfinding/NavMeshManager';
@@ -3497,23 +3498,7 @@ export class Game {
   }
 
   private remapFactions(): void {
-    // Swap faction IDs in map data so slot 0 = player's faction
-    const oldPlayerFaction = this.map.spawns[0]?.factionId ?? FactionId.Brabanders;
-    const newPlayerFaction = this.playerFactionId;
-    if (oldPlayerFaction === newPlayerFaction) return;
-
-    const remap = (fid: number) => {
-      if (fid === oldPlayerFaction) return newPlayerFaction;
-      if (fid === newPlayerFaction) return oldPlayerFaction;
-      return fid;
-    };
-
-    // Create mutable copies with swapped factionIds
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const map = this.map as any;
-    map.spawns = this.map.spawns.map(s => ({ ...s, factionId: remap(s.factionId) }));
-    map.buildings = this.map.buildings.map(b => ({ ...b, factionId: remap(b.factionId) }));
-    map.units = this.map.units.map(u => ({ ...u, factionId: remap(u.factionId) }));
+    this.map = remapMapPlayerFaction(this.map, this.playerFactionId);
   }
 
   private getAIFactionId(): FactionId {
