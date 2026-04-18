@@ -21,6 +21,7 @@ import { createHero, isHeroActive } from '../entities/heroFactory';
 import { createGamePipeline, type SystemPipeline } from '../systems/SystemPipeline';
 import { generateMap, type GeneratedMap, DecoType } from '../world/MapGenerator';
 import { remapMapPlayerFaction } from '../world/factionRemap';
+import { checkBuildingAffordability, chargeBuildingCost } from '../world/buildingCost';
 import { createMapTunnelSystem } from '../systems/MapTunnelSystem';
 import { queueCommand } from '../systems/CommandSystem';
 import { NavMeshManager } from '../pathfinding/NavMeshManager';
@@ -1769,9 +1770,6 @@ export class Game {
     if (hits.length > 0) {
       const point = hits[0].point;
       const buildingTypeId = this.getBuildingTypeIdForGhost(this.buildGhostType);
-      const arch = buildingTypeId < BUILDING_ARCHETYPES.length ? BUILDING_ARCHETYPES[buildingTypeId] : null;
-      const goldCost = arch?.costGold ?? 150;
-      const woodCost = arch?.costWood ?? 0;
       const buildingLabel = this.getBuildingLabel(this.buildGhostType);
 
       // Placement validation
@@ -1781,18 +1779,14 @@ export class Game {
         return;
       }
 
-      if (!this.playerState.canAfford(this.playerFactionId, goldCost)) {
-        this.hud?.showAlert(`Niet genoeg goud! (${goldCost} nodig)`, 'warning');
+      // Affordability check + deduct (extracted to buildingCost helper)
+      const cost = checkBuildingAffordability(buildingTypeId, this.playerFactionId, this.playerState);
+      if (!cost.ok) {
+        const label = cost.missing === 'gold' ? 'goud' : 'hout';
+        this.hud?.showAlert(`Niet genoeg ${label}! (${cost.required} nodig)`, 'warning');
         return;
       }
-      if (woodCost > 0 && !this.playerState.canAffordWood(this.playerFactionId, woodCost)) {
-        this.hud?.showAlert(`Niet genoeg hout! (${woodCost} nodig)`, 'warning');
-        return;
-      }
-
-      // Deduct resources
-      this.playerState.spend(this.playerFactionId, goldCost);
-      if (woodCost > 0) this.playerState.spendWood(this.playerFactionId, woodCost);
+      chargeBuildingCost(cost.goldCost, cost.woodCost, this.playerFactionId, this.playerState);
 
       // Spawn building
       const eid = this.spawnBuildingAtRuntime(buildingTypeId, this.playerFactionId, point.x, point.z);

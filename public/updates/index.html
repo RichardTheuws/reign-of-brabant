@@ -476,6 +476,39 @@
     <div class="content">
         <div class="timeline">
 
+            <!-- ── v0.37.20 (Fase 3 follow-ups — Havermoutmelkbar + cost helper) -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.37.20</span>
+                        <span class="update__date">18 april 2026</span>
+                        <h2 class="update__title">Randstad krijgt eindelijk Havermoutmelk — game-breaker bug gefixt + 91 nieuwe tests</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--fix">Bugfix</span>
+                            <span class="tag tag--gameplay">Gameplay</span>
+                            <span class="tag tag--feat">Tests</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Tijdens Fase 3 van de audit kwam aan het licht dat <strong>Randstad players nooit Havermoutmelk konden produceren</strong>. <code>TertiaryResourceSystem</code> verwachtte 2.0 Havermoutmelk/sec per voltooide <code>TertiaryResourceBuilding</code>, maar Randstad had geen X-hotkey om er één te plaatsen. Missie-objectief "vergeet de Havermoutmelk niet" was letterlijk onhaalbaar. Nu gefixt — Havermoutmelkbar (tier 2, X-hotkey).</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">F5 — RANDSTAD HAVERMOUTMELKBAR</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Havermoutmelkbar</strong> — Randstad's tertiary-resource gebouw (tier 2, hotkey X), exact dezelfde pattern als Limburg's Mijnschacht en Belgen's Chocolaterie. Brabanders blijft terecht zonder X-hotkey: Gezelligheid is proximity-based, geen gebouw nodig.</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">REFACTORS UIT MONOLIETEN</h3>
+                        <ul class="update__highlights">
+                            <li><strong><code>src/ui/factionBuildMenus.ts</code></strong> — Hotkey-grid data uit <code>HUD.ts</code> (2900-regel monoliet) gehaald. <code>FACTION_WORKER_BUILDS</code>, <code>FACTION_BUILDING_LABELS</code> en types nu testbaar zonder DOM. HUD.ts re-importeert ongewijzigd.</li>
+                            <li><strong><code>src/world/buildingCost.ts</code></strong> — Building cost-check + deduct uit <code>Game.handleBuildPlacement</code> geëxtraheerd. <code>checkBuildingAffordability</code> + <code>chargeBuildingCost</code> zijn pure functies die het twee-resources-deductie contract expliciet maken (de Bug 12 categorie waar unit-training in v0.37.16 op vastliep).</li>
+                            <li><strong>+91 tests</strong> — 77 voor de menu-data (hotkey grid coverage, cross-faction consistency, F5-regression-guard), 14 voor de cost-helper (archetype lookup, ok/fail paths, geen state mutatie bij check, beide resources atomic deductie).</li>
+                        </ul>
+
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--space-md);">Test-suite deze sessie: <strong>287 → 773</strong> (+486 tests, +169%). Volgende fases: Training (3b) → Combat (4) → Tier 2/3 (5) → Endgame (7).</p>
+                    </div>
+                </div>
+            </article>
+
             <!-- ── v0.37.19 (Audit Fase 3 — Economy tier 1) ──────────── -->
             <article class="update">
                 <div class="update__card">

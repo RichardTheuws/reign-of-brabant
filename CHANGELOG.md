@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.37.20] - 2026-04-18 — Audit Fase 3 follow-ups: F5 Havermoutmelkbar + buildingCost helper
+
+### Fixed
+- **F5 — Randstad missing X-hotkey (P1 game-breaker)**: Bij het vorige audit-rondje ontdekt dat `TertiaryResourceSystem` Randstad in `BUILDING_FACTIONS` heeft staan met rate 2.0 Havermoutmelk/sec per voltooide `TertiaryResourceBuilding`, maar dat de UI Randstad players geen enkele manier gaf om er één te plaatsen. Mission-text "vergeet de Havermoutmelk niet" (`MissionDefinitions.ts:4294`) was onhaalbaar. **Fix**: Randstad krijgt nu een X-hotkey "Havermoutmelkbar" (tier 2), identieke pattern als Limburg's Mijnschacht en Belgen's Chocolaterie. Brabanders blijft terecht uitgesloten — Gezelligheid is proximity-based via `GezeligheidSystem`.
+
+### Refactored
+- **`src/ui/factionBuildMenus.ts` (nieuw)** — `FACTION_WORKER_BUILDS`, `FACTION_BUILDING_LABELS`, `BASE_WORKER_CMDS`, `TIER_REQUIREMENT_LABELS` en bijbehorende types geëxtraheerd uit `HUD.ts` (2900-regel monoliet) zodat ze testbaar zijn zonder DOM. HUD.ts re-importeert.
+- **`src/world/buildingCost.ts` (nieuw)** — `getBuildingCost`, `checkBuildingAffordability`, `chargeBuildingCost` geëxtraheerd uit `Game.handleBuildPlacement`. De 25-regel inline cost+spend logic is nu één pure helper-call. Alert-message blijft in Game.ts (UI-laag).
+
+### Added (test coverage)
+- `tests/factionBuildMenus.test.ts` (+77 tests) — hotkey grid coverage per factie (Q/E/R/T/F/G/Z verplicht voor allemaal, X verplicht voor non-Brabanders), cross-faction consistency (zelfde hotkey → zelfde `BuildingTypeId` overal), F5-regression-guard (Randstad MOET een X-hotkey TertiaryResourceBuilding hebben), tier validatie, faction-label sanity.
+- `tests/buildingCost.test.ts` (+14 tests) — `getBuildingCost` archetype-lookup + fallback, `checkBuildingAffordability` ok/fail-gold/fail-wood/no-mutation/short-circuit, `chargeBuildingCost` deductie + de regression-guard "BEIDE resources worden afgetrokken bij gemixte cost" (precies de Bug 12 categorie die unit-training in v0.37.16 raakte).
+
+### Notes
+- **Test-suite groei deze sessie: 287 → 773 (+486 tests, +169%)**.
+- Volgende fases (4 t/m 7 — combat, tier 2/3, endgame) wachten op groen licht.
+
 ## [0.37.19] - 2026-04-18 — Audit Fase 3 (economy tier 1) — GatherSystem + BuildSystem covered
 
 ### Audit

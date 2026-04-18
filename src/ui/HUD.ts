@@ -206,88 +206,18 @@ const FACTION_UNIT_NAMES: Record<Faction, { worker: string; infantry: string; ra
 };
 
 // ---------------------------------------------------------------------------
-// Faction-specific worker build commands
+// Faction-specific worker build commands (data lives in factionBuildMenus.ts
+// for testability — see tests/factionBuildMenus.test.ts)
 // ---------------------------------------------------------------------------
 
-interface WorkerBuildCmd {
-  action: CommandAction;
-  icon: string;
-  label: string;
-  hotkey?: string;
-  iconClass?: string;
-}
-
-const BASE_WORKER_CMDS: WorkerBuildCmd[] = [
-  { action: 'move', icon: 'MOV', label: '', hotkey: 'W', iconClass: 'btn-icon--move' },
-  { action: 'stop', icon: 'STP', label: '', hotkey: 'E', iconClass: 'btn-icon--stop' },
-];
-
-// Worker build commands per faction. Each building has:
-// - Unique BuildingTypeId-based icon via BuildingPortraits canvas rendering
-// - Consistent hotkey grid avoiding WASD: Q/E/R, T/F/G, Z/X
-// - buildingTypeId for portrait lookup and inline cost display
-// - tier: 1 (always available), 2 (requires Blacksmith), 3 (requires UpgradeBuilding)
-interface WorkerBuildCmdExt extends WorkerBuildCmd {
-  buildingTypeId?: BuildingTypeId;
-  tier?: 1 | 2 | 3;
-}
-
-// Tier requirement labels for locked building tooltips
-const TIER_REQUIREMENT_LABELS: Record<number, string> = {
-  2: 'Smederij',    // Requires completed Blacksmith
-  3: 'Geavanceerde Smederij', // Requires completed UpgradeBuilding
-};
-
-// Hotkey grid avoids WASD (camera): Q/E/R (row 1), T/F/G (row 2), Z/X (row 3)
-// Tier: 1=always, 2=requires Blacksmith, 3=requires UpgradeBuilding
-const FACTION_WORKER_BUILDS: Record<Faction, WorkerBuildCmdExt[]> = {
-  brabant: [
-    { action: 'build-barracks',        icon: 'BRK', label: 'Kazerne',         hotkey: 'Q', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Barracks,                 tier: 1 },
-    { action: 'build-lumbercamp',      icon: 'LMB', label: 'Houtzagerij',     hotkey: 'E', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.LumberCamp,               tier: 1 },
-    { action: 'build-blacksmith',      icon: 'BSM', label: 'Smederij',        hotkey: 'R', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Blacksmith,                tier: 1 },
-    { action: 'build-housing',         icon: 'HSE', label: 'Boerenhoeve',     hotkey: 'T', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Housing,                   tier: 2 },
-    { action: 'build-tower',           icon: 'TWR', label: 'Kerktoren',       hotkey: 'F', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.DefenseTower,              tier: 2 },
-    { action: 'build-faction2',        icon: 'ADV', label: 'Feestzaal',       hotkey: 'G', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial2,           tier: 3 },
-    { action: 'build-siege-workshop',  icon: 'SWK', label: 'Tractorschuur',   hotkey: 'Z', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.SiegeWorkshop,             tier: 3 },
-  ],
-  randstad: [
-    { action: 'build-barracks',        icon: 'BRK', label: 'Vergaderzaal',    hotkey: 'Q', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Barracks,                 tier: 1 },
-    { action: 'build-lumbercamp',      icon: 'LMB', label: 'Starbucks',       hotkey: 'E', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.LumberCamp,               tier: 1 },
-    { action: 'build-blacksmith',      icon: 'BSM', label: 'CoworkingSpace',  hotkey: 'R', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Blacksmith,                tier: 1 },
-    { action: 'build-housing',         icon: 'HSE', label: 'Vinex-wijk',      hotkey: 'T', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Housing,                   tier: 2 },
-    { action: 'build-tower',           icon: 'TWR', label: 'Kantoor-toren',   hotkey: 'F', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.DefenseTower,              tier: 2 },
-    { action: 'build-faction2',        icon: 'ADV', label: 'Parkeergarage',   hotkey: 'G', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial2,           tier: 3 },
-    { action: 'build-siege-workshop',  icon: 'SWK', label: 'Sloopwerf',      hotkey: 'Z', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.SiegeWorkshop,             tier: 3 },
-  ],
-  limburg: [
-    { action: 'build-barracks',        icon: 'BRK', label: 'Schuttershal',    hotkey: 'Q', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Barracks,                 tier: 1 },
-    { action: 'build-lumbercamp',      icon: 'LMB', label: 'Vlaaibakkerij',   hotkey: 'E', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.LumberCamp,               tier: 1 },
-    { action: 'build-blacksmith',      icon: 'BSM', label: 'Klooster',        hotkey: 'R', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Blacksmith,                tier: 1 },
-    { action: 'build-housing',         icon: 'HSE', label: 'Huuske',          hotkey: 'T', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Housing,                   tier: 2 },
-    { action: 'build-tower',           icon: 'TWR', label: 'Wachttoren',      hotkey: 'F', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.DefenseTower,              tier: 2 },
-    { action: 'build-faction2',        icon: 'ADV', label: 'Mijnwerkerskamp', hotkey: 'G', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial2,           tier: 3 },
-    { action: 'build-siege-workshop',  icon: 'SWK', label: 'Steengroeve',     hotkey: 'Z', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.SiegeWorkshop,             tier: 3 },
-    { action: 'build-mijnschacht',     icon: 'TRT', label: 'Mijnschacht',     hotkey: 'X', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.TertiaryResourceBuilding,  tier: 2 },
-  ],
-  belgen: [
-    { action: 'build-barracks',        icon: 'BRK', label: 'Frituur',         hotkey: 'Q', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Barracks,                 tier: 1 },
-    { action: 'build-lumbercamp',      icon: 'LMB', label: 'Frietfabriek',    hotkey: 'E', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.LumberCamp,               tier: 1 },
-    { action: 'build-blacksmith',      icon: 'BSM', label: 'EU-Parlement',    hotkey: 'R', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Blacksmith,                tier: 1 },
-    { action: 'build-housing',         icon: 'HSE', label: 'Brusselse Woning', hotkey: 'T', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Housing,                  tier: 2 },
-    { action: 'build-tower',           icon: 'TWR', label: 'Commissiegebouw', hotkey: 'F', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.DefenseTower,              tier: 2 },
-    { action: 'build-faction2',        icon: 'ADV', label: 'Rijschool',       hotkey: 'G', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial2,           tier: 3 },
-    { action: 'build-siege-workshop',  icon: 'SWK', label: 'Frituurkanon-werkplaats', hotkey: 'Z', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.SiegeWorkshop,    tier: 3 },
-    { action: 'build-chocolaterie',    icon: 'TRT', label: 'Chocolaterie',    hotkey: 'X', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.TertiaryResourceBuilding,  tier: 2 },
-  ],
-};
-
-// Faction-specific building command labels (train panel)
-const FACTION_BUILDING_LABELS: Record<Faction, { worker: string; infantry: string; ranged: string; heavy: string; siege: string; support: string }> = {
-  brabant:  { worker: 'Boer',               infantry: 'Carnavalvierder', ranged: 'Sluiper',        heavy: 'Tractorrijder',     siege: 'Frituurmeester',  support: 'Boerinneke' },
-  randstad: { worker: 'Stagiair',           infantry: 'Manager',         ranged: 'Consultant',     heavy: 'CorporateAdvocaat', siege: 'Sloopkogel',      support: 'HR-Medewerker' },
-  limburg:  { worker: 'Mijnwerker',         infantry: 'Schutterij',      ranged: 'Vlaaienwerper',  heavy: 'Mergelridder',      siege: 'Mijnkarretje',    support: 'Heuvelwacht' },
-  belgen:   { worker: 'Frietkraamhouder',   infantry: 'Bierbouwer',      ranged: 'Chocolatier',    heavy: 'Rijexaminator',     siege: 'Frituurkanon',    support: 'Pralinemaker' },
-};
+import {
+  BASE_WORKER_CMDS,
+  TIER_REQUIREMENT_LABELS,
+  FACTION_WORKER_BUILDS,
+  FACTION_BUILDING_LABELS,
+  type WorkerBuildCmd,
+  type WorkerBuildCmdExt,
+} from './factionBuildMenus';
 
 // ---------------------------------------------------------------------------
 // HUD
