@@ -476,6 +476,33 @@
     <div class="content">
         <div class="timeline">
 
+            <!-- ── v0.37.19 (Audit Fase 3 — Economy tier 1) ──────────── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.37.19</span>
+                        <span class="update__date">18 april 2026</span>
+                        <h2 class="update__title">Audit Fase 3 — Economy tier 1 clean, GatherSystem + BuildSystem nu getest</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Audit</span>
+                            <span class="tag tag--feat">Tests</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Fase 3 van de audit (5 stappen — wood/gold harvest, bouwen met workers, placement-rules, bridge-placement) doorgelopen. Geen P0/P1 bugs. Maar: <strong>GatherSystem en BuildSystem — letterlijk de kern van de economie — hadden ZERO directe test-coverage.</strong> Allebei nu volledig vastgelegd met red→green tests.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">FASE 3 — ECONOMY TIER 1</h3>
+                        <ul class="update__highlights">
+                            <li><strong>+20 GatherSystem-tests</strong> — Complete worker state machine: NONE → MOVING → GATHERING (op arrival) → RETURNING (bij volle carry) → MOVING (auto-resume na deposit). Harvesting math (HARVEST_RATE, carry-cap, diminishing returns onder threshold). Resource-uitputting (carry-met-dust → RETURNING, geen carry → zoek volgende, alles op → idle). Deposit routing (gold naar TownHall, wood prefereert LumberCamp + fallback, vijandelijk telt niet, incompleet telt niet). End-to-end round-trip in 1 test.</li>
+                            <li><strong>+16 BuildSystem-tests</strong> — Progress accumulatie (1/2/5 workers stacken lineair). Range checks (buiten BUILD_RANGE telt niet, op de grens wél, boundary inclusive). Faction filtering (mixed crowd → alleen eigen factie). Dode workers tellen niet. Completion: progress clampt op max, <code>building-placed</code> event fires met juiste payload, geen re-emit. Defensieve guards: complete/dood/maxProgress=0 worden geskipt.</li>
+                            <li><strong>Note</strong>: Building cost-deductie (gold + wood spend bij placement) zit correct in <code>Game.handleBuildPlacement</code>, maar verweven met DOM raycaster + HUD — pure-helper extractie is follow-up. Brabanders/Randstad hebben geen X-hotkey building (alleen Limburgers + Belgen — TertiaryResource). Mogelijk intentioneel.</li>
+                        </ul>
+
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--space-md);">Test-suite: <strong>287 → 682</strong> deze sessie (+395 tests, +138%). Volgende fases: Training (3b) → Combat (4) → Tier 2/3 (5) → Endgame (7).</p>
+                    </div>
+                </div>
+            </article>
+
             <!-- ── v0.37.18 (Audit Fase 2 — Map &amp; spawn, +359 tests) ─ -->
             <article class="update">
                 <div class="update__card">

@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.37.19] - 2026-04-18 — Audit Fase 3 (economy tier 1) — GatherSystem + BuildSystem covered
+
+### Audit
+- Fase 3 (economy tier 1, 5 stappen) afgerond. Geen P0/P1 bugs. **GatherSystem en BuildSystem hadden ZERO directe test-coverage** — beide zijn nu volledig getest. Plus stap 12-14 was al gedekt door eerdere bug-fix tests (placement-river, placement-lumbercamp, worker-build-resets-gather).
+
+### Added (test coverage)
+- `tests/GatherSystem.test.ts` (+20 tests) — locks de complete worker-gather state machine:
+  - State transitions: NONE → MOVING_TO_RESOURCE → GATHERING (op arrival distance) → RETURNING (bij volle carry) → MOVING (auto-resume zelfde resource na deposit).
+  - Harvesting math: HARVEST_RATE per seconde, decrement van resource amount, carry-cap (max CARRY_CAPACITY), diminishing returns onder DIMINISHING_RETURNS_THRESHOLD.
+  - Resource-uitputting: depleted-met-carry → RETURNING, depleted-zonder-carry → zoek volgende of idle, alle resources op → state NONE.
+  - Deposit routing: gold naar TownHall, wood prefereert LumberCamp en valt terug op TownHall, vijandelijk gebouw telt niet, incompleet gebouw telt niet, geen deposit → state NONE.
+  - End-to-end round trip: arrive → harvest → fill → return → deposit → +CARRY_CAPACITY gold in PlayerState.
+- `tests/BuildSystem.test.ts` (+16 tests) — locks construction-progress accumulation:
+  - 1/2/5 workers stacken lineair (BUILD_SPEED × workerCount × dt).
+  - Worker buiten BUILD_RANGE telt niet; worker exact op de grens telt wel (boundary inclusive).
+  - Vijandige factie-workers tellen niet; mixed crowd telt alleen eigen factie.
+  - Dode workers tellen niet (IsDead component).
+  - Completion: progress >= maxProgress → `complete=1`, `building-placed` event met juiste payload, geen re-emit op vervolg-ticks, progress wordt geclamped op maxProgress.
+  - Defensieve guards: complete buildings worden geskipt, maxProgress<=0 wordt geskipt, dode buildings worden geskipt, geen workers in range → geen progress.
+
+### Notes
+- **Test-suite groei deze sessie: 287 → 682 (+395 tests in 1 dag, +138%)**.
+- Building-cost-deduction (gold + wood spend bij placement) zit in `Game.handleBuildPlacement` en is correct, maar tied aan DOM raycaster + HUD — extractie naar pure helper is een aparte refactor (follow-up).
+- Brabanders/Randstad hebben geen `X` hotkey-binding voor TertiaryResourceBuilding (alleen Limburgers + Belgen). Mogelijk intentioneel — to confirm.
+
 ## [0.37.18] - 2026-04-18 — Audit Fase 2 (map &amp; spawn) — +359 tests, factionRemap geëxtraheerd
 
 ### Audit
