@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.37.13] - 2026-04-18 — Safari wheel/trackpad claim
+
+### Fixed
+- **Skirmish menu scroll bleef niet werken in Safari** zelfs met `min-height: 0` + inner wrapper. User's Web-Inspector box model bevestigde dat `.faction-scroll` wel degelijk overflow had (content 248.91px in 218px container), maar scroll-events bereikten 'm niet. Root cause: `#ui-overlay` heeft `pointer-events: none` zodat het game-canvas eronder klikken ontvangt; direct children krijgen `pointer-events: auto` terug, maar Safari respecteert die inheritance niet altijd voor wheel-events op genest elements. Fix: expliciete `pointer-events: auto` + `touch-action: pan-y` op `.faction-scroll` + expliciete `::-webkit-scrollbar` styling. Scroll-container is nu ook pure `display: block` (i.p.v. flex) zodat scroll-gedrag identiek is aan standard scroll-containers, minder browser-bug-oppervlak.
+
 ## [0.37.12] - 2026-04-18 — echte scroll-container, Safari-proof
 
 ### Fixed
