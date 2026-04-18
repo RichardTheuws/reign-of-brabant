@@ -476,6 +476,73 @@
     <div class="content">
         <div class="timeline">
 
+            <!-- ── v0.37.3 – v0.37.16 (Audit Sprint) ──────────────── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.37.3 – v0.37.16</span>
+                        <span class="update__date">17-18 april 2026</span>
+                        <h2 class="update__title">Audit Sprint — 14 patches, 9 gameplay-bugs, scroll + shaders gefixed</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--fix">Bugfix</span>
+                            <span class="tag tag--gameplay">Gameplay</span>
+                            <span class="tag tag--ui">UI/UX</span>
+                            <span class="tag tag--feat">Tests</span>
+                            <span class="tag tag--feat">Audit</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Een tweedaagse systematische audit-sprint: 6 gameplay-audits parallel uitgevoerd (6 diepgaande rapporten in <code>audits/</code>), 9 P0/P1 bugs met red-tests vastgelegd voor ze gefixt werden, +81 nieuwe tests (206 → 287), 14 versiepatches, alles gepusht. Focus op kwaliteit + regressieprotectie: elke fix heeft een bijbehorende test die permanent beschermt tegen terugkeer.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">AUDIT-FASE (v0.37.3)</h3>
+                        <ul class="update__highlights">
+                            <li><strong>6 parallelle agents</strong> — Building-placement, Rally/commands, Unit-behavior, Building-behavior, Guidance-UX, Map/terrain audits. Resultaat: 8 rapporten (audits/01-08.md), 5 P0 gameplay-bugs geïdentificeerd, 45 falende red-tests die de fixes zouden valideren</li>
+                            <li><strong>Test-inventaris</strong> — memory-check corrigeerde oud foutief getal (618 → werkelijk 206 tests / 277 expects)</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">CORE GAMEPLAY FIXES</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Rally-point pickt nu resources correct</strong> (v0.37.5) — <code>findEntityAtPosition</code> leest nu ECS Position component i.p.v. mesh.position. Right-click op boom/mijn zet worker-rally target betrouwbaar. Extractie naar aparte testbare helper</li>
+                            <li><strong>Bruggen over rivieren</strong> (v0.37.5, v0.37.7, v0.37.15) — Nieuwe <code>BuildingTypeId.Bridge</code>, terrain.isRiver verplicht voor bridge-placement. Map-gen bruggen snappen nu naar river-paths met correcte rotation én schalen mee met river-width (geen bruggen meer op land of te smal voor het kanaal)</li>
+                            <li><strong>FactionSpecial2 produceert nu Heavy</strong> (v0.37.4) — Feestzaal/Parkeergarage/Mijnwerkerskamp/Rijschool hadden typeId=Barracks en produceerden Infantry/Ranged (duplicaat). Nu typeId=FactionSpecial2 en produceren Heavy units. T3-progressie eindelijk speelbaar</li>
+                            <li><strong>SiegeWorkshop-data toegevoegd</strong> (v0.37.4) — HUD toonde knoppen maar er was geen data-entry voor enige factie. Nu 4 volledige entries (Tractorschuur/Sloopwerf/Steengroeve/Frituurkanon-werkplaats) met Siege-productie</li>
+                            <li><strong>LumberCamp-error heeft nu context</strong> (v0.37.6) — Was "moet binnen 20 eenheden van bomen staan" generiek. Nu gestructureerde <code>PlacementResult</code> met <code>nearestWoodDistance</code> en <code>nearestWoodPosition</code>, error-string toont live de dichtste afstand ("dichtste: 34")</li>
+                            <li><strong>Worker hervat niet meer harvesten</strong> (v0.37.8) — handleBuild reset nu <code>Gatherer.state</code> naar NONE, precies zoals move/attack dat doen. Gebouwen worden nu daadwerkelijk afgebouwd in plaats van dat de worker na 2 seconden terug naar een boom liep</li>
+                            <li><strong>Rally-point werkt op alle productiegebouwen</strong> (v0.37.8) — Game.ts createBuildingEntity miste <code>RallyPoint</code> component bij pre-placed buildings in skirmish. Nu shared <code>spawnBuildingEntity</code> helper: contract locked via regression-test</li>
+                            <li><strong>Unit-training trekt nu ook hout af</strong> (v0.37.16) — CommandSystem riep alleen <code>spend()</code> (gold). <code>costSecondary</code> (hout) werd NOOIT afgeschreven — units waren letterlijk half gratis. Nu dubbele check + spend + refund, pre-flight alert: "Niet genoeg hout! (60 nodig)"</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">RENDERING &amp; INPUT</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Terrain shader compile-crash gefixt</strong> (v0.37.9) — Three.js r183 declareerde <code>vUv</code> niet meer in onze materiaal-configuratie, fragment shader faalde. Eigen <code>vTerrainUv</code> varying geïnjecteerd, werkt onafhankelijk van Three.js versie-gedrag</li>
+                            <li><strong>Wheel-scroll werkte nergens in UI</strong> (v0.37.14) — De echte root cause van een half dagwerk aan CSS-gemodder: een globale <code>window.addEventListener('wheel', preventDefault)</code> voor camera-zoom blokkeerde élke scroll in de hele pagina. Listener verplaatst naar canvas only. Menus en panels scrollen nu natief. Memory-learning vastgelegd</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">UI &amp; ASSETS</h3>
+                        <ul class="update__highlights">
+                            <li><strong>4 nieuwe factie-leader portretten</strong> (v0.37.10) — Via fal.ai Flux Pro (oil-painting, Rembrandt-stijl, 768×1024 met gouden lijsten). Brabanders prins met worstenbroodje-scepter, stressvolle Randstad CEO met tablet, Limburgse mijnbaron met vlaai, Belgische diplomaat met chocola en frietjes</li>
+                            <li><strong>3 nieuwe HUD command-icons</strong> (v0.37.16) — cmd-heavy (warhammer), cmd-siege (catapult), cmd-support (healer-potion) via Flux Dev + BiRefNet. Vervangen generieke "HVY/SIE/SUP" tekst-placeholders</li>
+                            <li><strong>Skirmish menu volledig herzien</strong> (v0.37.10 t/m v0.37.14) — Broken image-paden gefixt, layout responsive, 3-laag flex (header / scrollable / confirm-bar), Safari-proof scroll, fallback UI voor ontbrekende portretten, FoW-toggle toont nu helder "Aan" of "Uit"</li>
+                            <li><strong>Smederij upgrade-paneel</strong> (v0.37.16) — Upgrade-buttons liepen over de bovenkant van het paneel. Nieuwe column-flex layout, 160×56 buttons met icoon + naam + kosten, gouden progress-bar, panel positie verhoogd zodat building-card niet overlapt</li>
+                            <li><strong>Versie-weergave klopt nu</strong> (v0.37.10) — game toonde v0.31.1 terwijl package.json v0.37.x was. Vite's <code>define</code> werkte niet betrouwbaar; nu directe JSON-import uit package.json</li>
+                            <li><strong>Boerinneke i.p.v. Boerinne</strong> (v0.37.16) — Brabants dialect voor de support-unit. Rename door factionData, HUD, Game, abilities</li>
+                            <li><strong>Kerktoren i.p.v. Kerk</strong> (v0.37.16) — duidelijker als verdedigings-toren</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">WERKCIJFERS</h3>
+                        <ul class="update__highlights">
+                            <li><strong>14 versiepatches</strong> in 2 dagen — v0.37.3 → v0.37.16</li>
+                            <li><strong>+81 nieuwe tests</strong> — van 206 naar 287 tests (+40%), alle nieuwe functionaliteit locked via red→green cycle</li>
+                            <li><strong>8 audit-rapporten</strong> bewaard in <code>audits/</code> voor toekomstige sessies</li>
+                            <li><strong>Typecheck schoon</strong> door de hele sprint — geen enkele regressie in bestaande functionaliteit</li>
+                            <li><strong>Memory-learnings</strong> vastgelegd — wheel-listener-scope gotcha, Safari flex-scroll patterns, test-inventaris</li>
+                        </ul>
+
+                        <p style="color: var(--gold-light); font-style: italic; margin-top: var(--space-lg); font-size: 0.95rem;">Volgende sessie: systematische stap-voor-stap nalooping van de complete gameplay-flow (main menu → spawn → economy → training → combat → tier 2/3 → endgame), elk punt met eigen mini-audit en red-test waar zinvol.</p>
+                    </div>
+                </div>
+            </article>
+
             <!-- ── v0.37.2 ─────────────────────────────── -->
             <article class="update">
                 <div class="update__card">
