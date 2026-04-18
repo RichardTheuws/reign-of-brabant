@@ -432,11 +432,12 @@ function generateRiverValley(
   }
 
   // 5 bridges, snapped onto the wiggly river path so they always cross it.
+  const riverValleyRivers: RiverSpawn[] = [{ path: riverPath, width: 12 }];
   const bridges: BridgeSpawn[] = [];
   const allBridgeXs = [...bridgeXs, 0];
   for (const bx of allBridgeXs) {
     const raw: BridgeSpawn = { x: bx, z: 0, rotation: 0, width: 4, length: 14 };
-    bridges.push(snapBridgeToRiver(raw, riverPath));
+    bridges.push(snapBridgeToRivers(raw, riverValleyRivers));
   }
 
   // Roads along banks
@@ -1660,7 +1661,7 @@ function generateArchipelago(
     rivers.push({ path: channelPath, width: channelWidth * 0.8 });
   }
 
-  // Bridges: one from each island to center, snapped to the ring channel.
+  // Bridges: one from each island to center, snapped to the nearest channel.
   for (let slot = 0; slot < playerCount; slot++) {
     const angle = (slot / playerCount) * Math.PI * 2 - Math.PI / 2;
     const bridgeR = centerIslandRadius;
@@ -1671,10 +1672,10 @@ function generateArchipelago(
       width: 5,
       length: channelWidth + 4,
     };
-    bridges.push(snapBridgeToRiver(raw, ringPath));
+    bridges.push(snapBridgeToRivers(raw, rivers));
   }
 
-  // If 2 players: add secondary flanking bridges, also snapped to the ring.
+  // If 2 players: add secondary flanking bridges, also snapped to the rivers.
   if (playerCount === 2) {
     const flankAngle1 = Math.PI * 0.15;
     const flankAngle2 = Math.PI * 1.15;
@@ -1693,8 +1694,8 @@ function generateArchipelago(
       width: 4,
       length: channelWidth + 2,
     };
-    bridges.push(snapBridgeToRiver(raw1, ringPath));
-    bridges.push(snapBridgeToRiver(raw2, ringPath));
+    bridges.push(snapBridgeToRivers(raw1, rivers));
+    bridges.push(snapBridgeToRivers(raw2, rivers));
   }
 
   // Roads from spawns to nearest bridge
@@ -1842,41 +1843,64 @@ function nudgeFromRiver(
 }
 
 /**
- * Snap a bridge onto its closest river-path point and orient it perpendicular
- * to the local tangent. Templates often place bridges at assumed coordinates
- * (e.g. z=0) while river paths wiggle via RNG; without snapping the bridge
- * drifts next to the river instead of crossing it.
+ * Snap a bridge onto the closest point of its matching river and:
+ *   - position it exactly on that river point,
+ *   - rotate it perpendicular to the local tangent (so it crosses, not follows),
+ *   - scale its width to always span the river with a small shore margin.
  *
- * Pure helper -- does not mutate the inputs.
+ * Pure helper -- does not mutate the inputs. Accepts the full rivers array
+ * so each bridge picks the correct river even on templates with multiple
+ * channels (e.g. archipelago's ring + radial channels).
  */
-function snapBridgeToRiver<T extends BridgeSpawn>(
+function snapBridgeToRivers<T extends BridgeSpawn>(
   bridge: T,
-  riverPath: ReadonlyArray<{ x: number; z: number }>,
+  rivers: ReadonlyArray<RiverSpawn>,
 ): T {
-  if (riverPath.length === 0) return bridge;
+  if (rivers.length === 0) return bridge;
 
-  let bestI = 0;
+  let bestRiver: RiverSpawn | null = null;
+  let bestIdx = 0;
   let bestDistSq = Infinity;
-  for (let i = 0; i < riverPath.length; i++) {
-    const p = riverPath[i];
-    const dx = bridge.x - p.x;
-    const dz = bridge.z - p.z;
-    const d = dx * dx + dz * dz;
-    if (d < bestDistSq) {
-      bestDistSq = d;
-      bestI = i;
+
+  for (const river of rivers) {
+    for (let i = 0; i < river.path.length; i++) {
+      const p = river.path[i];
+      const dx = bridge.x - p.x;
+      const dz = bridge.z - p.z;
+      const d = dx * dx + dz * dz;
+      if (d < bestDistSq) {
+        bestDistSq = d;
+        bestRiver = river;
+        bestIdx = i;
+      }
     }
   }
+  if (!bestRiver) return bridge;
 
-  const closest = riverPath[bestI];
-  const before = riverPath[Math.max(0, bestI - 1)];
-  const after = riverPath[Math.min(riverPath.length - 1, bestI + 1)];
+  const path = bestRiver.path;
+  const closest = path[bestIdx];
+  const before = path[Math.max(0, bestIdx - 1)];
+  const after = path[Math.min(path.length - 1, bestIdx + 1)];
   const tangentX = after.x - before.x;
   const tangentZ = after.z - before.z;
-  // Rotation faces across the river -> perpendicular to tangent.
   const rotation = Math.atan2(tangentZ, tangentX) + Math.PI / 2;
 
-  return { ...bridge, x: closest.x, z: closest.z, rotation };
+  // Bridge must visibly span the river. The GLB model scales uniformly by
+  // bridge.width (Terrain.ts: model.scale.setScalar(bridge.width * 0.5)),
+  // so we bump width to "river width + shore margin" and keep length in
+  // step so path metadata stays consistent.
+  const riverWidth = bestRiver.width;
+  const spanWidth = Math.max(bridge.width, riverWidth * 1.35 + 2);
+  const spanLength = Math.max(bridge.length, riverWidth + 6);
+
+  return {
+    ...bridge,
+    x: closest.x,
+    z: closest.z,
+    rotation,
+    width: spanWidth,
+    length: spanLength,
+  };
 }
 
 // ---------------------------------------------------------------------------

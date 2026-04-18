@@ -481,8 +481,15 @@ export class MenuScreens {
 
   private updateFogOfWarToggle(): void {
     const btn = document.getElementById('fow-toggle');
-    if (btn) {
-      btn.classList.toggle('is-selected', this.selectedFogOfWar);
+    if (!btn) return;
+    // Toggle is always "active looking" so the player can see their choice;
+    // only the inner label flips between Aan / Uit. Avoid overwriting the
+    // button's .diff-label span (preserves typography + layout).
+    btn.classList.add('is-selected');
+    const label = btn.querySelector('.diff-label');
+    if (label) {
+      label.textContent = this.selectedFogOfWar ? 'Aan' : 'Uit';
+    } else {
       btn.textContent = this.selectedFogOfWar ? 'Aan' : 'Uit';
     }
   }

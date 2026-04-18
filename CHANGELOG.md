@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.37.15] - 2026-04-18 — FoW toggle label + bruggen schalen met rivier
+
+### Fixed
+- **Fog of War toggle** stond op "Aan" en liet na een klik de button in not-selected stijl staan terwijl `textContent` de span verving. Nu blijft de toggle altijd in de actieve (gouden) stijl en flipt alleen de `.diff-label` span tussen "Aan" en "Uit".
+- **Bruggen op archipelago/river-valley waren visueel te smal** voor brede rivieren — user: "de bruggen zouden opgeschaald en juist gepositioneerd moeten worden om natuurlijk met de waterpartijen te werken". `snapBridgeToRivers` (voorheen `snapBridgeToRiver`) accepteert nu de volledige `rivers` array en schaalt de bridge-width dynamisch naar `riverWidth * 1.35 + 2` met een shore-marge. In archipelago kiest elke bridge de dichtstbijzijnde kanaal (ring of radial) i.p.v. altijd aan te nemen dat de ringPath correct is. 15 bridge-alignment tests blijven groen.
+
 ## [0.37.14] - 2026-04-18 — ECHTE root cause: globale wheel-preventDefault
 
 ### Fixed
