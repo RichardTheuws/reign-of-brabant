@@ -387,12 +387,13 @@
       position: absolute; inset: 0; z-index: 60; display: none; flex-direction: column;
       align-items: center;
       background: linear-gradient(135deg, rgba(10,8,6,0.94) 0%, rgba(20,15,10,0.88) 100%);
-      padding: 24px 24px 120px; overflow-y: auto;
+      padding: 20px 24px 0; overflow-y: auto; overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
       scrollbar-width: thin;
       scrollbar-color: rgba(212, 168, 83, 0.3) transparent;
     }
-    .faction-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+    .faction-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; flex-shrink: 0; }
     .faction-back-btn {
       background: none; border: 1px solid var(--color-panel-border); color: var(--color-text);
       padding: 8px 16px; border-radius: 6px; cursor: pointer;
@@ -404,10 +405,10 @@
       color: var(--color-gold); flex: 1; text-align: center;
     }
     .faction-cards-row {
-      display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px;
+      display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px;
     }
     .faction-card {
-      width: 150px; padding: 16px; border: 2px solid var(--color-panel-border);
+      width: 140px; padding: 12px; border: 2px solid var(--color-panel-border);
       border-radius: 10px; background: var(--color-panel-bg); cursor: pointer;
       transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s; text-align: center;
     }
@@ -423,21 +424,21 @@
       color: var(--color-text); margin-bottom: 4px;
     }
     .faction-card-lock { font-size: 0.75rem; color: var(--color-text-dim); }
-    #faction-preview { max-width: 700px; width: 100%; margin: 0 auto 24px; min-height: 200px; }
+    #faction-preview { max-width: 700px; width: 100%; margin: 0 auto 14px; min-height: auto; }
     .faction-preview-placeholder {
       text-align: center; color: var(--color-text-dim); font-style: italic; padding: 40px 0;
     }
     .faction-preview-content {
-      display: flex; gap: 24px; background: var(--color-panel-bg);
+      display: flex; gap: 18px; background: var(--color-panel-bg);
       border: 1px solid var(--color-panel-border); border-radius: 10px;
-      padding: 20px; animation: fadeSlideUp 0.3s ease-out;
+      padding: 14px 16px; animation: fadeSlideUp 0.3s ease-out;
     }
     @keyframes fadeSlideUp {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
     .faction-preview-image {
-      flex-shrink: 0; width: 180px; height: 220px; border-radius: 8px;
+      flex-shrink: 0; width: 140px; height: 180px; border-radius: 8px;
       overflow: hidden; border: 2px solid var(--color-panel-border); background: rgba(0,0,0,0.3);
       position: relative;
     }
@@ -468,8 +469,8 @@
       color: var(--color-gold);
     }
     .faction-card-portrait {
-      width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
-      border: 2px solid var(--color-panel-border); margin-bottom: 8px;
+      width: 64px; height: 64px; border-radius: 50%; object-fit: cover;
+      border: 2px solid var(--color-panel-border); margin-bottom: 6px;
       transition: border-color 0.2s;
     }
     .faction-card.is-selected .faction-card-portrait { border-color: var(--color-gold-bright); }
@@ -478,15 +479,20 @@
     }
     .faction-confirm-area {
       text-align: center;
-      position: fixed; bottom: 0; left: 0; right: 0;
-      padding: 20px 0 24px;
-      background: linear-gradient(180deg, rgba(10,8,6,0) 0%, rgba(10,8,6,0.96) 35%, rgba(10,8,6,0.98) 100%);
-      z-index: 61;
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      pointer-events: none;
+      position: sticky; bottom: 0;
+      margin-top: auto;
+      padding: 14px 16px 16px;
+      background: rgba(10, 8, 6, 0.98);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border-top: 1px solid rgba(212, 168, 83, 0.18);
+      box-shadow: 0 -8px 16px rgba(0, 0, 0, 0.35);
+      z-index: 5;
+      width: 100%;
+      /* Break out of the #faction-select 24px horizontal padding so the bar
+         spans the full overlay width visually. */
+      align-self: stretch;
     }
-    .faction-confirm-area .faction-confirm-btn { pointer-events: auto; }
     .faction-confirm-btn {
       padding: 14px 48px; border: 2px solid var(--color-gold); border-radius: 8px;
       background: rgba(212,168,83,0.12); color: var(--color-gold);

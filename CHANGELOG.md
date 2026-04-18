@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.37.11] - 2026-04-18 — skirmish scroll + dichter gepakte layout
+
+### Fixed
+- **Skirmish menu scrolde niet op Safari Mac** bij smalle viewport-hoogte: `position: fixed` op de Start Gevecht-bar blokkeerde scroll-events op de flex-container. Terug naar `position: sticky; bottom: 0` binnen de scrollbare `#faction-select` container + opaque background + schaduw + `overscroll-behavior: contain`. Alle opties (Spelers, Kaartgrootte, Startgoud, Moeilijkheid, Fog of War) zijn weer bereikbaar door te scrollen.
+- **Compacter layout** voor verticaal beperkte schermen: preview-image 180→180→140×180, card-portret 80→64px, padding-bottom rondom header/preview/cards verlaagd. Meer opties tegelijk zichtbaar zonder scrollen.
+
 ## [0.37.10] - 2026-04-17 — skirmish menu polish + version-display fix
 
 ### Fixed — Bug 10
