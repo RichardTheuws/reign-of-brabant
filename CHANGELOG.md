@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.37.16] - 2026-04-18 — Boerinneke, wood-deductie, Kerktoren, Smederij-paneel
+
+### Fixed
+- **Bug 11 — Boerinneke i.p.v. Boerinne**: ondersteuner rename (Brabants dialect) in factionData, HUD labels, Game.ts labels, unitAbilityMap. Portret-card toonde alleen "SUP" placeholder zonder kosten; nu:
+  - Asset Generator heeft `cmd-heavy.png`, `cmd-siege.png`, `cmd-support.png` gegenereerd (Flux Dev + BiRefNet transparency, 256x256). Ingewired in `COMMAND_ICON_IMAGES`.
+  - `getInlineUnitCost` gebruikt nu `getFactionUnitArchetype()` i.p.v. de legacy `UNIT_ARCHETYPES` array die maar tot Heavy (index 3) liep. Heavy/Siege/Support krijgen nu hun echte kosten getoond.
+- **Bug 12 — Training trekt nu ook hout af**: `CommandSystem.handleTrain` riep alleen `playerState.spend()` (gold). `costSecondary` (hout) werd nooit afgeschreven. Nieuwe `getUnitWoodCostForFaction`-helper + `canAffordWood` + `spendWood` + wood-refund bij full-queue. `Game.ts::trainFromSelectedBuilding` doet nu een pre-flight check zodat speler direct hoort wat er ontbreekt (gold / wood / populatie). +3 red→green tests in `training-deducts-wood.test.ts`.
+- **Bug 13 — Kerk → Kerktoren**: label hernoemd in HUD + factionData zodat speler direct herkent dat het een verdedigings-toren is. Noot: de GLB `tower.glb` voor Brabanders lijkt volgens user-feedback een windmolen; een nieuwe Meshy-regeneratie voor dit model is een aparte P2 follow-up.
+- **Bug 14 — Smederij upgrade-paneel**: paneelstyling compleet herzien. Upgrade-buttons (160x56, horizontale flex met icoon + naam + kosten) zitten nu netjes binnen het paneel i.p.v. afgesneden aan de bovenkant. Progress-bar + research-timer stylen als gouden highlight. Paneelpositie verhoogd naar `bottom: 230px` wanneer het building-card zichtbaar is, zodat beide compleet zichtbaar zijn.
+
+### Notes
+- Upgrade-effecten op bestaande units (retroactieve stat-buffs na voltooide research) zijn nog niet volledig gevalideerd — zie audit 04 §5 voor follow-up.
+
 ## [0.37.15] - 2026-04-18 — FoW toggle label + bruggen schalen met rivier
 
 ### Fixed

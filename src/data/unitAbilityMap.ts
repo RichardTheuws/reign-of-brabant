@@ -40,7 +40,7 @@ function buildMap(): Map<string, UnitAbilityAssignment> {
     activeAbility: findAbilityIndex('smokkelroute'),
     passiveAbilities: [],
   });
-  m.set(`${FactionId.Brabanders}:Boerinne`, {
+  m.set(`${FactionId.Brabanders}:Boerinneke`, {
     activeAbility: findAbilityIndex('koffie-met-gebak'),
     passiveAbilities: [],
   });

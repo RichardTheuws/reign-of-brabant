@@ -30,7 +30,7 @@ export enum ExtendedUnitTypeId {
   Boer = 0,
   Carnavalvierder = 1,
   Sluiper = 2,              // Ranged stealth
-  Boerinne = 3,             // Support / Healer
+  Boerinneke = 3,             // Support / Healer
   Muzikant = 4,             // Buffer / Debuffer [Tier 2]
   Tractorrijder = 5,        // Heavy / Cavalry [Tier 2]
   Frituurmeester = 6,       // Siege [Tier 3]
@@ -220,11 +220,11 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       sightRange: 10,
       carryCapacity: 0,
     },
-    // Boerinne (Support / Healer) -- fragile healer, decent range
+    // Boerinneke (Support / Healer) -- fragile healer, decent range
     {
       typeId: UnitTypeId.Support,
-      name: 'Boerinne',
-      brabantName: 'Boerinne',
+      name: 'Boerinneke',
+      brabantName: 'Boerinneke',
       hp: 50,
       attack: 8,
       attackSpeed: 1.5,
@@ -404,7 +404,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       sightRange: 14,
       carryCapacity: 0,
     },
-    // HR-Medewerker (Support / Healer) [Tier 2] -- better range than Boerinne, costlier
+    // HR-Medewerker (Support / Healer) [Tier 2] -- better range than Boerinneke, costlier
     {
       typeId: UnitTypeId.Support,
       name: 'HR-Medewerker',
@@ -864,8 +864,8 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
     // Kerk (Defense tower)
     {
       typeId: BuildingTypeId.Barracks, // defense tower slot
-      name: 'Kerk',
-      brabantName: 'Kerk',
+      name: 'Kerktoren',
+      brabantName: 'Kerktoren',
       hp: 900,
       costGold: 200,
       costSecondary: 200,

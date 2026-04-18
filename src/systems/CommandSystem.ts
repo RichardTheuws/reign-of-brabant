@@ -101,6 +101,14 @@ function getUnitCostForFaction(factionId: number, unitTypeId: number): number {
   }
 }
 
+function getUnitWoodCostForFaction(factionId: number, unitTypeId: number): number {
+  try {
+    return getFactionUnitArchetype(factionId, unitTypeId).costSecondary ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
 function getUnitBuildTimeForFaction(factionId: number, unitTypeId: number): number {
   try {
     return getFactionUnitArchetype(factionId, unitTypeId).buildTime;
@@ -323,15 +331,18 @@ function handleTrain(world: GameWorld, cmd: TrainCommand): void {
 
   const factionId = Faction.id[bEid];
 
-  // Check cost -- use command-provided cost, or look up faction-specific cost
+  // Check cost -- gold from command or faction lookup, wood always from archetype.
   const cost = cmd.cost || getUnitCostForFaction(factionId, cmd.unitTypeId);
+  const woodCost = getUnitWoodCostForFaction(factionId, cmd.unitTypeId);
   if (!playerState.canAfford(factionId, cost)) return;
+  if (woodCost > 0 && !playerState.canAffordWood(factionId, woodCost)) return;
 
   // Check population
   if (!playerState.hasPopulationRoom(factionId)) return;
 
-  // Deduct gold at START of production
+  // Deduct both resources at START of production
   playerState.spend(factionId, cost);
+  if (woodCost > 0) playerState.spendWood(factionId, woodCost);
 
   // If building is not currently producing, start immediately
   if (Production.unitType[bEid] === NO_PRODUCTION) {
@@ -357,8 +368,9 @@ function handleTrain(world: GameWorld, cmd: TrainCommand): void {
     }
   }
 
-  // Queue full -- refund
+  // Queue full -- refund both resources
   playerState.addGold(factionId, cost);
+  if (woodCost > 0) playerState.addWood(factionId, woodCost);
 }
 
 /**

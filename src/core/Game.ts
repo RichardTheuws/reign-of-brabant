@@ -1250,11 +1250,28 @@ export class Game {
       if (!arch.produces.includes(unitType)) continue;
 
       const factionUnitArch = getFactionUnitArchetype(this.playerFactionId, unitType);
+      const goldCost = factionUnitArch.costGold;
+      const woodCost = factionUnitArch.costSecondary ?? 0;
+
+      // Pre-flight: give the player a reason if the command will silently reject.
+      if (!this.playerState.canAfford(this.playerFactionId, goldCost)) {
+        this.hud?.showAlert(`Niet genoeg goud! (${goldCost} nodig)`, 'warning');
+        return;
+      }
+      if (woodCost > 0 && !this.playerState.canAffordWood(this.playerFactionId, woodCost)) {
+        this.hud?.showAlert(`Niet genoeg hout! (${woodCost} nodig)`, 'warning');
+        return;
+      }
+      if (!this.playerState.hasPopulationRoom(this.playerFactionId)) {
+        this.hud?.showAlert('Populatie vol! Bouw Huusjes.', 'warning');
+        return;
+      }
+
       queueCommand({
         type: 'train',
         buildingEid: eid,
         unitTypeId: unitType,
-        cost: factionUnitArch.costGold,
+        cost: goldCost,
       });
       return;
     }
@@ -2347,7 +2364,7 @@ export class Game {
     if (!isBlacksmith) {
       // Faction-specific unit names
       const unitNames: Record<number, Record<string, string>> = {
-        0: { worker: 'Boer', infantry: 'Carnavalvierder', ranged: 'Sluiper', heavy: 'Tractorrijder', siege: 'Frituurmeester', support: 'Boerinne' },
+        0: { worker: 'Boer', infantry: 'Carnavalvierder', ranged: 'Sluiper', heavy: 'Tractorrijder', siege: 'Frituurmeester', support: 'Boerinneke' },
         1: { worker: 'Stagiair', infantry: 'Manager', ranged: 'Consultant', heavy: 'CorporateAdvocaat', siege: 'Sloopkogel', support: 'HR-Medewerker' },
         2: { worker: 'Mijnwerker', infantry: 'Schutterij', ranged: 'Vlaaienwerper', heavy: 'Mergelridder', siege: 'Mijnkarretje', support: 'Heuvelwacht' },
         3: { worker: 'Frietkraamhouder', infantry: 'Bierbouwer', ranged: 'Chocolatier', heavy: 'Rijexaminator', siege: 'Frituurkanon', support: 'Pralinemaker' },

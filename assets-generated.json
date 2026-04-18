@@ -42,6 +42,30 @@
       "size": "768x1024",
       "generated": "2026-04-17",
       "use_case": "faction-select card preview"
+    },
+    {
+      "file": "public/assets/ui/commands/cmd-heavy.png",
+      "model": "fal-ai/flux/dev + fal-ai/birefnet/v2",
+      "prompt": "medieval two-handed warhammer icon, large steel head with bronze accents, long wooden haft, dark outline, flat icon style, fantasy RTS game UI button art, centered on plain light background, symmetric composition, readable silhouette at small size",
+      "size": "256x256",
+      "generated": "2026-04-17",
+      "use_case": "HUD build button — heavy infantry category"
+    },
+    {
+      "file": "public/assets/ui/commands/cmd-siege.png",
+      "model": "fal-ai/flux/dev + fal-ai/birefnet/v2",
+      "prompt": "medieval catapult siege weapon icon, wooden trebuchet engine with stone projectile loaded in the bucket, bronze rivets and iron fittings, dark outline, flat icon style, fantasy RTS game UI button art, centered on plain light background, symmetric composition, readable silhouette at small size",
+      "size": "256x256",
+      "generated": "2026-04-17",
+      "use_case": "HUD build button — siege weapons"
+    },
+    {
+      "file": "public/assets/ui/commands/cmd-support.png",
+      "model": "fal-ai/flux/dev + fal-ai/birefnet/v2",
+      "prompt": "medieval healer potion flask icon, glass vial filled with glowing red liquid, wrapped in linen bandage with a red cross emblem, sprig of green herbs beside it, bronze cap and gold trim, dark outline, flat icon style, fantasy RTS game UI button art, centered on plain light background, symmetric composition, readable silhouette at small size",
+      "size": "256x256",
+      "generated": "2026-04-17",
+      "use_case": "HUD build button — support/healer category"
     }
   ]
 }

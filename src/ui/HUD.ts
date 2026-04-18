@@ -6,6 +6,8 @@
  */
 
 import { audioManager } from '../audio/AudioManager';
+import { getFactionUnitArchetype } from '../data/factionData';
+import { FactionId } from '../types/index';
 import {
   UNIT_ARCHETYPES,
   BUILDING_ARCHETYPES,
@@ -25,6 +27,9 @@ const COMMAND_ICON_IMAGES: Record<string, string> = {
   WRK: '/assets/ui/commands/cmd-worker.png',
   INF: '/assets/ui/commands/cmd-infantry.png',
   RNG: '/assets/ui/commands/cmd-ranged.png',
+  HVY: '/assets/ui/commands/cmd-heavy.png',
+  SIE: '/assets/ui/commands/cmd-siege.png',
+  SUP: '/assets/ui/commands/cmd-support.png',
   H1:  '/assets/ui/commands/cmd-hero.png',
   H2:  '/assets/ui/commands/cmd-hero.png',
   RLY: '/assets/ui/commands/cmd-rally.png',
@@ -241,7 +246,7 @@ const FACTION_WORKER_BUILDS: Record<Faction, WorkerBuildCmdExt[]> = {
     { action: 'build-lumbercamp',      icon: 'LMB', label: 'Houtzagerij',     hotkey: 'E', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.LumberCamp,               tier: 1 },
     { action: 'build-blacksmith',      icon: 'BSM', label: 'Smederij',        hotkey: 'R', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Blacksmith,                tier: 1 },
     { action: 'build-housing',         icon: 'HSE', label: 'Boerenhoeve',     hotkey: 'T', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Housing,                   tier: 2 },
-    { action: 'build-tower',           icon: 'TWR', label: 'Kerk',            hotkey: 'F', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.DefenseTower,              tier: 2 },
+    { action: 'build-tower',           icon: 'TWR', label: 'Kerktoren',       hotkey: 'F', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.DefenseTower,              tier: 2 },
     { action: 'build-faction2',        icon: 'ADV', label: 'Feestzaal',       hotkey: 'G', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial2,           tier: 3 },
     { action: 'build-siege-workshop',  icon: 'SWK', label: 'Tractorschuur',   hotkey: 'Z', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.SiegeWorkshop,             tier: 3 },
   ],
@@ -278,7 +283,7 @@ const FACTION_WORKER_BUILDS: Record<Faction, WorkerBuildCmdExt[]> = {
 
 // Faction-specific building command labels (train panel)
 const FACTION_BUILDING_LABELS: Record<Faction, { worker: string; infantry: string; ranged: string; heavy: string; siege: string; support: string }> = {
-  brabant:  { worker: 'Boer',               infantry: 'Carnavalvierder', ranged: 'Sluiper',        heavy: 'Tractorrijder',     siege: 'Frituurmeester',  support: 'Boerinne' },
+  brabant:  { worker: 'Boer',               infantry: 'Carnavalvierder', ranged: 'Sluiper',        heavy: 'Tractorrijder',     siege: 'Frituurmeester',  support: 'Boerinneke' },
   randstad: { worker: 'Stagiair',           infantry: 'Manager',         ranged: 'Consultant',     heavy: 'CorporateAdvocaat', siege: 'Sloopkogel',      support: 'HR-Medewerker' },
   limburg:  { worker: 'Mijnwerker',         infantry: 'Schutterij',      ranged: 'Vlaaienwerper',  heavy: 'Mergelridder',      siege: 'Mijnkarretje',    support: 'Heuvelwacht' },
   belgen:   { worker: 'Frietkraamhouder',   infantry: 'Bierbouwer',      ranged: 'Chocolatier',    heavy: 'Rijexaminator',     siege: 'Frituurkanon',    support: 'Pralinemaker' },
@@ -1570,13 +1575,29 @@ export class HUD {
     };
     const typeId = actionToTypeId[action];
     if (typeId === undefined) return null;
-    const archetypes = this.getFactionUnitArchetypes();
-    const arch = archetypes[typeId] as UnitArchetype | undefined;
+    // Use factionData as source of truth so Heavy / Siege / Support get
+    // their costs too (the legacy UNIT_ARCHETYPES array only covers 0-3).
+    let arch: UnitArchetype | null = null;
+    try {
+      arch = getFactionUnitArchetype(this.getFactionIdFromCurrent(), typeId);
+    } catch {
+      const archetypes = this.getFactionUnitArchetypes();
+      arch = (archetypes[typeId] as UnitArchetype | undefined) ?? null;
+    }
     if (!arch) return null;
     const parts: string[] = [];
     if (arch.costGold > 0) parts.push(`${arch.costGold}g`);
     if (arch.costSecondary > 0) parts.push(`${arch.costSecondary}h`);
     return parts.join('+') || null;
+  }
+
+  private getFactionIdFromCurrent(): FactionId {
+    switch (this.currentFaction) {
+      case 'randstad': return FactionId.Randstad;
+      case 'limburg':  return FactionId.Limburgers;
+      case 'belgen':   return FactionId.Belgen;
+      default:         return FactionId.Brabanders;
+    }
   }
 
   // -----------------------------------------------------------------------
