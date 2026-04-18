@@ -4,9 +4,30 @@ dist/
 .DS_Store
 *.listing
 
+# macOS Finder duplicates ("file 2.ext", "file 3.ext")
+* 2.*
+* 3.*
+* [0-9].*
+
 # Large binary assets (managed separately)
 assets/models/
 assets/audio/
+assets/richard-reference/
+
+# Cinematic: keep scripts (.py, .md, .txt), exclude all binary media
+cinematic/clips/
+cinematic/clips-v2/
+cinematic/output/
+cinematic/music/
+cinematic/sfx/
+cinematic/voice/
+cinematic/keyframes/
+cinematic/keyframes-v2/
+cinematic/*.mp4
+cinematic/*.mp3
+cinematic/*.wav
+cinematic/*.png
+cinematic/*.jpg
 
 # Keep concept art and UI assets
 !assets/concepts/
