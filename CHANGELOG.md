@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.37.12] - 2026-04-18 — echte scroll-container, Safari-proof
+
+### Fixed
+- **Scroll werkte niet in Safari**: `#faction-select` was tegelijk de flex-container én de scroll-container. Safari heeft bekende issues met flex-item scrolling zonder `min-height: 0`; onze `overflow-y: auto` op de absolute flex-column werd genegeerd. Opgelost via de "klassieke app-layout": een inner `.faction-scroll` wrapper met `flex: 1 1 auto; min-height: 0; overflow-y: auto`. Header (`.faction-header`) en confirm-bar (`.faction-confirm-area`) blijven vast buiten het scrollgebied. Werkt in Safari, Chrome en Firefox.
+
 ## [0.37.11] - 2026-04-18 — skirmish scroll + dichter gepakte layout
 
 ### Fixed

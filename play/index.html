@@ -385,13 +385,22 @@
     /* ================================================================ FACTION SELECT */
     #faction-select {
       position: absolute; inset: 0; z-index: 60; display: none; flex-direction: column;
-      align-items: center;
       background: linear-gradient(135deg, rgba(10,8,6,0.94) 0%, rgba(20,15,10,0.88) 100%);
-      padding: 20px 24px 0; overflow-y: auto; overflow-x: hidden;
+      overflow: hidden; /* the inner .faction-scroll owns the scrolling */
+    }
+    #faction-select > .faction-header { padding: 20px 24px 0; }
+    #faction-select > .faction-confirm-area { flex-shrink: 0; }
+    .faction-scroll {
+      flex: 1 1 auto;
+      min-height: 0; /* critical for Safari: lets flex child actually shrink & scroll */
+      width: 100%;
+      overflow-y: auto; overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
       scrollbar-width: thin;
       scrollbar-color: rgba(212, 168, 83, 0.3) transparent;
+      padding: 16px 24px 24px;
+      display: flex; flex-direction: column; align-items: center;
     }
     .faction-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; flex-shrink: 0; }
     .faction-back-btn {
@@ -479,19 +488,13 @@
     }
     .faction-confirm-area {
       text-align: center;
-      position: sticky; bottom: 0;
-      margin-top: auto;
       padding: 14px 16px 16px;
       background: rgba(10, 8, 6, 0.98);
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
       border-top: 1px solid rgba(212, 168, 83, 0.18);
       box-shadow: 0 -8px 16px rgba(0, 0, 0, 0.35);
-      z-index: 5;
       width: 100%;
-      /* Break out of the #faction-select 24px horizontal padding so the bar
-         spans the full overlay width visually. */
-      align-self: stretch;
     }
     .faction-confirm-btn {
       padding: 14px 48px; border: 2px solid var(--color-gold); border-radius: 8px;
@@ -2203,6 +2206,7 @@
           <div style="width: 80px;"></div>
         </div>
 
+        <div class="faction-scroll">
         <div class="faction-cards-row">
           <div class="faction-card" id="faction-card-brabanders" data-faction="brabanders">
             <img class="faction-card-portrait" src="/assets/portraits/brabant-prins.png" alt="Brabanders" loading="lazy">
@@ -2361,6 +2365,7 @@
             </div>
           </div>
         </div>
+        </div><!-- /.faction-scroll -->
 
         <div class="faction-confirm-area">
           <button class="faction-confirm-btn" id="faction-confirm-btn" disabled>
