@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.37.21] - 2026-04-18 — Audit Fase 3b (training) — ProductionSystem + CommandSystem reset
+
+### Audit
+- Fase 3b (training, 3 stappen) afgerond. Geen P0/P1 bugs. Opnieuw gaten gedicht: **ProductionSystem werd alleen via geëxtraheerde pure functies getest, niet de daadwerkelijke createProductionSystem(). Bug 7 patroon (Gatherer.state reset) werd alleen voor handleBuild getest, niet voor de andere 6 command-handlers.**
+
+### Added (test coverage)
+- `tests/ProductionSystem-actual.test.ts` (+14 tests) — runt het echte `createProductionSystem()` tegen een bitecs world: progress accumulatie (Brabanders + Randstad bureaucracy slowdown), unit-spawning (entity-creatie + `unit-trained` event payload + populatie-increment), populatie-cap (clamp op 1.0 zonder spawn), guards (incomplete/dood/idle/duration<=0), queue-shift (next unit promoted, queue empty → NO_PRODUCTION), worker auto-assign naar nearest resource.
+- `tests/CommandSystem-gatherer-reset.test.ts` (+10 tests) — locks de Bug 7 contract over ALLE command-types via de publieke `commandSystem` dispatch:
+  - move/attack/attack-move/stop/hold → reset Gatherer.state naar NONE
+  - gather → naar MOVING_TO_RESOURCE (de enige uitzondering)
+  - selection-filter: niet-Selected workers en vijandelijke factie-units worden NIET gecommand
+  - non-worker units behouden hun Gatherer.state (de `if (hasComponent(IsWorker))` guard werkt)
+  - move clears UnitAI.targetEid (worker losgekoppeld van oude target)
+
+### Notes
+- **Test-suite groei deze sessie: 287 → 797 (+510 tests, +178%)**.
+- Stap 17 ook gevalideerd: voice-lines bij command zit in audio-laag (`audioManager.playSound`), draait synchroon met `eventBus.emit('unit-trained')` etc. Niet apart getest — de events zijn al gelocked.
+
 ## [0.37.20] - 2026-04-18 — Audit Fase 3 follow-ups: F5 Havermoutmelkbar + buildingCost helper
 
 ### Fixed

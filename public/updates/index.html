@@ -476,6 +476,32 @@
     <div class="content">
         <div class="timeline">
 
+            <!-- ── v0.37.21 (Audit Fase 3b — Training) ──────────────── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.37.21</span>
+                        <span class="update__date">18 april 2026</span>
+                        <h2 class="update__title">Audit Fase 3b — Training clean, ProductionSystem &amp; Bug 7-patroon nu volledig getest</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Audit</span>
+                            <span class="tag tag--feat">Tests</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Fase 3b (3 stappen — train worker, train infantry/ranged, right-click commands) doorgelopen. Geen P0/P1 bugs. Opnieuw twee diepe coverage-gaten gedicht: <strong>ProductionSystem werd alleen via geëxtraheerde pure functies "getest" (duplicaat-logica)</strong>, niet het echte systeem. En het <strong>Bug 7 patroon (Gatherer.state reset) was alleen voor <code>handleBuild</code> gelocked</strong>, niet voor de 6 andere command-handlers.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">FASE 3b — TRAINING</h3>
+                        <ul class="update__highlights">
+                            <li><strong>+14 ProductionSystem-actual tests</strong> — Echte <code>createProductionSystem()</code> tegen bitecs world: progress-accumulatie + Randstad bureaucracy-slowdown, unit-spawning (entity + <code>unit-trained</code> event payload + populatie-increment), populatie-cap (clamp op 1.0), guards (incomplete/dood/idle/duration=0), queue-shift, worker auto-assign naar nearest resource.</li>
+                            <li><strong>+10 CommandSystem Gatherer-reset tests</strong> — De Bug 7 contract is nu over ALLE command-types gelocked via publieke <code>commandSystem</code> dispatch: move/attack/attack-move/stop/hold → reset naar NONE, gather → MOVING_TO_RESOURCE (uitzondering), selection-filter (niet-Selected en enemy units worden niet gecommand), non-worker units behouden hun Gatherer-state.</li>
+                        </ul>
+
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--space-md);">Test-suite deze sessie: <strong>287 → 797</strong> (+510 tests, +178%). Volgende fases: Combat (4) → Tier 2/3 (5) → Endgame (7).</p>
+                    </div>
+                </div>
+            </article>
+
             <!-- ── v0.37.20 (Fase 3 follow-ups — Havermoutmelkbar + cost helper) -->
             <article class="update">
                 <div class="update__card">
