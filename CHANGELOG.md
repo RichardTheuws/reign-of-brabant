@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.37.14] - 2026-04-18 — ECHTE root cause: globale wheel-preventDefault
+
+### Fixed
+- **Scroll in alle UI-menus werkte niet** (niet alleen skirmish) omdat `main.ts` een `window.addEventListener('wheel', e => e.preventDefault(), { passive: false })` had staan — bedoeld voor RTS camera-zoom, maar het blokkeerde élke wheel-event in de hele pagina inclusief scroll in menus, HUD-panels en tech-tree viewer. De DevTools screenshot van de gebruiker bevestigde dit: `.faction-scroll` had correct `overflow-y: auto` + `pointer-events: auto` + `touch-action: pan-y`, maar scroll kwam nooit aan omdat `preventDefault` op window-niveau al gedaan was.
+- Fix: listener verplaatst van `window` naar `canvas` (het game-canvas element). Camera-zoom werkt nog steeds boven het game-veld; alle UI-menus en scrollable panels scrollen nu natief.
+
 ## [0.37.13] - 2026-04-18 — Safari wheel/trackpad claim
 
 ### Fixed

@@ -98,7 +98,12 @@ window.addEventListener('keydown', (e) => {
 });
 window.addEventListener('keyup', (e) => keysDown.delete(e.code));
 window.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
-window.addEventListener('wheel', (e) => { e.preventDefault(); scrollDelta += e.deltaY > 0 ? 1 : -1; }, { passive: false });
+// Camera zoom: only capture wheel events over the game canvas itself.
+// A window-level listener used to preventDefault() on every wheel event,
+// which also blocked native scrolling inside menus (skirmish select, HUD
+// panels). Scoping to the canvas lets menus scroll freely; wheel over
+// the game area still feeds the RTS camera zoom.
+canvas.addEventListener('wheel', (e) => { e.preventDefault(); scrollDelta += e.deltaY > 0 ? 1 : -1; }, { passive: false });
 window.addEventListener('contextmenu', (e) => e.preventDefault());
 window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
