@@ -111,14 +111,14 @@ const TUTORIAL_STEPS: TutorialStep[] = [
   },
   // Step 5/12 — Wachten op gold (200) — pause overlay
   {
-    message: 'Het goud komt binnen! Linksboven zie je je grondstoffen. Wacht tot je 200 goud hebt \u2014 dat is genoeg voor een Kazerne.',
+    message: 'Het goud komt binnen! Linksboven zie je je grondstoffen. Wacht tot je 200 goud hebt \u2014 dat is genoeg voor een Cafe (de Brabantse Kazerne).',
     condition: (s) => s.gold >= 200,
     pauseOnEntry: true,
     allowedActions: new Set<AllowedAction>(['camera', 'select', 'box-select', 'right-click']),
   },
   // Step 6/12 — Gebouw plaatsen (Barracks)
   {
-    message: 'Tijd om te bouwen! Druk op B om het bouwmenu te openen en kies de Kazerne. Klik dan op een open plek om te plaatsen.',
+    message: 'Tijd om te bouwen! Druk op B om het bouwmenu te openen en kies de Cafe (Kazerne). Klik dan op een open plek om te plaatsen.',
     condition: (s) => s.barracksPlaced,
     highlight: 'b-button',
     hotkey: 'B',
@@ -126,14 +126,14 @@ const TUTORIAL_STEPS: TutorialStep[] = [
   },
   // Step 7/12 — Wachten op constructie — pause overlay
   {
-    message: 'De Kazerne wordt gebouwd. Je Boer bouwt automatisch \u2014 hoe meer Boeren helpen, hoe sneller het gaat.',
+    message: 'Het Cafe wordt gebouwd. Je Boer bouwt automatisch \u2014 hoe meer Boeren helpen, hoe sneller het gaat.',
     condition: (s) => s.barracksComplete,
     pauseOnEntry: true,
     allowedActions: new Set<AllowedAction>(['camera', 'select', 'box-select', 'right-click', 'build']),
   },
   // Step 8/12 — Unit trainen
   {
-    message: 'De Kazerne is klaar! Klik erop en druk W om een Carnavalvierder te trainen.',
+    message: 'Het Cafe is klaar! Klik erop en druk W om een Carnavalvierder te trainen. Je hebt 25 hout extra nodig — stuur een Boer naar de bomen als je nog geen hout hebt.',
     condition: (s) => s.unitTrainingStarted,
     highlight: 'barracks',
     hotkey: 'W',

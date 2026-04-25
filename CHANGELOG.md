@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.37.24] - 2026-04-25 — P0 fix: Mission 1 hout-deadlock + Brabant building-naming
+
+### Fixed (P0 game-breaker, gemeld door Richard live op v0.37.23)
+- **Mission 1 (`brabant-1-de-oogst`) had geen `treeResources` ingedefinieerd**, terwijl Tutorial stap 8 forceert dat de speler een Carnavalvierder traint (Brabanders Infantry, costGold=75 + costSecondary=25 hout). Geen bomen → geen hout → tutorial onhaalbaar. Vijf bomen toegevoegd rond TownHall (-20,-20), totaal 1000 hout, alle binnen 25u afstand van de TownHall.
+- **Brabant missies/tutorial gebruikten generiek "Kazerne" i.p.v. de factie-naam "Cafe"**, terwijl Belgen al "Frituur (Kazerne)" en Limburgers "Heuvelfort (Kazerne)" hanteren. Voor consistentie nu ook Brabant: "Cafe (Kazerne)" als hint, daarna "Cafe". Aangepast in M1 build-barracks objective, M2 briefing, M2 hint-triggers, M3 hint, en Tutorial.ts step 5/6/7/8.
+- **Tutorial step 8 bericht uitgebreid** met expliciete waarschuwing dat 25 hout nodig is — "stuur een Boer naar de bomen als je nog geen hout hebt".
+
+### Added (regression class lock, +46 tests, 861 → 907)
+- `tests/MissionDefinitions-resources.test.ts` — locks per missie:
+  - **Tutorial-mission lock**: `brabant-1-de-oogst` MOET `treeResources.length>0`, totaal hout ≥ 50 (twee Carnavalvierders), minstens één boom binnen 25u van player TownHall, alle bomen binnen mapSize-bounds.
+  - **Regression-class lock**: alle missies — als `treeResources` is gezet moeten amounts > 0; tutorial-mission speciaal: trees zijn verplicht.
+  - **Cost-data anchors**: Brabanders Infantry kost wood (anchor voor tutorial-eis), Brabanders Barracks (Cafe) kost geen wood (anchor voor bonus-objective haalbaarheid).
+  - **Faction-naming locks**: M1 build-barracks objective bevat "Cafe", M2 briefing bevat "Cafe", Belgen M1 bevat "Frituur", Limburgers heeft Heuvelfort-objective. Voorkomt dat per-factie naming naar "Kazerne" terugfaalt.
+
+### Notes
+- Test-suite groei deze sessie: 861 → 907 (+46, +5%). Volledig groen via pre-deploy gate.
+- Originele cause: tutorial-mission was nooit speelbaar getest met de bonus-objective gedwongen Infantry training. Nieuwe locks dwingen volgende tutorial-missies (andere facties) ook tot tree-coverage.
+
 ## [0.37.23] - 2026-04-25 — Audit Fase 4 (combat) — stappen 18-22
 
 ### Audit

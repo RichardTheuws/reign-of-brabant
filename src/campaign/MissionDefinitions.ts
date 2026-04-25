@@ -163,13 +163,24 @@ const MISSION_1_DE_OOGST: MissionDefinition = {
     { x: -20, z: -10, amount: 1500 },
   ],
 
+  // Tutorial step 8 forces training of a Carnavalvierder (Infantry, 25 wood),
+  // so the player needs reachable trees from the start. Cluster around the
+  // TownHall (-20,-20) on the side opposite the gold mines.
+  treeResources: [
+    { x: -28, z: -22, amount: 200 },
+    { x: -26, z: -25, amount: 200 },
+    { x: -24, z: -28, amount: 200 },
+    { x: -22, z: -30, amount: 200 },
+    { x: -30, z: -18, amount: 200 },
+  ],
+
   objectives: [
     // Primary: gather 500 gold — gives room to build barracks (200g), train units, fight, then finish
     { id: 'gather-500', type: 'gather-gold', description: 'Verzamel 500 goud', targetValue: 500, isBonus: false },
     // Bonus: don't lose any workers
     { id: 'no-worker-loss', type: 'no-worker-loss', description: 'Verlies geen boeren', targetValue: 0, isBonus: true },
     // Bonus: build a barracks
-    { id: 'build-barracks', type: 'build-building', description: 'Bouw een Kazerne', targetValue: 1, isBonus: true },
+    { id: 'build-barracks', type: 'build-building', description: 'Bouw een Cafe (Kazerne)', targetValue: 1, isBonus: true },
   ],
 
   triggers: [
@@ -213,7 +224,7 @@ const MISSION_2_EERSTE_SCHERMUTSEL: MissionDefinition = {
   briefingText:
     'Onbekende indringers zijn gesignaleerd aan de rand van het dorp. Ze dragen pakken en ' +
     'praten over "synergien" en "kwartaalcijfers". Dit zijn geen gewone reizigers.\n\n' +
-    'Bouw een Kazerne en train soldaten om het dorp te verdedigen. De vijand heeft een ' +
+    'Bouw een Cafe (de Brabantse Kazerne) en train soldaten om het dorp te verdedigen. De vijand heeft een ' +
     'klein kamp opgeslagen in het noordoosten — vernietig hun Hoofdkantoor!\n\n' +
     'Brabant rekent op je.',
 
@@ -253,13 +264,13 @@ const MISSION_2_EERSTE_SCHERMUTSEL: MissionDefinition = {
     {
       id: 'tip-start',
       condition: { type: 'time', seconds: 5 },
-      actions: [{ type: 'message', text: 'Bouw een Kazerne om soldaten te trainen. Selecteer een Boer → klik op het hamer-icoon (Kazerne) → klik op een open plek.' }],
+      actions: [{ type: 'message', text: 'Bouw een Cafe (Brabantse Kazerne) om soldaten te trainen. Selecteer een Boer → klik op het hamer-icoon → klik op een open plek.' }],
       once: true,
     },
     {
       id: 'barracks-built',
       condition: { type: 'building-built', buildingType: BuildingTypeId.Barracks },
-      actions: [{ type: 'message', text: 'Goed bezig! Klik nu op de Kazerne en train Carnavalvierders (W) of Sluipers (E). Je hebt minstens 3 soldaten nodig om aan te vallen!' }],
+      actions: [{ type: 'message', text: 'Goed bezig! Klik nu op het Cafe en train Carnavalvierders (W) of Sluipers (E). Je hebt minstens 3 soldaten nodig om aan te vallen!' }],
       once: true,
     },
     {
@@ -364,7 +375,7 @@ const MISSION_3_VERDEDIGING: MissionDefinition = {
     {
       id: 'tip-start',
       condition: { type: 'time', seconds: 5 },
-      actions: [{ type: 'message', text: 'De vijand komt eraan! Bouw extra Kazernes en train zo snel mogelijk eenheden.' }],
+      actions: [{ type: 'message', text: 'De vijand komt eraan! Bouw extra Cafes en train zo snel mogelijk eenheden.' }],
       once: true,
     },
     {
