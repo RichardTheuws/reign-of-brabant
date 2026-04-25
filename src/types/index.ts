@@ -28,7 +28,7 @@ export enum FactionId {
  * Unit type identifiers -- matches archetype data arrays.
  *
  * Range 0-9: Universal types shared across all factions.
- * Faction-specific unit flavours are resolved via FactionConfig lookup,
+ * Faction-specific unit flavours are resolved at render/UI time,
  * not via separate enum values (keeps ECS u8 components compact).
  */
 export enum UnitTypeId {
@@ -660,127 +660,6 @@ export interface HeroAbilityDef {
   /** Optional gezelligheid cost. */
   readonly gezelligheidCost?: number;
 }
-
-// ---------------------------------------------------------------------------
-// Interfaces -- Faction Configuration
-// ---------------------------------------------------------------------------
-
-/**
- * Configuration for how a faction's tertiary resource works.
- * Each faction has a unique tertiary resource with different generation mechanics.
- */
-export interface TertiaryResourceConfig {
-  /** The ResourceType enum value for this faction's tertiary resource. */
-  readonly resourceType: ResourceType;
-  /** Display name of the tertiary resource. */
-  readonly name: string;
-  /** How the resource is generated (e.g. "proximity", "building", "combat", "passive"). */
-  readonly generationMethod: 'proximity' | 'building' | 'combat' | 'passive';
-  /** Base generation rate (units per second). */
-  readonly baseRate: number;
-  /** Short description of the mechanic for UI tooltips. */
-  readonly description: string;
-}
-
-/**
- * Static configuration for a faction.
- * Contains all metadata, resource names, colours, and tertiary resource config.
- */
-export interface FactionConfig {
-  /** Faction enum value. */
-  readonly factionId: FactionId;
-  /** Display name of the faction. */
-  readonly name: string;
-  /** Short tagline / description. */
-  readonly tagline: string;
-  /** Primary colour (hex number for Three.js). */
-  readonly primaryColor: number;
-  /** Secondary colour (hex number for Three.js). */
-  readonly secondaryColor: number;
-  /** Faction-flavoured name for the Gold resource. */
-  readonly goldName: string;
-  /** Faction-flavoured name for the Wood resource. */
-  readonly woodName: string;
-  /** Tertiary resource configuration. */
-  readonly tertiaryResource: TertiaryResourceConfig;
-  /** Faction-specific passive description (e.g. Gezelligheid bonus, Bureaucracy). */
-  readonly passiveDescription: string;
-}
-
-/**
- * Static faction configurations for all 4 factions.
- * Keyed by FactionId for O(1) lookup.
- */
-export const FACTION_CONFIGS: Record<FactionId, FactionConfig> = {
-  [FactionId.Brabanders]: {
-    factionId: FactionId.Brabanders,
-    name: 'Brabanders',
-    tagline: 'Gezelligheid is onze kracht',
-    primaryColor: 0xe67e22,
-    secondaryColor: 0xe8a839,
-    goldName: 'Worstenbroodjes',
-    woodName: 'Bier',
-    tertiaryResource: {
-      resourceType: ResourceType.Gezelligheid,
-      name: 'Gezelligheid',
-      generationMethod: 'proximity',
-      baseRate: 0.5,
-      description: 'Gegenereerd wanneer units dicht bij elkaar staan. Meer units = meer Gezelligheid.',
-    },
-    passiveDescription: 'Groepsbonus: units nabij elkaar krijgen attack/speed/armor buffs.',
-  },
-  [FactionId.Randstad]: {
-    factionId: FactionId.Randstad,
-    name: 'Randstad',
-    tagline: 'Efficiency through bureaucracy',
-    primaryColor: 0x2980b9,
-    secondaryColor: 0x3498db,
-    goldName: 'PowerPoints',
-    woodName: 'LinkedIn',
-    tertiaryResource: {
-      resourceType: ResourceType.Havermoutmelk,
-      name: 'Havermoutmelk',
-      generationMethod: 'passive',
-      baseRate: 0.3,
-      description: 'Passief gegenereerd over tijd. Versnelt naarmate efficiency stacks toenemen.',
-    },
-    passiveDescription: 'Bureaucratie: acties starten 20% trager maar versnellen met efficiency stacks.',
-  },
-  [FactionId.Limburgers]: {
-    factionId: FactionId.Limburgers,
-    name: 'Limburgers',
-    tagline: 'Diep in de aarde, sterk als mergel',
-    primaryColor: 0x808080,
-    secondaryColor: 0xc0c0c0,
-    goldName: 'Vlaai',
-    woodName: 'Mergel',
-    tertiaryResource: {
-      resourceType: ResourceType.Kolen,
-      name: 'Kolen',
-      generationMethod: 'building',
-      baseRate: 0.4,
-      description: 'Gegenereerd door Mijnschacht gebouwen. Meer schachten = meer Kolen.',
-    },
-    passiveDescription: 'Mijnbouw: heavy units zijn goedkoper en sterker. Gebouwen hebben extra HP.',
-  },
-  [FactionId.Belgen]: {
-    factionId: FactionId.Belgen,
-    name: 'Belgen',
-    tagline: 'Frieten, bier en compromissen',
-    primaryColor: 0xd4a017,
-    secondaryColor: 0xf0c040,
-    goldName: 'Frieten',
-    woodName: 'Trappist',
-    tertiaryResource: {
-      resourceType: ResourceType.Chocolade,
-      name: 'Chocolade',
-      generationMethod: 'combat',
-      baseRate: 0.2,
-      description: 'Gegenereerd door vijandelijke units te verslaan. Meer kills = meer Chocolade.',
-    },
-    passiveDescription: 'Veerkracht: alle units regenereren langzaam HP. Sterkere defence dan offence.',
-  },
-};
 
 // ---------------------------------------------------------------------------
 // Interfaces -- Runtime State

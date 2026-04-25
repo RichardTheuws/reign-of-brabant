@@ -33,3 +33,5 @@ cinematic/*.jpg
 !assets/concepts/
 !assets/factions/
 !assets/ui/
+test-results/
+playwright-report/

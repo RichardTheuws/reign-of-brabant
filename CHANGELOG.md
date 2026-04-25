@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.37.22] - 2026-04-25 — UAT scaffold + pre-deploy regression gate
+
+### Added
+- **Playwright UAT-suite** (`uat/` + `playwright.config.ts`) — eerste smoke `01-boot.spec.ts` valideert dat `/play/` boot, canvas + main-menu rendert, en geen onverwachte console errors gooit. Eigen `uat/tsconfig.json` om types-conflict met three.js te voorkomen.
+- **Console-guard helper** (`uat/helpers/console-guard.ts`) — collecteert console errors + pageerrors, met allow-list voor verwachte ruis (favicon, vite HMR, Umami, three deprecation).
+- **`vitest.config.ts`** — expliciete include `tests/**/*.test.ts` + exclude `uat/`, voorkomt dat vitest de Playwright specs oppakt.
+- **npm scripts**: `test:uat`, `test:uat:headed`, `test:all` (typecheck → vitest → UAT), `predeploy`.
+
+### Changed
+- **`deploy-rob.sh`** — STEP 0 regression gate ingevoegd: vóór elke deploy draait `npm run test:all`. Faalt iets → deploy abort. Nieuwe `--skip-tests` flag voor noodgevallen (NOT recommended).
+
+### Removed (F6/F7 dead metadata cleanup)
+- **`src/types/index.ts`** — `FACTION_CONFIGS` const + `FactionConfig` + `TertiaryResourceConfig` interfaces verwijderd. Volledig dood: 0 imports buiten de definitie. `generationMethod` veld lag uitsluitend in deze dode struct. -123 regels.
+
+### Notes
+- Pre-deploy gate verifieerd: typecheck + 797 vitest + 1 UAT smoke groen.
+- Volgende sessie-doel: **Fase 4 Combat audit** (stappen 18-22). UAT-suite groeit per fase mee.
+
 ## [0.37.21] - 2026-04-18 — Audit Fase 3b (training) — ProductionSystem + CommandSystem reset
 
 ### Audit
