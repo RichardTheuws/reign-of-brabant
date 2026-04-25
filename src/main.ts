@@ -122,6 +122,10 @@ const eventBus = new EventBus();
 const particles = new ParticleSystem(scene);
 const game = new Game(scene, terrain, rtsCamera, eventBus, particles);
 
+if (import.meta.env.DEV) {
+  (globalThis as { __rob?: { game: Game; eventBus: typeof eventBus } }).__rob = { game, eventBus };
+}
+
 // ---------------------------------------------------------------------------
 // Menu screens controller
 // ---------------------------------------------------------------------------
@@ -189,6 +193,11 @@ function resetTutorialState(): void {
 // State Machine
 // ---------------------------------------------------------------------------
 const stateMachine = new GameStateMachine();
+if (import.meta.env.DEV) {
+  const w = globalThis as { __rob?: { stateMachine?: GameStateMachine } };
+  if (w.__rob) w.__rob.stateMachine = stateMachine;
+  else w.__rob = { stateMachine } as never;
+}
 let gameInitialized = false;
 let gamePaused = false;
 

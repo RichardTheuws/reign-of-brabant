@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.37.23] - 2026-04-25 — Audit Fase 4 (combat) — stappen 18-22
+
+### Audit
+- Fase 4 (combat, 5 stappen 18-22) afgerond. CombatSystem had vóór deze sessie ALLEEN pure formule-tests. Nu ook integratie-coverage tegen `createCombatSystem()` met echte bitecs world.
+
+### Added (test coverage, +64 tests, 797 → 861)
+- `tests/CombatSystem-attack-move.test.ts` (+11) — A-key contract: Movement.hasTarget=1, UnitAI.state=Idle (zodat auto-aggro fires), originX/Z als leash, NeedsPathfinding tag, worker Gatherer-reset, niet-Selected guard. Auto-aggro lock: closest-enemy keuze, AGGRO_RANGE filter, geen friendly fire, dode targets genegeerd.
+- `tests/CombatSystem-hold-position.test.ts` (+11) — Hold cmd writes (Movement.hasTarget=0, state=HoldPosition), processHoldPosition scant alleen binnen Attack.range, NIET binnen AGGRO_RANGE, geen state-transitie naar Attacking, drop-target bij range-loss. **Patrol-cmd gap-lock** (bestaat niet in CommandSystem, gedocumenteerd).
+- `tests/CombatSystem-damage-matrix.test.ts` (+25) — Volledige 4×5 DAMAGE_MODIFIERS matrix gevalideerd via echte CombatSystem (niet pure functie). MIN_DAMAGE clamp, Attack.siegeBonus stack met Siege→Building 2x → 6x totaal, ARMOR_FACTOR=0.5 subtractie, multiplier vóór armor-aftrek.
+- `tests/DeathSystem.test.ts` (+11) — DeathTimer init op eerste tick, Health-clamp, geen event-emit voor cleanup-deadline. DEATH_TIMER=2.0s gedrag. unit-died/building-destroyed events met correcte payload. Worker decrementeert populatie maar NIET militaire telling; non-worker decrementeert beide; Hero gebruikt PopulationCost.cost. CombatSystem.processAttacking → clearAttackAndSeekNew bij IsDead-target.
+- `tests/CombatSystem-building-destruction.test.ts` (+6) — HP drain via processAttacking met Siege→Building 2x bonus. IsDead tag automatisch op buildings bij HP<=0. Auto-aggro pickup van enemy buildings. Splash damage hits gebouwen binnen radius met linear falloff, geen friendly fire.
+- `uat/02-skirmish-quickstart.spec.ts` — Playwright e2e: main menu → btn-play → faction-select → Brabanders kiezen → confirm → wacht op stateMachine.currentId === 'PLAYING'. 15s round-trip, console-guard actief.
+
+### AUDIT FINDING (locked, niet gefixt)
+- **HoldPosition retaliation gap** — `CombatSystem.ts:218-220` doet auto-retaliate door state op `Attacking` te zetten en `targetEid` te overschrijven, ongeacht of de target HoldPosition stond. Hierdoor breaks het "hold respects state, never chases"-contract zodra een hold-positioned unit geraakt wordt. Vastgelegd in `CombatSystem-hold-position.test.ts` als `KNOWN GAP` test. Fix-voorstel: lijn 212 conditie uitbreiden met `&& targetState !== UnitAIState.HoldPosition`.
+
+### Added (UAT infra)
+- **`window.__rob` test hook** — In `src/main.ts` (DEV-only, `import.meta.env.DEV`): `globalThis.__rob = { game, eventBus, stateMachine }`. Maakt deterministische UAT-state-checks mogelijk zonder DOM-polling.
+
+### Notes
+- 25 abilities in UnitAbilitySystem + 24 hero-cases verkend via combat-map agent: ALLE hebben non-stub implementaties (audit 03-claim "20+ dead handlers" was te scherp; mogelijk dun, niet leeg). Stat-balans audit vindt plaats in fase 6 (heroes/abilities).
+- F4 leverde 1 audit finding (HoldPosition retaliation), 0 P0/P1 bugs. Test-suite groei sessie: 797 → 861 (+64, +8%).
+
 ## [0.37.22] - 2026-04-25 — UAT scaffold + pre-deploy regression gate
 
 ### Added
