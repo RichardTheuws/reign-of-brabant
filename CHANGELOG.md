@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.37.27] - 2026-04-25 — P1 fix: ProductionSystem silent-fail voor Heavy/Siege/Support
+
+### Fixed (P1 game-breaker, gemeld door Richard live op v0.37.26)
+- **`ProductionSystem.spawnUnit` had alleen UNIT_TEMPLATES voor Worker/Infantry/Ranged.** Voor Heavy/Siege/Support/Special/Hero retourneerde `templates[unitTypeId] = undefined` → silent `return` na resource-deduct → resources verdwenen, geen unit, geen `unit-trained` event. Dit raakte ALLE D-hotkey (Support), A-hotkey (Heavy via FactionSpecial2), en S-hotkey (Siege via SiegeWorkshop) trainings. Heroes (T/Y) gingen via een aparte `trainHero()` flow en bleven werken.
+- **Fix**: `spawnUnit` delegeert nu naar `factories.createUnit()` voor types die geen UNIT_TEMPLATE hebben. Dat lost via `getFactionUnitArchetype()` de juiste factionData stats op (HP/attack/range/cost). Worker/Infantry/Ranged behouden de bestaande template-driven path zodat balance en Randstad-overrides intact blijven.
+
+### Added (regression-class lock, +23 tests, 954 → 977)
+- `tests/CommandSystem-train-support.test.ts` — Per factie (Brabanders/Randstad/Limburgers/Belgen):
+  - **Anchor**: Support archetype data bestaat met juiste namen (Boerinneke, HR-Medewerker, Sjpion, Wafelzuster).
+  - **CommandSystem**: queueCommand zet Production.unitType=Support, Production.duration=archetype.buildTime, deducts gold + wood, refuses bij wood-tekort.
+  - **ProductionSystem-completion**: Heavy ENESupport ENSiege spawnen via createUnit pad → `unit-trained` event vuurt met juiste payload. Houdt rekening met Randstad bureaucracy slowdown (1.5x dt).
+
+### Notes
+- Test-suite groei: 954 → 977 (+23, +2.4%). Volledig groen via gate.
+- Randstad heeft een ingebouwde 1.2x productie-slowdown (bureaucracy); dit was geen bug maar genoeg om mijn eerste test-tick te kort te maken — UAT-tests lossen dit op met `buildTime * 1.5 + 1` dt-budget.
+
 ## [0.37.26] - 2026-04-25 — Audit Fase 5 (tech tree) — stappen 24-26 + audit-04 fix
 
 ### Audit

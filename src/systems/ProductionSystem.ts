@@ -44,6 +44,7 @@ import {
 import { onRandstadActionCompleted } from './BureaucracySystem';
 import { ceoProductionBuff } from './HeroSystem';
 import { getFactionUnitArchetype } from '../data/factionData';
+import { createUnit } from '../entities/factories';
 import { gameConfig } from '../core/GameConfig';
 import { getAIHPScaling } from './CombatSystem';
 import type { GameWorld } from '../ecs/world';
@@ -215,104 +216,107 @@ function spawnUnit(
   unitTypeId: number,
   factionId: number,
 ): void {
-  // Use Randstad-specific templates for the Randstad/AI faction
+  // Position at rally point (offset from building) with random scatter, clamped to map bounds
+  const halfMap = MAP_SIZE / 2;
+  const scatterX = (Math.random() - 0.5) * 3.0;
+  const scatterZ = (Math.random() - 0.5) * 3.0;
+  const spawnX = Math.max(-halfMap + 1, Math.min(halfMap - 1, Position.x[buildingEid] + RALLY_OFFSET + scatterX));
+  const spawnZ = Math.max(-halfMap + 1, Math.min(halfMap - 1, Position.z[buildingEid] + RALLY_OFFSET + scatterZ));
+
+  // Templates only define Worker/Infantry/Ranged. For Heavy/Siege/Support/Special
+  // we delegate to createUnit() which resolves from factionData. This avoids the
+  // silent-fail bug (v0.37.27) where train-support deducted resources but never
+  // emitted unit-trained because spawnUnit returned early on undefined template.
   const templates = factionId === FactionId.Randstad ? RANDSTAD_UNIT_TEMPLATES : UNIT_TEMPLATES;
   const template = templates[unitTypeId];
-  if (!template) return;
 
-  const eid = addEntity(world);
+  let eid: number;
+  let isWorker = false;
+  let carryCapacity = 0;
 
-  // Position at rally point (offset from building) with random scatter, clamped to map bounds
-  addComponent(world, eid, Position);
-  const halfMap = MAP_SIZE / 2;
-  const scatterX = (Math.random() - 0.5) * 3.0; // +-1.5 units
-  const scatterZ = (Math.random() - 0.5) * 3.0; // +-1.5 units
-  Position.x[eid] = Math.max(-halfMap + 1, Math.min(halfMap - 1, Position.x[buildingEid] + RALLY_OFFSET + scatterX));
-  Position.y[eid] = Position.y[buildingEid];
-  Position.z[eid] = Math.max(-halfMap + 1, Math.min(halfMap - 1, Position.z[buildingEid] + RALLY_OFFSET + scatterZ));
+  if (template) {
+    // Legacy path for Worker/Infantry/Ranged: keep template-driven stats so
+    // existing balance + Randstad overrides stay intact.
+    eid = addEntity(world);
 
-  // Health (with AI late-game scaling for non-player factions)
-  addComponent(world, eid, Health);
-  let hp = template.hp;
-  if (!gameConfig.isPlayerFaction(factionId)) {
-    const hpScale = getAIHPScaling(world.meta.elapsed);
-    if (hpScale > 1.0) {
-      hp = Math.round(hp * hpScale);
+    addComponent(world, eid, Position);
+    Position.x[eid] = spawnX;
+    Position.y[eid] = Position.y[buildingEid];
+    Position.z[eid] = spawnZ;
+
+    addComponent(world, eid, Health);
+    let hp = template.hp;
+    if (!gameConfig.isPlayerFaction(factionId)) {
+      const hpScale = getAIHPScaling(world.meta.elapsed);
+      if (hpScale > 1.0) hp = Math.round(hp * hpScale);
     }
-  }
-  Health.current[eid] = hp;
-  Health.max[eid] = hp;
+    Health.current[eid] = hp;
+    Health.max[eid] = hp;
 
-  // Attack
-  addComponent(world, eid, Attack);
-  Attack.damage[eid] = template.attack;
-  Attack.speed[eid] = template.attackSpeed;
-  Attack.range[eid] = template.range;
-  Attack.timer[eid] = 0;
+    addComponent(world, eid, Attack);
+    Attack.damage[eid] = template.attack;
+    Attack.speed[eid] = template.attackSpeed;
+    Attack.range[eid] = template.range;
+    Attack.timer[eid] = 0;
 
-  // Armor
-  addComponent(world, eid, Armor);
-  Armor.value[eid] = template.armor;
+    addComponent(world, eid, Armor);
+    Armor.value[eid] = template.armor;
 
-  // Movement
-  addComponent(world, eid, Movement);
-  Movement.speed[eid] = template.speed;
-  Movement.hasTarget[eid] = 0;
+    addComponent(world, eid, Movement);
+    Movement.speed[eid] = template.speed;
+    Movement.hasTarget[eid] = 0;
 
-  // Faction
-  addComponent(world, eid, Faction);
-  Faction.id[eid] = factionId;
+    addComponent(world, eid, Faction);
+    Faction.id[eid] = factionId;
+    addComponent(world, eid, UnitType);
+    UnitType.id[eid] = unitTypeId;
 
-  // UnitType
-  addComponent(world, eid, UnitType);
-  UnitType.id[eid] = unitTypeId;
+    addComponent(world, eid, UnitAI);
+    UnitAI.state[eid] = UnitAIState.Idle;
+    UnitAI.targetEid[eid] = NO_ENTITY;
 
-  // UnitAI
-  addComponent(world, eid, UnitAI);
-  UnitAI.state[eid] = UnitAIState.Idle;
-  UnitAI.targetEid[eid] = NO_ENTITY;
+    addComponent(world, eid, Visibility);
+    Visibility.range[eid] = template.sightRange;
 
-  // Visibility
-  addComponent(world, eid, Visibility);
-  Visibility.range[eid] = template.sightRange;
+    addComponent(world, eid, Rotation);
+    Rotation.y[eid] = 0;
 
-  // Rotation (for facing direction in renderer)
-  addComponent(world, eid, Rotation);
-  Rotation.y[eid] = 0;
+    addComponent(world, eid, Selected);
+    Selected.by[eid] = 255;
 
-  // Selected (default: not selected)
-  addComponent(world, eid, Selected);
-  Selected.by[eid] = 255;
+    addComponent(world, eid, GezeligheidBonus);
+    GezeligheidBonus.nearbyCount[eid] = 0;
+    GezeligheidBonus.attackMult[eid] = 1.0;
+    GezeligheidBonus.speedMult[eid] = 1.0;
+    GezeligheidBonus.armorMult[eid] = 1.0;
+    GezeligheidBonus.passiveHeal[eid] = 0;
+    GezeligheidBonus.damageReduction[eid] = 0;
 
-  // GezeligheidBonus (initialize to neutral defaults; GezeligheidSystem
-  // will write actual bonuses for Brabander units)
-  addComponent(world, eid, GezeligheidBonus);
-  GezeligheidBonus.nearbyCount[eid] = 0;
-  GezeligheidBonus.attackMult[eid] = 1.0;
-  GezeligheidBonus.speedMult[eid] = 1.0;
-  GezeligheidBonus.armorMult[eid] = 1.0;
-  GezeligheidBonus.passiveHeal[eid] = 0;
-  GezeligheidBonus.damageReduction[eid] = 0;
+    addComponent(world, eid, IsUnit);
 
-  // Tags
-  addComponent(world, eid, IsUnit);
+    isWorker = template.isWorker;
+    carryCapacity = template.carryCapacity;
 
-  // Worker-specific
-  if (template.isWorker) {
-    addComponent(world, eid, IsWorker);
-    addComponent(world, eid, Gatherer);
-    Gatherer.state[eid] = 0;
-    Gatherer.carryCapacity[eid] = template.carryCapacity;
-    Gatherer.carrying[eid] = 0;
-    Gatherer.targetEid[eid] = NO_ENTITY;
-    Gatherer.previousTarget[eid] = NO_ENTITY;
+    if (isWorker) {
+      addComponent(world, eid, IsWorker);
+      addComponent(world, eid, Gatherer);
+      Gatherer.state[eid] = 0;
+      Gatherer.carryCapacity[eid] = carryCapacity;
+      Gatherer.carrying[eid] = 0;
+      Gatherer.targetEid[eid] = NO_ENTITY;
+      Gatherer.previousTarget[eid] = NO_ENTITY;
+    }
+  } else {
+    // Heavy/Siege/Support/Special: data-driven spawn from factionData.
+    eid = createUnit(world, unitTypeId as UnitTypeId, factionId as FactionId, spawnX, spawnZ);
+    if (eid < 0) return;
+    Position.y[eid] = Position.y[buildingEid];
   }
 
-  // Worker auto-assign: send newly trained workers to gather resources
-  if (template.isWorker) {
+  // Common rally-point routing for both paths.
+  if (isWorker) {
     const assigned = assignWorkerToResource(world, eid, buildingEid);
     if (!assigned && hasComponent(world, buildingEid, RallyPoint)) {
-      // No resource found -- fall back to rally point position if custom
       const rx = RallyPoint.x[buildingEid];
       const rz = RallyPoint.z[buildingEid];
       const defaultRallyX = Position.x[buildingEid] + 3;
@@ -326,7 +330,6 @@ function spawnUnit(
       }
     }
   } else if (hasComponent(world, buildingEid, RallyPoint)) {
-    // Non-worker: send to rally point position if custom
     const rx = RallyPoint.x[buildingEid];
     const rz = RallyPoint.z[buildingEid];
     const defaultRallyX = Position.x[buildingEid] + 3;
@@ -340,7 +343,6 @@ function spawnUnit(
     }
   }
 
-  // Emit event
   eventBus.emit('unit-trained', {
     entityId: eid,
     factionId: factionId as FactionId,
