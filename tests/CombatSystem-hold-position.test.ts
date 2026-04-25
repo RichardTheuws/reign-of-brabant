@@ -190,31 +190,26 @@ describe('F4-stap 19 — hold-position behavior in CombatSystem', () => {
 });
 
 // ---------------------------------------------------------------------------
-// F4-stap 19 — KNOWN GAP: hold-position breaks under retaliation
+// F4-stap 19 — hold retaliation contract (FIXED in v0.37.25)
 // ---------------------------------------------------------------------------
 
-describe('F4-stap 19 — hold retaliation gap (audit finding)', () => {
-  it('AUDIT FINDING: a hold-position unit that gets HIT switches to Attacking', () => {
-    // CombatSystem.ts:218-220: when ANY non-Attacking-non-Dead unit takes a
-    // hit, processAttacking auto-sets `UnitAI.state[target] = Attacking;
-    // UnitAI.targetEid[target] = attacker;`. HoldPosition is NOT excluded.
-    // This breaks the spec "hold respects state — never chases".
-    //
-    // We LOCK this behavior here as a known gap. If/when CombatSystem is
-    // patched to exclude HoldPosition from retaliation, this test must be
-    // updated to assert the new contract (state stays HoldPosition).
+describe('F4-stap 19 — hold retaliation respects state (post-fix contract)', () => {
+  it('a hold-position unit that gets HIT stays in HoldPosition (no chase)', () => {
+    // CombatSystem.ts:209-225 used to flip ANY hit target to Attacking. After
+    // the fix, HoldPosition is preserved: the unit acquires the attacker as
+    // target (so processHoldPosition can fire next tick if in range) but never
+    // leaves HoldPosition state.
     const world = replaceWorld();
     const unit = spawnSelectedSoldier(world, 0, 0, 1.5);
     queueCommand({ type: 'hold' });
     tickCommand(world);
     expect(UnitAI.state[unit]).toBe(UnitAIState.HoldPosition);
 
-    // Spawn enemy that can hit unit, with timer ready to fire immediately.
     const enemy = spawnEnemy(world, 0.5, 0);
     Attack.damage[enemy] = 5;
     Attack.range[enemy] = 1.5;
     Attack.speed[enemy] = 1.0;
-    Attack.timer[enemy] = 0; // ready to fire
+    Attack.timer[enemy] = 0;
     Attack.attackType[enemy] = AttackType.Melee;
     Attack.siegeBonus[enemy] = 1.0;
     UnitAI.state[enemy] = UnitAIState.Attacking;
@@ -222,9 +217,37 @@ describe('F4-stap 19 — hold retaliation gap (audit finding)', () => {
 
     tickCombat(world);
 
-    // KNOWN GAP: state flipped to Attacking via retaliation logic.
-    expect(UnitAI.state[unit]).toBe(UnitAIState.Attacking);
+    // NEW CONTRACT: state stays HoldPosition — no auto-Attacking switch.
+    expect(UnitAI.state[unit]).toBe(UnitAIState.HoldPosition);
+    // Target acquired so we can shoot back next tick (if still in range).
     expect(UnitAI.targetEid[unit]).toBe(enemy);
+  });
+
+  it('hold-unit takes damage but does not chase enemy that retreats', () => {
+    const world = replaceWorld();
+    const unit = spawnSelectedSoldier(world, 0, 0, 1.5);
+    queueCommand({ type: 'hold' });
+    tickCommand(world);
+
+    const enemy = spawnEnemy(world, 0.5, 0);
+    Attack.damage[enemy] = 5;
+    Attack.range[enemy] = 1.5;
+    Attack.speed[enemy] = 1.0;
+    Attack.timer[enemy] = 0;
+    Attack.attackType[enemy] = AttackType.Melee;
+    Attack.siegeBonus[enemy] = 1.0;
+    UnitAI.state[enemy] = UnitAIState.Attacking;
+    UnitAI.targetEid[enemy] = unit;
+
+    tickCombat(world);
+    // Enemy retreats out of range
+    Position.x[enemy] = 20;
+
+    tickCombat(world);
+
+    // Hold-unit must NOT be chasing — Movement.hasTarget stays 0.
+    expect(UnitAI.state[unit]).toBe(UnitAIState.HoldPosition);
+    expect(Movement.hasTarget[unit]).toBe(0);
   });
 });
 

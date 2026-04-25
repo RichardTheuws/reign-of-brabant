@@ -209,7 +209,11 @@ function processAttacking(world: GameWorld, eid: number, dt: number): void {
   // Damage triggers self-defense: non-attacking units retaliate against attacker
   if (hasComponent(world, targetEid, UnitAI) && hasComponent(world, targetEid, IsUnit)) {
     const targetState = UnitAI.state[targetEid];
-    if (targetState !== UnitAIState.Attacking && targetState !== UnitAIState.Dead) {
+    if (
+      targetState !== UnitAIState.Attacking &&
+      targetState !== UnitAIState.Dead &&
+      targetState !== UnitAIState.HoldPosition
+    ) {
       // Save gather target for workers so they can auto-resume after combat
       if (hasComponent(world, targetEid, IsWorker) && Gatherer.targetEid[targetEid] !== NO_ENTITY) {
         Gatherer.previousTarget[targetEid] = Gatherer.targetEid[targetEid];
@@ -218,6 +222,11 @@ function processAttacking(world: GameWorld, eid: number, dt: number): void {
       UnitAI.state[targetEid] = UnitAIState.Attacking;
       UnitAI.targetEid[targetEid] = eid;
       Movement.hasTarget[targetEid] = 0;
+    }
+    // HoldPosition units retaliate without leaving HoldPosition: just acquire
+    // the attacker as target so processHoldPosition can fire next tick.
+    else if (targetState === UnitAIState.HoldPosition && UnitAI.targetEid[targetEid] === NO_ENTITY) {
+      UnitAI.targetEid[targetEid] = eid;
     }
   }
 

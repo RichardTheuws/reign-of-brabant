@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.37.25] - 2026-04-25 — Audit-finding fix: HoldPosition retaliation respects state
+
+### Fixed (audit-finding uit v0.37.23 fase 4)
+- **`CombatSystem.ts:209-225`** — Retaliation-logic flipte ELKE geraakte non-Attacking-non-Dead unit naar `Attacking`, ongeacht of die op HoldPosition stond. Dit brak het "hold respects state, never chases"-contract: een hold-positioned unit ging chasen zodra ie geraakt werd.
+- **Fix**: `HoldPosition` toegevoegd aan exclusion-list. Nieuwe gedrag: hold-units verkrijgen wel het attacker-target (zodat `processHoldPosition` volgende tick kan terugschieten) maar verlaten NOOIT HoldPosition state. Movement.hasTarget blijft 0 → geen chase.
+
+### Tests updated (KNOWN GAP → contract)
+- `tests/CombatSystem-hold-position.test.ts` — De voormalige "AUDIT FINDING" test die het bug-gedrag locked, is geflipt naar de nieuwe contract-eis: hold-unit blijft in HoldPosition na hit. Tweede contract-test toegevoegd: hold-unit chase-t niet wanneer attacker terugtrekt. Test-suite: 907 → 908 (+1).
+
 ## [0.37.24] - 2026-04-25 — P0 fix: Mission 1 hout-deadlock + Brabant building-naming
 
 ### Fixed (P0 game-breaker, gemeld door Richard live op v0.37.23)
