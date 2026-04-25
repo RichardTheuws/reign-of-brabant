@@ -176,7 +176,7 @@ const DEFAULT_FEATURES: TerrainFeatures = {
 export class Terrain {
   readonly mesh: THREE.Mesh;
   readonly waterMesh: THREE.Mesh;
-  readonly mapSize: number;
+  mapSize: number;
 
   /** Number of geometry segments (computed from mapSize). */
   private segments: number;
@@ -298,17 +298,56 @@ export class Terrain {
    * Rebuild the terrain with new features.
    * Called when a new map is generated with specific terrain features.
    * Re-generates the heightmap, carves rivers, and rebuilds visuals.
+   *
+   * @param features - New terrain features (rivers, biome, roads, ...)
+   * @param mapSize  - Optional new map size in world units. When provided
+   *                   and different from the current size, the geometry is
+   *                   regenerated at `mapSize × SEGMENTS_PER_UNIT` resolution.
+   *                   This prevents the "blank outer ring" bug on large maps
+   *                   where logical placement extends past the original mesh.
    */
-  rebuild(features: TerrainFeatures): void {
+  rebuild(features: TerrainFeatures, mapSize?: number): void {
     this.features = features;
     activePalette = BIOME_PALETTES[features.biome] ?? BIOME_PALETTES.meadow;
 
-    // Reset masks
+    // Resize geometry if mapSize changed.
+    if (mapSize !== undefined && mapSize !== this.mapSize) {
+      this.mapSize = mapSize;
+      this.segments = Math.round(mapSize * SEGMENTS_PER_UNIT);
+      this.geometry.dispose();
+      this.geometry = new THREE.PlaneGeometry(this.mapSize, this.mapSize, this.segments, this.segments);
+      this.geometry.rotateX(-Math.PI / 2);
+      this.mesh.geometry = this.geometry;
+
+      const vertexCount = (this.segments + 1) * (this.segments + 1);
+      this.heightData = new Float32Array(vertexCount);
+      this.detailNoise = new Float32Array(vertexCount);
+
+      // Resize water plane to match (water uses 1.5x mapSize).
+      this.waterMesh.geometry.dispose();
+      this.waterMesh.geometry = new THREE.PlaneGeometry(this.mapSize * 1.5, this.mapSize * 1.5, 80, 80);
+      waterGeometry = this.waterMesh.geometry;
+      this.waterMesh.geometry.rotateX(-Math.PI / 2);
+
+      // Regenerate grid overlay at new size if it exists.
+      if (this.gridOverlay) {
+        const wasVisible = this.gridOverlay.visible;
+        const sceneRef = this.gridOverlay.parent;
+        this.gridOverlay.geometry.dispose();
+        (this.gridOverlay.material as THREE.Material).dispose();
+        sceneRef?.remove(this.gridOverlay);
+        this.gridOverlay = this.createGridOverlay();
+        this.gridOverlay.visible = wasVisible;
+        sceneRef?.add(this.gridOverlay);
+      }
+    }
+
+    // Reset masks (sized to current geometry).
     const vertexCount = (this.segments + 1) * (this.segments + 1);
     this.riverMask = new Uint8Array(vertexCount);
     this.roadMask = new Uint8Array(vertexCount);
 
-    // Dispose old feature meshes
+    // Dispose old feature meshes.
     for (const obj of this.featureMeshes) {
       obj.traverse((child) => {
         if ((child as THREE.Mesh).isMesh) {
@@ -321,7 +360,7 @@ export class Terrain {
     }
     this.featureMeshes.length = 0;
 
-    // Rebuild everything
+    // Rebuild everything.
     this.generateHeightmap();
     this.carveRivers();
     this.raiseRockWalls();
@@ -329,11 +368,11 @@ export class Terrain {
     this.applyVertexColors();
     this.buildFeatureVisuals();
 
-    // Update geometry
+    // Update geometry.
     this.geometry.attributes.position.needsUpdate = true;
     this.geometry.computeVertexNormals();
 
-    // Rebuild material with new terrain-aware normal + roughness maps
+    // Rebuild material with new terrain-aware normal + roughness maps.
     const oldMaterial = this.mesh.material as THREE.MeshStandardMaterial;
     if (oldMaterial.normalMap) oldMaterial.normalMap.dispose();
     if (oldMaterial.roughnessMap) oldMaterial.roughnessMap.dispose();

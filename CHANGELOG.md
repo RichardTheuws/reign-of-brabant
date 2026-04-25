@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.37.29] - 2026-04-25 — P1 fix: terrain blanco buitenring op grote skirmish-maps
+
+### Fixed (P1, gemeld door Richard live op v0.37.28)
+- **`Terrain.rebuild()` paste alleen `features` aan, nooit de geometry-grootte.** Bij selectie van large skirmish-map (192) bleef de mesh op default 128 staan → buiten ±64 was er geen mesh, geen heightmap, geen vertex colors → bruine "blanco" buitenring waar geen gebouwen geplaatst konden worden, terrain leek bovendien grof omdat de logische placement-coördinaten verder reikten dan de mesh.
+- **Fix**: `rebuild(features, mapSize?)` neemt nu een optionele nieuwe mapSize. Bij verandering: dispose oude PlaneGeometry, nieuwe `mapSize × SEGMENTS_PER_UNIT(2)` segments, heightmap/detail/river/road masks resized, water-plane (1.5×) en grid-overlay meegeschaald. `Terrain.mapSize` is nu schrijfbaar (was readonly).
+- **`Game.startSkirmishGame`**: geeft `mapSize` mee aan `terrain.rebuild()`.
+
+### Added (regression-class lock, +7 tests, 1052 → 1059)
+- `tests/Terrain-rebuild-mapsize.test.ts` (jsdom env via `// @vitest-environment jsdom`):
+  - Default mapSize 128.
+  - rebuild met 192 → geometry width/height = 192, segments = 384 (2 per unit).
+  - rebuild met 80 → geometry 80×80.
+  - rebuild zonder mapSize-arg behoudt huidige waarde (backwards-compat).
+  - getHeightAt op (-90, -90) is finite na resize naar 192 (was undefined).
+  - water plane resized 1.5× mapSize.
+- `jsdom` toegevoegd als devDependency voor terrain-tests.
+
+### Notes
+- BUG 3 (gebouwen kloppen niet allemaal + functies/upgrades) — dit is een feature-uitbreiding (per-gebouw audit + research/training-implementatie). Wordt apart gepakt in een follow-up sessie.
+- Test-suite: 1052 → 1059 (+7, +0.7%).
+
 ## [0.37.28] - 2026-04-25 — P1 fix: factie-namen voor T2/T3-gebouwen + Heavy/Siege/Support units
 
 ### Fixed (P1, gemeld door Richard live op v0.37.27)

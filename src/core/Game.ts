@@ -227,9 +227,11 @@ export class Game {
     // 1. Generate map layout
     this.map = generateMap(42, (x, z) => this.terrain.getHeightAt(x, z), playerCount, mapTemplate as any, mapSize);
 
-    // 1b. Rebuild terrain with map-specific features (biome, rivers, bridges, roads, tunnels)
+    // 1b. Rebuild terrain with map-specific features (biome, rivers, bridges, roads, tunnels).
+    // Pass mapSize so the geometry resizes for large/huge maps — without this
+    // the outer ring beyond ±64 had no mesh ("blank outer ring" v0.37.28 live bug).
     if (this.map.terrainFeatures) {
-      this.terrain.rebuild(this.map.terrainFeatures);
+      this.terrain.rebuild(this.map.terrainFeatures, mapSize);
     }
 
     // 1c. Register map tunnel system if the map has tunnels
