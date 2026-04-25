@@ -945,6 +945,20 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       sightRange: 8,
       produces: [],
     },
+    // Wagenbouwer (Tier-3 unlock — Geavanceerde Smederij voor Brabant)
+    // Audit-04 fix v0.37.26: zonder dit gebouw was Tier 3 (Feestzaal +
+    // Tractorschuur) onbereikbaar.
+    {
+      typeId: BuildingTypeId.UpgradeBuilding,
+      name: 'Wagenbouwer',
+      brabantName: 'Wagenbouwer',
+      hp: 600,
+      costGold: 350,
+      costSecondary: 200,
+      buildTime: 50,
+      sightRange: 9,
+      produces: [],
+    },
   ],
 
   // =========================================================================
@@ -1057,6 +1071,18 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       costSecondary: 250,
       buildTime: 40,
       sightRange: 12,
+      produces: [],
+    },
+    // Innovatie Lab (Tier-3 unlock — Geavanceerde Smederij voor Randstad)
+    {
+      typeId: BuildingTypeId.UpgradeBuilding,
+      name: 'Innovatie Lab',
+      brabantName: 'Innovatie Lab',
+      hp: 700,
+      costGold: 400,
+      costSecondary: 225,
+      buildTime: 55,
+      sightRange: 10,
       produces: [],
     },
   ],
@@ -1195,6 +1221,18 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       costSecondary: 40,
       buildTime: 20,
       sightRange: 8,
+      produces: [],
+    },
+    // Hoogoven (Tier-3 unlock — Geavanceerde Smederij voor Limburg)
+    {
+      typeId: BuildingTypeId.UpgradeBuilding,
+      name: 'Hoogoven',
+      brabantName: 'Hoogoven',
+      hp: 800,
+      costGold: 350,
+      costSecondary: 200,
+      buildTime: 55,
+      sightRange: 9,
       produces: [],
     },
   ],
@@ -1357,6 +1395,18 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       costSecondary: 225,
       buildTime: 46,
       sightRange: 10,
+      produces: [],
+    },
+    // Diamantslijperij (Tier-3 unlock — Geavanceerde Smederij voor Belgen)
+    {
+      typeId: BuildingTypeId.UpgradeBuilding,
+      name: 'Diamantslijperij',
+      brabantName: 'Diamantslijperij',
+      hp: 600,
+      costGold: 375,
+      costSecondary: 225,
+      buildTime: 55,
+      sightRange: 9,
       produces: [],
     },
   ],

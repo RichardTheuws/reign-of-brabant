@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.37.26] - 2026-04-25 — Audit Fase 5 (tech tree) — stappen 24-26 + audit-04 fix
+
+### Audit
+- Fase 5 stappen 24 (Blacksmith upgrade-paneel + retroactief), 25 (Tier 2 unlock-gate), 26 (Tier 3 gate). Audit-04 finding bevestigd voor alle 4 facties: `BuildingTypeId.UpgradeBuilding` ontbrak compleet, waardoor Tier 3 (FactionSpecial2 + SiegeWorkshop) permanent vergrendeld was. Heavy units en Siege units waren in praktijk onbereikbaar.
+
+### Fixed (audit-04 §3.2 + §4 — circulair Tier 3 gate)
+- **`src/data/factionData.ts`**: per factie een `BuildingTypeId.UpgradeBuilding` archetype toegevoegd in `FACTION_BUILDINGS`:
+  - **Brabanders**: Wagenbouwer (350g + 200 secondary, hp 600, 50s)
+  - **Randstad**: Innovatie Lab (400g + 225, hp 700, 55s)
+  - **Limburgers**: Hoogoven (350g + 200, hp 800, 55s)
+  - **Belgen**: Diamantslijperij (375g + 225, hp 600, 55s)
+- **`src/ui/factionBuildMenus.ts`**: hotkey **C** ('build-upgrade') per factie toegevoegd. Tier=2 (zichtbaar/buildbaar zodra Blacksmith complete is). Brabanders skipt geen letter meer.
+
+### Added (test coverage, +46 tests, 908 → 954)
+- `tests/TechTreeSystem-research-lifecycle.test.ts` (+18) — UPGRADE_DEFINITIONS structuur (7 universele upgrades, prerequisite-chains MeleeAttack1→2, RangedAttack1→2, ArmorUpgrade1→2). startResearch validation: gold-deduct + 'research-started' event, refuses bij geen-goud / geen-prerequisite / al-busy / al-onderzocht. **Retroactief**: completed MeleeAttack1 voegt direct +2 dmg toe op bestaande Brabanders Infantry; affectsUnitTypes-filter (Ranged niet beïnvloed); ArmorUpgrade1 raakt ALLE units (null filter); MoveSpeed1 vermenigvuldigt speed * 1.10; faction-filter (vijandelijke units onaangetast). applyAllUpgradesToNewUnit: nieuw-getrainde unit krijgt cumulatieve stack. Blacksmith destroyed mid-research → cancel.
+- `tests/TechTreeSystem-tier-gates.test.ts` (+28) — T2-gate per BuildingType (Housing/DefenseTower/TertiaryResource/FactionSpecial1/UpgradeBuilding) blokkeert zonder Blacksmith, blokkeert met INCOMPLETE Blacksmith, opent met complete. Cross-faction-filter: vijandelijk Blacksmith ontgrendelt niets. T3-gate (FactionSpecial2/SiegeWorkshop): blokkeert met alleen Blacksmith, opent met UpgradeBuilding complete. **Audit-04 lock**: alle 4 facties MOETEN een UpgradeBuilding archetype hebben in FACTION_BUILDINGS — zodra dit ontbreekt is Tier 3 onbereikbaar.
+
+### Notes
+- Tutorial step 8 (Carnavalvierder training) blijft Brabant-Infantry-only — geen wijziging in flow.
+- Volgende fase: Fase 6 (advanced units + heroes), met test-suite groei tot ~1100 verwacht.
+
 ## [0.37.25] - 2026-04-25 — Audit-finding fix: HoldPosition retaliation respects state
 
 ### Fixed (audit-finding uit v0.37.23 fase 4)
