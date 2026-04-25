@@ -1538,6 +1538,77 @@ export function getFactionBuildingArchetype(
 }
 
 /**
+ * Per-faction display names for building types that don't (yet) have full
+ * archetype data in FACTION_BUILDINGS (Housing/DefenseTower/
+ * TertiaryResourceBuilding/FactionSpecial1). Used as a fallback in
+ * `getDisplayBuildingName` so the HUD never shows "Gebouw".
+ *
+ * Note: these are display labels only. Actual placement still uses generic
+ * BUILDING_ARCHETYPES fallback for stats. When archetype data is added later,
+ * this table is consulted only as a fallback.
+ */
+const FACTION_BUILDING_NAME_FALLBACKS: Record<number, Partial<Record<BuildingTypeId, string>>> = {
+  [ExtendedFactionId.Brabanders]: {
+    [BuildingTypeId.Housing]: 'Boerenhoeve',
+    [BuildingTypeId.DefenseTower]: 'Kerktoren',
+    [BuildingTypeId.TertiaryResourceBuilding]: 'Worstenbroodjeskraam',
+    [BuildingTypeId.FactionSpecial1]: 'Carnavalstent',
+  },
+  [ExtendedFactionId.Randstad]: {
+    [BuildingTypeId.Housing]: 'Vinex-wijk',
+    [BuildingTypeId.DefenseTower]: 'Kantoor-toren',
+    [BuildingTypeId.TertiaryResourceBuilding]: 'Havermoutmelkbar',
+    [BuildingTypeId.FactionSpecial1]: 'Boardroom',
+  },
+  [ExtendedFactionId.Limburgers]: {
+    [BuildingTypeId.Housing]: 'Huuske',
+    [BuildingTypeId.DefenseTower]: 'Wachttoren',
+    [BuildingTypeId.TertiaryResourceBuilding]: 'Mijnschacht',
+    [BuildingTypeId.FactionSpecial1]: 'Vlaaiwinkel',
+  },
+  [ExtendedFactionId.Belgen]: {
+    [BuildingTypeId.Housing]: 'Brusselse Woning',
+    [BuildingTypeId.DefenseTower]: 'Commissiegebouw',
+    [BuildingTypeId.TertiaryResourceBuilding]: 'Chocolaterie',
+    [BuildingTypeId.FactionSpecial1]: 'Diplomatiek Salon',
+  },
+};
+
+/**
+ * Display name for a building, resolved via factionData. Used by HUD/info-card
+ * so EVERY building type (T1-T3) shows its faction-specific flavour name
+ * instead of a generic "Gebouw" fallback.
+ *
+ * Resolution order:
+ *  1. FACTION_BUILDINGS archetype lookup (full data + name).
+ *  2. FACTION_BUILDING_NAME_FALLBACKS (display-only labels for types without data).
+ *  3. 'Gebouw' (only if both miss — covered by tests).
+ */
+export function getDisplayBuildingName(
+  factionId: number,
+  buildingTypeId: BuildingTypeId,
+): string {
+  try {
+    return getFactionBuildingArchetype(factionId, buildingTypeId).name;
+  } catch {
+    const fallback = FACTION_BUILDING_NAME_FALLBACKS[factionId]?.[buildingTypeId];
+    return fallback ?? 'Gebouw';
+  }
+}
+
+/**
+ * Display name for a unit, resolved via factionData. Used by HUD/info-card
+ * so Heavy/Siege/Support units show their faction-specific flavour name
+ * instead of a generic "Unit" fallback.
+ */
+export function getDisplayUnitName(
+  factionId: number,
+  unitTypeId: UnitTypeId,
+): string {
+  return getFactionUnitArchetype(factionId, unitTypeId).name;
+}
+
+/**
  * Get all worker-type units across all factions.
  * Useful for comparing faction worker strengths.
  */

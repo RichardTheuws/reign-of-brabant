@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.37.28] - 2026-04-25 — P1 fix: factie-namen voor T2/T3-gebouwen + Heavy/Siege/Support units
+
+### Fixed (P1, gemeld door Richard live op v0.37.27)
+- **`Game.getBuildingName`** had hardcoded mapping voor alleen TownHall/Barracks/LumberCamp/Blacksmith → fallback "Gebouw" voor Housing/DefenseTower/TertiaryResource/UpgradeBuilding/FactionSpecial1/FactionSpecial2/SiegeWorkshop. Nu via `getDisplayBuildingName()` uit factionData met fallback-tabel voor types zonder full archetype.
+- **`Game.getUnitNameByType`** had hardcoded mapping voor alleen Worker/Infantry/Ranged → fallback "Unit" voor Heavy/Siege/Support. Nu via `getDisplayUnitName()` uit factionData.
+- **`Game.buildBuildingCardData` inline `unitNames`** was uit sync met factionData ("Sloopkogel" vs werkelijke "Vastgoedmakelaar", "Heuvelwacht" vs "Sjpion", "Pralinemaker" vs "Wafelzuster", "CorporateAdvocaat" zonder spatie). Nu ook via `getDisplayUnitName()` — single source of truth.
+- **UpgradeBuilding tonen status "Tier 3 ontgrendeld — Bouw nu Feestzaal/Tractorschuur"** zodat speler ziet dat het gebouw functie heeft (research-koppeling is een follow-up).
+
+### Added
+- **`getDisplayBuildingName(factionId, typeId)`** in `src/data/factionData.ts` — primary lookup via FACTION_BUILDINGS, fallback naar nieuwe `FACTION_BUILDING_NAME_FALLBACKS` tabel voor types die archetype-data missen (Housing/DefenseTower/TertiaryResource/FactionSpecial1).
+- **`getDisplayUnitName(factionId, typeId)`** — delegeert naar `getFactionUnitArchetype`. Gooit als unit-data ontbreekt; caller (Game.ts) vangt via try/catch en fallt terug op "Unit".
+
+### Tests (+75, 977 → 1052)
+- `tests/display-names-faction-aware.test.ts` — Voor ALLE 4 facties × 11 building types + 4 facties × 6 unit types: naam mag niet "Gebouw"/"Unit" zijn, moet > 2 chars. Specifieke locks voor UpgradeBuilding/Barracks/Blacksmith/Heavy/Siege/Support per factie zodat factie-naming niet meer kan wegwaaien.
+
+### Notes
+- BuildingRenderer 'upgrade' typeId mapt nog naar Blacksmith.glb als visuele fallback (`src/rendering/BuildingRenderer.ts:62-65`). Eigen mesh per factie is een aparte Meshy-job — voor nu krijgt UpgradeBuilding visueel een Smederij-look maar wel de juiste naam.
+- Test-suite groei: 977 → 1052 (+75, +7.7%).
+
 ## [0.37.27] - 2026-04-25 — P1 fix: ProductionSystem silent-fail voor Heavy/Siege/Support
 
 ### Fixed (P1 game-breaker, gemeld door Richard live op v0.37.26)

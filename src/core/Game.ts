@@ -15,7 +15,7 @@ import { IsUnit, IsBuilding, IsResource, IsWorker, IsDead, IsHero } from '../ecs
 import { FactionId, UnitTypeId, BuildingTypeId, HeroTypeId, UpgradeId, ResourceType, MAP_SIZE, MAP_SIZES, RESOURCE_PRESETS, UnitAIState, NO_PRODUCTION, NO_ENTITY, HERO_POPULATION_COST, type UnitArchetype, type MapSizeOption, type ResourcePreset } from '../types/index';
 import { UNIT_ARCHETYPES, RANDSTAD_UNIT_ARCHETYPES, LIMBURGERS_UNIT_ARCHETYPES, BELGEN_UNIT_ARCHETYPES, BUILDING_ARCHETYPES } from '../entities/archetypes';
 import { HERO_ARCHETYPES, getHeroTypesForFaction, getHeroArchetype } from '../entities/heroArchetypes';
-import { getFactionUnitArchetype } from '../data/factionData';
+import { getFactionUnitArchetype, getDisplayBuildingName, getDisplayUnitName } from '../data/factionData';
 import { getPortraitUrl } from '../data/portraitMap';
 import { createHero, isHeroActive } from '../entities/heroFactory';
 import { createGamePipeline, type SystemPipeline } from '../systems/SystemPipeline';
@@ -2256,35 +2256,16 @@ export class Game {
 
   private getUnitNameByType(type: number, factionId?: number): string {
     const fid = factionId ?? this.playerFactionId;
-    const names: Record<number, Record<number, string>> = {
-      [FactionId.Brabanders]: { [UnitTypeId.Worker]: 'Boer', [UnitTypeId.Infantry]: 'Carnavalvierder', [UnitTypeId.Ranged]: 'Sluiper' },
-      [FactionId.Randstad]: { [UnitTypeId.Worker]: 'Stagiair', [UnitTypeId.Infantry]: 'Manager', [UnitTypeId.Ranged]: 'Consultant' },
-      [FactionId.Limburgers]: { [UnitTypeId.Worker]: 'Mijnwerker', [UnitTypeId.Infantry]: 'Schutterij', [UnitTypeId.Ranged]: 'Vlaaienwerper' },
-      [FactionId.Belgen]: { [UnitTypeId.Worker]: 'Frietkraamhouder', [UnitTypeId.Infantry]: 'Bierbouwer', [UnitTypeId.Ranged]: 'Chocolatier' },
-    };
-    return names[fid]?.[type] ?? 'Unit';
+    try {
+      return getDisplayUnitName(fid, type as UnitTypeId);
+    } catch {
+      return 'Unit';
+    }
   }
 
-  private getBuildingName(buildingType: number): string {
-    const names: Record<number, Record<number, string>> = {
-      [BuildingTypeId.TownHall]: {
-        [FactionId.Brabanders]: 'Boerderij', [FactionId.Randstad]: 'Hoofdkantoor',
-        [FactionId.Limburgers]: 'Grottentempel', [FactionId.Belgen]: 'Wafelpaleis',
-      },
-      [BuildingTypeId.Barracks]: {
-        [FactionId.Brabanders]: 'Cafe', [FactionId.Randstad]: 'Vergaderzaal',
-        [FactionId.Limburgers]: 'Heuvelfort', [FactionId.Belgen]: 'Frituurfort',
-      },
-      [BuildingTypeId.LumberCamp]: {
-        [FactionId.Brabanders]: 'Houtzagerij', [FactionId.Randstad]: 'Logistiek Centrum',
-        [FactionId.Limburgers]: 'Mijnschacht', [FactionId.Belgen]: 'Chocolaterie',
-      },
-      [BuildingTypeId.Blacksmith]: {
-        [FactionId.Brabanders]: 'Smederij', [FactionId.Randstad]: 'R&D Lab',
-        [FactionId.Limburgers]: 'Mergeloven', [FactionId.Belgen]: 'Brouwerij',
-      },
-    };
-    return names[buildingType]?.[this.playerFactionId] ?? 'Gebouw';
+  private getBuildingName(buildingType: number, factionId?: number): string {
+    const fid = factionId ?? this.playerFactionId;
+    return getDisplayBuildingName(fid, buildingType as BuildingTypeId);
   }
 
   private getBuildingHudType(buildingType: number): 'townhall' | 'barracks' | 'lumbercamp' | 'blacksmith' {
@@ -2351,20 +2332,32 @@ export class Game {
       status = queueCount > 0
         ? `Training ${current.unitName}${timeStr} +${queueCount}`
         : `Training ${current.unitName}${timeStr}`;
+    } else if (buildingType === BuildingTypeId.UpgradeBuilding) {
+      // UpgradeBuilding (Wagenbouwer/Innovatie Lab/Hoogoven/Diamantslijperij)
+      // unlocks Tier 3 (FactionSpecial2 + SiegeWorkshop). It has no own
+      // training/research yet (planned follow-up).
+      status = 'Tier 3 ontgrendeld — Bouw nu Feestzaal/Tractorschuur';
     }
 
     // Build actions (only for non-blacksmith production buildings)
     const actions: BuildingCardAction[] = [];
 
     if (!isBlacksmith) {
-      // Faction-specific unit names
-      const unitNames: Record<number, Record<string, string>> = {
-        0: { worker: 'Boer', infantry: 'Carnavalvierder', ranged: 'Sluiper', heavy: 'Tractorrijder', siege: 'Frituurmeester', support: 'Boerinneke' },
-        1: { worker: 'Stagiair', infantry: 'Manager', ranged: 'Consultant', heavy: 'CorporateAdvocaat', siege: 'Sloopkogel', support: 'HR-Medewerker' },
-        2: { worker: 'Mijnwerker', infantry: 'Schutterij', ranged: 'Vlaaienwerper', heavy: 'Mergelridder', siege: 'Mijnkarretje', support: 'Heuvelwacht' },
-        3: { worker: 'Frietkraamhouder', infantry: 'Bierbouwer', ranged: 'Chocolatier', heavy: 'Rijexaminator', siege: 'Frituurkanon', support: 'Pralinemaker' },
+      // Faction-specific unit names — single source of truth via factionData.
+      // Previously hardcoded inline; live-bug v0.37.27 ("Sloopkogel" vs
+      // factionData's "Vastgoedmakelaar" etc.) showed why duplication breaks.
+      const fid = this.playerFactionId;
+      const tryName = (typeId: UnitTypeId, fallback: string): string => {
+        try { return getDisplayUnitName(fid, typeId); } catch { return fallback; }
       };
-      const names = unitNames[this.playerFactionId] ?? unitNames[0];
+      const names = {
+        worker:   tryName(UnitTypeId.Worker, 'Worker'),
+        infantry: tryName(UnitTypeId.Infantry, 'Infantry'),
+        ranged:   tryName(UnitTypeId.Ranged, 'Ranged'),
+        heavy:    tryName(UnitTypeId.Heavy, 'Heavy'),
+        siege:    tryName(UnitTypeId.Siege, 'Siege'),
+        support:  tryName(UnitTypeId.Support, 'Support'),
+      };
 
       // Determine what this building can produce
       const arch = BUILDING_ARCHETYPES[buildingType];
