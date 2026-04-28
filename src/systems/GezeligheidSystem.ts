@@ -33,6 +33,10 @@ import { techTreeSystem } from './TechTreeSystem';
 const CARNAVALSVUUR_RADIUS_SQ = 64; // 8u
 const CARNAVALSVUUR_DAMAGE_MULT = 1.10;
 
+/** Carnavalstent aura: +20% damage in this radius around a Brabant FactionSpecial1 (Carnavalstent). */
+const CARNAVALSTENT_RADIUS_SQ = 144; // 12u
+const CARNAVALSTENT_ATTACK_MULT = 1.20;
+
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
@@ -193,6 +197,33 @@ export function createGezeligheidSystem() {
           const dz = th.z - pz;
           if (dx * dx + dz * dz <= CARNAVALSVUUR_RADIUS_SQ) {
             GezeligheidBonus.attackMult[eid] *= CARNAVALSVUUR_DAMAGE_MULT;
+            break;
+          }
+        }
+      }
+    }
+
+    // Carnavalstent aura: +20% attackMult for Brabander units within 12u of a
+    // complete Brabant Carnavalstent (FactionSpecial1). Multiplicative-stack on
+    // the tier-bonus AND on Carnavalsvuur (1.10 × 1.20 = 1.32).
+    const tents: Array<{ x: number; z: number }> = [];
+    const allBuildings = query(world, [Position, Building, Faction, IsBuilding]);
+    for (const bEid of allBuildings) {
+      if (Faction.id[bEid] !== FactionId.Brabanders) continue;
+      if (hasComponent(world, bEid, IsDead)) continue;
+      if (Building.typeId[bEid] !== BuildingTypeId.FactionSpecial1) continue;
+      if (Building.complete[bEid] !== 1) continue;
+      tents.push({ x: Position.x[bEid], z: Position.z[bEid] });
+    }
+    if (tents.length > 0) {
+      for (const eid of brabanderUnits) {
+        const px = Position.x[eid];
+        const pz = Position.z[eid];
+        for (const t of tents) {
+          const dx = t.x - px;
+          const dz = t.z - pz;
+          if (dx * dx + dz * dz <= CARNAVALSTENT_RADIUS_SQ) {
+            GezeligheidBonus.attackMult[eid] *= CARNAVALSTENT_ATTACK_MULT;
             break;
           }
         }

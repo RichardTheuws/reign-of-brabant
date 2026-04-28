@@ -887,6 +887,18 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       sightRange: 10,
       produces: [UnitTypeId.Heavy],
     },
+    // Carnavalstent (FactionSpecial1, Tier 2) — aura +20% damage in 12u radius for Brabant units.
+    {
+      typeId: BuildingTypeId.FactionSpecial1,
+      name: 'Carnavalstent',
+      brabantName: 'Carnavalstent',
+      hp: 600,
+      costGold: 200,
+      costSecondary: 150,
+      buildTime: 35,
+      sightRange: 9,
+      produces: [],
+    },
     // Tractorschuur (Siege workshop -- trains Siege units, Tier 3)
     {
       typeId: BuildingTypeId.SiegeWorkshop,
@@ -1038,6 +1050,18 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       buildTime: 50,
       sightRange: 10,
       produces: [UnitTypeId.Heavy],
+    },
+    // Boardroom (FactionSpecial1, Tier 2) — CEO Kwartaalcijfers: click to activate +50% production 30s, 120s cooldown.
+    {
+      typeId: BuildingTypeId.FactionSpecial1,
+      name: 'Boardroom',
+      brabantName: 'Boardroom',
+      hp: 700,
+      costGold: 250,
+      costSecondary: 200,
+      buildTime: 40,
+      sightRange: 10,
+      produces: [],
     },
     // Sloopwerf (Siege workshop -- trains Siege units, Tier 3)
     {
@@ -1201,6 +1225,18 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       sightRange: 10,
       produces: [UnitTypeId.Heavy],
     },
+    // Vlaaiwinkel (FactionSpecial1, Tier 2) — passive heal-pulse 10 HP/5s in 10u radius for Limburger units.
+    {
+      typeId: BuildingTypeId.FactionSpecial1,
+      name: 'Vlaaiwinkel',
+      brabantName: 'Vlaaiwinkel',
+      hp: 700,
+      costGold: 200,
+      costSecondary: 150,
+      buildTime: 35,
+      sightRange: 9,
+      produces: [],
+    },
     // Steengroeve (Siege workshop -- trains Siege units, Tier 3)
     {
       typeId: BuildingTypeId.SiegeWorkshop,
@@ -1326,6 +1362,18 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       buildTime: 42,
       sightRange: 10,
       produces: [UnitTypeId.Heavy],
+    },
+    // Diplomatiek Salon (FactionSpecial1, Tier 2) — random event every 90s: chocolade / resources / spawn Bierbouwer.
+    {
+      typeId: BuildingTypeId.FactionSpecial1,
+      name: 'Diplomatiek Salon',
+      brabantName: 'Diplomatiek Salon',
+      hp: 650,
+      costGold: 225,
+      costSecondary: 175,
+      buildTime: 40,
+      sightRange: 9,
+      produces: [],
     },
     // Frituurkanon-werkplaats (Siege workshop -- trains Siege units, Tier 3)
     {

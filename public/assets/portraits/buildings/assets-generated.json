@@ -1,0 +1,45 @@
+{
+  "generated": "2026-04-28",
+  "model": "fal-ai/flux/dev",
+  "size": "1024x1024",
+  "style": "Painted RPG card-art with ornate gold curved frame top edge, dark moody vignette background with green-black gradient, dramatic chiaroscuro lighting, oil painting texture. Style-match for existing portrait set (brabant-prins.png, belgen-frietkoning.png, limburg-mijnbaas.png, upgrades/*.png). Adapted from Bundel 2.5 upgrade-portrait template by replacing 'no characters' with 'may include 1-2 small background characters as scale' since interiors feel empty without human reference.",
+  "purpose": "Selection-card portraits for FactionSpecial1 buildings (Carnavalstent, Boardroom, Vlaaiwinkel, Diplomatiek Salon). Displayed when player selects their faction-unique special building.",
+  "assets": [
+    {
+      "file": "brabant-faction-special-1.png",
+      "label": "Carnavalstent",
+      "faction": "Brabant",
+      "building_key": "FactionSpecial1",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, the festive interior of a Brabantian carnival tent with a giant orange-red-yellow Brabant flag hanging center, strings of warm festive lights, a Bourgondisch cross emblem on the wall, large oak beer barrels stacked in the foreground, wooden dance floor, may include 1-2 small carnival revelers in the background as scale, warm orange and red painterly atmosphere, centered on dark moody vignette background with green-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, fantasy game building card icon, oil painting texture, no text, museum quality"
+    },
+    {
+      "file": "randstad-faction-special-1.png",
+      "label": "Boardroom",
+      "faction": "Randstad",
+      "building_key": "FactionSpecial1",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, a modern corporate boardroom with a long glass conference table reflecting overhead lights, ergonomic black executive chairs around it, two large wall-mounted presentation screens showing colorful business charts and graphs, sleek metallic coffee pot and laptop on the table, floor-to-ceiling windows with city skyline glow, high ceiling, clean cinematic concept art aesthetic, may include 1-2 small silhouetted business figures in the background as scale, blue-grey-white palette with warm yellow desk-lamp accents, centered on dark moody vignette background with deep blue-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, fantasy game building card icon, oil painting texture meets corporate concept art, no text, no logos, museum quality"
+    },
+    {
+      "file": "limburg-faction-special-1.png",
+      "label": "Vlaaiwinkel",
+      "faction": "Limburg",
+      "building_key": "FactionSpecial1",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, a cozy traditional Limburg vlaai bakery interior with a wooden vitrine display case showing rows of authentic Dutch fruit pies (kruimelvlaai with crumble topping, abrikoos apricot vlaai, glossy red kers cherry vlaai, custard vlaai), pale beige Limburg mergel limestone walls, a chalkboard sign on the wall with chalk lines suggesting writing, soft steam rising from a fresh pie indicating warm bread aroma, warm hanging lantern, may include 1-2 small background figures of a baker or customer as scale, warm brown orange and cream palette with red cherry accents, painterly cozy traditional atmosphere, centered on dark moody vignette background with warm brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, fantasy game building card icon, oil painting texture, no readable text, museum quality"
+    },
+    {
+      "file": "belgen-faction-special-1.png",
+      "label": "Diplomatiek Salon",
+      "faction": "Belgen",
+      "building_key": "FactionSpecial1",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, an elegant Belgian diplomatic embassy salon interior with art deco design, ornate crystal chandelier hanging from the ceiling, a Belgian tricolor flag (black yellow red vertical stripes) on a polished brass standing pole, two plush burgundy velvet armchairs facing each other around a low mahogany coffee table set with a delicate porcelain coffee service and two cups, gilded gold frame mirror on the wall, parquet wood flooring with rug, may include 1-2 small silhouetted diplomats in the deep background as scale, refined understated luxury, black gold and burgundy palette, centered on dark moody vignette background with deep black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching gold accents, fantasy game building card icon, oil painting texture, no text, no flag emblems readable, museum quality"
+    }
+  ]
+}

@@ -42,7 +42,7 @@ import {
   MINIMUM_MELEE_RANGE,
   UpgradeId,
 } from '../types/index';
-import { onRandstadActionCompleted } from './BureaucracySystem';
+import { onRandstadActionCompleted, boardroomBuff, BOARDROOM_PRODUCTION_MULT } from './BureaucracySystem';
 import { ceoProductionBuff } from './HeroSystem';
 import { techTreeSystem } from './TechTreeSystem';
 import { getFactionUnitArchetype } from '../data/factionData';
@@ -179,7 +179,11 @@ export function createProductionSystem() {
       const aiOptMod = techTreeSystem.isResearched(factionId, UpgradeId.AIOptimization)
         ? (1 / 1.20)
         : 1.0;
-      const effectiveDuration = duration * bureaucracyMod * ceoBuff * aiOptMod;
+      // Apply Boardroom CEO Kwartaalcijfers buff (Randstad FactionSpecial1, click-activated): +50% speed during 30s window.
+      const boardroomMod = (boardroomBuff.active && factionId === FactionId.Randstad)
+        ? BOARDROOM_PRODUCTION_MULT
+        : 1.0;
+      const effectiveDuration = duration * bureaucracyMod * ceoBuff * aiOptMod * boardroomMod;
 
       Production.progress[bEid] += dt / effectiveDuration;
 

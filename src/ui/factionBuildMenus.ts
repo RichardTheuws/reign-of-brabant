@@ -54,6 +54,7 @@ export const FACTION_WORKER_BUILDS: Record<Faction, WorkerBuildCmdExt[]> = {
     { action: 'build-housing',         icon: 'HSE', label: 'Boerenhoeve',     hotkey: 'T', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Housing,                   tier: 2 },
     { action: 'build-tower',           icon: 'TWR', label: 'Kerktoren',       hotkey: 'F', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.DefenseTower,              tier: 2 },
     { action: 'build-upgrade',         icon: 'UPG', label: 'Wagenbouwer',     hotkey: 'C', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.UpgradeBuilding,           tier: 2 },
+    { action: 'build-faction1',        icon: 'SP1', label: 'Carnavalstent',   hotkey: 'V', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial1,           tier: 2 },
     { action: 'build-faction2',        icon: 'ADV', label: 'Feestzaal',       hotkey: 'G', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial2,           tier: 3 },
     { action: 'build-siege-workshop',  icon: 'SWK', label: 'Tractorschuur',   hotkey: 'Z', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.SiegeWorkshop,             tier: 3 },
     // Brabanders intentionally skip X — Gezelligheid is proximity-generated.
@@ -65,6 +66,7 @@ export const FACTION_WORKER_BUILDS: Record<Faction, WorkerBuildCmdExt[]> = {
     { action: 'build-housing',         icon: 'HSE', label: 'Vinex-wijk',      hotkey: 'T', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Housing,                   tier: 2 },
     { action: 'build-tower',           icon: 'TWR', label: 'Kantoor-toren',   hotkey: 'F', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.DefenseTower,              tier: 2 },
     { action: 'build-upgrade',         icon: 'UPG', label: 'Innovatie Lab',   hotkey: 'C', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.UpgradeBuilding,           tier: 2 },
+    { action: 'build-faction1',        icon: 'SP1', label: 'Boardroom',        hotkey: 'V', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial1,           tier: 2 },
     { action: 'build-faction2',        icon: 'ADV', label: 'Parkeergarage',   hotkey: 'G', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial2,           tier: 3 },
     { action: 'build-siege-workshop',  icon: 'SWK', label: 'Sloopwerf',       hotkey: 'Z', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.SiegeWorkshop,             tier: 3 },
     // F5-fix (v0.37.20): Randstad tertiary-resource building (Havermoutmelkbar).
@@ -81,6 +83,7 @@ export const FACTION_WORKER_BUILDS: Record<Faction, WorkerBuildCmdExt[]> = {
     { action: 'build-housing',         icon: 'HSE', label: 'Huuske',          hotkey: 'T', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Housing,                   tier: 2 },
     { action: 'build-tower',           icon: 'TWR', label: 'Wachttoren',      hotkey: 'F', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.DefenseTower,              tier: 2 },
     { action: 'build-upgrade',         icon: 'UPG', label: 'Hoogoven',        hotkey: 'C', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.UpgradeBuilding,           tier: 2 },
+    { action: 'build-faction1',        icon: 'SP1', label: 'Vlaaiwinkel',     hotkey: 'V', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial1,           tier: 2 },
     { action: 'build-faction2',        icon: 'ADV', label: 'Mijnwerkerskamp', hotkey: 'G', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial2,           tier: 3 },
     { action: 'build-siege-workshop',  icon: 'SWK', label: 'Steengroeve',     hotkey: 'Z', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.SiegeWorkshop,             tier: 3 },
     { action: 'build-mijnschacht',     icon: 'TRT', label: 'Mijnschacht',     hotkey: 'X', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.TertiaryResourceBuilding,  tier: 2 },
@@ -92,6 +95,7 @@ export const FACTION_WORKER_BUILDS: Record<Faction, WorkerBuildCmdExt[]> = {
     { action: 'build-housing',         icon: 'HSE', label: 'Brusselse Woning', hotkey: 'T', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Housing,                  tier: 2 },
     { action: 'build-tower',           icon: 'TWR', label: 'Commissiegebouw', hotkey: 'F', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.DefenseTower,              tier: 2 },
     { action: 'build-upgrade',         icon: 'UPG', label: 'Diamantslijperij', hotkey: 'C', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.UpgradeBuilding,          tier: 2 },
+    { action: 'build-faction1',        icon: 'SP1', label: 'Diplomatiek Salon', hotkey: 'V', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial1,         tier: 2 },
     { action: 'build-faction2',        icon: 'ADV', label: 'Rijschool',       hotkey: 'G', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial2,           tier: 3 },
     { action: 'build-siege-workshop',  icon: 'SWK', label: 'Frituurkanon-werkplaats', hotkey: 'Z', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.SiegeWorkshop,    tier: 3 },
     { action: 'build-chocolaterie',    icon: 'TRT', label: 'Chocolaterie',    hotkey: 'X', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.TertiaryResourceBuilding,  tier: 2 },

@@ -196,6 +196,8 @@ import { createSeparationSystem } from './SeparationSystem';
 import { createPopulationSystem } from './PopulationSystem';
 import { createTowerSystem } from './TowerSystem';
 import { createHealingSystem } from './HealingSystem';
+import { createVlaaiwinkelSystem } from './VlaaiwinkelSystem';
+import { createDiplomatiekSalonSystem } from './DiplomatiekSalonSystem';
 import { createUnitAbilitySystem } from './UnitAbilitySystem';
 import { createDeathSystem } from './DeathSystem';
 import { createUpkeepSystem } from './UpkeepSystem';
@@ -252,7 +254,10 @@ export function createGamePipeline(terrain: Terrain, devMode = false): SystemPip
   // Phase 5: Combat & Economy
   pipeline.add('CombatSystem', createCombatSystem(), 'combat');
   pipeline.add('HealingSystem', createHealingSystem(), 'combat');
+  pipeline.add('VlaaiwinkelSystem', createVlaaiwinkelSystem(), 'combat');
   pipeline.add('TowerSystem', createTowerSystem(), 'combat');
+  // Phase 4.83 placement (logical, but lives near other faction systems):
+  pipeline.add('DiplomatiekSalonSystem', createDiplomatiekSalonSystem(), 'faction');
   pipeline.add('GatherSystem', createGatherSystem(), 'economy');
   pipeline.add('ProductionSystem', createProductionSystem(), 'economy');
   pipeline.add('BuildSystem', createBuildSystem(), 'economy');

@@ -41,7 +41,7 @@ import { spawnBuildingEntity } from '../entities/buildingSpawn';
 import { HUD, type SelectedUnit, type CommandAction, type HeroAbilityData, type BuildingCardData, type BuildingCardAction } from '../ui/HUD';
 import { activateCarnavalsrage, getCarnavalsrageState, getCarnavalsrageConfig, resetAbilitySystem } from '../systems/AbilitySystem';
 import { activateHeroAbility, resetHeroSystem } from '../systems/HeroSystem';
-import { resetBureaucracy } from '../systems/BureaucracySystem';
+import { resetBureaucracy, activateBoardroom, isBoardroomReady, boardroomBuff } from '../systems/BureaucracySystem';
 import { resetDiplomacy } from '../systems/DiplomacySystem';
 import { audioManager } from '../audio/AudioManager';
 import { playUnitVoice } from '../audio/UnitVoices';
@@ -935,9 +935,28 @@ export class Game {
       case 'research-upgrade':
         this.showTechTreeUI();
         break;
+      case 'activate-boardroom':
+        this.tryActivateBoardroom();
+        break;
       case 'cancel-queue':
         // Handled via onQueueCancel callback, not via command action
         break;
+    }
+  }
+
+  /**
+   * Activate the Randstad Boardroom CEO Kwartaalcijfers buff: +50% production
+   * speed for 30s on a 120s cooldown. Only fires when the player is Randstad
+   * and the cooldown is ready.
+   */
+  private tryActivateBoardroom(): void {
+    if (this.playerFactionId !== FactionId.Randstad) return;
+    const fired = activateBoardroom();
+    if (fired) {
+      this.hud?.showAlert('CEO Kwartaalcijfers actief — productie +50% (30s)', 'info');
+      audioManager.playSound('click');
+    } else {
+      this.hud?.showAlert('Boardroom-buff nog op cooldown', 'warning');
     }
   }
 
@@ -2084,6 +2103,10 @@ export class Game {
           const cardData = this.buildBuildingCardData(firstEid, buildingType, buildingName, queueItems, true);
           this.hud.showBuildingCard(cardData);
           this.showUpgradeBuildingResearchUI(firstEid);
+        } else if (buildingType === BuildingTypeId.FactionSpecial1 && Building.complete[firstEid] === 1) {
+          // FactionSpecial1: card with optional boardroom action (Randstad).
+          const cardData = this.buildBuildingCardData(firstEid, buildingType, buildingName, queueItems, true);
+          this.hud.showBuildingCard(cardData);
         } else {
           // Normal production building: show building card with training actions
           const cardData = this.buildBuildingCardData(firstEid, buildingType, buildingName, queueItems, false);
@@ -2578,6 +2601,22 @@ export class Game {
           isRally: true,
         });
       }
+    }
+
+    // Boardroom CEO Kwartaalcijfers — only for Randstad FactionSpecial1.
+    if (buildingType === BuildingTypeId.FactionSpecial1
+        && this.playerFactionId === FactionId.Randstad
+        && Building.complete[eid] === 1) {
+      let label = 'Activeer Kwartaalcijfers';
+      if (boardroomBuff.active) label = `Actief (${Math.ceil(boardroomBuff.remaining)}s)`;
+      else if (!isBoardroomReady()) label = `Cooldown (${Math.ceil(boardroomBuff.cooldown)}s)`;
+      actions.push({
+        action: 'activate-boardroom',
+        icon: 'CEO',
+        label,
+        hotkey: 'T',
+        iconClass: 'btn-icon--research',
+      });
     }
 
     return {

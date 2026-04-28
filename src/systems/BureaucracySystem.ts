@@ -87,6 +87,49 @@ const stunnedUnits = new Set<number>();
 const fatiguedUnits = new Map<number, { attack: number; speed: number }>();
 
 // ---------------------------------------------------------------------------
+// Boardroom — CEO Kwartaalcijfers ability (Randstad FactionSpecial1)
+// ---------------------------------------------------------------------------
+
+/** Per-faction-instance buff (singleton — only one Boardroom buff active at a time). */
+export const boardroomBuff = { active: false, remaining: 0, cooldown: 0 };
+
+const BOARDROOM_DURATION = 30;
+const BOARDROOM_COOLDOWN = 120;
+/** Production duration multiplier when Boardroom buff is active (0.667 = +50% speed). */
+export const BOARDROOM_PRODUCTION_MULT = 0.667;
+
+/** Activate the Boardroom buff if cooldown has elapsed. Returns true on success. */
+export function activateBoardroom(): boolean {
+  if (boardroomBuff.active || boardroomBuff.cooldown > 0) return false;
+  boardroomBuff.active = true;
+  boardroomBuff.remaining = BOARDROOM_DURATION;
+  boardroomBuff.cooldown = BOARDROOM_COOLDOWN;
+  return true;
+}
+
+export function isBoardroomReady(): boolean {
+  return !boardroomBuff.active && boardroomBuff.cooldown <= 0;
+}
+
+export function getBoardroomState() {
+  return { active: boardroomBuff.active, remaining: boardroomBuff.remaining, cooldown: boardroomBuff.cooldown };
+}
+
+function tickBoardroom(dt: number): void {
+  if (boardroomBuff.active) {
+    boardroomBuff.remaining -= dt;
+    if (boardroomBuff.remaining <= 0) {
+      boardroomBuff.active = false;
+      boardroomBuff.remaining = 0;
+    }
+  }
+  if (boardroomBuff.cooldown > 0) {
+    boardroomBuff.cooldown -= dt;
+    if (boardroomBuff.cooldown < 0) boardroomBuff.cooldown = 0;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
@@ -99,6 +142,9 @@ const fatiguedUnits = new Map<number, { attack: number; speed: number }>();
 export function createBureaucracySystem() {
   return function bureaucracySystem(world: GameWorld, dt: number): void {
     const elapsed = world.meta.elapsed;
+
+    // -- Boardroom buff timer (Randstad FactionSpecial1 ability) --
+    tickBoardroom(dt);
 
     // -- Werkoverleg cycle --
     updateWerkoverleg(world, dt);
@@ -382,4 +428,7 @@ export function resetBureaucracy(): void {
   meetingFatigueRemaining = 0;
   stunnedUnits.clear();
   fatiguedUnits.clear();
+  boardroomBuff.active = false;
+  boardroomBuff.remaining = 0;
+  boardroomBuff.cooldown = 0;
 }

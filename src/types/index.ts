@@ -924,6 +924,13 @@ export interface CombatCritEvent {
   readonly damage: number;
 }
 
+export interface DiplomatiekEventEvent {
+  readonly outcome: 'chocolade' | 'resources' | 'spawn';
+  readonly x: number;
+  readonly z: number;
+  readonly eid: number;
+}
+
 export interface UnitAbilityUsedEvent {
   readonly eid: number;
   readonly abilityId: string;
@@ -970,6 +977,7 @@ export interface GameEvents {
   'hero-ability-used': HeroAbilityUsedEvent;
   'combat-hit': CombatHitEvent;
   'combat-crit': CombatCritEvent;
+  'diplomatiek-event': DiplomatiekEventEvent;
   'unit-healed': UnitHealedEvent;
   'unit-ability-used': UnitAbilityUsedEvent;
   'carnavalsrage-activated': CarnavalsrageActivatedEvent;

@@ -1,5 +1,46 @@
 # Changelog
 
+## [0.37.35] - 2026-04-28 — Bundel 3: 4 FactionSpecial1 systems (Carnavalstent / Boardroom / Vlaaiwinkel / Diplomatiek Salon)
+
+### Added (4 archetypes — eerste FactionSpecial1 implementatie)
+- **Brabant Carnavalstent** — `factionData.ts`: HP 600, 200g+150h, 35s build, sight 9. Tier 2.
+- **Randstad Boardroom** — HP 700, 250g+200h, 40s build, sight 10.
+- **Limburg Vlaaiwinkel** — HP 700, 200g+150h, 35s build, sight 9.
+- **Belgen Diplomatiek Salon** — HP 650, 225g+175h, 40s build, sight 9.
+- **`factionBuildMenus.ts`**: 4× nieuwe `'build-faction1'` entry met hotkey **V** (tier 2). Hotkey-mapping uniform over facties (per repo-regel).
+
+### Added (4 effect-systems)
+- **Carnavalstent (Brabant aura)** — `GezeligheidSystem.ts` extension: per Brabander unit binnen 12u² (=144) van een complete Carnavalstent → `attackMult *= 1.20`. Multiplicatief stack op Carnavalsvuur (1.10 × 1.20 = 1.32) en tier-bonus. Niet-stapelend tussen meerdere tents (break-after-first).
+- **Boardroom (Randstad CEO Kwartaalcijfers)** — `BureaucracySystem.ts`: nieuwe `boardroomBuff = { active, remaining, cooldown }` module-state + `activateBoardroom()` / `isBoardroomReady()` API. `tickBoardroom(dt)` runt voor werkoverleg-cycle. **30s active, 120s cooldown, +50% production speed (duration *= 0.667)**. Click-actie via building-card "Activeer Kwartaalcijfers" knop op Randstad FactionSpecial1, hotkey T. ProductionSystem.processBuilding krijgt 5e duration-factor `boardroomMod` naast bureaucracy/ceo-hero/aiOpt.
+- **VlaaiwinkelSystem (Limburg heal)** — nieuwe file `src/systems/VlaaiwinkelSystem.ts`. Pipeline-phase `'combat'` na CombatSystem (heal mag damage same-tick reverten). 5s throttle via accumulator. Per Limburger unit binnen 10u² (=100) van een complete Vlaaiwinkel: +10 HP × aantal Vlaaiwinkels in radius (stacks). HP geclamped op max.
+- **DiplomatiekSalonSystem (Belgen random-event)** — nieuwe file `src/systems/DiplomatiekSalonSystem.ts`. Pipeline-phase `'faction'`. Per complete Belgen Salon: 90s cooldown timer in module-scope Map (cleanup voor recycled eids). Bij timer=0 → `Math.random()` outcome:
+  - `< 0.33` → `'chocolade'`: +50 tertiary
+  - `< 0.66` → `'resources'`: +200 gold + 100 wood
+  - `≥ 0.66` → `'spawn'`: 1 free Belgen Worker bij Salon-positie
+  - Emits `'diplomatiek-event'` met `{outcome, x, z, eid}` voor HUD/audio-laag.
+  - Reset cooldown 90s. Verse spawn start met 90s cooldown (geen instant-payout exploit).
+
+### Added (UI)
+- **Selection-handler in Game.ts**: `BuildingTypeId.FactionSpecial1` branch — toont building-card (geen training-actions; Boardroom-button conditional op Randstad).
+- **`activate-boardroom`** CommandAction + `tryActivateBoardroom()` handler.
+- **`'diplomatiek-event'`** + `DiplomatiekEventEvent` interface in GameEvents.
+
+### Added (assets)
+- **4 building-portraits** door Asset Generator (Flux Dev, RPG card-art template met building-interior variant). Files in `public/assets/portraits/buildings/`. 4-voor-4 success-rate. Visueel sterkst: Boardroom (cinematische glazen tafel + skyline) en Vlaaiwinkel (cozy painterly met houten vlaaikast).
+
+### Tests (+32, 1120 → 1152)
+- `tests/Bundel3-Carnavalstent.test.ts` (+6): aura applies/no-aura/incomplete/factie-lock/non-stack/Carnavalsvuur-stack
+- `tests/Bundel3-Boardroom.test.ts` (+8): state machine (initial/activate/double-fire/30s-tick/120s-ready/snapshot) + ProductionSystem integration (Randstad faster than baseline; Brabanders unaffected)
+- `tests/VlaaiwinkelSystem.test.ts` (+8): heal/no-heal/factie-lock/stack/clamp/throttle/incomplete/empty
+- `tests/DiplomatiekSalonSystem.test.ts` (+10): timer-cycles/3 outcomes/event-payload/factie-lock/incomplete/2-salons-independent
+
+### Notes
+- **Stack-tracking**: 5 multiplicatieve duration-mods op ProductionSystem nu: `bureaucracyMod * ceoBuff * aiOptMod * boardroomMod`. Werkt cumulatief — Boardroom + AI Optimization actief = +50% × +20% = ~80% snellere productie voor Randstad.
+- **Boardroom click-target**: hotkey T staat per-card (geen globale binding) — voorkomt conflict met `train-hero-0` op Barracks.
+- **Diplomatiek Salon trappist→chocolade**: outcome-naam aligned met factionData (Belgen tertiary = Chocolade). Lore-note: "trappist" was werknaam in plan-spec.
+- **Pipeline phases**: VlaaiwinkelSystem in 'combat' (na CombatSystem heal-revert), DiplomatiekSalonSystem in 'faction'. Geen breaking changes voor andere systems.
+- **Backlog opportunities** (zie BACKLOG.md): GLB-models voor 4 FactionSpecial1 (nu lumbercamp.glb fallback) — voor Bundel 5 Meshy-marathon. Per-factie portrait-mapping in BuildingPortraits.ts (huidige fallback toont "TH"/"BRK" abbrevs).
+
 ## [0.37.34] - 2026-04-28 — Bundel 2.5: ActionCard refactor — research-panels nu in Barracks-stijl
 
 ### Added (UI unify — research-panels match Barracks card-look)

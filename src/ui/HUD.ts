@@ -66,6 +66,7 @@ export type CommandAction =
   | 'train-hero-0' | 'train-hero-1'
   | 'hero-ability-q' | 'hero-ability-w' | 'hero-ability-e'
   | 'research-upgrade'
+  | 'activate-boardroom'
   | 'cancel-queue';
 
 export interface SelectedUnit {
