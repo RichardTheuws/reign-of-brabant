@@ -2486,16 +2486,20 @@ export class Game {
     if (!this.hud) return;
     const factionId = this.playerFactionId;
 
-    // Build upgrade button data
-    const upgrades = UPGRADE_DEFINITIONS.map(def => ({
-      id: def.id as number,
-      name: def.name,
-      description: def.description,
-      costGold: def.cost.gold,
-      canAfford: this.playerState.canAfford(factionId, def.cost.gold),
-      canResearch: techTreeSystem.canResearch(factionId, def.id),
-      isResearched: techTreeSystem.isResearched(factionId, def.id),
-    }));
+    // Blacksmith only researches combat/armor/speed upgrades (IDs 0-6).
+    // Wood-upgrades (7/8/9) live on the LumberCamp panel.
+    const WOOD_UPGRADE_IDS = new Set<number>([UpgradeId.WoodCarry1, UpgradeId.WoodCarry2, UpgradeId.WoodGather]);
+    const upgrades = UPGRADE_DEFINITIONS
+      .filter(def => !WOOD_UPGRADE_IDS.has(def.id as number))
+      .map(def => ({
+        id: def.id as number,
+        name: def.name,
+        description: def.description,
+        costGold: def.cost.gold,
+        canAfford: this.playerState.canAfford(factionId, def.cost.gold),
+        canResearch: techTreeSystem.canResearch(factionId, def.id),
+        isResearched: techTreeSystem.isResearched(factionId, def.id),
+      }));
 
     // Get current research progress for this Blacksmith
     const progress = techTreeSystem.getResearchProgress(blacksmithEid, factionId);

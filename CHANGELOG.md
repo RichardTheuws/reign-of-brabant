@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.37.32] - 2026-04-28 — P1 hotfix: wood-upgrades lekten in Blacksmith-paneel
+
+### Fixed (P1, Richard hands-on report v0.37.31)
+- **Blacksmith-paneel toonde 9 buttons inclusief Houtdraagkracht I/II + Snelle Kap** (vaak als "OK" omdat al voltooid via LumberCamp). Wood-upgrades horen exclusief op het LumberCamp-paneel.
+- **Root cause**: `Game.showBlacksmithResearchUI` mapte heel `UPGRADE_DEFINITIONS` (10 entries) zonder filter. LumberCamp-paneel filterde wel op de 3 wood-IDs.
+- **Fix**: Blacksmith filtert nu op niet-wood IDs (combat/armor/speed 0-6). LumberCamp blijft op de 3 wood-IDs (7,8,9). Strikte partitie.
+
+### Tests (+4, 1088 → 1092)
+- `tests/research-panel-id-separation.test.ts`:
+  - UPGRADE_DEFINITIONS partition: elke id is OF combat OF wood.
+  - Blacksmith-filter levert exact 7 combat-upgrades.
+  - LumberCamp-set levert exact 3 wood-upgrades.
+  - Geen overlap tussen combat- en wood-id sets.
+
 ## [0.37.31] - 2026-04-28 — P0 hotfix: research-paneel klik werkte STILL niet op v0.37.30
 
 ### Fixed (P0, Richard hands-on report 5 min na v0.37.30 deploy)
