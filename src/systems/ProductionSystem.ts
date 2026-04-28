@@ -43,6 +43,7 @@ import {
   UpgradeId,
 } from '../types/index';
 import { onRandstadActionCompleted, boardroomBuff, BOARDROOM_PRODUCTION_MULT } from './BureaucracySystem';
+import { getSprintModeProductionMod } from './HavermoutmelkSystem';
 import { ceoProductionBuff } from './HeroSystem';
 import { techTreeSystem } from './TechTreeSystem';
 import { getFactionUnitArchetype } from '../data/factionData';
@@ -183,7 +184,9 @@ export function createProductionSystem() {
       const boardroomMod = (boardroomBuff.active && factionId === FactionId.Randstad)
         ? BOARDROOM_PRODUCTION_MULT
         : 1.0;
-      const effectiveDuration = duration * bureaucracyMod * ceoBuff * aiOptMod * boardroomMod;
+      // Apply Sprint Mode buff (Randstad Havermoutmelkbar click-action): +20% speed during 60s window.
+      const sprintMod = getSprintModeProductionMod(factionId);
+      const effectiveDuration = duration * bureaucracyMod * ceoBuff * aiOptMod * boardroomMod * sprintMod;
 
       Production.progress[bEid] += dt / effectiveDuration;
 

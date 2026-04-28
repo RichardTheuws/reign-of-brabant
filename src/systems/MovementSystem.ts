@@ -7,9 +7,10 @@
 
 import { query, hasComponent } from 'bitecs';
 import { Position, Movement, Rotation, GezeligheidBonus, Stunned, Faction } from '../ecs/components';
-import { IsUnit } from '../ecs/tags';
+import { IsUnit, IsWorker } from '../ecs/tags';
 import { playerState } from '../core/PlayerState';
 import { UPKEEP_DEBT_EFFECTIVENESS, ROAD_SPEED_BONUS } from '../types/index';
+import { getDeadlineCrunchSpeedMult } from './HavermoutmelkSystem';
 import type { Terrain } from '../world/Terrain';
 import type { GameWorld } from '../ecs/world';
 
@@ -60,6 +61,11 @@ export function createMovementSystem(terrain: Terrain) {
       // Upkeep debt: reduce movement speed
       if (playerState.isInUpkeepDebt(Faction.id[eid])) {
         effectiveSpeed *= UPKEEP_DEBT_EFFECTIVENESS;
+      }
+
+      // Deadline Crunch (Randstad Havermoutmelkbar click-action) — workers only.
+      if (hasComponent(world, eid, IsWorker)) {
+        effectiveSpeed *= getDeadlineCrunchSpeedMult(Faction.id[eid]);
       }
       const stepX = _dx * _invDist * effectiveSpeed * dt;
       const stepZ = _dz * _invDist * effectiveSpeed * dt;

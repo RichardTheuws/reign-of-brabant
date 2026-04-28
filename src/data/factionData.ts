@@ -1658,9 +1658,9 @@ const FACTION_UPGRADE_NAME_OVERRIDES: Record<number, Partial<Record<UpgradeId, {
     [UpgradeId.WoodGather]: { name: 'Snellere Bakker',  description: 'Bakkers verzamelen 25% sneller.' },
   },
   [ExtendedFactionId.Randstad]: {
-    [UpgradeId.WoodCarry1]: { name: 'Latte Capacity',   description: "Barista's dragen +5 hout per trip." },
-    [UpgradeId.WoodCarry2]: { name: 'Cold Brew Bonus',  description: "Barista's dragen nog +5 hout per trip." },
-    [UpgradeId.WoodGather]: { name: 'Caffeine Kick',    description: "Barista's verzamelen 25% sneller." },
+    [UpgradeId.WoodCarry1]: { name: 'Grotere Laptoptas', description: 'Stagiairs dragen +5 hout per trip.' },
+    [UpgradeId.WoodCarry2]: { name: 'Powerpoint Pro',    description: 'Stagiairs dragen nog +5 hout per trip.' },
+    [UpgradeId.WoodGather]: { name: 'Sprint Velocity',   description: 'Stagiairs verzamelen 25% sneller.' },
   },
   [ExtendedFactionId.Limburgers]: {
     [UpgradeId.WoodCarry1]: { name: 'Grotere Vlaai',    description: 'Vlaaibakkers dragen +5 hout per trip.' },

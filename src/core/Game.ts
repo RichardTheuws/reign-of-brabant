@@ -42,6 +42,11 @@ import { HUD, type SelectedUnit, type CommandAction, type HeroAbilityData, type 
 import { activateCarnavalsrage, getCarnavalsrageState, getCarnavalsrageConfig, resetAbilitySystem } from '../systems/AbilitySystem';
 import { activateHeroAbility, resetHeroSystem } from '../systems/HeroSystem';
 import { resetBureaucracy, activateBoardroom, isBoardroomReady, boardroomBuff } from '../systems/BureaucracySystem';
+import {
+  activateSprintMode, isSprintModeReady, getSprintModeState, SPRINT_MODE_COST,
+  activateDeadlineCrunch, isDeadlineCrunchReady, getDeadlineCrunchState, DEADLINE_CRUNCH_COST,
+  resetHavermoutmelkBuffs,
+} from '../systems/HavermoutmelkSystem';
 import { resetDiplomacy } from '../systems/DiplomacySystem';
 import { audioManager } from '../audio/AudioManager';
 import { playUnitVoice } from '../audio/UnitVoices';
@@ -935,6 +940,12 @@ export class Game {
       case 'research-upgrade':
         this.showTechTreeUI();
         break;
+      case 'activate-sprint-mode':
+        this.tryActivateSprintMode();
+        break;
+      case 'activate-deadline-crunch':
+        this.tryActivateDeadlineCrunch();
+        break;
       case 'activate-boardroom':
         this.tryActivateBoardroom();
         break;
@@ -957,6 +968,46 @@ export class Game {
       audioManager.playSound('click');
     } else {
       this.hud?.showAlert('Boardroom-buff nog op cooldown', 'warning');
+    }
+  }
+
+  /**
+   * Sprint Mode click-action (Randstad Havermoutmelkbar). Spends 30 havermoutmelk
+   * for 60s of +20% gather rate AND +20% production speed for all Randstad
+   * units/buildings. 90s cooldown.
+   */
+  private tryActivateSprintMode(): void {
+    if (this.playerFactionId !== FactionId.Randstad) return;
+    if (this.playerState.getTertiary(FactionId.Randstad) < SPRINT_MODE_COST) {
+      this.hud?.showAlert(`Niet genoeg havermoutmelk (${SPRINT_MODE_COST} nodig)`, 'warning');
+      return;
+    }
+    const fired = activateSprintMode();
+    if (fired) {
+      this.hud?.showAlert('Sprint Mode actief — gather + productie +20% (60s)', 'info');
+      audioManager.playSound('click');
+    } else {
+      this.hud?.showAlert('Sprint Mode nog op cooldown', 'warning');
+    }
+  }
+
+  /**
+   * Deadline Crunch click-action (Randstad Havermoutmelkbar). Spends 50
+   * havermoutmelk for 30s of +50% movement speed for Randstad workers
+   * (stagiairs). 90s cooldown.
+   */
+  private tryActivateDeadlineCrunch(): void {
+    if (this.playerFactionId !== FactionId.Randstad) return;
+    if (this.playerState.getTertiary(FactionId.Randstad) < DEADLINE_CRUNCH_COST) {
+      this.hud?.showAlert(`Niet genoeg havermoutmelk (${DEADLINE_CRUNCH_COST} nodig)`, 'warning');
+      return;
+    }
+    const fired = activateDeadlineCrunch();
+    if (fired) {
+      this.hud?.showAlert('Deadline Crunch — Stagiairs +50% snelheid (30s)', 'info');
+      audioManager.playSound('click');
+    } else {
+      this.hud?.showAlert('Deadline Crunch nog op cooldown', 'warning');
     }
   }
 
@@ -2616,6 +2667,35 @@ export class Game {
       });
     }
 
+    // Havermoutmelkbar (Randstad TertiaryResource) — Sprint Mode + Deadline Crunch click-actions.
+    if (buildingType === BuildingTypeId.TertiaryResourceBuilding
+        && this.playerFactionId === FactionId.Randstad
+        && Building.complete[eid] === 1) {
+      const sprint = getSprintModeState();
+      let sprintLabel = `Sprint Mode (${SPRINT_MODE_COST}h)`;
+      if (sprint.active) sprintLabel = `Sprint Mode actief (${Math.ceil(sprint.remaining)}s)`;
+      else if (!isSprintModeReady()) sprintLabel = `Sprint Mode cd (${Math.ceil(sprint.cooldown)}s)`;
+      actions.push({
+        action: 'activate-sprint-mode',
+        icon: 'SPR',
+        label: sprintLabel,
+        hotkey: 'T',
+        iconClass: 'btn-icon--research',
+      });
+
+      const crunch = getDeadlineCrunchState();
+      let crunchLabel = `Deadline Crunch (${DEADLINE_CRUNCH_COST}h)`;
+      if (crunch.active) crunchLabel = `Crunch actief (${Math.ceil(crunch.remaining)}s)`;
+      else if (!isDeadlineCrunchReady()) crunchLabel = `Crunch cd (${Math.ceil(crunch.cooldown)}s)`;
+      actions.push({
+        action: 'activate-deadline-crunch',
+        icon: 'DDL',
+        label: crunchLabel,
+        hotkey: 'Y',
+        iconClass: 'btn-icon--research',
+      });
+    }
+
     return {
       id: eid,
       name: buildingName,
@@ -3787,6 +3867,7 @@ export class Game {
     resetAbilitySystem();
     resetHeroSystem();
     resetBureaucracy();
+    resetHavermoutmelkBuffs();
     resetDiplomacy();
 
     // Stop music system

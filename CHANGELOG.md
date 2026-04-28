@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.37.39] - 2026-04-28 — Bug #1a: Randstad Havermoutmelkbar — 3 concurrent functies + naming consistency
+
+### Added — `HavermoutmelkSystem.ts`
+Randstad TertiaryResource (Havermoutmelkbar) krijgt drie functies, allemaal alleen actief voor FactionId.Randstad. Per `feedback_v1_perfection_multi_function.md`: voor v1.0 kiezen we voor diepgang ipv minimal-change.
+
+- **Sprint Mode** (click-action) — 30 havermoutmelk → 60s window: +20% gather rate (alle Randstad gatherers) en +20% production speed (alle Randstad gebouwen). 90s cooldown. Stapelt multiplicatief met Boardroom (Bundle 3): 1.20 × 1.50 = 1.80x speed kortstondig haalbaar. Hotkey T.
+- **Deadline Crunch** (click-action) — 50 havermoutmelk → 30s window: +50% movement speed voor Randstad workers (Stagiairs, niet Barista's — namen-correctie). 90s cooldown. Hotkey Y.
+- **Stagiairsleger** (passive) — per 100 havermoutmelk in voorraad krijgen Randstad gatherers +5% gather rate, cap +25% (op 500+ voorraad). Multiplicatief met Sprint Mode: 1.20 × 1.25 = 1.50 max.
+
+### Changed — system integration
+- **`GatherSystem.ts:harvest`** — `effectiveRate *= getRandstadGatherMult(factionId)` (Sprint × Stagiairsleger combined).
+- **`ProductionSystem.ts:processBuilding`** — extra `sprintMod` factor naast bureaucracy/ceo/aiOpt/boardroom.
+- **`MovementSystem.ts`** — workers (`IsWorker` tag): `effectiveSpeed *= getDeadlineCrunchSpeedMult(factionId)`.
+- **`SystemPipeline.ts`** — `HavermoutmelkSystem` toegevoegd in faction-phase (4.805) na BureaucracySystem en vóór UndergroundSystem.
+- **`Game.ts`** — building-card actions voor Havermoutmelkbar (Sprint Mode + Deadline Crunch buttons). HUD.BuildingAction-type uitgebreid.
+
+### Fixed — Randstad naming consistency
+- **`factionData.ts:1661-1663`** Randstad wood-upgrade overrides hernoemd: "Latte Capacity" → "Grotere Laptoptas", "Cold Brew Bonus" → "Powerpoint Pro", "Caffeine Kick" → "Sprint Velocity". Plus alle "Barista's" referenties → "Stagiairs". Live-namen waren al "Stagiair" (worker), upgrade-flavour was nog koffie-thema. Per `feedback_randstad_stagiair_naming.md`.
+
+### Added — tests (+21)
+- **`tests/HavermoutmelkSystem.test.ts`** dekt:
+  - Sprint Mode: ready-state, gating op cost+cooldown, activation+cost-spend, expiration timer, production-mod isolation per factie.
+  - Deadline Crunch: ready-state, cost-gating, +50% worker speed Randstad-only, expire+cooldown reactivation.
+  - Stagiairsleger: 0/100/200/250 voorraad → 0/1/2/2 stacks, cap op MAX_STACKS, voorraad-derived (spending verlaagt direct).
+  - Combined: 1.0 baseline, voorraad-only 1.10, full-stack Sprint 1.50, exact SPRINT_GATHER_MULT na cost-spend zonder bonus.
+  - Reset: resetHavermoutmelkBuffs zeroes alles.
+
+### Backlog
+- `.claude/plans/BACKLOG.md` aangevuld met "🌟 v1.0 PERFECTIE — multi-functie audit per gebouw" sectie. Per gebouw status (✅ /⚠️ /🚫) en concrete kandidaten per factie. Geschat 6-8 toekomstige bundels voor volledige multi-functie roll-out.
+
+### Notes
+- Test-suite: 1261 → 1282 (+21).
+- Namen-correctie cascade: bestaande `LumberCampUpgrades.test.ts:282` aangepast van "Latte Capacity" → "Grotere Laptoptas".
+
 ## [0.37.38] - 2026-04-28 — Bug #3: end-match "Verzameld" stat tracking
 
 ### Fixed

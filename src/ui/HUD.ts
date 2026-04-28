@@ -67,6 +67,8 @@ export type CommandAction =
   | 'hero-ability-q' | 'hero-ability-w' | 'hero-ability-e'
   | 'research-upgrade'
   | 'activate-boardroom'
+  | 'activate-sprint-mode'
+  | 'activate-deadline-crunch'
   | 'cancel-queue';
 
 export interface SelectedUnit {

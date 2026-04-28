@@ -30,6 +30,7 @@ import {
   DIMINISHING_RETURNS_THRESHOLD,
   DIMINISHING_RETURNS_GATHER_MULT,
 } from '../types/index';
+import { getRandstadGatherMult } from './HavermoutmelkSystem';
 import type { GameWorld } from '../ecs/world';
 
 // Gather states (matches Gatherer.state u8 values)
@@ -121,6 +122,8 @@ function processGathering(world: GameWorld, eid: number, dt: number): void {
   // Per-worker gather-rate multiplier from upgrades (defensive: 0 → 1 fallback for legacy entities).
   const speedMult = Gatherer.gatherSpeedMult[eid];
   if (speedMult > 0) effectiveRate *= speedMult;
+  // Randstad-only: Sprint Mode buff (click-action) × Stagiairsleger passive (voorraad-based).
+  effectiveRate *= getRandstadGatherMult(Faction.id[eid]);
   const harvestAmount = effectiveRate * dt;
   const baseCapacity = Gatherer.carryCapacity[eid] || CARRY_CAPACITY;
   const capacity = baseCapacity + (Gatherer.carryBonus[eid] || 0);

@@ -1,6 +1,6 @@
 {
   "name": "reign-of-brabant",
-  "version": "0.37.38",
+  "version": "0.37.39",
   "private": true,
   "type": "module",
   "description": "Browser-based 3D RTS set in medieval Brabant -- Three.js, TypeScript, bitECS",

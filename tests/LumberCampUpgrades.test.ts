@@ -279,9 +279,9 @@ describe('LumberCamp wood-upgrades — per-faction display naming', () => {
       .toBe('Stevigere Manden');
   });
 
-  it('Randstad WoodCarry1 → "Latte Capacity"', () => {
+  it('Randstad WoodCarry1 → "Grotere Laptoptas"', () => {
     expect(getDisplayUpgradeName(ExtendedFactionId.Randstad, UpgradeId.WoodCarry1).name)
-      .toBe('Latte Capacity');
+      .toBe('Grotere Laptoptas');
   });
 
   it('Limburgers WoodGather → "Snellere Oven"', () => {

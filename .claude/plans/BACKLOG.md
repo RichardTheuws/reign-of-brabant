@@ -8,6 +8,36 @@ Bij oppakken: subject + commit-SHA invullen onder "Resolved".
 
 ---
 
+## 🌟 v1.0 PERFECTIE — multi-functie audit per gebouw
+
+Per `feedback_v1_perfection_multi_function.md`: voor v1.0 streven we naar **2-3 functies per "specialty"-gebouw** (TertiaryResource / UpgradeBuilding / FactionSpecial1+2). Niet alleen één click-action of passive, maar een combinatie. Status na v0.37.39:
+
+### TertiaryResource (4 gebouwen)
+- ✅ **Randstad Havermoutmelkbar** — Sprint Mode (click), Deadline Crunch (click), Stagiairsleger (passive). v0.37.39.
+- ⚠️ **Limburg Mijnschacht** — heeft Kolen-generation + UndergroundSystem tunnels, maar **geen click-action** voor strategische play. Kandidaten: "Ploegendienst" (kost 30 kolen → +50% mining speed 60s) + "Drukvuur" (kost 50 kolen → tunnel opens 50% sneller voor 30s).
+- ⚠️ **Belgen Chocolaterie** — chocolade-generation + DiplomacySystem persuasion. **Geen passive bonus**. Kandidaat: "Pralines voor Iedereen" (per 100 chocolade in voorraad = +5% diplomacy-effectiviteit, cap +25%).
+- 🚫 **Brabant Worstenbroodjeskraam** — archetype ontbreekt nog (Bundel 4A pending). Plan: passive +0.5 Gezelligheid/sec + click-action "Carnavalsmaal" (massa Gezelligheid burst).
+
+### UpgradeBuilding (4 gebouwen) — alle 4 hebben research, maar geen click-acties of unique passives
+- ⚠️ **Brabant Wagenbouwer** — research-panel + T3 gate. Kandidaat: "Carnaval-prep" passive (terwijl gebouwd = +5% Gezelligheid-generation rondom).
+- ⚠️ **Randstad Innovatie Lab** — research + T3 gate. Kandidaat: "OneDrive Sync" passive (alle Randstad gebouwen +5% efficiency stack-cap zolang Lab leeft).
+- ⚠️ **Limburg Hoogoven** — research + T3 gate. Kandidaat: "Kolenrook" passive (binnen 10u rondom: +1 armor voor Limburg-units).
+- ⚠️ **Belgen Diamantslijperij** — research + T3 gate. Kandidaat: "Geslepen Wapens" passive (Belgen-units in 8u radius: +5% crit chance).
+
+### FactionSpecial1 (4 gebouwen) — Bundle 3 reeds 1 functie elk
+- ✅ **Brabant Carnavalstent** — +20% damage aura. Kandidaat tweede: click-action "Carnavalsoptocht" (kost Gezelligheid → 30s alle units +20% movement).
+- ✅ **Randstad Boardroom** — Kwartaalcijfers click (+50% production 30s). Kandidaat passive: per Boardroom +1 efficiency-stack-cap.
+- ✅ **Limburg Vlaaiwinkel** — heal aura. Kandidaat tweede: click-action "Limburgse Trakteerronde" (kost 100 kolen → 60s passive heal-rate +100%).
+- ✅ **Belgen Diplomatiek Salon** — diplomats/persuasion. Kandidaat passive: per Salon -10% gold-cost voor diplomatie-acties.
+
+### FactionSpecial2 (4 gebouwen) — produceren Heavy/Hero, geen unique mechanics
+- ⚠️ Alle 4: kandidaat — passive "Gewricht-uitstraling" (+1 sight range voor alle units in faction).
+- Of unieke per factie afgestemde click-actions ("Gemobiliseerd!" / "Opening Bid" / "Steenhouwersfeest" / "Diplomatieke Spil").
+
+**Werkvolgorde**: per bundel 1-2 gebouwen oppakken (multi-functie audit + impl + tests). Geschat 6-8 toekomstige bundels om dit volledig af te ronden voor v1.0.
+
+---
+
 ## 🔴 P0 / P1 — game-breakers of wrong-state bugs
 
 ### Chocolaterie heeft verkeerde `typeId` — genereert geen Chocolade
