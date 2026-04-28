@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.37.38] - 2026-04-28 — Bug #3: end-match "Verzameld" stat tracking
+
+### Fixed
+- **Game.stats.resourcesGathered** werd geïnitialiseerd op 0 maar nooit geïncrementeerd → victory screen toonde altijd "Goud 0" ongeacht hoeveel grondstoffen verzameld waren (live-bug Richard 2026-04-28 na 9:54 Randstad-skirmish-win).
+- **`PlayerState`** — toegevoegd: `goldGathered` + `woodGathered` cumulative counters per factie + `recordGoldGathered` / `recordWoodGathered` API + `getGoldGathered` / `getWoodGathered` getters.
+- **`GatherSystem.depositSystem`** — gebruikt nu `recordGoldGathered`/`recordWoodGathered` ipv `addGold`/`addWood` zodat refunds (CommandSystem cancel-build) en mission-grants (Game.startMission) NIET ten onrechte als "verzameld" tellen.
+- **`Game.endMatch`** — leest nu `playerState.getGoldGathered + getWoodGathered` ipv het stale `stats.resourcesGathered` veld.
+- **`play/index.html`** — stat-row label hernoemd "Goud" → "Verzameld" (de stat is gold + wood combined; "Goud" was misleidend).
+
+### Added — tests (+7)
+- **`tests/GatherSystem-stat-tracking.test.ts`** — gold-deposit increments goldGathered (niet woodGathered), wood-deposit andersom, accumulatie over meerdere drop-offs, refund-via-addGold telt NIET, per-factie isolatie, reset() zeroes.
+
+### Notes
+- Test-suite: 1254 → 1261 (+7).
+- Geen behaviour-change voor save/load (alleen nieuwe runtime-velden, default 0).
+
 ## [0.37.37] - 2026-04-28 — Bug #2: building labels via factionData single source of truth
 
 ### Fixed

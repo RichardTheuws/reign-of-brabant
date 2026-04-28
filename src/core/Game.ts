@@ -3491,7 +3491,9 @@ export class Game {
         enemiesKilled: this.stats.enemiesKilled,
         buildingsBuilt: this.stats.buildingsBuilt,
         buildingsDestroyed: 0,
-        resourcesGathered: this.stats.resourcesGathered,
+        resourcesGathered:
+          this.playerState.getGoldGathered(this.playerFactionId) +
+          this.playerState.getWoodGathered(this.playerFactionId),
       });
     }
   }

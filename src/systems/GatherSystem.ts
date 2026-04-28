@@ -168,9 +168,9 @@ function processReturning(world: GameWorld, eid: number): void {
     // Deposit resources
     const amount = Math.floor(Gatherer.carrying[eid]);
     if (resType === ResourceType.Wood) {
-      playerState.addWood(factionId, amount);
+      playerState.recordWoodGathered(factionId, amount);
     } else {
-      playerState.addGold(factionId, amount);
+      playerState.recordGoldGathered(factionId, amount);
     }
     Gatherer.carrying[eid] = 0;
 

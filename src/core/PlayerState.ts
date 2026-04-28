@@ -30,6 +30,10 @@ interface PlayerData {
   militaryCount: number;
   /** Whether this player is in upkeep debt (gold=0, has military units). */
   upkeepDebt: boolean;
+  /** Cumulative gold deposited by gatherers (excludes mission/refund grants). For end-match stats. */
+  goldGathered: number;
+  /** Cumulative wood deposited by gatherers. For end-match stats. */
+  woodGathered: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -52,7 +56,7 @@ class PlayerStateManager {
   reset(playerCount: number = 4): void {
     this.players = [];
     for (let i = 0; i < playerCount; i++) {
-      this.players.push({ gold: 100, wood: 0, populationCurrent: 0, populationMax: 10, gezelligheid: 0, tertiary: 0, efficiencyStacks: 0, militaryCount: 0, upkeepDebt: false });
+      this.players.push({ gold: 100, wood: 0, populationCurrent: 0, populationMax: 10, gezelligheid: 0, tertiary: 0, efficiencyStacks: 0, militaryCount: 0, upkeepDebt: false, goldGathered: 0, woodGathered: 0 });
     }
   }
 
@@ -106,6 +110,36 @@ class PlayerStateManager {
   /** Get current wood for a player. */
   getWood(factionId: number): number {
     return this.players[factionId].wood;
+  }
+
+  // -------------------------------------------------------------------------
+  // Gathered totals (cumulative, end-match stats)
+  // -------------------------------------------------------------------------
+
+  /**
+   * Record a successful gold deposit by a gatherer. Adds gold to the player
+   * AND increments the cumulative-gathered counter. Use this from GatherSystem
+   * instead of `addGold` so refunds/grants don't pollute the stats.
+   */
+  recordGoldGathered(factionId: number, amount: number): void {
+    this.players[factionId].gold += amount;
+    this.players[factionId].goldGathered += amount;
+  }
+
+  /** Record a successful wood deposit by a gatherer. */
+  recordWoodGathered(factionId: number, amount: number): void {
+    this.players[factionId].wood += amount;
+    this.players[factionId].woodGathered += amount;
+  }
+
+  /** Cumulative gold gathered by a player since match start. */
+  getGoldGathered(factionId: number): number {
+    return this.players[factionId].goldGathered;
+  }
+
+  /** Cumulative wood gathered by a player since match start. */
+  getWoodGathered(factionId: number): number {
+    return this.players[factionId].woodGathered;
   }
 
   // -------------------------------------------------------------------------
