@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.40.0] - 2026-04-28 — v1.0 perfectie milestone: UpgradeBuilding passives × 4 + versioning-policy + updates-page sync
+
+### Versioning policy reset
+Vóór deze release: alles op patch-counter (0.37.0 → 0.37.41) inclusief grote feature-bundels. Vanaf nu strikt SemVer:
+- **MINOR** voor features / nieuwe gameplay-mechanieken / bundel-werk.
+- **PATCH** alleen voor pure bug-fixes.
+- **MAJOR** voor v1.0 / breaking changes / save-format wijzigingen.
+
+Per `feedback_versioning_policy.md`. v0.37.41 had MINOR moeten zijn — vandaar de jump naar v0.40.0 als duidelijke milestone-marker (0.38 en 0.39 overgeslagen om de verandering visueel te markeren).
+
+### Added — `UpgradeBuildingPassivesSystem.ts` (4 passieve auras, één per factie)
+Per v1.0 perfectie regel (`feedback_v1_perfection_multi_function`): elk specialty-gebouw heeft 2-3 functies. UpgradeBuildings hadden alleen "research panel + T3 gate" — deze release voegt een unieke passieve aura per factie toe.
+
+| Factie | Naam | Effect |
+|--------|------|--------|
+| Brabant | **Wagenbouwerij** | Per actieve Wagenbouwer: +0.3 Gezelligheid/sec direct in voorraad. |
+| Randstad | **Innovatie Boost** | Per actief Innovatie Lab: alle Randstad units +5% movement speed (gestapeld, cap +20%). |
+| Limburg | **Kolenrook** | Limburg units binnen 10u radius van een Hoogoven: +1 armor (gestapeld, cap +3). |
+| Belgen | **Geslepen Wapens** | Belgen units binnen 8u radius van een Diamantslijperij: +5% crit chance (gestapeld, cap +15%). 10× crit-multiplier. Stapelt met Diamantgloeiende-research. |
+
+### Changed — system integration
+- **`SystemPipeline.ts`** — `UpgradeBuildingPassivesSystem` toegevoegd in faction-phase (4.807) na WorstenbroodjeskraamSystem. Caches counts + posities elke 1.0s.
+- **`MovementSystem.ts`** — `effectiveSpeed *= getInnovatieBoostSpeedMult(factionId)` (Randstad-only).
+- **`CombatSystem.ts`** — `targetArmor` in beide combat-paths (idle-attack + hold-position) bevat nu `getKolenrookArmorAt(...)`. Nieuwe `tryGeslepenWapensCrit(eid, dmg, target)` na Diamantgloeiende-crit.
+- **`Game.ts`** — `resetUpgradeBuildingPassives()` aangeroepen in `endMatch()`.
+
+### Added — tests (+22)
+- **`tests/UpgradeBuildingPassivesSystem.test.ts`** dekt: per factie aparte describe-block met cache-correctness, scaling-linear, cap-clamp, radius-edge cases, factie-isolation, throttle-gedrag, reset.
+
+### Updated — public/updates/index.html
+- 7 nieuwe entries (v0.37.36 t/m v0.40.0) toegevoegd via Asset Generator-loze general-purpose agent. Inclusief model-viewer cards voor de Bundle 5 + 4A meshes.
+- **Pre-existing CSS-issue gesignaleerd**: `tag--ui` wordt in oudere entries (v0.37.34/33) gebruikt maar is niet in de CSS-block gedefinieerd → silent no-style. Niet gefixt deze patch (out of scope).
+
+### Notes
+- Test-suite: 1477 → 1499 (+22).
+- Geen save-format changes — runtime-only nieuwe systeem-state, default 0.
+
 ## [0.37.41] - 2026-04-28 — Bundel 4 finale: Worstenbroodjeskraam GLB + per-gebouw smoke UAT (4B) + mesh-audit Resolved (4C)
 
 ### Added — 12e Meshy v6 GLB (asset-generator agent, parallel run)

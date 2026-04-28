@@ -12,6 +12,7 @@ import { playerState } from '../core/PlayerState';
 import { UPKEEP_DEBT_EFFECTIVENESS, ROAD_SPEED_BONUS } from '../types/index';
 import { getDeadlineCrunchSpeedMult } from './HavermoutmelkSystem';
 import { getTrakteerrondeSpeedMult } from './WorstenbroodjeskraamSystem';
+import { getInnovatieBoostSpeedMult } from './UpgradeBuildingPassivesSystem';
 import type { Terrain } from '../world/Terrain';
 import type { GameWorld } from '../ecs/world';
 
@@ -71,6 +72,9 @@ export function createMovementSystem(terrain: Terrain) {
 
       // Trakteerronde (Brabant Worstenbroodjeskraam click-action) — all Brabant units.
       effectiveSpeed *= getTrakteerrondeSpeedMult(Faction.id[eid]);
+
+      // Innovatie Boost (Randstad UpgradeBuilding passive) — per Lab +5%, cap +20%.
+      effectiveSpeed *= getInnovatieBoostSpeedMult(Faction.id[eid]);
       const stepX = _dx * _invDist * effectiveSpeed * dt;
       const stepZ = _dz * _invDist * effectiveSpeed * dt;
 

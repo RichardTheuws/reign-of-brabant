@@ -476,6 +476,293 @@
     <div class="content">
         <div class="timeline">
 
+            <!-- ── v0.40.0 (v1.0 perfectie milestone — UpgradeBuilding passives × 4) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.40.0</span>
+                        <span class="update__date">28 april 2026 — vandaag live</span>
+                        <h2 class="update__title">v1.0 perfectie milestone: vier UpgradeBuilding passives — eindelijk identiteit per factie ook ná Tier 3</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Feature</span>
+                            <span class="tag tag--gameplay">Gameplay</span>
+                            <span class="tag tag--feat">Milestone</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">UpgradeBuildings stonden er sinds v0.37.26 voornamelijk als research-gate voor Tier 3. Nu krijgen ze ook elk een eigen passive — vier compleet verschillende mechanieken die de gameplay-identiteit van iedere factie verlengen tot in de late game. Eerste release onder het herziene versioning-beleid: <strong>MINOR voor features, PATCH voor bugfixes</strong> — vandaar de sprong van 0.37.x naar 0.40.0.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">VIER UPGRADEBUILDING PASSIVES</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Wagenbouwerij (Brabant)</strong> — Extra Gezelligheid-flux per actieve Wagenbouwer. Versterkt de Brabant-loop: meer Gezelligheid → meer Worstenbroodjeskraam-buffs → meer momentum. Schaalt mee met aantal voltooide UpgradeBuildings.</li>
+                            <li><strong>Innovatie Boost (Randstad)</strong> — Randstad units krijgen +5% movement speed per actief Innovatie Lab, met cap op +20% (= 4 labs). Stapelt vanaf de speedboost in Boardroom (v0.37.35) en Sprint Mode (v0.37.39) — een gefocuste Randstad krijgt nu echt het tempo van een corporate raid.</li>
+                            <li><strong>Kolenrook (Limburg)</strong> — Limburg units in 10u radius rond een Hoogoven krijgen +1 armor (gestapeld, cap +3). Versterkt het defensieve heal-pulse-archetype uit Bundel 3: turtling-Limburg is nu echt taai van skirmish tot endgame.</li>
+                            <li><strong>Geslepen Wapens (Belgen)</strong> — Belgen units in 8u radius rond een Diamantslijperij krijgen +5% crit chance (gestapeld, cap +15%). Ondersteunt de Diamantgloeiende-Wapens upgrade uit Bundel 2A — Belgen zijn nu een burst-damage factie pur sang.</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">UPGRADEBUILDING 3D — VIER FACTIES</h3>
+                        <div class="update__media">
+                            <div class="media-item">
+                                <model-viewer
+                                    src="/assets/models/v02/brabanders/upgrade.glb"
+                                    alt="Brabanders Wagenbouwerij"
+                                    auto-rotate camera-controls touch-action="pan-y"
+                                    style="width:100%; height:220px; border-radius:8px; border:1px solid var(--border); background: var(--bg-card);">
+                                </model-viewer>
+                                <p class="media-item__caption">Wagenbouwerij — Brabant Gezelligheid-flux</p>
+                            </div>
+                            <div class="media-item">
+                                <model-viewer
+                                    src="/assets/models/v02/randstad/upgrade.glb"
+                                    alt="Randstad Innovatie Lab"
+                                    auto-rotate camera-controls touch-action="pan-y"
+                                    style="width:100%; height:220px; border-radius:8px; border:1px solid var(--border); background: var(--bg-card);">
+                                </model-viewer>
+                                <p class="media-item__caption">Innovatie Lab — Randstad +5% movement</p>
+                            </div>
+                            <div class="media-item">
+                                <model-viewer
+                                    src="/assets/models/v02/limburgers/upgrade.glb"
+                                    alt="Limburgers Hoogoven"
+                                    auto-rotate camera-controls touch-action="pan-y"
+                                    style="width:100%; height:220px; border-radius:8px; border:1px solid var(--border); background: var(--bg-card);">
+                                </model-viewer>
+                                <p class="media-item__caption">Hoogoven — Limburg +1 armor aura</p>
+                            </div>
+                            <div class="media-item">
+                                <model-viewer
+                                    src="/assets/models/v02/belgen/upgrade.glb"
+                                    alt="Belgen Diamantslijperij"
+                                    auto-rotate camera-controls touch-action="pan-y"
+                                    style="width:100%; height:220px; border-radius:8px; border:1px solid var(--border); background: var(--bg-card);">
+                                </model-viewer>
+                                <p class="media-item__caption">Diamantslijperij — Belgen +5% crit aura</p>
+                            </div>
+                        </div>
+
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--space-md);">Versioning beleid herzien: vanaf nu <strong>MINOR voor features, PATCH voor bug-fixes</strong>. Daarmee dekt 0.40.0 alles wat in 0.37.30-41 als feature-bundels achter PATCH-bumps zat. v1.0-pad is daarmee schoner gemarkeerd: 0.40.0 → 0.50.0 → 0.60.0 per feature-milestone.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.37.41 (Bundel 4 finale — 12e Meshy GLB + 4B smoke UAT) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.37.41</span>
+                        <span class="update__date">28 april 2026</span>
+                        <h2 class="update__title">Worstenbroodjeskraam krijgt eigen 3D mesh — 12-GLB visuele dubbele-meshes backlog gesloten</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--visual">Assets</span>
+                            <span class="tag tag--feat">Tests</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Bundel 4 sluit af met de twaalfde unieke Meshy v6 GLB van deze sprint — de Brabant Worstenbroodjeskraam — plus een breedte-test-suite die per-gebouw × per-factie smoke-checks vastlegt. Met deze release is de visuele dubbele-meshes backlog (geërfd uit pre-Bundel 1) volledig opgeruimd.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">WORSTENBROODJESKRAAM 3D</h3>
+                        <div class="update__media">
+                            <div class="media-item">
+                                <model-viewer
+                                    src="/assets/models/v02/brabanders/worstenbroodjeskraam.glb"
+                                    alt="Brabant Worstenbroodjeskraam"
+                                    auto-rotate camera-controls touch-action="pan-y"
+                                    style="width:100%; height:220px; border-radius:8px; border:1px solid var(--border); background: var(--bg-card);">
+                                </model-viewer>
+                                <p class="media-item__caption">Worstenbroodjeskraam — 12e Meshy v6 GLB van deze sprint (7.9 MB)</p>
+                            </div>
+                        </div>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">SMOKE UAT — PER-GEBOUW × PER-FACTIE</h3>
+                        <ul class="update__highlights">
+                            <li><strong>+177 nieuwe smoke tests</strong> — Elke buildable per archetype × elke factie krijgt een minimal-build-and-spawn assertion. Voorkomt dat een toekomstige refactor stilletjes één factie's gebouw breekt zonder dat het in een specifieke unit-test naar boven komt.</li>
+                            <li><strong>Visuele dubbele-meshes backlog → Resolved</strong> — Sinds v0.37.36 (Bundel 5) zijn er 12 unieke Meshy v6 GLBs uitgerold; samen met de eerdere v02-batches deelt geen archetype × factie combinatie meer een mesh met een ander archetype.</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.37.40 (Bundel 4A — Brabant Worstenbroodjeskraam) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.37.40</span>
+                        <span class="update__date">28 april 2026</span>
+                        <h2 class="update__title">Brabant krijgt z'n Worstenbroodjeskraam: heal-aura, trakteerronde en passieve Gezelligheid</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Feature</span>
+                            <span class="tag tag--gameplay">Gameplay</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Brabant had nog geen tertiary-gebouw met eigen identiteit (Gezelligheid is proximity-based, geen X-hotkey). De Worstenbroodjeskraam vult dat gat: drie samenhangende mechanieken die elkaar versterken via Brabant's Gezelligheid-loop.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">WORSTENBROODJESKRAAM — DRIE FUNCTIES</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Archetype Worstenbroodjeskraam</strong> — Tier 2, hotkey X, HP 450, kost 150 goud + 100 hout. Past keurig binnen de bestaande tertiary-pattern (Mijnschacht / Chocolaterie / Havermoutmelkbar) maar met een eigen Brabant-twist.</li>
+                            <li><strong>Passive: +0.5 Gezelligheid/sec per kraam</strong> — Stapelt lineair zonder cap. Geeft de Brabant-economie een betrouwbare flux naast de proximity-based Gezelligheid van workers en buildings.</li>
+                            <li><strong>Trakteerronde click (50 Gezelligheid → 30s buff)</strong> — Brabant units krijgen +20% movement speed gedurende de buff. Eerste echte Gezelligheid-sink in de game; voorheen was het puur een unit-stat-modifier.</li>
+                            <li><strong>Heal-aura</strong> — Brabant units in 8u radius regenereren +0.5 HP/sec. Combineert defensief met de Carnavalstent-aura (Bundel 3) en versterkt de "Brabant = mensen verzorgen" thematiek.</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.37.39 (Bundel 4 deel 1 — Randstad Havermoutmelkbar 3 functies) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.37.39</span>
+                        <span class="update__date">28 april 2026</span>
+                        <h2 class="update__title">Havermoutmelkbar krijgt corporate identity: Sprint Mode, Deadline Crunch en Stagiairsleger</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Feature</span>
+                            <span class="tag tag--gameplay">Gameplay</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">De Havermoutmelkbar (toegevoegd in v0.37.20) was tot nu toe alleen een tertiary-resource pomp. Bundel 4 deel 1 voegt drie corporate-themed mechanieken toe — twee click-actions en één passive — die de Randstad-identiteit visceraal maken: alles draait om sprintjes en stagiairs.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">DRIE FUNCTIES</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Sprint Mode (30 havermoutmelk)</strong> — 60 seconden +20% gather rate én +20% production speed voor alle Randstad-economy. Eerste Randstad-mechaniek die beide kanten van de economie tegelijk boost.</li>
+                            <li><strong>Deadline Crunch (50 havermoutmelk)</strong> — 30 seconden waarin alle Stagiairs +50% movement speed krijgen. Pairing met de Sprint Mode-buff geeft een korte, intense burst van Randstad-tempo.</li>
+                            <li><strong>Stagiairsleger (passive)</strong> — Voor elke 100 havermoutmelk in voorraad: +5% gather rate (gecapt op +25%). Beloont opslag-management — Randstad players moeten kiezen tussen "spend voor click-actions" of "stack voor passive bonus".</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">HAVERMOUTMELKBAR 3D</h3>
+                        <div class="update__media">
+                            <div class="media-item">
+                                <model-viewer
+                                    src="/assets/models/v02/randstad/tertiary.glb"
+                                    alt="Randstad Havermoutmelkbar"
+                                    auto-rotate camera-controls touch-action="pan-y"
+                                    style="width:100%; height:220px; border-radius:8px; border:1px solid var(--border); background: var(--bg-card);">
+                                </model-viewer>
+                                <p class="media-item__caption">Havermoutmelkbar — Randstad tertiary-resource gebouw</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.37.38 (Bug #3 — Verzameld stat tracking) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.37.38</span>
+                        <span class="update__date">28 april 2026</span>
+                        <h2 class="update__title">Victory screen toont eindelijk hoeveel je verzamelde — niet meer "Goud 0" na een 30 minuten game</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--fix">Bugfix</span>
+                            <span class="tag tag--feat">UI</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Bug #3 op de RoB-bugs board: het victory-screen toonde altijd "Goud 0" als verzameld-stat, ook na games waarin de speler honderden gold gespendeerd had. Nu correct: cumulatieve gold + wood gathered over de hele match. Label hernoemd "Goud" → "Verzameld" zodat duidelijk is wát het meet.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">FIX</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Stat-tracking via gather-event bus</strong> — Elke <code>resource-gathered</code> event accumuleert in <code>SessionStats.totalGathered.gold/wood</code>. Voorheen werd de display gevoed door <code>currentResources</code> wat altijd 0 is op victory (alles uitgegeven aan units/gebouwen).</li>
+                            <li><strong>Label hernoemd: "Goud" → "Verzameld"</strong> — Toont nu beide resources duidelijk gescheiden. End-of-match-stats voelen daarmee voor het eerst als een echte sessie-samenvatting.</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.37.37 (Bug #2 — Building labels via factionData) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.37.37</span>
+                        <span class="update__date">28 april 2026</span>
+                        <h2 class="update__title">Carnavalstent toonde "Dorpsweide", Boardroom toonde "Starbucks HQ" — 9 hardcoded labels gefixt</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--fix">Bugfix</span>
+                            <span class="tag tag--infra">Refactor</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Bug #2 op de RoB-bugs board: 9 building-labels in de UI bleven hardcoded mappings tonen die uit sync waren met factionData. Carnavalstent toonde "Dorpsweide", Boardroom toonde "Starbucks HQ", Diplomatiek Salon toonde dubbel "Chocolaterie". Refactor: alle UI-labels routen nu via <code>getDisplayBuildingName(faction, archetype)</code> — single source of truth.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">9 LABEL-MISMATCHES GEFIXT</h3>
+                        <ul class="update__highlights">
+                            <li><strong>FactionSpecial1 buildings</strong> — Carnavalstent (Brabant), Boardroom (Randstad), Vlaaiwinkel (Limburg), Diplomatiek Salon (Belgen) toonden alle vier verkeerde labels in selection-card én bouwmenu. Bundel 3 introduceerde de gebouwen, maar de UI-mappings vergaten mee te bewegen.</li>
+                            <li><strong>UpgradeBuilding labels</strong> — Wagenbouwer / Innovatie Lab / Hoogoven / Diamantslijperij hadden in selection-card de oude generieke "Geavanceerde Smederij" tekst.</li>
+                            <li><strong>Refactor naar single source of truth</strong> — Alle UI-laag callsites geüniformeerd op <code>getDisplayBuildingName</code> / <code>getDisplayUnitName</code> uit <code>factionData</code>. Dezelfde lesson als v0.37.28 — hardcoded UI-mappings zijn verboden, factionData is de bron.</li>
+                        </ul>
+
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--space-md);">Memory-update: <em>"factionData single source of truth"</em> als shared agent-regel. Hardcoded UI-mappings = anti-pattern.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.37.36 (Bundel 5 — 11 dedicated GLBs) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.37.36</span>
+                        <span class="update__date">28 april 2026</span>
+                        <h2 class="update__title">Bundel 5: 11 unieke building-meshes via Meshy v6 — geen visuele dubbele-meshes meer</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--visual">Assets</span>
+                            <span class="tag tag--feat">3D</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Backlog uit Bundel 3: alle FactionSpecial1-gebouwen, UpgradeBuildings en TertiaryResource-gebouwen deelden nog dezelfde GLB-mesh als hun LumberCamp- of Smederij-equivalent. Deze release vervangt 11 van die stand-ins met unieke Meshy v6 image-to-3D meshes — elke factie's identiteit nu ook visueel gelocked van Tier 1 tot Tier 3.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">11 NIEUWE GLBs</h3>
+                        <ul class="update__highlights">
+                            <li><strong>4× TertiaryResource</strong> — Mijnschacht (Limburg), Chocolaterie (Belgen), Havermoutmelkbar (Randstad), Worstenbroodjeskraam volgt in v0.37.41. Elk met eigen silhouette en material-pass.</li>
+                            <li><strong>4× UpgradeBuilding</strong> — Wagenbouwerij, Innovatie Lab, Hoogoven, Diamantslijperij. Eindelijk visueel onderscheid in plaats van de gerecyclede Smederij-mesh.</li>
+                            <li><strong>3× FactionSpecial1</strong> — Carnavalstent (Brabant), Boardroom (Randstad), Vlaaiwinkel (Limburg). Diplomatiek Salon (Belgen) komt in een latere ronde — Meshy gaf nog niet de gewenste salon-vibe.</li>
+                            <li><strong>Pipeline</strong> — Image-to-3D via building-portrait input (Flux Dev RPG card-art van Bundel 2.5). Realistic-only generation, geen preview-stap. Volledige batch in &lt; 25 minuten via parallel calls.</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">HERO MESHES</h3>
+                        <div class="update__media">
+                            <div class="media-item">
+                                <model-viewer
+                                    src="/assets/models/v02/randstad/special1.glb"
+                                    alt="Randstad Boardroom"
+                                    auto-rotate camera-controls touch-action="pan-y"
+                                    style="width:100%; height:220px; border-radius:8px; border:1px solid var(--border); background: var(--bg-card);">
+                                </model-viewer>
+                                <p class="media-item__caption">Boardroom — Randstad FactionSpecial1</p>
+                            </div>
+                            <div class="media-item">
+                                <model-viewer
+                                    src="/assets/models/v02/limburgers/upgrade.glb"
+                                    alt="Limburgers Hoogoven"
+                                    auto-rotate camera-controls touch-action="pan-y"
+                                    style="width:100%; height:220px; border-radius:8px; border:1px solid var(--border); background: var(--bg-card);">
+                                </model-viewer>
+                                <p class="media-item__caption">Hoogoven — Limburg UpgradeBuilding</p>
+                            </div>
+                            <div class="media-item">
+                                <model-viewer
+                                    src="/assets/models/v02/limburgers/special1.glb"
+                                    alt="Limburgers Vlaaiwinkel"
+                                    auto-rotate camera-controls touch-action="pan-y"
+                                    style="width:100%; height:220px; border-radius:8px; border:1px solid var(--border); background: var(--bg-card);">
+                                </model-viewer>
+                                <p class="media-item__caption">Vlaaiwinkel — Limburg FactionSpecial1</p>
+                            </div>
+                            <div class="media-item">
+                                <model-viewer
+                                    src="/assets/models/v02/brabanders/special1.glb"
+                                    alt="Brabanders Carnavalstent"
+                                    auto-rotate camera-controls touch-action="pan-y"
+                                    style="width:100%; height:220px; border-radius:8px; border:1px solid var(--border); background: var(--bg-card);">
+                                </model-viewer>
+                                <p class="media-item__caption">Carnavalstent — Brabant FactionSpecial1</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
             <!-- ── v0.37.35 (Bundel 3 — FactionSpecial1 × 4 facties) ──── -->
             <article class="update">
                 <div class="update__card">

@@ -49,6 +49,7 @@ import { gameConfig } from '../core/GameConfig';
 import { eventBus } from '../core/EventBus';
 import type { GameWorld } from '../ecs/world';
 import { techTreeSystem } from './TechTreeSystem';
+import { getKolenrookArmorAt, getGeslepenCritAt } from './UpgradeBuildingPassivesSystem';
 
 /**
  * Diamantgloeiende Wapens — Belgen UpgradeBuilding research. 5% chance per
@@ -63,6 +64,27 @@ function tryDiamantgloeiendeWapensCrit(attackerEid: number, baseDamage: number, 
   if (!techTreeSystem.isResearched(FactionId.Belgen, UpgradeId.DiamantgloeiendeWapens)) return baseDamage;
   if (Math.random() >= DG_WAPENS_CRIT_CHANCE) return baseDamage;
   const crit = baseDamage * DG_WAPENS_CRIT_MULT;
+  eventBus.emit('combat-crit', { attackerEid, targetEid, damage: crit });
+  return crit;
+}
+
+/**
+ * Geslepen Wapens — Belgen UpgradeBuilding passive (Diamantslijperij aura).
+ * Per Diamantslijperij binnen 8u van de attacker: +5% crit chance, cap +15%.
+ * Crit-multiplier identiek aan Diamantgloeiende (10x).
+ */
+const GW_CRIT_MULT = 10;
+
+function tryGeslepenWapensCrit(attackerEid: number, baseDamage: number, targetEid: number): number {
+  if (Faction.id[attackerEid] !== FactionId.Belgen) return baseDamage;
+  const critChance = getGeslepenCritAt(
+    Faction.id[attackerEid],
+    Position.x[attackerEid],
+    Position.z[attackerEid],
+  );
+  if (critChance <= 0) return baseDamage;
+  if (Math.random() >= critChance) return baseDamage;
+  const crit = baseDamage * GW_CRIT_MULT;
   eventBus.emit('combat-crit', { attackerEid, targetEid, damage: crit });
   return crit;
 }
@@ -181,7 +203,13 @@ function processAttacking(world: GameWorld, eid: number, dt: number): void {
 
   // Fire attack -- apply Gezelligheid bonus to attacker damage and target armor
   let attackerDamage = Attack.damage[eid] * (GezeligheidBonus.attackMult[eid] || 1.0);
-  const targetArmor = Armor.value[targetEid] * (GezeligheidBonus.armorMult[targetEid] || 1.0);
+  // Kolenrook (Limburg UpgradeBuilding passive): +armor for Limburgers within radius of any Hoogoven.
+  const kolenrookArmor = getKolenrookArmorAt(
+    Faction.id[targetEid],
+    Position.x[targetEid],
+    Position.z[targetEid],
+  );
+  const targetArmor = (Armor.value[targetEid] + kolenrookArmor) * (GezeligheidBonus.armorMult[targetEid] || 1.0);
 
   // Siege bonus: multiply damage when attacking buildings
   const isTargetBuilding = hasComponent(world, targetEid, IsBuilding);
@@ -220,6 +248,11 @@ function processAttacking(world: GameWorld, eid: number, dt: number): void {
 
   // Diamantgloeiende Wapens crit (Belgen UpgradeBuilding research)
   effectiveDamage = tryDiamantgloeiendeWapensCrit(eid, effectiveDamage, targetEid);
+
+  // Geslepen Wapens crit (Belgen UpgradeBuilding passive — proximity-based aura).
+  // Stacks with Diamantgloeiende-research: this is an ADDITIONAL roll on the
+  // post-research damage. Cap +15% chance × 10× crit = up to +1.5x EV vs ranged.
+  effectiveDamage = tryGeslepenWapensCrit(eid, effectiveDamage, targetEid);
 
   Health.current[targetEid] -= effectiveDamage;
 
@@ -376,7 +409,13 @@ function processHoldPosition(
           }
 
           let attackerDamage = Attack.damage[eid] * (GezeligheidBonus.attackMult[eid] || 1.0);
-          const targetArmor = Armor.value[currentTarget] * (GezeligheidBonus.armorMult[currentTarget] || 1.0);
+          // Kolenrook (Limburg UpgradeBuilding passive) — proximity armor bonus.
+          const holdKolenrookArmor = getKolenrookArmorAt(
+            Faction.id[currentTarget],
+            Position.x[currentTarget],
+            Position.z[currentTarget],
+          );
+          const targetArmor = (Armor.value[currentTarget] + holdKolenrookArmor) * (GezeligheidBonus.armorMult[currentTarget] || 1.0);
 
           // Siege bonus vs buildings
           const isTargetBldg = hasComponent(world, currentTarget, IsBuilding);
@@ -408,6 +447,8 @@ function processHoldPosition(
 
           // Diamantgloeiende Wapens crit (Belgen UpgradeBuilding research)
           effectiveDamage = tryDiamantgloeiendeWapensCrit(eid, effectiveDamage, currentTarget);
+          // Geslepen Wapens crit (Belgen UpgradeBuilding passive — proximity).
+          effectiveDamage = tryGeslepenWapensCrit(eid, effectiveDamage, currentTarget);
 
           Health.current[currentTarget] = Math.max(0, Health.current[currentTarget] - effectiveDamage);
 

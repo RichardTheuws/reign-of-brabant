@@ -192,6 +192,7 @@ import { createBureaucracySystem } from './BureaucracySystem';
 import { createTertiaryResourceSystem } from './TertiaryResourceSystem';
 import { createHavermoutmelkSystem } from './HavermoutmelkSystem';
 import { createWorstenbroodjeskraamSystem } from './WorstenbroodjeskraamSystem';
+import { createUpgradeBuildingPassivesSystem } from './UpgradeBuildingPassivesSystem';
 import { createUndergroundSystem } from './UndergroundSystem';
 import { createDiplomacySystem } from './DiplomacySystem';
 import { createSeparationSystem } from './SeparationSystem';
@@ -252,6 +253,9 @@ export function createGamePipeline(terrain: Terrain, devMode = false): SystemPip
 
   // Phase 4.806: Worstenbroodjeskraam (Brabant TertiaryResource — passive Gez flux + heal aura + Trakteerronde click)
   pipeline.add('WorstenbroodjeskraamSystem', createWorstenbroodjeskraamSystem(), 'faction');
+
+  // Phase 4.807: UpgradeBuilding passives — caches counts/positions per factie, ticks Brabant Gez bonus
+  pipeline.add('UpgradeBuildingPassivesSystem', createUpgradeBuildingPassivesSystem(), 'faction');
 
   // Phase 4.81: Underground tunnels (Limburgers faction -- needs Kolen from TertiaryResourceSystem)
   pipeline.add('UndergroundSystem', createUndergroundSystem(), 'faction');

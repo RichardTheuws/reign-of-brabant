@@ -51,6 +51,7 @@ import {
   activateTrakteerronde, isTrakteerrondeReady, getTrakteerrondeState,
   TRAKTEERRONDE_COST, resetWorstenbroodjeskraamBuffs,
 } from '../systems/WorstenbroodjeskraamSystem';
+import { resetUpgradeBuildingPassives } from '../systems/UpgradeBuildingPassivesSystem';
 import { resetDiplomacy } from '../systems/DiplomacySystem';
 import { audioManager } from '../audio/AudioManager';
 import { playUnitVoice } from '../audio/UnitVoices';
@@ -3913,6 +3914,7 @@ export class Game {
     resetBureaucracy();
     resetHavermoutmelkBuffs();
     resetWorstenbroodjeskraamBuffs();
+    resetUpgradeBuildingPassives();
     resetDiplomacy();
 
     // Stop music system
