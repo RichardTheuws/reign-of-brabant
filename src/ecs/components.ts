@@ -121,6 +121,8 @@ export const Gatherer = {
   carryCapacity: f32(), // max carry (typically 10)
   resourceType: u8(),   // ResourceType enum
   previousTarget: u32(), // entity id of resource node before combat interrupted (for auto-resume)
+  carryBonus: f32(),    // additive bonus to carryCapacity from upgrades (default 0)
+  gatherSpeedMult: f32(), // multiplicative tick-rate modifier from upgrades (default 1.0 — Float32Array zeros, factory init required)
 };
 
 // ---------------------------------------------------------------------------

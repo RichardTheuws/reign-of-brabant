@@ -102,14 +102,14 @@ export enum BuildingTypeId {
 /**
  * Upgrade identifiers for the tech tree.
  *
- * 0-6: Universal upgrades (backwards compatible).
+ * 0-9: Universal upgrades (backwards compatible).
  * 10-19: Brabanders faction upgrades.
  * 20-29: Randstad faction upgrades.
  * 30-39: Limburgers faction upgrades.
  * 40-49: Belgen faction upgrades.
  */
 export enum UpgradeId {
-  // --- Universal upgrades (0-6, unchanged) ---
+  // --- Universal upgrades (0-9) ---
   MeleeAttack1 = 0,
   MeleeAttack2 = 1,
   RangedAttack1 = 2,
@@ -117,6 +117,12 @@ export enum UpgradeId {
   ArmorUpgrade1 = 4,
   ArmorUpgrade2 = 5,
   MoveSpeed1 = 6,
+  /** Workers carry +5 wood per trip (LumberCamp tier 1). */
+  WoodCarry1 = 7,
+  /** Workers carry another +5 wood per trip — stacks with WoodCarry1. */
+  WoodCarry2 = 8,
+  /** Workers gather wood 25% faster. */
+  WoodGather = 9,
 
   // --- Brabanders faction upgrades (10-19) ---
   /** Increases Gezelligheid generation rate. */

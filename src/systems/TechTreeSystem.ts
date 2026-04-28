@@ -20,6 +20,7 @@ import {
   Armor,
   Movement,
   Building,
+  Gatherer,
 } from '../ecs/components';
 import { IsUnit, IsBuilding, IsDead } from '../ecs/tags';
 import { playerState } from '../core/PlayerState';
@@ -62,6 +63,10 @@ export interface UpgradeDefinition {
   readonly bonusArmor: number;
   /** Multiplicative speed bonus (e.g., 0.10 = +10%). Applied on top of base speed. */
   readonly bonusSpeedFraction: number;
+  /** Additive bonus to Gatherer.carryBonus (workers only). */
+  readonly bonusCarry?: number;
+  /** Multiplicative bonus to Gatherer harvest tick-rate (e.g., 0.25 = +25%). */
+  readonly bonusGatherSpeedFraction?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -159,6 +164,48 @@ export const UPGRADE_DEFINITIONS: readonly UpgradeDefinition[] = [
     bonusDamage: 0,
     bonusArmor: 0,
     bonusSpeedFraction: 0.10,
+  },
+  // UpgradeId.WoodCarry1 = 7
+  {
+    id: UpgradeId.WoodCarry1,
+    name: 'Houtdraagkracht I',
+    description: 'Werkers dragen +5 hout per trip.',
+    cost: { gold: 100 },
+    researchTime: 30,
+    prerequisite: null,
+    affectsUnitTypes: [UnitTypeId.Worker],
+    bonusDamage: 0,
+    bonusArmor: 0,
+    bonusSpeedFraction: 0,
+    bonusCarry: 5,
+  },
+  // UpgradeId.WoodCarry2 = 8
+  {
+    id: UpgradeId.WoodCarry2,
+    name: 'Houtdraagkracht II',
+    description: 'Werkers dragen nog +5 hout per trip (stapelt).',
+    cost: { gold: 175 },
+    researchTime: 45,
+    prerequisite: UpgradeId.WoodCarry1,
+    affectsUnitTypes: [UnitTypeId.Worker],
+    bonusDamage: 0,
+    bonusArmor: 0,
+    bonusSpeedFraction: 0,
+    bonusCarry: 5,
+  },
+  // UpgradeId.WoodGather = 9
+  {
+    id: UpgradeId.WoodGather,
+    name: 'Snelle Kap',
+    description: 'Werkers verzamelen hout 25% sneller.',
+    cost: { gold: 200 },
+    researchTime: 40,
+    prerequisite: null,
+    affectsUnitTypes: [UnitTypeId.Worker],
+    bonusDamage: 0,
+    bonusArmor: 0,
+    bonusSpeedFraction: 0,
+    bonusGatherSpeedFraction: 0.25,
   },
 ];
 
@@ -461,6 +508,13 @@ export class TechTreeSystem {
     }
     if (def.bonusSpeedFraction !== 0) {
       Movement.speed[eid] *= (1 + def.bonusSpeedFraction);
+    }
+    if (def.bonusCarry !== undefined && def.bonusCarry !== 0) {
+      Gatherer.carryBonus[eid] += def.bonusCarry;
+    }
+    if (def.bonusGatherSpeedFraction !== undefined && def.bonusGatherSpeedFraction !== 0) {
+      const current = Gatherer.gatherSpeedMult[eid] || 1;
+      Gatherer.gatherSpeedMult[eid] = current * (1 + def.bonusGatherSpeedFraction);
     }
   }
 

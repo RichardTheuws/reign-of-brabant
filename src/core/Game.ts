@@ -15,7 +15,7 @@ import { IsUnit, IsBuilding, IsResource, IsWorker, IsDead, IsHero } from '../ecs
 import { FactionId, UnitTypeId, BuildingTypeId, HeroTypeId, UpgradeId, ResourceType, MAP_SIZE, MAP_SIZES, RESOURCE_PRESETS, UnitAIState, NO_PRODUCTION, NO_ENTITY, HERO_POPULATION_COST, type UnitArchetype, type MapSizeOption, type ResourcePreset } from '../types/index';
 import { UNIT_ARCHETYPES, RANDSTAD_UNIT_ARCHETYPES, LIMBURGERS_UNIT_ARCHETYPES, BELGEN_UNIT_ARCHETYPES, BUILDING_ARCHETYPES } from '../entities/archetypes';
 import { HERO_ARCHETYPES, getHeroTypesForFaction, getHeroArchetype } from '../entities/heroArchetypes';
-import { getFactionUnitArchetype, getDisplayBuildingName, getDisplayUnitName } from '../data/factionData';
+import { getFactionUnitArchetype, getDisplayBuildingName, getDisplayUnitName, getDisplayUpgradeName } from '../data/factionData';
 import { getPortraitUrl } from '../data/portraitMap';
 import { createHero, isHeroActive } from '../entities/heroFactory';
 import { createGamePipeline, type SystemPipeline } from '../systems/SystemPipeline';
@@ -1977,6 +1977,11 @@ export class Game {
           const cardData = this.buildBuildingCardData(firstEid, buildingType, buildingName, queueItems, true);
           this.hud.showBuildingCard(cardData);
           this.showBlacksmithResearchUI(firstEid);
+        } else if (buildingType === BuildingTypeId.LumberCamp && Building.complete[firstEid] === 1) {
+          // LumberCamp: show building card + wood-upgrade research panel (re-uses Blacksmith DOM mutex).
+          const cardData = this.buildBuildingCardData(firstEid, buildingType, buildingName, queueItems, true);
+          this.hud.showBuildingCard(cardData);
+          this.showLumberCampResearchUI(firstEid);
         } else {
           // Normal production building: show building card with training actions
           const cardData = this.buildBuildingCardData(firstEid, buildingType, buildingName, queueItems, false);
@@ -2522,6 +2527,53 @@ export class Game {
     );
   }
 
+  /**
+   * Show the LumberCamp research UI: 3 wood-upgrade buttons (carry I/II + gather speed),
+   * each with the per-faction display name. Re-uses the Blacksmith panel DOM as a mutex.
+   */
+  private showLumberCampResearchUI(lumberCampEid: number): void {
+    if (!this.hud) return;
+    const factionId = this.playerFactionId;
+    const WOOD_UPGRADE_IDS: UpgradeId[] = [UpgradeId.WoodCarry1, UpgradeId.WoodCarry2, UpgradeId.WoodGather];
+
+    const upgrades = WOOD_UPGRADE_IDS.map(id => {
+      const def = getUpgradeDefinition(id);
+      const display = getDisplayUpgradeName(factionId, id);
+      return {
+        id: def.id as number,
+        name: display.name,
+        description: display.description,
+        costGold: def.cost.gold,
+        canAfford: this.playerState.canAfford(factionId, def.cost.gold),
+        canResearch: techTreeSystem.canResearch(factionId, def.id),
+        isResearched: techTreeSystem.isResearched(factionId, def.id),
+      };
+    });
+
+    const progress = techTreeSystem.getResearchProgress(lumberCampEid, factionId);
+    let researchProgress: { name: string; progress: number; remaining: number } | null = null;
+    if (progress) {
+      const display = getDisplayUpgradeName(factionId, progress.upgradeId);
+      researchProgress = { name: display.name, progress: progress.progress, remaining: progress.remaining };
+    }
+
+    this.hud.showBlacksmithPanel(
+      upgrades,
+      researchProgress,
+      (upgradeId: number) => {
+        const success = techTreeSystem.startResearch(factionId, lumberCampEid, upgradeId as UpgradeId);
+        if (success) {
+          const display = getDisplayUpgradeName(factionId, upgradeId as UpgradeId);
+          this.hud?.showAlert(`Onderzoek gestart: ${display.name}`, 'info');
+          audioManager.playSound('click');
+          this.showLumberCampResearchUI(lumberCampEid);
+        } else {
+          this.hud?.showAlert('Kan onderzoek niet starten!', 'warning');
+        }
+      },
+    );
+  }
+
   update(dt: number): void {
     if (this.gameOver) return;
     this._elapsedTime += dt;
@@ -2974,11 +3026,14 @@ export class Game {
           } else if (hasComponent(world, firstEid, Production)) {
             this.hud.updateProductionQueue(0, '', 0);
           }
-          // Update Blacksmith research progress (refreshes every frame)
-          if (Building.typeId[firstEid] === BuildingTypeId.Blacksmith &&
-              Building.complete[firstEid] === 1 &&
-              Faction.id[firstEid] === this.playerFactionId) {
-            this.showBlacksmithResearchUI(firstEid);
+          // Update Blacksmith / LumberCamp research progress (refreshes every frame)
+          if (Building.complete[firstEid] === 1 && Faction.id[firstEid] === this.playerFactionId) {
+            const tid = Building.typeId[firstEid];
+            if (tid === BuildingTypeId.Blacksmith) {
+              this.showBlacksmithResearchUI(firstEid);
+            } else if (tid === BuildingTypeId.LumberCamp) {
+              this.showLumberCampResearchUI(firstEid);
+            }
           }
         }
       }

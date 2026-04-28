@@ -320,6 +320,13 @@ export class HUD {
   // Bound handlers for cleanup
   private boundHandlers: Array<{ el: HTMLElement | Document; event: string; handler: EventListener }> = [];
 
+  // Delegated click callback for the blacksmith/research panel.
+  // Stored on the instance because showBlacksmithPanel is called every frame
+  // (Game.ts:2981) — per-button addEventListener would race with the
+  // innerHTML='' rebuild between mousedown and mouseup, killing clicks.
+  private blacksmithOnResearch: ((upgradeId: number) => void) | null = null;
+  private blacksmithDelegationBound = false;
+
   // Alert auto-dismiss timers
   private alertTimers: number[] = [];
 
@@ -1022,6 +1029,24 @@ export class HUD {
     const panel = document.getElementById('cmd-blacksmith');
     if (!panel) return;
 
+    // Bind ONE delegated click listener on the panel parent. This survives
+    // per-frame innerHTML rebuilds (only children are wiped, parent stays).
+    this.blacksmithOnResearch = onResearch;
+    if (!this.blacksmithDelegationBound) {
+      const handler = (e: Event) => {
+        const target = e.target as HTMLElement | null;
+        const btn = target?.closest('button[data-research-id]') as HTMLButtonElement | null;
+        if (!btn || btn.disabled) return;
+        const id = Number(btn.dataset.researchId);
+        if (Number.isNaN(id)) return;
+        audioManager.playSound('click');
+        this.blacksmithOnResearch?.(id);
+      };
+      panel.addEventListener('click', handler);
+      this.boundHandlers.push({ el: panel, event: 'click', handler: handler as EventListener });
+      this.blacksmithDelegationBound = true;
+    }
+
     panel.hidden = false;
     panel.innerHTML = '';
 
@@ -1053,6 +1078,7 @@ export class HUD {
         continue;
       }
 
+      btn.dataset.researchId = String(upg.id);
       btn.innerHTML = `
         <span class="btn-icon btn-icon--research"></span>
         <span class="research-name">${this.escapeHtml(upg.name)}</span>
@@ -1065,13 +1091,6 @@ export class HUD {
         else upgIconSpan.textContent = 'UPG';
       }
       btn.title = `${upg.name}\n${upg.description}\nKosten: ${upg.costGold} goud`;
-
-      if (!upg.isResearched && upg.canResearch) {
-        btn.addEventListener('click', () => {
-          audioManager.playSound('click');
-          onResearch(upg.id);
-        });
-      }
 
       panel.appendChild(btn);
     }

@@ -118,8 +118,12 @@ function processGathering(world: GameWorld, eid: number, dt: number): void {
   if (maxAmount > 0 && Resource.amount[targetEid] / maxAmount < DIMINISHING_RETURNS_THRESHOLD) {
     effectiveRate *= DIMINISHING_RETURNS_GATHER_MULT;
   }
+  // Per-worker gather-rate multiplier from upgrades (defensive: 0 → 1 fallback for legacy entities).
+  const speedMult = Gatherer.gatherSpeedMult[eid];
+  if (speedMult > 0) effectiveRate *= speedMult;
   const harvestAmount = effectiveRate * dt;
-  const capacity = Gatherer.carryCapacity[eid] || CARRY_CAPACITY;
+  const baseCapacity = Gatherer.carryCapacity[eid] || CARRY_CAPACITY;
+  const capacity = baseCapacity + (Gatherer.carryBonus[eid] || 0);
   const remaining = capacity - Gatherer.carrying[eid];
   const available = Resource.amount[targetEid];
   const actual = Math.min(harvestAmount, remaining, available);

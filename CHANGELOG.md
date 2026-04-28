@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.37.30] - 2026-04-28 — Bundel 1: Blacksmith click-fix + LumberCamp wood-upgrades
+
+### Fixed (P0, Richard hands-on report v0.37.29)
+- **Blacksmith research-knoppen reageerden niet op clicks.** Root cause: `Game.ts:2981` riep `showBlacksmithResearchUI` elke frame aan zolang een Blacksmith geselecteerd was. Die deed `panel.innerHTML = ''` → buttons + per-button addEventListener werden iedere frame vernietigd en hercreëerd. Browsers fire `'click'` alleen wanneer mousedown + mouseup op hetzelfde DOM-element plaatsvinden — tussendoor was het element al vervangen, dus geen click.
+- **Fix**: event delegation. Eén `'click'` listener op `#cmd-blacksmith` parent (overleeft `innerHTML=''` want parent zelf wordt niet verwijderd), buttons krijgen `data-research-id` attribute, callback wordt in `this.blacksmithOnResearch` instance-var bewaard zodat re-renders de nieuwste callback gebruiken.
+
+### Added (LumberCamp wood-upgrades — 3 universele upgrades + per-factie naming)
+- **3 nieuwe `UpgradeId`** in `src/types/index.ts`:
+  - `WoodCarry1=7` — werkers dragen +5 hout per trip (100g, 30s, geen prereq).
+  - `WoodCarry2=8` — nog +5 hout, stapelt (175g, 45s, vereist WoodCarry1).
+  - `WoodGather=9` — verzamelen 25% sneller (200g, 40s, geen prereq).
+- **`Gatherer` component**: 2 nieuwe Float32Array velden (`carryBonus`, `gatherSpeedMult`). Factories initialiseren `carryBonus=0` en `gatherSpeedMult=1` op alle 3 worker-spawn-paden (Float32Array-zero zou `gatherSpeedMult=0` betekenen → harvest×0 bug; expliciete init + GatherSystem `>0` guard).
+- **`UpgradeDefinition` interface**: 2 optional velden (`bonusCarry?`, `bonusGatherSpeedFraction?`).
+- **`TechTreeSystem.applyUpgradeToEntity`**: 2 nieuwe branches voor carry/gather mods. `affectsUnitTypes=[UnitTypeId.Worker]` guard verzekert non-Workers ongewijzigd blijven.
+- **`GatherSystem.processGathering`**: leest `gatherSpeedMult` voor effective rate, `carryBonus` voor effective capacity.
+- **`getDisplayUpgradeName(factionId, upgradeId)`** in `factionData.ts` — pattern parallel aan `getDisplayBuildingName`. Per-factie overrides 3 upgrades × 4 facties: Brabanders (Stevigere Manden / Volkoren Brood / Snellere Bakker), Randstad (Latte Capacity / Cold Brew Bonus / Caffeine Kick), Limburgers (Grotere Vlaai / Suiker-Boost / Snellere Oven), Belgen (XL Patatzak / Mayo-Reserve / Snel Frituren).
+- **`Game.showLumberCampResearchUI`** + selection-branch + per-frame refresh-branch in `Game.ts`. Hergebruikt `HUD.showBlacksmithPanel` als generieke render (DOM-mutex op `#cmd-blacksmith`).
+
+### Tests (+26, 1059 → 1085)
+- `tests/HUD-blacksmith-panel.test.ts` (+6, jsdom env): click survives per-frame rebuild; latest callback wins; disabled blocks click; locked-research hidden; geen listener-accumulatie.
+- `tests/LumberCampUpgrades.test.ts` (+20): 3 definitions × cost/prereq/effect, 3 cost-deduct + research-started events, 3 retroactive-apply, 1 stacking, 3 new-spawn-inherits, 3 non-Worker-isolation, 4 per-faction naming-locks, 1 double-research guard.
+- Bestaande `TechTreeSystem-research-lifecycle.test.ts`: `UPGRADE_DEFINITIONS.length` aanname 7 → 10.
+
+### Notes
+- HUD.ts staat nu onder jsdom-test → eerste UI-laag coverage in suite.
+- Geen breaking change: `bonusCarry` / `bonusGatherSpeedFraction` zijn optional; bestaande upgrades onaangetast.
+- `cmd-blacksmith` DOM-id wordt nu gedeeld door Blacksmith én LumberCamp panel (mutex via `hideBlacksmithPanel()` op selection-change, al aanwezig op `Game.ts:1973`).
+
 ## [0.37.29] - 2026-04-25 — P1 fix: terrain blanco buitenring op grote skirmish-maps
 
 ### Fixed (P1, gemeld door Richard live op v0.37.28)

@@ -11,11 +11,13 @@
 import {
   UnitTypeId,
   BuildingTypeId,
+  UpgradeId,
   ArmorType,
   MINIMUM_MELEE_RANGE,
   type UnitArchetype,
   type BuildingArchetype,
 } from '../types/index';
+import { getUpgradeDefinition } from '../systems/TechTreeSystem';
 
 // ---------------------------------------------------------------------------
 // Extended Enums -- All unit types across all 4 factions
@@ -1594,6 +1596,48 @@ export function getDisplayBuildingName(
     const fallback = FACTION_BUILDING_NAME_FALLBACKS[factionId]?.[buildingTypeId];
     return fallback ?? 'Gebouw';
   }
+}
+
+/**
+ * Per-faction display overrides for upgrades. Same pattern as
+ * FACTION_BUILDING_NAME_FALLBACKS — flavour names that replace the generic
+ * UPGRADE_DEFINITIONS name/description in HUD output.
+ */
+const FACTION_UPGRADE_NAME_OVERRIDES: Record<number, Partial<Record<UpgradeId, { name: string; description: string }>>> = {
+  [ExtendedFactionId.Brabanders]: {
+    [UpgradeId.WoodCarry1]: { name: 'Stevigere Manden', description: 'Bakkers dragen +5 hout per trip.' },
+    [UpgradeId.WoodCarry2]: { name: 'Volkoren Brood',   description: 'Bakkers dragen nog +5 hout per trip.' },
+    [UpgradeId.WoodGather]: { name: 'Snellere Bakker',  description: 'Bakkers verzamelen 25% sneller.' },
+  },
+  [ExtendedFactionId.Randstad]: {
+    [UpgradeId.WoodCarry1]: { name: 'Latte Capacity',   description: "Barista's dragen +5 hout per trip." },
+    [UpgradeId.WoodCarry2]: { name: 'Cold Brew Bonus',  description: "Barista's dragen nog +5 hout per trip." },
+    [UpgradeId.WoodGather]: { name: 'Caffeine Kick',    description: "Barista's verzamelen 25% sneller." },
+  },
+  [ExtendedFactionId.Limburgers]: {
+    [UpgradeId.WoodCarry1]: { name: 'Grotere Vlaai',    description: 'Vlaaibakkers dragen +5 hout per trip.' },
+    [UpgradeId.WoodCarry2]: { name: 'Suiker-Boost',     description: 'Vlaaibakkers dragen nog +5 hout per trip.' },
+    [UpgradeId.WoodGather]: { name: 'Snellere Oven',    description: 'Vlaaibakkers verzamelen 25% sneller.' },
+  },
+  [ExtendedFactionId.Belgen]: {
+    [UpgradeId.WoodCarry1]: { name: 'XL Patatzak',      description: 'Frietboeren dragen +5 hout per trip.' },
+    [UpgradeId.WoodCarry2]: { name: 'Mayo-Reserve',     description: 'Frietboeren dragen nog +5 hout per trip.' },
+    [UpgradeId.WoodGather]: { name: 'Snel Frituren',    description: 'Frietboeren verzamelen 25% sneller.' },
+  },
+};
+
+/**
+ * Display name + description for an upgrade, with per-faction flavour override.
+ * Falls back to UPGRADE_DEFINITIONS if no faction-specific name is registered.
+ */
+export function getDisplayUpgradeName(
+  factionId: number,
+  upgradeId: UpgradeId,
+): { name: string; description: string } {
+  const override = FACTION_UPGRADE_NAME_OVERRIDES[factionId]?.[upgradeId];
+  if (override) return override;
+  const def = getUpgradeDefinition(upgradeId);
+  return { name: def.name, description: def.description };
 }
 
 /**
