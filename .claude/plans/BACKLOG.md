@@ -49,6 +49,29 @@ Bij oppakken: subject + commit-SHA invullen onder "Resolved".
 
 ---
 
+## 🟡 P2 — kwaliteits / coverage gaten (Bundel 2 sessie)
+
+### TowerSystem sniper-bonus tegen ranged units niet geïmplementeerd
+- **Gevonden**: 2026-04-28 (Bundel 2B-explore)
+- **Bundel-fit**: kleine gameplay-bug, kan in Bundel 5 of latere sweep.
+- **Issue**: plan-spec Bundel 2B noemt "sniper-bonus tegen ranged units" maar `TowerSystem.processAttacking` heeft geen bonus-logic. Range / damage / attack-speed werken wel.
+- **Voorstel**: damage * 1.5 als target heeft `UnitType.id === Ranged`. Of extra range tegen Ranged. Test-lock erbij.
+
+### Housing display-name per factie test gap
+- **Gevonden**: 2026-04-28 (Bundel 2C-explore)
+- **Bundel-fit**: coverage uitbreiding — `tests/display-names-faction-aware.test.ts` mist Housing-specifieke factie-namen (Boerenhoeve / Vinex-wijk / Huuske / Brusselse Woning).
+
+### 3D mouseover-tooltip pattern ontbreekt
+- **Gevonden**: 2026-04-28 (Bundel 2B-explore)
+- **Bundel-fit**: UX polish, future bundle. Raycaster bestaat (per click) maar geen mousemove-tooltip-binding voor 3D buildings.
+- **Voorstel**: throttle 100ms raycaster + DOM tooltip-div met building-info.
+
+### Construction-timer in `Building.status` text
+- **Gevonden**: 2026-04-28 (Bundel 2B-explore)
+- **Bundel-fit**: kleine UX-polish. Status zegt `'Under construction'` maar toont geen "(15s)" remaining-tijd zoals trainings-units doen.
+
+---
+
 ## ✅ Resolved
 
 (leeg — vul in bij oppakken met datum + commit-SHA)

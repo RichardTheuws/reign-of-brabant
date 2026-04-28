@@ -77,8 +77,8 @@ beforeEach(() => {
 // ---------------------------------------------------------------------------
 
 describe('F5-stap 24 — UPGRADE_DEFINITIONS table', () => {
-  it('has the 10 universal upgrades (7 combat/armor/speed + 3 LumberCamp wood)', () => {
-    expect(UPGRADE_DEFINITIONS).toHaveLength(10);
+  it('has 18 upgrade definitions (7 Blacksmith + 3 LumberCamp + 4 T3 universal + 4 faction-unique)', () => {
+    expect(UPGRADE_DEFINITIONS).toHaveLength(18);
   });
 
   it('Zwaardvechten II requires Zwaardvechten I (chain)', () => {

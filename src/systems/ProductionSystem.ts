@@ -40,9 +40,11 @@ import {
   CARRY_CAPACITY,
   MAP_SIZE,
   MINIMUM_MELEE_RANGE,
+  UpgradeId,
 } from '../types/index';
 import { onRandstadActionCompleted } from './BureaucracySystem';
 import { ceoProductionBuff } from './HeroSystem';
+import { techTreeSystem } from './TechTreeSystem';
 import { getFactionUnitArchetype } from '../data/factionData';
 import { createUnit } from '../entities/factories';
 import { gameConfig } from '../core/GameConfig';
@@ -173,7 +175,11 @@ export function createProductionSystem() {
       const ceoBuff = (ceoProductionBuff.active && factionId === FactionId.Randstad)
         ? 0.667
         : 1.0;
-      const effectiveDuration = duration * bureaucracyMod * ceoBuff;
+      // Apply AI Optimization (Randstad UpgradeBuilding research): -20% duration globally for the faction.
+      const aiOptMod = techTreeSystem.isResearched(factionId, UpgradeId.AIOptimization)
+        ? (1 / 1.20)
+        : 1.0;
+      const effectiveDuration = duration * bureaucracyMod * ceoBuff * aiOptMod;
 
       Production.progress[bEid] += dt / effectiveDuration;
 

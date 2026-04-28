@@ -41,11 +41,31 @@ import {
   AI_SCALING_TIER2_TIME,
   AI_SCALING_TIER1_BONUS,
   AI_SCALING_TIER2_BONUS,
+  UpgradeId,
+  FactionId,
 } from '../types/index';
 import { playerState } from '../core/PlayerState';
 import { gameConfig } from '../core/GameConfig';
 import { eventBus } from '../core/EventBus';
 import type { GameWorld } from '../ecs/world';
+import { techTreeSystem } from './TechTreeSystem';
+
+/**
+ * Diamantgloeiende Wapens — Belgen UpgradeBuilding research. 5% chance per
+ * attack of 10x crit. Math.random() follows existing codebase conventions
+ * (Game.ts/ProductionSystem already use it for non-deterministic effects).
+ */
+const DG_WAPENS_CRIT_MULT = 10;
+const DG_WAPENS_CRIT_CHANCE = 0.05;
+
+function tryDiamantgloeiendeWapensCrit(attackerEid: number, baseDamage: number, targetEid: number): number {
+  if (Faction.id[attackerEid] !== FactionId.Belgen) return baseDamage;
+  if (!techTreeSystem.isResearched(FactionId.Belgen, UpgradeId.DiamantgloeiendeWapens)) return baseDamage;
+  if (Math.random() >= DG_WAPENS_CRIT_CHANCE) return baseDamage;
+  const crit = baseDamage * DG_WAPENS_CRIT_MULT;
+  eventBus.emit('combat-crit', { attackerEid, targetEid, damage: crit });
+  return crit;
+}
 
 // ---------------------------------------------------------------------------
 // Damage modifier lookup: AttackType → ArmorType → multiplier
@@ -197,6 +217,9 @@ function processAttacking(world: GameWorld, eid: number, dt: number): void {
     effectiveDamage *= (1 - dmgReduction);
     effectiveDamage = Math.max(MIN_DAMAGE, effectiveDamage);
   }
+
+  // Diamantgloeiende Wapens crit (Belgen UpgradeBuilding research)
+  effectiveDamage = tryDiamantgloeiendeWapensCrit(eid, effectiveDamage, targetEid);
 
   Health.current[targetEid] -= effectiveDamage;
 
@@ -382,6 +405,9 @@ function processHoldPosition(
             effectiveDamage *= (1 - holdDmgRed);
             effectiveDamage = Math.max(MIN_DAMAGE, effectiveDamage);
           }
+
+          // Diamantgloeiende Wapens crit (Belgen UpgradeBuilding research)
+          effectiveDamage = tryDiamantgloeiendeWapensCrit(eid, effectiveDamage, currentTarget);
 
           Health.current[currentTarget] = Math.max(0, Health.current[currentTarget] - effectiveDamage);
 

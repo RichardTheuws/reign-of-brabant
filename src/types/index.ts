@@ -102,11 +102,12 @@ export enum BuildingTypeId {
 /**
  * Upgrade identifiers for the tech tree.
  *
- * 0-9: Universal upgrades (backwards compatible).
+ * 0-9: Universal Tier 1/2 upgrades (Blacksmith / LumberCamp).
  * 10-19: Brabanders faction upgrades.
  * 20-29: Randstad faction upgrades.
  * 30-39: Limburgers faction upgrades.
  * 40-49: Belgen faction upgrades.
+ * 50-59: Universal Tier 3 upgrades (UpgradeBuilding gate).
  */
 export enum UpgradeId {
   // --- Universal upgrades (0-9) ---
@@ -133,6 +134,8 @@ export enum UpgradeId {
   BrabantseVlijt = 12,
   /** Infantry gains bonus damage when grouped. */
   SamenSterk = 13,
+  /** Brabant aura: all units +10% damage in 8u radius around TownHall (UpgradeBuilding gate). */
+  Carnavalsvuur = 14,
 
   // --- Randstad faction upgrades (20-29) ---
   /** Reduces Bureaucracy penalty. */
@@ -143,6 +146,8 @@ export enum UpgradeId {
   PowerPointMastery = 22,
   /** Unlocks the Eindeloze Vergadering ability. */
   VergaderingProtocol = 23,
+  /** Randstad: all buildings produce units 20% faster (UpgradeBuilding gate). */
+  AIOptimization = 24,
 
   // --- Limburgers faction upgrades (30-39) ---
   /** Increases Kolen generation rate. */
@@ -153,6 +158,8 @@ export enum UpgradeId {
   VlaaiMotivatie = 32,
   /** Siege units deal bonus damage to buildings. */
   Mijnbouwexplosief = 33,
+  /** Limburg: Heavy units +3 armor (stacks with universal armor — UpgradeBuilding gate). */
+  Mergelharnas = 34,
 
   // --- Belgen faction upgrades (40-49) ---
   /** Increases Chocolade generation rate. */
@@ -163,6 +170,14 @@ export enum UpgradeId {
   TrappistBrouwerij = 42,
   /** Buildings cost less wood. */
   FritenvetFundering = 43,
+  /** Belgen: 5% chance per attack of 10x crit damage (UpgradeBuilding gate). */
+  DiamantgloeiendeWapens = 44,
+
+  // --- Universal Tier 3 upgrades (50-59, requires UpgradeBuilding) ---
+  MeleeAttack3 = 50,
+  RangedAttack3 = 51,
+  ArmorUpgrade3 = 52,
+  MoveSpeed2 = 53,
 }
 
 /**
@@ -903,6 +918,12 @@ export interface CombatHitEvent {
   readonly z: number;
 }
 
+export interface CombatCritEvent {
+  readonly attackerEid: number;
+  readonly targetEid: number;
+  readonly damage: number;
+}
+
 export interface UnitAbilityUsedEvent {
   readonly eid: number;
   readonly abilityId: string;
@@ -948,6 +969,7 @@ export interface GameEvents {
   'hero-revived': HeroRevivedEvent;
   'hero-ability-used': HeroAbilityUsedEvent;
   'combat-hit': CombatHitEvent;
+  'combat-crit': CombatCritEvent;
   'unit-healed': UnitHealedEvent;
   'unit-ability-used': UnitAbilityUsedEvent;
   'carnavalsrage-activated': CarnavalsrageActivatedEvent;

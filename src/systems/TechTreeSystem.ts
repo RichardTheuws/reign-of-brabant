@@ -67,6 +67,14 @@ export interface UpgradeDefinition {
   readonly bonusCarry?: number;
   /** Multiplicative bonus to Gatherer harvest tick-rate (e.g., 0.25 = +25%). */
   readonly bonusGatherSpeedFraction?: number;
+  /** Requires a complete UpgradeBuilding for the faction (T3 + faction-unique gate). */
+  readonly requiresUpgradeBuilding?: boolean;
+  /** Aura damage-bonus fraction (Carnavalsvuur 0.10 = +10% in radius). */
+  readonly bonusDamageFraction?: number;
+  /** Per-attack crit chance (DG-Wapens 0.05 = 5% chance of 10x damage). */
+  readonly bonusCritChance?: number;
+  /** Production duration multiplier (AI-Opt 0.20 → effective duration *= 1/(1+0.20)). */
+  readonly bonusProductionSpeedFraction?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -207,11 +215,135 @@ export const UPGRADE_DEFINITIONS: readonly UpgradeDefinition[] = [
     bonusSpeedFraction: 0,
     bonusGatherSpeedFraction: 0.25,
   },
+  // ---- Universal Tier 3 (UpgradeBuilding gate) ----
+  // UpgradeId.MeleeAttack3 = 50
+  {
+    id: UpgradeId.MeleeAttack3,
+    name: 'Zwaardvechten III',
+    description: 'Infanterie krijgt nog +3 aanval (vereist UpgradeBuilding).',
+    cost: { gold: 350 },
+    researchTime: 50,
+    prerequisite: UpgradeId.MeleeAttack2,
+    affectsUnitTypes: [UnitTypeId.Infantry],
+    bonusDamage: 3,
+    bonusArmor: 0,
+    bonusSpeedFraction: 0,
+    requiresUpgradeBuilding: true,
+  },
+  // UpgradeId.RangedAttack3 = 51
+  {
+    id: UpgradeId.RangedAttack3,
+    name: 'Boogschieten III',
+    description: 'Afstandstroepen krijgen nog +3 aanval (vereist UpgradeBuilding).',
+    cost: { gold: 350 },
+    researchTime: 50,
+    prerequisite: UpgradeId.RangedAttack2,
+    affectsUnitTypes: [UnitTypeId.Ranged],
+    bonusDamage: 3,
+    bonusArmor: 0,
+    bonusSpeedFraction: 0,
+    requiresUpgradeBuilding: true,
+  },
+  // UpgradeId.ArmorUpgrade3 = 52
+  {
+    id: UpgradeId.ArmorUpgrade3,
+    name: 'Bepantsering III',
+    description: 'Alle eenheden krijgen nog +1 bepantsering (vereist UpgradeBuilding).',
+    cost: { gold: 400 },
+    researchTime: 55,
+    prerequisite: UpgradeId.ArmorUpgrade2,
+    affectsUnitTypes: null,
+    bonusDamage: 0,
+    bonusArmor: 1,
+    bonusSpeedFraction: 0,
+    requiresUpgradeBuilding: true,
+  },
+  // UpgradeId.MoveSpeed2 = 53
+  {
+    id: UpgradeId.MoveSpeed2,
+    name: 'Snelle Mars II',
+    description: 'Alle eenheden bewegen nog 10% sneller (vereist UpgradeBuilding).',
+    cost: { gold: 300 },
+    researchTime: 45,
+    prerequisite: UpgradeId.MoveSpeed1,
+    affectsUnitTypes: null,
+    bonusDamage: 0,
+    bonusArmor: 0,
+    bonusSpeedFraction: 0.10,
+    requiresUpgradeBuilding: true,
+  },
+  // ---- Faction-unique upgrades (UpgradeBuilding gate) ----
+  // UpgradeId.Carnavalsvuur = 14 (Brabant)
+  {
+    id: UpgradeId.Carnavalsvuur,
+    name: 'Carnavalsvuur',
+    description: 'Aura: Brabant-eenheden +10% schade in 8u rond TownHall.',
+    cost: { gold: 500 },
+    researchTime: 60,
+    prerequisite: null,
+    affectsUnitTypes: null,
+    bonusDamage: 0,
+    bonusArmor: 0,
+    bonusSpeedFraction: 0,
+    bonusDamageFraction: 0.10,
+    requiresUpgradeBuilding: true,
+  },
+  // UpgradeId.AIOptimization = 24 (Randstad)
+  {
+    id: UpgradeId.AIOptimization,
+    name: 'AI Optimization',
+    description: 'Alle gebouwen produceren 20% sneller.',
+    cost: { gold: 500 },
+    researchTime: 60,
+    prerequisite: null,
+    affectsUnitTypes: null,
+    bonusDamage: 0,
+    bonusArmor: 0,
+    bonusSpeedFraction: 0,
+    bonusProductionSpeedFraction: 0.20,
+    requiresUpgradeBuilding: true,
+  },
+  // UpgradeId.Mergelharnas = 34 (Limburg)
+  {
+    id: UpgradeId.Mergelharnas,
+    name: 'Mergelharnas',
+    description: 'Zware eenheden krijgen +3 bepantsering (stapelt met universele Bepantsering).',
+    cost: { gold: 500 },
+    researchTime: 60,
+    prerequisite: null,
+    affectsUnitTypes: [UnitTypeId.Heavy],
+    bonusDamage: 0,
+    bonusArmor: 3,
+    bonusSpeedFraction: 0,
+    requiresUpgradeBuilding: true,
+  },
+  // UpgradeId.DiamantgloeiendeWapens = 44 (Belgen)
+  {
+    id: UpgradeId.DiamantgloeiendeWapens,
+    name: 'Diamantgloeiende Wapens',
+    description: 'Belgische eenheden hebben 5% kans op een 10x kritieke treffer.',
+    cost: { gold: 500 },
+    researchTime: 60,
+    prerequisite: null,
+    affectsUnitTypes: null,
+    bonusDamage: 0,
+    bonusArmor: 0,
+    bonusSpeedFraction: 0,
+    bonusCritChance: 0.05,
+    requiresUpgradeBuilding: true,
+  },
 ];
 
-/** Lookup upgrade definition by id. */
+// Map-based lookup avoids sparse-array issues now that UpgradeIds are
+// non-contiguous (10-19/20-29/30-39/40-49 faction ranges + 50-59 T3).
+const UPGRADE_DEFINITION_MAP: ReadonlyMap<UpgradeId, UpgradeDefinition> =
+  new Map(UPGRADE_DEFINITIONS.map(d => [d.id, d]));
+
+/** Lookup upgrade definition by id. Throws if id is unknown. */
 export function getUpgradeDefinition(id: UpgradeId): UpgradeDefinition {
-  return UPGRADE_DEFINITIONS[id];
+  const def = UPGRADE_DEFINITION_MAP.get(id);
+  if (!def) throw new Error(`Unknown UpgradeId: ${id}`);
+  return def;
 }
 
 // ---------------------------------------------------------------------------
@@ -309,15 +441,38 @@ export class TechTreeSystem {
     return this.getFactionState(factionId).completed;
   }
 
-  /** Check if an upgrade's prerequisites are met for a faction. */
-  canResearch(factionId: number, upgradeId: UpgradeId): boolean {
+  /**
+   * Check if an upgrade's prerequisites are met for a faction.
+   *
+   * The optional `world` argument enables T3 / faction-unique gating that
+   * requires a completed UpgradeBuilding. Calls without `world` cannot pass
+   * the gate — by design, so UI without world access fails closed.
+   */
+  canResearch(factionId: number, upgradeId: UpgradeId, world?: GameWorld): boolean {
     const def = getUpgradeDefinition(upgradeId);
     const state = this.getFactionState(factionId);
     // Already researched
     if (state.completed.has(upgradeId)) return false;
     // Check prerequisite
     if (def.prerequisite !== null && !state.completed.has(def.prerequisite)) return false;
+    // UpgradeBuilding gate (T3 + faction-unique)
+    if (def.requiresUpgradeBuilding === true) {
+      if (!world) return false;
+      if (!this.hasCompleteUpgradeBuilding(factionId, world)) return false;
+    }
     return true;
+  }
+
+  private hasCompleteUpgradeBuilding(factionId: number, world: GameWorld): boolean {
+    const buildings = query(world, [Building, Faction, IsBuilding]);
+    for (const eid of buildings) {
+      if (Faction.id[eid] !== factionId) continue;
+      if (hasComponent(world, eid, IsDead)) continue;
+      if (Building.typeId[eid] === BuildingTypeId.UpgradeBuilding && Building.complete[eid] === 1) {
+        return true;
+      }
+    }
+    return false;
   }
 
   // -------------------------------------------------------------------------
@@ -396,7 +551,7 @@ export class TechTreeSystem {
    * Start researching an upgrade at a specific Blacksmith.
    * Returns true if research started successfully.
    */
-  startResearch(factionId: number, blacksmithEid: number, upgradeId: UpgradeId): boolean {
+  startResearch(factionId: number, blacksmithEid: number, upgradeId: UpgradeId, world?: GameWorld): boolean {
     const state = this.getFactionState(factionId);
     const def = getUpgradeDefinition(upgradeId);
 
@@ -405,6 +560,12 @@ export class TechTreeSystem {
 
     // Validate: prerequisites met
     if (def.prerequisite !== null && !state.completed.has(def.prerequisite)) return false;
+
+    // Validate: UpgradeBuilding gate (defense-in-depth — UI also checks via canResearch)
+    if (def.requiresUpgradeBuilding === true) {
+      if (!world) return false;
+      if (!this.hasCompleteUpgradeBuilding(factionId, world)) return false;
+    }
 
     // Validate: Blacksmith not already researching
     if (state.activeResearch.has(blacksmithEid)) return false;

@@ -110,6 +110,16 @@ export interface BuildingCardData {
   portraitAbbrev: string; // Short building type abbreviation (TH, BRK, etc.) -- legacy fallback
   buildingTypeId: number; // BuildingTypeId for canvas-drawn portrait
   actions: BuildingCardAction[];
+  /** Optional combat/role stats (e.g., DefenseTower range/dps/armor). */
+  stats?: BuildingCardStats;
+  /** Optional info-text rendered under status (e.g., Housing population provided). */
+  infoText?: string;
+}
+
+export interface BuildingCardStats {
+  range?: number;  // attack range in units
+  dps?: number;    // damage per second
+  armor?: number;  // building armor value
 }
 
 export interface ProductionQueueItem {
@@ -778,6 +788,9 @@ export class HUD {
     // Status
     this.bcardStatus.textContent = data.status;
 
+    // Optional info-text + stats line (rendered below status)
+    this.renderBuildingCardExtras(data);
+
     // Build action buttons (hide grid + preceding divider when no actions)
     this.bcardActions.innerHTML = '';
     const actionDivider = this.bcardActions.previousElementSibling;
@@ -1120,6 +1133,45 @@ export class HUD {
       btn.title = `${upg.name}\n${upg.description}\nKosten: ${upg.costGold} goud`;
 
       panel.appendChild(btn);
+    }
+  }
+
+  /**
+   * Render optional infoText (Housing) + stats grid (DefenseTower) below the
+   * bcard-status line. The container is created on demand and reset between
+   * card-shows so cards without these fields show no leftover state.
+   */
+  private renderBuildingCardExtras(data: BuildingCardData): void {
+    const status = this.bcardStatus;
+    if (!status) return;
+    let extras = status.parentElement?.querySelector('.bcard-extras') as HTMLElement | null;
+    if (!extras) {
+      extras = document.createElement('div');
+      extras.className = 'bcard-extras';
+      status.parentElement?.insertBefore(extras, status.nextSibling);
+    }
+    extras.innerHTML = '';
+    extras.hidden = !data.infoText && !data.stats;
+    if (data.infoText) {
+      const info = document.createElement('div');
+      info.className = 'bcard-info-text';
+      info.textContent = data.infoText;
+      extras.appendChild(info);
+    }
+    if (data.stats) {
+      const grid = document.createElement('div');
+      grid.className = 'bcard-stats-grid';
+      const fmt = (label: string, value: number | undefined, suffix = '') => {
+        if (value === undefined) return;
+        const cell = document.createElement('span');
+        cell.className = 'bcard-stat';
+        cell.textContent = `${label}: ${Math.round(value * 10) / 10}${suffix}`;
+        grid.appendChild(cell);
+      };
+      fmt('Bereik', data.stats.range, 'u');
+      fmt('DPS', data.stats.dps);
+      fmt('Bepantsering', data.stats.armor);
+      extras.appendChild(grid);
     }
   }
 

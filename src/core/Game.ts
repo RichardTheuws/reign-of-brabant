@@ -31,6 +31,7 @@ import { UnitRenderer } from '../rendering/UnitRenderer';
 import { BuildingRenderer } from '../rendering/BuildingRenderer';
 import { PropRenderer } from '../rendering/PropRenderer';
 import { SelectionRenderer, type SelectionData } from '../rendering/SelectionRenderer';
+import { TowerRangeRenderer } from '../rendering/TowerRangeRenderer';
 import { FogOfWarRenderer } from '../rendering/FogOfWarRenderer';
 import { visionData } from '../systems/VisionSystem';
 import { playerState } from '../core/PlayerState';
@@ -45,6 +46,7 @@ import { resetDiplomacy } from '../systems/DiplomacySystem';
 import { audioManager } from '../audio/AudioManager';
 import { playUnitVoice } from '../audio/UnitVoices';
 import { techTreeSystem, UPGRADE_DEFINITIONS, getUpgradeDefinition } from '../systems/TechTreeSystem';
+import { TOWER_RANGE, TOWER_DAMAGE, TOWER_ATTACK_SPEED } from '../systems/TowerSystem';
 import { validateBuildingPlacement } from '../systems/BuildSystem';
 import { createMusicSystem, type MusicSystem } from '../systems/MusicSystem';
 import { getUpkeepPerTick, resetUpkeepTimers } from '../systems/UpkeepSystem';
@@ -79,6 +81,31 @@ function unitTypeName(unitType: number): 'worker' | 'infantry' | 'ranged' | 'hea
   return 'infantry';
 }
 
+/** UpgradeIds that the Blacksmith hosts (universal T1/T2 combat/armor/speed). */
+const BLACKSMITH_UPGRADE_IDS: ReadonlySet<number> = new Set([
+  UpgradeId.MeleeAttack1, UpgradeId.MeleeAttack2,
+  UpgradeId.RangedAttack1, UpgradeId.RangedAttack2,
+  UpgradeId.ArmorUpgrade1, UpgradeId.ArmorUpgrade2,
+  UpgradeId.MoveSpeed1,
+]);
+
+function isBlacksmithUpgrade(id: number): boolean {
+  return BLACKSMITH_UPGRADE_IDS.has(id);
+}
+
+/** UpgradeIds that the UpgradeBuilding hosts: T3 universal + the faction-unique research. */
+function upgradeBuildingResearchIds(factionId: FactionId): UpgradeId[] {
+  const ids: UpgradeId[] = [
+    UpgradeId.MeleeAttack3, UpgradeId.RangedAttack3,
+    UpgradeId.ArmorUpgrade3, UpgradeId.MoveSpeed2,
+  ];
+  if (factionId === FactionId.Brabanders)  ids.push(UpgradeId.Carnavalsvuur);
+  if (factionId === FactionId.Randstad)    ids.push(UpgradeId.AIOptimization);
+  if (factionId === FactionId.Limburgers)  ids.push(UpgradeId.Mergelharnas);
+  if (factionId === FactionId.Belgen)      ids.push(UpgradeId.DiamantgloeiendeWapens);
+  return ids;
+}
+
 export class Game {
   private scene: THREE.Scene;
   private terrain: Terrain;
@@ -93,6 +120,7 @@ export class Game {
   private buildingRenderer: BuildingRenderer;
   private propRenderer: PropRenderer;
   private selectionRenderer: SelectionRenderer;
+  private towerRangeRenderer: TowerRangeRenderer;
   private fogOfWarRenderer: FogOfWarRenderer;
   private selectedEntities: number[] = [];
   private playerState: typeof playerState;
@@ -198,6 +226,7 @@ export class Game {
     this.buildingRenderer = new BuildingRenderer(buildingGroup);
     this.propRenderer = new PropRenderer(propGroup);
     this.selectionRenderer = new SelectionRenderer(selectionGroup, healthBarGroup);
+    this.towerRangeRenderer = new TowerRangeRenderer(scene);
     this.fogOfWarRenderer = new FogOfWarRenderer();
     scene.add(this.fogOfWarRenderer.mesh);
     this.playerState = playerState;
@@ -965,7 +994,7 @@ export class Game {
 
     for (const def of UPGRADE_DEFINITIONS) {
       const isResearched = techTreeSystem.isResearched(this.playerFactionId, def.id);
-      const canResearch = techTreeSystem.canResearch(this.playerFactionId, def.id);
+      const canResearch = techTreeSystem.canResearch(this.playerFactionId, def.id, world);
 
       // Determine tier based on prerequisites
       let tier = 1;
@@ -1720,6 +1749,15 @@ export class Game {
       this.particles.spawnConstructionDust(event.x, y, event.z);
       if (event.factionId === this.playerFactionId) {
         audioManager.playSound('building_complete', { x: event.x, z: event.z });
+        // Housing population toast — provides instant feedback that pop-cap bumped.
+        if (event.buildingTypeId === BuildingTypeId.Housing) {
+          const arch = BUILDING_ARCHETYPES[BuildingTypeId.Housing];
+          const provided = arch?.populationProvided ?? 10;
+          const popCur = this.playerState.getPopulation(this.playerFactionId);
+          const popMax = this.playerState.getPopulationMax(this.playerFactionId);
+          const houseName = getDisplayBuildingName(this.playerFactionId, BuildingTypeId.Housing);
+          this.hud?.showAlert(`${houseName} klaar — populatie-cap +${provided} (${popCur}/${popMax})`, 'info');
+        }
       }
     });
 
@@ -1931,6 +1969,11 @@ export class Game {
   private onSelectionChanged(entityIds: number[]): void {
     this.selectedEntities = entityIds;
 
+    // Empty selection → hide tower range indicator + research panels.
+    if (entityIds.length === 0) {
+      this.towerRangeRenderer?.hide();
+    }
+
     // Clear old Selected components
     const allUnits = query(world, [Selected]);
     for (const eid of allUnits) {
@@ -1972,6 +2015,15 @@ export class Game {
         // Hide blacksmith panel by default (shown only for Blacksmith selection)
         this.hud.hideBlacksmithPanel();
 
+        // Range-indicator: show only for selected DefenseTower; hide otherwise.
+        if (buildingType === BuildingTypeId.DefenseTower && Building.complete[firstEid] === 1) {
+          const tx = Position.x[firstEid];
+          const tz = Position.z[firstEid];
+          this.towerRangeRenderer.show(tx, tz, this.terrain.getHeightAt(tx, tz));
+        } else {
+          this.towerRangeRenderer.hide();
+        }
+
         if (buildingType === BuildingTypeId.Blacksmith && Building.complete[firstEid] === 1) {
           // Blacksmith: show building card WITHOUT training actions + show research panel
           const cardData = this.buildBuildingCardData(firstEid, buildingType, buildingName, queueItems, true);
@@ -1982,6 +2034,11 @@ export class Game {
           const cardData = this.buildBuildingCardData(firstEid, buildingType, buildingName, queueItems, true);
           this.hud.showBuildingCard(cardData);
           this.showLumberCampResearchUI(firstEid);
+        } else if (buildingType === BuildingTypeId.UpgradeBuilding && Building.complete[firstEid] === 1) {
+          // UpgradeBuilding: show building card + T3 + faction-unique research panel.
+          const cardData = this.buildBuildingCardData(firstEid, buildingType, buildingName, queueItems, true);
+          this.hud.showBuildingCard(cardData);
+          this.showUpgradeBuildingResearchUI(firstEid);
         } else {
           // Normal production building: show building card with training actions
           const cardData = this.buildBuildingCardData(firstEid, buildingType, buildingName, queueItems, false);
@@ -2008,6 +2065,7 @@ export class Game {
           };
         });
         this.hud.showUnitPanel(units);
+        this.towerRangeRenderer.hide();
 
         // Show worker commands if a worker is selected
         const hasWorker = entityIds.some(eid => hasComponent(world, eid, IsWorker));
@@ -2341,9 +2399,21 @@ export class Game {
         : `Training ${current.unitName}${timeStr}`;
     } else if (buildingType === BuildingTypeId.UpgradeBuilding) {
       // UpgradeBuilding (Wagenbouwer/Innovatie Lab/Hoogoven/Diamantslijperij)
-      // unlocks Tier 3 (FactionSpecial2 + SiegeWorkshop). It has no own
-      // training/research yet (planned follow-up).
-      status = 'Tier 3 ontgrendeld — Bouw nu Feestzaal/Tractorschuur';
+      // unlocks Tier 3 (FactionSpecial2 + SiegeWorkshop) + hosts T3 research.
+      status = 'Tier 3 ontgrendeld — Selecteer voor onderzoek';
+    } else if (buildingType === BuildingTypeId.DefenseTower && Building.complete[eid] === 1) {
+      status = 'Patrouilleert — schiet automatisch op vijanden';
+    }
+
+    // Stats / infoText for non-production buildings
+    let stats: { range?: number; dps?: number; armor?: number } | undefined;
+    let infoText: string | undefined;
+    if (buildingType === BuildingTypeId.DefenseTower) {
+      stats = { range: TOWER_RANGE, dps: TOWER_DAMAGE / TOWER_ATTACK_SPEED, armor: 0 };
+    } else if (buildingType === BuildingTypeId.Housing) {
+      const arch = BUILDING_ARCHETYPES[buildingType];
+      const provided = arch?.populationProvided ?? 10;
+      infoText = `Biedt +${provided} populatie-cap`;
     }
 
     // Build actions (only for non-blacksmith production buildings)
@@ -2476,6 +2546,8 @@ export class Game {
       portraitAbbrev: portraitAbbrevs[buildingType] ?? 'BLD',
       buildingTypeId: buildingType,
       actions,
+      stats,
+      infoText,
     };
   }
 
@@ -2486,18 +2558,18 @@ export class Game {
     if (!this.hud) return;
     const factionId = this.playerFactionId;
 
-    // Blacksmith only researches combat/armor/speed upgrades (IDs 0-6).
-    // Wood-upgrades (7/8/9) live on the LumberCamp panel.
-    const WOOD_UPGRADE_IDS = new Set<number>([UpgradeId.WoodCarry1, UpgradeId.WoodCarry2, UpgradeId.WoodGather]);
+    // Blacksmith hosts the universal T1/T2 combat/armor/speed upgrades (IDs 0-6).
+    // Wood-upgrades (7-9) live on LumberCamp; T3 + faction-unique (14/24/34/44, 50-53)
+    // live on UpgradeBuilding.
     const upgrades = UPGRADE_DEFINITIONS
-      .filter(def => !WOOD_UPGRADE_IDS.has(def.id as number))
+      .filter(def => isBlacksmithUpgrade(def.id as number))
       .map(def => ({
         id: def.id as number,
         name: def.name,
         description: def.description,
         costGold: def.cost.gold,
         canAfford: this.playerState.canAfford(factionId, def.cost.gold),
-        canResearch: techTreeSystem.canResearch(factionId, def.id),
+        canResearch: techTreeSystem.canResearch(factionId, def.id, world),
         isResearched: techTreeSystem.isResearched(factionId, def.id),
       }));
 
@@ -2517,7 +2589,7 @@ export class Game {
       upgrades,
       researchProgress,
       (upgradeId: number) => {
-        const success = techTreeSystem.startResearch(factionId, blacksmithEid, upgradeId as UpgradeId);
+        const success = techTreeSystem.startResearch(factionId, blacksmithEid, upgradeId as UpgradeId, world);
         if (success) {
           const def = getUpgradeDefinition(upgradeId as UpgradeId);
           this.hud?.showAlert(`Onderzoek gestart: ${def.name}`, 'info');
@@ -2549,7 +2621,7 @@ export class Game {
         description: display.description,
         costGold: def.cost.gold,
         canAfford: this.playerState.canAfford(factionId, def.cost.gold),
-        canResearch: techTreeSystem.canResearch(factionId, def.id),
+        canResearch: techTreeSystem.canResearch(factionId, def.id, world),
         isResearched: techTreeSystem.isResearched(factionId, def.id),
       };
     });
@@ -2565,12 +2637,59 @@ export class Game {
       upgrades,
       researchProgress,
       (upgradeId: number) => {
-        const success = techTreeSystem.startResearch(factionId, lumberCampEid, upgradeId as UpgradeId);
+        const success = techTreeSystem.startResearch(factionId, lumberCampEid, upgradeId as UpgradeId, world);
         if (success) {
           const display = getDisplayUpgradeName(factionId, upgradeId as UpgradeId);
           this.hud?.showAlert(`Onderzoek gestart: ${display.name}`, 'info');
           audioManager.playSound('click');
           this.showLumberCampResearchUI(lumberCampEid);
+        } else {
+          this.hud?.showAlert('Kan onderzoek niet starten!', 'warning');
+        }
+      },
+    );
+  }
+
+  /**
+   * Show the UpgradeBuilding research UI: 4 T3 universal upgrades + 1 faction-unique
+   * for the current player faction. Re-uses the Blacksmith panel DOM-mutex.
+   */
+  private showUpgradeBuildingResearchUI(upgradeBuildingEid: number): void {
+    if (!this.hud) return;
+    const factionId = this.playerFactionId;
+    const ids = upgradeBuildingResearchIds(factionId);
+
+    const upgrades = ids.map(id => {
+      const def = getUpgradeDefinition(id);
+      const display = getDisplayUpgradeName(factionId, id);
+      return {
+        id: def.id as number,
+        name: display.name,
+        description: display.description,
+        costGold: def.cost.gold,
+        canAfford: this.playerState.canAfford(factionId, def.cost.gold),
+        canResearch: techTreeSystem.canResearch(factionId, def.id, world),
+        isResearched: techTreeSystem.isResearched(factionId, def.id),
+      };
+    });
+
+    const progress = techTreeSystem.getResearchProgress(upgradeBuildingEid, factionId);
+    let researchProgress: { name: string; progress: number; remaining: number } | null = null;
+    if (progress) {
+      const display = getDisplayUpgradeName(factionId, progress.upgradeId);
+      researchProgress = { name: display.name, progress: progress.progress, remaining: progress.remaining };
+    }
+
+    this.hud.showBlacksmithPanel(
+      upgrades,
+      researchProgress,
+      (upgradeId: number) => {
+        const success = techTreeSystem.startResearch(factionId, upgradeBuildingEid, upgradeId as UpgradeId, world);
+        if (success) {
+          const display = getDisplayUpgradeName(factionId, upgradeId as UpgradeId);
+          this.hud?.showAlert(`Onderzoek gestart: ${display.name}`, 'info');
+          audioManager.playSound('click');
+          this.showUpgradeBuildingResearchUI(upgradeBuildingEid);
         } else {
           this.hud?.showAlert('Kan onderzoek niet starten!', 'warning');
         }
@@ -3030,13 +3149,15 @@ export class Game {
           } else if (hasComponent(world, firstEid, Production)) {
             this.hud.updateProductionQueue(0, '', 0);
           }
-          // Update Blacksmith / LumberCamp research progress (refreshes every frame)
+          // Update Blacksmith / LumberCamp / UpgradeBuilding research progress (refreshes every frame)
           if (Building.complete[firstEid] === 1 && Faction.id[firstEid] === this.playerFactionId) {
             const tid = Building.typeId[firstEid];
             if (tid === BuildingTypeId.Blacksmith) {
               this.showBlacksmithResearchUI(firstEid);
             } else if (tid === BuildingTypeId.LumberCamp) {
               this.showLumberCampResearchUI(firstEid);
+            } else if (tid === BuildingTypeId.UpgradeBuilding) {
+              this.showUpgradeBuildingResearchUI(firstEid);
             }
           }
         }

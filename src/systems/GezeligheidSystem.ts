@@ -21,11 +21,17 @@ import {
   Faction,
   Health,
   GezeligheidBonus,
+  Building,
 } from '../ecs/components';
-import { IsUnit, IsDead } from '../ecs/tags';
-import { FactionId } from '../types/index';
+import { IsUnit, IsDead, IsBuilding } from '../ecs/tags';
+import { FactionId, BuildingTypeId, UpgradeId } from '../types/index';
 import { playerState } from '../core/PlayerState';
 import type { GameWorld } from '../ecs/world';
+import { techTreeSystem } from './TechTreeSystem';
+
+/** Carnavalsvuur aura: +10% damage in this radius around a Brabant TownHall (squared). */
+const CARNAVALSVUUR_RADIUS_SQ = 64; // 8u
+const CARNAVALSVUUR_DAMAGE_MULT = 1.10;
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -164,6 +170,33 @@ export function createGezeligheidSystem() {
     if (totalGroupedUnits > 0) {
       const generated = totalGroupedUnits * GEZELLIGHEID_GEN_RATE * UPDATE_INTERVAL;
       playerState.addGezelligheid(FactionId.Brabanders, generated);
+    }
+
+    // Carnavalsvuur aura: +10% attackMult on top of group-Gezelligheid for any
+    // Brabant unit within 8u of a complete Brabant TownHall. Multiplicative
+    // stack on the tier-bonus already written above.
+    if (techTreeSystem.isResearched(FactionId.Brabanders, UpgradeId.Carnavalsvuur)) {
+      const townHalls: Array<{ x: number; z: number }> = [];
+      const buildings = query(world, [Position, Building, Faction, IsBuilding]);
+      for (const bEid of buildings) {
+        if (Faction.id[bEid] !== FactionId.Brabanders) continue;
+        if (hasComponent(world, bEid, IsDead)) continue;
+        if (Building.typeId[bEid] !== BuildingTypeId.TownHall) continue;
+        if (Building.complete[bEid] !== 1) continue;
+        townHalls.push({ x: Position.x[bEid], z: Position.z[bEid] });
+      }
+      for (const eid of brabanderUnits) {
+        const px = Position.x[eid];
+        const pz = Position.z[eid];
+        for (const th of townHalls) {
+          const dx = th.x - px;
+          const dz = th.z - pz;
+          if (dx * dx + dz * dz <= CARNAVALSVUUR_RADIUS_SQ) {
+            GezeligheidBonus.attackMult[eid] *= CARNAVALSVUUR_DAMAGE_MULT;
+            break;
+          }
+        }
+      }
     }
   };
 }

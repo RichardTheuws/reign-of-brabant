@@ -26,16 +26,16 @@ import type { SystemFn } from './SystemPipeline';
 // ---------------------------------------------------------------------------
 
 /** Attack range in world units. */
-const TOWER_RANGE = 14;
+export const TOWER_RANGE = 14;
 
 /** Squared attack range (avoids sqrt in distance checks). */
 const TOWER_RANGE_SQ = TOWER_RANGE * TOWER_RANGE;
 
 /** Damage dealt per attack. */
-const TOWER_DAMAGE = 15;
+export const TOWER_DAMAGE = 15;
 
 /** Seconds between attacks. */
-const TOWER_ATTACK_SPEED = 1.5;
+export const TOWER_ATTACK_SPEED = 1.5;
 
 // ---------------------------------------------------------------------------
 // System factory

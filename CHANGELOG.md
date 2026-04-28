@@ -1,5 +1,44 @@
 # Changelog
 
+## [0.37.33] - 2026-04-28 — Bundel 2: UpgradeBuilding research + Watchtower UX + Housing toast
+
+### Added (Bundel 2A — UpgradeBuilding research-pakket)
+- **8 nieuwe `UpgradeId`** in `src/types/index.ts`:
+  - **T3 universal** (50-53): MeleeAttack3 / RangedAttack3 / ArmorUpgrade3 / MoveSpeed2 — alle prereq T2, alle 350-400g/45-55s.
+  - **Faction-unique** (14/24/34/44): Carnavalsvuur (Brabant aura) / AIOptimization (Randstad +20% production) / Mergelharnas (Limburg Heavy +3 armor) / DiamantgloeiendeWapens (Belgen 5% crit voor 10x dmg) — alle 500g/60s, geen prereq.
+  - **`requiresUpgradeBuilding: true`** op alle 8 — vereist een complete UpgradeBuilding (Wagenbouwer/Innovatie Lab/Hoogoven/Diamantslijperij).
+- **`UpgradeDefinition` interface**: 4 optional velden (`requiresUpgradeBuilding`, `bonusDamageFraction`, `bonusCritChance`, `bonusProductionSpeedFraction`).
+- **`getUpgradeDefinition` Map-refactor**: `UPGRADE_DEFINITION_MAP` (was sparse-array lookup) — non-contiguous IDs (14/24/34/44/50-53) werkten niet meer met array-index, throws bij onbekende ID.
+- **`canResearch(factionId, upgradeId, world?)` + `startResearch(..., world?)`** — optional `world` param. Zonder `world` faalt de UpgradeBuilding-gate gesloten (defense-in-depth). Nieuwe private `hasCompleteUpgradeBuilding` helper.
+- **4 effect-system implementaties** zonder nieuwe SystemPipeline-add (alle extend bestaande systems):
+  - **Carnavalsvuur** — `GezeligheidSystem` aura-pass na tier-loop: Brabant-units binnen 8u van complete TownHall krijgen `attackMult *= 1.10`.
+  - **AI Optimization** — `ProductionSystem.processBuilding` 4e duration-factor `1/1.20` voor Randstad bij researched.
+  - **Mergelharnas** — ZERO nieuwe code: bestaande `affectsUnitTypes=[Heavy]` + `bonusArmor: 3` filter werkt out-of-box. Stack additief met ArmorUpgrade1+2+3.
+  - **Diamantgloeiende Wapens** — `CombatSystem` `tryDiamantgloeiendeWapensCrit` helper toegepast in `processAttacking` én `processHoldPosition`. 5% Math.random() roll → 10x damage + nieuw `combat-crit` event.
+- **`Game.showUpgradeBuildingResearchUI`** + selection-branch + per-frame refresh-branch in `Game.ts`. Hergebruikt `HUD.showBlacksmithPanel` als generieke render. Helpers `BLACKSMITH_UPGRADE_IDS` set + `upgradeBuildingResearchIds(factionId)` — strikte panel-partitie.
+
+### Added (Bundel 2B — Watchtower UX)
+- **`TowerRangeRenderer`** (`src/rendering/TowerRangeRenderer.ts`): translucent oranje ring (RingGeometry, opacity 0.28) op grond rond geselecteerde DefenseTower. Toont op selection, verbergt bij deselect of selectie van ander gebouw-type.
+- **`TOWER_RANGE` / `TOWER_DAMAGE` / `TOWER_ATTACK_SPEED`** geëxporteerd uit `TowerSystem.ts` voor display.
+- **`BuildingCardData.stats`** (range/dps/armor) + **`BuildingCardData.infoText`** velden. DefenseTower krijgt status `'Patrouilleert — schiet automatisch op vijanden'` + stats-grid (Bereik/DPS/Bepantsering).
+- **`HUD.renderBuildingCardExtras`** rendert stats + info-text onder de status-line. Container reset bij elke card-show.
+
+### Added (Bundel 2C — Housing populatie-toast)
+- **Toast bij Housing-completion**: `eventBus.on('building-placed')` listener detecteert `buildingTypeId === Housing` en player-faction → `hud.showAlert('Boerenhoeve klaar — populatie-cap +10 (cur/max)', 'info')`.
+- **Building card info-text** voor Housing: `'Biedt +10 populatie-cap'` onder de status-line.
+
+### Tests (+27, 1092 → 1119)
+- `tests/UpgradeBuildingResearch.test.ts` (+22): definitions × 5, canResearch gate × 8, retroactive effects × 4, duplicate-research × 2, Map-lookup × 3.
+- `tests/research-panel-id-separation.test.ts` (+3 herwerkt → +6): partitie-lock voor 4 panel-sets (Blacksmith=7 / LumberCamp=3 / UpgradeBuilding T3=4 / faction-unique=4) — geen overlap, alle 18 IDs gemapt.
+- `tests/HousingCompletionToast.test.ts` (+2): building-placed event-shape, toast-text composition.
+- Update `tests/TechTreeSystem-research-lifecycle.test.ts:81`: length 10 → 18.
+
+### Notes
+- **Geen archetype-werk** voor UpgradeBuilding: de 4 facties hebben al Wagenbouwer/Innovatie Lab/Hoogoven/Diamantslijperij data + hotkey C in `factionBuildMenus.ts`.
+- **DiamantgloeiendeWapens crit** gebruikt `Math.random()` — binnen bestaande conventie (Game.ts/ProductionSystem). Niet seeded; OK voor PoC.
+- **Mergelharnas** demonstreert dat het bestaande `affectsUnitTypes` + `bonusArmor` pattern flexibel genoeg is om nieuwe faction-unique armor-bonuses te dekken zonder code-uitbreiding.
+- Backlog-items uit deze sessie: TowerSystem sniper-bonus tegen ranged units (plan noemt dit, ontbreekt in code), 3D mouseover-tooltip-pattern, Housing-display-name per-factie test, construction-timer in status-text. Zie `.claude/plans/BACKLOG.md`.
+
 ## [0.37.32] - 2026-04-28 — P1 hotfix: wood-upgrades lekten in Blacksmith-paneel
 
 ### Fixed (P1, Richard hands-on report v0.37.31)
