@@ -69,6 +69,7 @@ export type CommandAction =
   | 'activate-boardroom'
   | 'activate-sprint-mode'
   | 'activate-deadline-crunch'
+  | 'activate-trakteerronde'
   | 'cancel-queue';
 
 export interface SelectedUnit {

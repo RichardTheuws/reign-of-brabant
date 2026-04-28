@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.37.40] - 2026-04-28 — Bundel 4A: Brabant Worstenbroodjeskraam (TertiaryResource archetype + 3 functies)
+
+### Added — archetype + build menu
+- **`factionData.ts`** — Brabant TertiaryResourceBuilding archetype (Worstenbroodjeskraam): HP 450, 150g + 100h, 30s build, sight 8.
+- **`factionBuildMenus.ts`** — Brabant X-hotkey ingevuld met `build-tertiary` (label "Worstenbroodjeskraam", tier 2). Was eerder bewust leeg ("Gezelligheid is proximity-based") — Bundel 4A vult de slot in met een gebouw dat zowel basis-Gez genereert als proximity-effecten heeft.
+
+### Added — `WorstenbroodjeskraamSystem.ts` (3 concurrent functies)
+- **Passive Gez flux** — per voltooide kraam +0.5 Gezelligheid/sec (1.0s tick interval, los van GezeligheidSystem proximity-mechaniek).
+- **Trakteerronde** (click-action) — kost 50 Gezelligheid → 30s window waarin alle Brabant units +20% movement speed krijgen. 90s cooldown. Hotkey T op kraam-selection.
+- **Heal-aura** (passive) — Brabant units binnen 8u radius van een complete kraam regenereren +0.5 HP/sec. Niet-stapelend (eerste kraam-in-radius wint). Niet voor non-Brabant units.
+
+### Changed — system integration
+- **`MovementSystem.ts`** — `effectiveSpeed *= getTrakteerrondeSpeedMult(factionId)` (Brabant units only).
+- **`SystemPipeline.ts`** — `WorstenbroodjeskraamSystem` toegevoegd in faction-phase (4.806) na HavermoutmelkSystem.
+- **`Game.ts`** — building-card action "Trakteerronde" voor Brabant TertiaryResource selection. `tryActivateTrakteerronde` handler. `resetWorstenbroodjeskraamBuffs` aangeroepen in endMatch.
+
+### Added — tests (+18, +1 updated)
+- **`tests/WorstenbroodjeskraamSystem.test.ts`** dekt: Gez-flux per kraam (lineair, complete-only, factie-specifiek, throttle-gedrag), Trakteerronde (cost gating, factie-isolation, expiration, cooldown), heal-aura (radius, full-HP no-overheal, no-stack, non-Brabant skip, max-clamp), reset.
+- **`tests/factionBuildMenus.test.ts`** — bestaande "Brabanders skipt X" test omgezet naar "Brabanders X = Worstenbroodjeskraam"; "tier 2 uniform" nu ook over Brabant heen.
+
+### Notes
+- Test-suite: 1282 → 1300 (+18).
+- Brabant heeft nu alle 11 building-types werkend.
+
 ## [0.37.39] - 2026-04-28 — Bug #1a: Randstad Havermoutmelkbar — 3 concurrent functies + naming consistency
 
 ### Added — `HavermoutmelkSystem.ts`

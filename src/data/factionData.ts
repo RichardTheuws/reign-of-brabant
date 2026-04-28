@@ -959,6 +959,21 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       sightRange: 8,
       produces: [],
     },
+    // Worstenbroodjeskraam (Tier 2, Brabant TertiaryResource — Bundel 4A)
+    // Multi-functie (v1.0 perfectie): passive +0.5 Gez/sec, click-action
+    // "Trakteerronde" (50 Gez → 30s units +20% speed), passive heal-aura
+    // (+0.5 HP/sec voor Brabant units in 8u radius).
+    {
+      typeId: BuildingTypeId.TertiaryResourceBuilding,
+      name: 'Worstenbroodjeskraam',
+      brabantName: 'Worstenbroodjeskraam',
+      hp: 450,
+      costGold: 150,
+      costSecondary: 100,
+      buildTime: 30,
+      sightRange: 8,
+      produces: [],
+    },
     // Wagenbouwer (Tier-3 unlock — Geavanceerde Smederij voor Brabant)
     // Audit-04 fix v0.37.26: zonder dit gebouw was Tier 3 (Feestzaal +
     // Tractorschuur) onbereikbaar.

@@ -100,13 +100,16 @@ describe('Tertiary-resource building (X-hotkey)', () => {
     });
   }
 
-  it('Brabanders intentionally has NO X-hotkey (Gezelligheid is proximity-based)', () => {
+  it('Brabanders X-hotkey = Worstenbroodjeskraam (Bundel 4A v0.37.40)', () => {
     const entry = FACTION_WORKER_BUILDS.brabant.find(b => b.hotkey === 'X');
-    expect(entry).toBeUndefined();
+    expect(entry?.action).toBe('build-tertiary');
+    expect(entry?.label).toBe('Worstenbroodjeskraam');
+    expect(entry?.buildingTypeId).toBe(BuildingTypeId.TertiaryResourceBuilding);
+    expect(entry?.tier).toBe(2);
   });
 
-  it('every X-hotkey entry is tier 2 (matches Limburgers / Belgen pattern)', () => {
-    for (const faction of NON_BRABANT) {
+  it('every X-hotkey entry is tier 2 (uniform across factions)', () => {
+    for (const faction of ['brabant', ...NON_BRABANT] as const) {
       const entry = FACTION_WORKER_BUILDS[faction].find(b => b.hotkey === 'X');
       expect(entry?.tier).toBe(2);
     }

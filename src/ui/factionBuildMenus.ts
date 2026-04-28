@@ -57,7 +57,9 @@ export const FACTION_WORKER_BUILDS: Record<Faction, WorkerBuildCmdExt[]> = {
     { action: 'build-faction1',        icon: 'SP1', label: 'Carnavalstent',   hotkey: 'V', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial1,           tier: 2 },
     { action: 'build-faction2',        icon: 'ADV', label: 'Feestzaal',       hotkey: 'G', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.FactionSpecial2,           tier: 3 },
     { action: 'build-siege-workshop',  icon: 'SWK', label: 'Tractorschuur',   hotkey: 'Z', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.SiegeWorkshop,             tier: 3 },
-    // Brabanders intentionally skip X — Gezelligheid is proximity-generated.
+    // Worstenbroodjeskraam (Bundel 4A v0.37.40): Brabant TertiaryResource — passive +0.5 Gez/sec
+    // + heal-aura (8u) + Trakteerronde click-action. Vult de X-slot in.
+    { action: 'build-tertiary',        icon: 'TRT', label: 'Worstenbroodjeskraam', hotkey: 'X', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.TertiaryResourceBuilding, tier: 2 },
   ],
   randstad: [
     { action: 'build-barracks',        icon: 'BRK', label: 'Vergaderzaal',    hotkey: 'Q', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Barracks,                 tier: 1 },

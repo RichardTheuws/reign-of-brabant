@@ -191,6 +191,7 @@ import { createTechTreeSystem } from './TechTreeSystem';
 import { createBureaucracySystem } from './BureaucracySystem';
 import { createTertiaryResourceSystem } from './TertiaryResourceSystem';
 import { createHavermoutmelkSystem } from './HavermoutmelkSystem';
+import { createWorstenbroodjeskraamSystem } from './WorstenbroodjeskraamSystem';
 import { createUndergroundSystem } from './UndergroundSystem';
 import { createDiplomacySystem } from './DiplomacySystem';
 import { createSeparationSystem } from './SeparationSystem';
@@ -248,6 +249,9 @@ export function createGamePipeline(terrain: Terrain, devMode = false): SystemPip
 
   // Phase 4.805: Havermoutmelk buffs (Randstad faction -- ticks Sprint Mode + Deadline Crunch buff timers)
   pipeline.add('HavermoutmelkSystem', createHavermoutmelkSystem(), 'faction');
+
+  // Phase 4.806: Worstenbroodjeskraam (Brabant TertiaryResource — passive Gez flux + heal aura + Trakteerronde click)
+  pipeline.add('WorstenbroodjeskraamSystem', createWorstenbroodjeskraamSystem(), 'faction');
 
   // Phase 4.81: Underground tunnels (Limburgers faction -- needs Kolen from TertiaryResourceSystem)
   pipeline.add('UndergroundSystem', createUndergroundSystem(), 'faction');

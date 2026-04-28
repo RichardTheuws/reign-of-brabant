@@ -11,6 +11,7 @@ import { IsUnit, IsWorker } from '../ecs/tags';
 import { playerState } from '../core/PlayerState';
 import { UPKEEP_DEBT_EFFECTIVENESS, ROAD_SPEED_BONUS } from '../types/index';
 import { getDeadlineCrunchSpeedMult } from './HavermoutmelkSystem';
+import { getTrakteerrondeSpeedMult } from './WorstenbroodjeskraamSystem';
 import type { Terrain } from '../world/Terrain';
 import type { GameWorld } from '../ecs/world';
 
@@ -67,6 +68,9 @@ export function createMovementSystem(terrain: Terrain) {
       if (hasComponent(world, eid, IsWorker)) {
         effectiveSpeed *= getDeadlineCrunchSpeedMult(Faction.id[eid]);
       }
+
+      // Trakteerronde (Brabant Worstenbroodjeskraam click-action) — all Brabant units.
+      effectiveSpeed *= getTrakteerrondeSpeedMult(Faction.id[eid]);
       const stepX = _dx * _invDist * effectiveSpeed * dt;
       const stepZ = _dz * _invDist * effectiveSpeed * dt;
 

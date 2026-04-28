@@ -47,6 +47,10 @@ import {
   activateDeadlineCrunch, isDeadlineCrunchReady, getDeadlineCrunchState, DEADLINE_CRUNCH_COST,
   resetHavermoutmelkBuffs,
 } from '../systems/HavermoutmelkSystem';
+import {
+  activateTrakteerronde, isTrakteerrondeReady, getTrakteerrondeState,
+  TRAKTEERRONDE_COST, resetWorstenbroodjeskraamBuffs,
+} from '../systems/WorstenbroodjeskraamSystem';
 import { resetDiplomacy } from '../systems/DiplomacySystem';
 import { audioManager } from '../audio/AudioManager';
 import { playUnitVoice } from '../audio/UnitVoices';
@@ -946,6 +950,9 @@ export class Game {
       case 'activate-deadline-crunch':
         this.tryActivateDeadlineCrunch();
         break;
+      case 'activate-trakteerronde':
+        this.tryActivateTrakteerronde();
+        break;
       case 'activate-boardroom':
         this.tryActivateBoardroom();
         break;
@@ -996,6 +1003,26 @@ export class Game {
    * havermoutmelk for 30s of +50% movement speed for Randstad workers
    * (stagiairs). 90s cooldown.
    */
+  /**
+   * Trakteerronde click-action (Brabant Worstenbroodjeskraam). Spends 50
+   * Gezelligheid for 30s of +20% movement speed for all Brabant units.
+   * 90s cooldown.
+   */
+  private tryActivateTrakteerronde(): void {
+    if (this.playerFactionId !== FactionId.Brabanders) return;
+    if (this.playerState.getGezelligheid(FactionId.Brabanders) < TRAKTEERRONDE_COST) {
+      this.hud?.showAlert(`Niet genoeg Gezelligheid (${TRAKTEERRONDE_COST} nodig)`, 'warning');
+      return;
+    }
+    const fired = activateTrakteerronde();
+    if (fired) {
+      this.hud?.showAlert('Trakteerronde — Brabant +20% snelheid (30s)', 'info');
+      audioManager.playSound('click');
+    } else {
+      this.hud?.showAlert('Trakteerronde nog op cooldown', 'warning');
+    }
+  }
+
   private tryActivateDeadlineCrunch(): void {
     if (this.playerFactionId !== FactionId.Randstad) return;
     if (this.playerState.getTertiary(FactionId.Randstad) < DEADLINE_CRUNCH_COST) {
@@ -2667,6 +2694,23 @@ export class Game {
       });
     }
 
+    // Worstenbroodjeskraam (Brabant TertiaryResource) — Trakteerronde click-action.
+    if (buildingType === BuildingTypeId.TertiaryResourceBuilding
+        && this.playerFactionId === FactionId.Brabanders
+        && Building.complete[eid] === 1) {
+      const trakteer = getTrakteerrondeState();
+      let label = `Trakteerronde (${TRAKTEERRONDE_COST} Gez)`;
+      if (trakteer.active) label = `Trakteerronde actief (${Math.ceil(trakteer.remaining)}s)`;
+      else if (!isTrakteerrondeReady()) label = `Trakteerronde cd (${Math.ceil(trakteer.cooldown)}s)`;
+      actions.push({
+        action: 'activate-trakteerronde',
+        icon: 'WBR',
+        label,
+        hotkey: 'T',
+        iconClass: 'btn-icon--research',
+      });
+    }
+
     // Havermoutmelkbar (Randstad TertiaryResource) — Sprint Mode + Deadline Crunch click-actions.
     if (buildingType === BuildingTypeId.TertiaryResourceBuilding
         && this.playerFactionId === FactionId.Randstad
@@ -3868,6 +3912,7 @@ export class Game {
     resetHeroSystem();
     resetBureaucracy();
     resetHavermoutmelkBuffs();
+    resetWorstenbroodjeskraamBuffs();
     resetDiplomacy();
 
     // Stop music system
