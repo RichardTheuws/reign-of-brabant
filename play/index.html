@@ -987,6 +987,32 @@
     .bcard-action-btn--rally {
       border-color: rgba(126, 200, 227, 0.4);
     }
+    .bcard-action-btn--info {
+      grid-column: 1 / -1; /* spans full row — info-tooltip-style row */
+      cursor: default;
+      opacity: 1;
+      border-color: rgba(212, 168, 83, 0.25);
+      background: rgba(60, 40, 20, 0.4);
+      justify-content: flex-start;
+    }
+    .bcard-action-btn--info:disabled {
+      opacity: 1;
+    }
+    .bcard-action-btn--info .bcard-action-icon {
+      flex: 0 0 auto;
+    }
+    .bcard-action-btn--info .bcard-action-label {
+      white-space: normal;
+      text-align: left;
+      flex: 1;
+      font-size: 0.7rem;
+      line-height: 1.2;
+      padding-left: 6px;
+    }
+    .bcard-action-btn--info .bcard-action-hotkey { display: none; }
+    .btn-icon--info {
+      color: #f0d060;
+    }
     .bcard-action-cost {
       position: absolute;
       top: 2px; left: 3px;

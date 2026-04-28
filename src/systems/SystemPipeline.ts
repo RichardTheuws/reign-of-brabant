@@ -193,6 +193,7 @@ import { createTertiaryResourceSystem } from './TertiaryResourceSystem';
 import { createHavermoutmelkSystem } from './HavermoutmelkSystem';
 import { createWorstenbroodjeskraamSystem } from './WorstenbroodjeskraamSystem';
 import { createUpgradeBuildingPassivesSystem } from './UpgradeBuildingPassivesSystem';
+import { createCarnavalsoptochtSystem } from './CarnavalsoptochtSystem';
 import { createUndergroundSystem } from './UndergroundSystem';
 import { createDiplomacySystem } from './DiplomacySystem';
 import { createSeparationSystem } from './SeparationSystem';
@@ -256,6 +257,9 @@ export function createGamePipeline(terrain: Terrain, devMode = false): SystemPip
 
   // Phase 4.807: UpgradeBuilding passives — caches counts/positions per factie, ticks Brabant Gez bonus
   pipeline.add('UpgradeBuildingPassivesSystem', createUpgradeBuildingPassivesSystem(), 'faction');
+
+  // Phase 4.808: Carnavalsoptocht (Brabant Carnavalstent click — buff-timer tick only)
+  pipeline.add('CarnavalsoptochtSystem', createCarnavalsoptochtSystem(), 'faction');
 
   // Phase 4.81: Underground tunnels (Limburgers faction -- needs Kolen from TertiaryResourceSystem)
   pipeline.add('UndergroundSystem', createUndergroundSystem(), 'faction');

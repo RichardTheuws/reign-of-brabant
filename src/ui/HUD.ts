@@ -70,6 +70,8 @@ export type CommandAction =
   | 'activate-sprint-mode'
   | 'activate-deadline-crunch'
   | 'activate-trakteerronde'
+  | 'activate-carnavalsoptocht'
+  | 'noop-info'
   | 'cancel-queue';
 
 export interface SelectedUnit {
@@ -102,6 +104,7 @@ export interface BuildingCardAction {
   iconClass?: string;  // Optional color class (btn-icon--train, etc.)
   isHero?: boolean;    // Hero training button
   isRally?: boolean;   // Rally point button
+  isInfo?: boolean;    // Non-clickable info-row (passive effect description)
 }
 
 export interface BuildingCardData {
@@ -815,6 +818,10 @@ export class HUD {
       btn.className = 'bcard-action-btn';
       if (act.isHero) btn.classList.add('bcard-action-btn--hero');
       if (act.isRally) btn.classList.add('bcard-action-btn--rally');
+      if (act.isInfo) {
+        btn.classList.add('bcard-action-btn--info');
+        btn.disabled = true;
+      }
       btn.dataset.action = act.action;
       btn.dataset.hotkey = act.hotkey;
 

@@ -13,6 +13,7 @@ import { UPKEEP_DEBT_EFFECTIVENESS, ROAD_SPEED_BONUS } from '../types/index';
 import { getDeadlineCrunchSpeedMult } from './HavermoutmelkSystem';
 import { getTrakteerrondeSpeedMult } from './WorstenbroodjeskraamSystem';
 import { getInnovatieBoostSpeedMult } from './UpgradeBuildingPassivesSystem';
+import { getCarnavalsoptochtSpeedMult } from './CarnavalsoptochtSystem';
 import type { Terrain } from '../world/Terrain';
 import type { GameWorld } from '../ecs/world';
 
@@ -75,6 +76,9 @@ export function createMovementSystem(terrain: Terrain) {
 
       // Innovatie Boost (Randstad UpgradeBuilding passive) — per Lab +5%, cap +20%.
       effectiveSpeed *= getInnovatieBoostSpeedMult(Faction.id[eid]);
+
+      // Carnavalsoptocht (Brabant Carnavalstent click-action) — +25% all Brabant units.
+      effectiveSpeed *= getCarnavalsoptochtSpeedMult(Faction.id[eid]);
       const stepX = _dx * _invDist * effectiveSpeed * dt;
       const stepZ = _dz * _invDist * effectiveSpeed * dt;
 

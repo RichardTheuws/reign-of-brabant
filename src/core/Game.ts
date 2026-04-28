@@ -52,6 +52,10 @@ import {
   TRAKTEERRONDE_COST, resetWorstenbroodjeskraamBuffs,
 } from '../systems/WorstenbroodjeskraamSystem';
 import { resetUpgradeBuildingPassives } from '../systems/UpgradeBuildingPassivesSystem';
+import {
+  activateCarnavalsoptocht, isCarnavalsoptochtReady, getCarnavalsoptochtState,
+  CARNAVALSOPTOCHT_COST, resetCarnavalsoptocht,
+} from '../systems/CarnavalsoptochtSystem';
 import { resetDiplomacy } from '../systems/DiplomacySystem';
 import { audioManager } from '../audio/AudioManager';
 import { playUnitVoice } from '../audio/UnitVoices';
@@ -954,6 +958,9 @@ export class Game {
       case 'activate-trakteerronde':
         this.tryActivateTrakteerronde();
         break;
+      case 'activate-carnavalsoptocht':
+        this.tryActivateCarnavalsoptocht();
+        break;
       case 'activate-boardroom':
         this.tryActivateBoardroom();
         break;
@@ -1004,6 +1011,26 @@ export class Game {
    * havermoutmelk for 30s of +50% movement speed for Randstad workers
    * (stagiairs). 90s cooldown.
    */
+  /**
+   * Carnavalsoptocht click-action (Brabant Carnavalstent). Spends 75
+   * Gezelligheid for 30s of +25% movement speed for all Brabant units
+   * (parade-effect). 90s cooldown.
+   */
+  private tryActivateCarnavalsoptocht(): void {
+    if (this.playerFactionId !== FactionId.Brabanders) return;
+    if (this.playerState.getGezelligheid(FactionId.Brabanders) < CARNAVALSOPTOCHT_COST) {
+      this.hud?.showAlert(`Niet genoeg Gezelligheid (${CARNAVALSOPTOCHT_COST} nodig)`, 'warning');
+      return;
+    }
+    const fired = activateCarnavalsoptocht();
+    if (fired) {
+      this.hud?.showAlert('Carnavalsoptocht — Brabant +25% snelheid (30s)', 'info');
+      audioManager.playSound('click');
+    } else {
+      this.hud?.showAlert('Carnavalsoptocht nog op cooldown', 'warning');
+    }
+  }
+
   /**
    * Trakteerronde click-action (Brabant Worstenbroodjeskraam). Spends 50
    * Gezelligheid for 30s of +20% movement speed for all Brabant units.
@@ -2679,6 +2706,48 @@ export class Game {
       }
     }
 
+    // FactionSpecial1 — passive info-row + click-action per factie (v0.41.0).
+    // Elk gebouw toont een (niet-clickable) info-row met passive effect, plus een
+    // optionele click-action waar van toepassing. Voor v1.0 perfectie consistent
+    // over alle 4 facties.
+    if (buildingType === BuildingTypeId.FactionSpecial1
+        && Building.complete[eid] === 1) {
+      const passiveByFaction: Record<number, { icon: string; label: string }> = {
+        [FactionId.Brabanders]: { icon: 'CRN', label: 'Aura: +20% schade Brabant-eenheden in 12u radius' },
+        [FactionId.Randstad]:   { icon: 'BRD', label: 'Click-buff: Kwartaalcijfers (zie hieronder)' },
+        [FactionId.Limburgers]: { icon: 'VLA', label: 'Aura: +10 HP/5s heal Limburg-eenheden in 10u radius' },
+        [FactionId.Belgen]:     { icon: 'DPL', label: 'Diplomatie: passief +1 diplomaat per 10s, click voor Persuasion' },
+      };
+      const passive = passiveByFaction[this.playerFactionId];
+      if (passive) {
+        actions.push({
+          action: 'noop-info',
+          icon: passive.icon,
+          label: passive.label,
+          hotkey: '',
+          iconClass: 'btn-icon--info',
+          isInfo: true,
+        });
+      }
+    }
+
+    // Carnavalsoptocht (Brabant Carnavalstent click-action, v0.41.0).
+    if (buildingType === BuildingTypeId.FactionSpecial1
+        && this.playerFactionId === FactionId.Brabanders
+        && Building.complete[eid] === 1) {
+      const opt = getCarnavalsoptochtState();
+      let label = `Carnavalsoptocht (${CARNAVALSOPTOCHT_COST} Gez)`;
+      if (opt.active) label = `Optocht actief (${Math.ceil(opt.remaining)}s)`;
+      else if (!isCarnavalsoptochtReady()) label = `Optocht cd (${Math.ceil(opt.cooldown)}s)`;
+      actions.push({
+        action: 'activate-carnavalsoptocht',
+        icon: 'OPT',
+        label,
+        hotkey: 'T',
+        iconClass: 'btn-icon--research',
+      });
+    }
+
     // Boardroom CEO Kwartaalcijfers — only for Randstad FactionSpecial1.
     if (buildingType === BuildingTypeId.FactionSpecial1
         && this.playerFactionId === FactionId.Randstad
@@ -3915,6 +3984,7 @@ export class Game {
     resetHavermoutmelkBuffs();
     resetWorstenbroodjeskraamBuffs();
     resetUpgradeBuildingPassives();
+    resetCarnavalsoptocht();
     resetDiplomacy();
 
     // Stop music system

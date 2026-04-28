@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.41.0] - 2026-04-28 — Carnavalsoptocht (Brabant click) + FactionSpecial1 info-display rows
+
+### Added — `CarnavalsoptochtSystem.ts`
+Live-feedback Richard 2026-04-28 (na v0.40.0): "Bij de carnavalstent zie ik geen mogelijke upgrades / functies". Carnavalstent had alleen passive +20% damage aura (Bundle 3), geen click-action zichtbaar in building-card.
+
+- **Carnavalsoptocht** click-action — kost 75 Gezelligheid → 30s alle Brabant units +25% movement speed (parade-effect). 90s cooldown. Hotkey T op Carnavalstent-selectie. Stapelt multiplicatief met Trakteerronde (Worstenbroodjeskraam): max 1.20 × 1.25 = 1.50.
+
+### Added — FactionSpecial1 passive info-display rows
+Op alle 4 FactionSpecial1 building-cards (Carnavalstent / Boardroom / Vlaaiwinkel / Diplomatiek Salon) staat nu een non-clickable info-row die de huidige passive uitlegt. Voorkomt herhaling van "ik zie geen functies" voor de andere 3 facties.
+
+- Brabant Carnavalstent: "Aura: +20% schade Brabant-eenheden in 12u radius"
+- Randstad Boardroom: "Click-buff: Kwartaalcijfers (zie hieronder)"
+- Limburg Vlaaiwinkel: "Aura: +10 HP/5s heal Limburg-eenheden in 10u radius"
+- Belgen Diplomatiek Salon: "Diplomatie: passief +1 diplomaat per 10s, click voor Persuasion"
+
+### Changed
+- **`HUD.BuildingCardAction`** — `isInfo?: boolean` veld toegevoegd. Info-rows worden gerenderd als `disabled` button met `bcard-action-btn--info` class.
+- **`play/index.html`** — CSS toegevoegd voor `.bcard-action-btn--info` (full-row span, left-aligned label, geen hotkey-display, eigen background-tint).
+- **`CommandAction`** type uitgebreid met `'noop-info'` + `'activate-carnavalsoptocht'`.
+- **`MovementSystem.ts`** — `effectiveSpeed *= getCarnavalsoptochtSpeedMult(factionId)`.
+- **`SystemPipeline.ts`** — `CarnavalsoptochtSystem` toegevoegd in faction-phase (4.808).
+- **`Game.ts`** — `tryActivateCarnavalsoptocht` handler + reset-hook in `endMatch`.
+
+### Added — tests (+7)
+- **`tests/CarnavalsoptochtSystem.test.ts`** — ready-state, cost-gating, factie-isolation (alleen Brabant), expiration timer, cooldown-block, reset.
+
+### Notes
+- Test-suite: 1499 → 1506 (+7).
+- Voor v0.42.0: resterende second-functies (Boardroom passive, Vlaaiwinkel click "Vlaai-Trakteerronde", Diplomatiek Salon passive). Per BACKLOG.md.
+
 ## [0.40.0] - 2026-04-28 — v1.0 perfectie milestone: UpgradeBuilding passives × 4 + versioning-policy + updates-page sync
 
 ### Versioning policy reset
