@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.37.36] - 2026-04-28 — Bundel 5: 11 dedicated Meshy v6 GLBs (visuele dubbele-meshes opgeruimd)
+
+### Added (11 unieke GLBs — generated via Meshy v6 image-to-3D)
+- **TertiaryResource** (3) — `randstad/tertiary.glb` (havermoutmelkbar), `limburgers/tertiary.glb` (mijnschacht), `belgen/tertiary.glb` (chocolaterie). Brabant uitgesloten — komt in Bundel 4A met Worstenbroodjeskraam-archetype.
+- **UpgradeBuilding** (4) — `brabanders/upgrade.glb` (wagenbouwer), `randstad/upgrade.glb` (innovatie lab), `limburgers/upgrade.glb` (hoogoven), `belgen/upgrade.glb` (diamantslijperij).
+- **FactionSpecial1** (4) — `brabanders/special1.glb` (carnavalstent), `randstad/special1.glb` (boardroom), `limburgers/special1.glb` (vlaaiwinkel), `belgen/special1.glb` (diplomatiek salon).
+- **Pipeline**: 1024×1024 isometric concept-art (Flux Dev + BiRefNet remove-bg) → Meshy v6 image-to-3D production. Concept-art-cost ~$0.33, totale GLB-batch ~13 productie-calls.
+
+### Changed
+- **`BuildingRenderer.ts`**: 11 paths in `BUILDING_MODEL_PATHS` geflipt van `lumbercamp.glb`/`blacksmith.glb` fallback naar dedicated `tertiary.glb`/`upgrade.glb`/`special1.glb`. V01 fallback (Safari path) ongemoeid.
+- **`BUILDING_MODEL_PATHS`** is nu `export`ed (was module-private) zodat tests over de mesh-mapping kunnen asserten.
+
+### Added — tests (+99)
+- **`tests/BuildingRenderer-mesh-uniqueness.test.ts`** — 99 assertions: per-faction unique-paths counts (Brabant 10 / overige 11), cross-faction path-isolation, Bundle 5 wired-slot correctness, fs-existence van elke V02 GLB op disk, en complete (type × faction) coverage. Voorkomt regressies waar fallback-paths sluipenderwijs terugkeren.
+
+### Fixed
+- **`scripts/generate_bundle5b.sh`**: data_uri (base64 PNG) gaat nu via tmp-file naar python3 ipv argv. Loste `Argument list too long` af voor PNGs > ~750KB (belgen-tertiary 822KB, belgen-upgrade 793KB faalden eerst).
+
+### Notes
+- Test-suite: 1152 → 1251 (+99).
+- 12-GLB visuele dubbele-meshes backlog → Resolved (op Brabant tertiary na — Bundel 4A).
+- Volgende: Bundel 4 (Brabant Worstenbroodjeskraam archetype + per-gebouw smoke UAT).
+
 ## [0.37.35] - 2026-04-28 — Bundel 3: 4 FactionSpecial1 systems (Carnavalstent / Boardroom / Vlaaiwinkel / Diplomatiek Salon)
 
 ### Added (4 archetypes — eerste FactionSpecial1 implementatie)

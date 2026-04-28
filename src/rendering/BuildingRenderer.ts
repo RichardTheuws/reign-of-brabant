@@ -14,7 +14,7 @@ import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 
 export type BuildingTypeName = 'townhall' | 'barracks' | 'blacksmith' | 'lumbercamp' | 'housing' | 'tower' | 'advanced' | 'siege-workshop' | 'tertiary' | 'upgrade' | 'special1';
 
-const BUILDING_MODEL_PATHS: Record<string, string> = {
+export const BUILDING_MODEL_PATHS: Record<string, string> = {
   townhall_0: '/assets/models/v02/brabanders/townhall.glb',
   townhall_1: '/assets/models/v02/randstad/townhall.glb',
   barracks_0: '/assets/models/v02/brabanders/barracks.glb',
@@ -53,21 +53,21 @@ const BUILDING_MODEL_PATHS: Record<string, string> = {
   'siege-workshop_1': '/assets/models/v02/randstad/siege-workshop.glb',
   'siege-workshop_2': '/assets/models/v02/limburgers/siege-workshop.glb',
   'siege-workshop_3': '/assets/models/v02/belgen/siege-workshop.glb',
-  // Tertiary resource building — fallback to lumbercamp
+  // Tertiary resource building — Bundle 5 dedicated meshes (brabant TBD in Bundle 4A)
   'tertiary_0': '/assets/models/v02/brabanders/lumbercamp.glb',
-  'tertiary_1': '/assets/models/v02/randstad/lumbercamp.glb',
-  'tertiary_2': '/assets/models/v02/limburgers/lumbercamp.glb',
-  'tertiary_3': '/assets/models/v02/belgen/lumbercamp.glb',
-  // Upgrade building — fallback to blacksmith
-  'upgrade_0': '/assets/models/v02/brabanders/blacksmith.glb',
-  'upgrade_1': '/assets/models/v02/randstad/blacksmith.glb',
-  'upgrade_2': '/assets/models/v02/limburgers/blacksmith.glb',
-  'upgrade_3': '/assets/models/v02/belgen/blacksmith.glb',
-  // FactionSpecial1 — fallback to lumbercamp
-  'special1_0': '/assets/models/v02/brabanders/lumbercamp.glb',
-  'special1_1': '/assets/models/v02/randstad/lumbercamp.glb',
-  'special1_2': '/assets/models/v02/limburgers/lumbercamp.glb',
-  'special1_3': '/assets/models/v02/belgen/lumbercamp.glb',
+  'tertiary_1': '/assets/models/v02/randstad/tertiary.glb',
+  'tertiary_2': '/assets/models/v02/limburgers/tertiary.glb',
+  'tertiary_3': '/assets/models/v02/belgen/tertiary.glb',
+  // Upgrade building — Bundle 5 dedicated meshes
+  'upgrade_0': '/assets/models/v02/brabanders/upgrade.glb',
+  'upgrade_1': '/assets/models/v02/randstad/upgrade.glb',
+  'upgrade_2': '/assets/models/v02/limburgers/upgrade.glb',
+  'upgrade_3': '/assets/models/v02/belgen/upgrade.glb',
+  // FactionSpecial1 — Bundle 5 dedicated meshes
+  'special1_0': '/assets/models/v02/brabanders/special1.glb',
+  'special1_1': '/assets/models/v02/randstad/special1.glb',
+  'special1_2': '/assets/models/v02/limburgers/special1.glb',
+  'special1_3': '/assets/models/v02/belgen/special1.glb',
 };
 
 const BUILDING_MODEL_FALLBACKS: Record<string, string> = {

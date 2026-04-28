@@ -35,3 +35,9 @@ cinematic/*.jpg
 !assets/ui/
 test-results/
 playwright-report/
+
+# Bundle 5 ephemeral run logs (script output, not source)
+scripts/bundle5b_generation.log
+scripts/bundle5b_status.json
+scripts/bundle5b_stdout.log
+scripts/retry_*.log

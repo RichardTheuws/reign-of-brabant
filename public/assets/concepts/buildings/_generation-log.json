@@ -1,0 +1,61 @@
+{
+  "generated_at": "2026-04-28T14:44:46Z",
+  "total_seconds": 96,
+  "results": [
+    {
+      "key": "randstad-tertiary",
+      "status": "OK",
+      "info": "8s|551919b"
+    },
+    {
+      "key": "limburg-tertiary",
+      "status": "OK",
+      "info": "13s|638771b"
+    },
+    {
+      "key": "belgen-tertiary",
+      "status": "OK",
+      "info": "9s|822178b"
+    },
+    {
+      "key": "brabant-upgrade",
+      "status": "OK",
+      "info": "8s|610078b"
+    },
+    {
+      "key": "randstad-upgrade",
+      "status": "OK",
+      "info": "8s|595716b"
+    },
+    {
+      "key": "limburg-upgrade",
+      "status": "OK",
+      "info": "8s|652887b"
+    },
+    {
+      "key": "belgen-upgrade",
+      "status": "OK",
+      "info": "9s|793800b"
+    },
+    {
+      "key": "brabant-faction1",
+      "status": "OK",
+      "info": "8s|400694b"
+    },
+    {
+      "key": "randstad-faction1",
+      "status": "OK",
+      "info": "8s|413051b"
+    },
+    {
+      "key": "limburg-faction1",
+      "status": "OK",
+      "info": "8s|682272b"
+    },
+    {
+      "key": "belgen-faction1",
+      "status": "OK",
+      "info": "9s|698341b"
+    }
+  ]
+}
