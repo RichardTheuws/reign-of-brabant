@@ -72,6 +72,51 @@ Bij oppakken: subject + commit-SHA invullen onder "Resolved".
 
 ---
 
+## 🟢 P3 — V1.0 visual perfection (factie-specifiek, on-brand)
+
+### V1.0 perfectie: ALLES factie-specifiek + per-functie unique HUD-images
+- **Gevonden**: 2026-04-28 (na Bundel 2.5 deploy — Richard live-confirmation)
+- **Bundel-fit**: groot, gefaseerd. Niet één bundel — eigen track parallel aan gameplay-bundels of gespreid over Bundel 5/6/7.
+- **Scope** — drie image-categorieën, allemaal moeten on-brand worden:
+
+  **A. Upgrade-portraits (18 → 4×18 = 72 versies)**
+  - Huidig (v0.37.34): 18 generic painted portraits (Flux Dev, RPG card-art template).
+  - Doel: per upgrade × per factie een eigen versie.
+  - Voorbeeld: WoodCarry1 generic = bakker met mand. Brabant-versie = Brabantse boer met worstenbroodjeskraam-mand. Randstad-versie = Starbucks-barista met latte-tray. Limburg-versie = vlaaibakker met mergel-vlaai-stapel. Belgen-versie = frietboer met patatzak.
+  - Per factie eigen color-palette + symboliek (Brabant oranje/rood, Randstad blauw/glas, Limburg bruin/mergel, Belgen geel/zwart/rood).
+
+  **B. Building-portraits (HUD command-bar + selection-card)**
+  - Huidig: tekst-abbrev (TH/BRK/LMB/BSM) + canvas-drawn fallback voor T2/T3 (zie screenshot — "Vergaderzaal", "Sloopwerf" etc. tonen generieke icoontjes met emoji-look).
+  - Doel: per factie × per building-type een eigen painted portrait.
+  - 11 building-types × 4 facties = 44 building-portraits.
+  - Stijl: zelfde RPG card-art template als upgrade-portraits voor consistentie.
+
+  **C. Unit-portraits — review bestaande set**
+  - Huidig: `public/assets/portraits/` heeft per factie 5-6 unit-portraits (al on-brand, maar coverage incompleet).
+  - Doel: bevestig 100% coverage voor alle UnitTypeIds (Worker/Infantry/Ranged/Heavy/Siege/Support/Hero) per factie = 7 × 4 = 28 portraits.
+  - Audit nodig: welke ontbreken? Welke zijn off-brand?
+
+  **D. FactionSpecial1/2 + TertiaryResource portraits (incremental)**
+  - Volgt op A+B+C als die fundament staat.
+
+- **Volgorde-voorstel** (gespreid):
+  1. Audit: welke building-portraits zijn er nu / zijn ze on-brand? (1 sessie, Asset Generator agent)
+  2. Mass-batch B (44 building-portraits) via Asset Generator — kan zelfde RPG-template als upgrade-portraits, maar per factie color-palette aanpassen
+  3. Mass-batch A (72 upgrade-versies, 4 per upgrade) — per factie variant. UpgradePortraits.ts moet dan worden uitgebreid met `getUpgradeImagePath(factionId, upgradeId)`.
+  4. C audit + gap-fill
+  5. D special-functions
+- **Code-impact**: minimaal voor A (UpgradePortraits.ts factie-aware lookup). B+C+D vereisen wel canvas-fallback removal en image-loaders. Zou een dedicated **Bundel 6 — Visual Perfectie** kunnen zijn.
+- **Asset-cost** schatting (Flux Dev op 1024×1024, ~10s per generation): 72+44+~10 fixes = ~130 generations = ~22min API-tijd.
+- **Quality-bar**: GEEN emoji-fallback (zie generic ascii-look op Sloopwerf-screenshot — onaanvaardbaar voor v1.0). On-brand of niet shippen.
+
+### Sub-bevinding: Sloopwerf canvas-fallback toont ascii/emoji-look
+- **Gevonden**: 2026-04-28 (zelfde sessie, screenshot 15:11)
+- **Bundel-fit**: cosmetisch, opgenomen in V1.0 perfectie scope hierboven (item B).
+- **Issue**: Randstad Sloopwerf (UpgradeBuilding) toont in selection-card een crude canvas-drawn icon (rood truckje op simpele garage). Speel het scherm — dit is `createBuildingPortraitImg` fallback.
+- **Voorstel**: vervang canvas-fallback met factie-specifieke painted portrait via Asset Generator zodra V1.0 visual sweep gepland is.
+
+---
+
 ## ✅ Resolved
 
 (leeg — vul in bij oppakken met datum + commit-SHA)
