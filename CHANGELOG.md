@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.37.37] - 2026-04-28 — Bug #2: building labels via factionData single source of truth
+
+### Fixed
+- **`Game.getBuildingLabel`** — verwijderde een hardcoded `factionLabels: Record<number, Record<string, string>>` mapping van 4×11 entries die onafhankelijk van `factionData.ts` werd onderhouden. Negen labels waren gedrift t.o.v. canon (Boardroom→"Starbucks HQ", Carnavalstent→"Dorpsweide", Diplomatiek Salon→"Chocolaterie" (dubbel), Hoogoven→"Geavanceerde Mijn", Vlaaiwinkel→"Mijnschacht", e.a.). Nu één regel: `getDisplayBuildingName(playerFactionId, getBuildingTypeIdForGhost(ghostType))`. Schendt niet langer `feedback_factiondata_single_source.md`.
+
+### Added — tests (+3)
+- **`tests/Game-getBuildingLabel-uses-factionData.test.ts`** — source-level invariants: assert dat `getBuildingLabel` `getDisplayBuildingName` aanroept, geen `factionLabels` table herintroduceert, en geen van de 12 oude foute labels bevat. Voorkomt regressie naar parallel-table.
+
+### Notes
+- Test-suite: 1251 → 1254 (+3).
+- HUD "Bouw: X" indicator + ghost-mode label tonen nu altijd de canonical naam uit `factionData.FACTION_BUILDINGS` of `FACTION_BUILDING_NAME_FALLBACKS`.
+
 ## [0.37.36] - 2026-04-28 — Bundel 5: 11 dedicated Meshy v6 GLBs (visuele dubbele-meshes opgeruimd)
 
 ### Added (11 unieke GLBs — generated via Meshy v6 image-to-3D)

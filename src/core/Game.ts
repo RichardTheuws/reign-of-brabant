@@ -1142,16 +1142,13 @@ export class Game {
     }
   }
 
-  /** Get a faction-aware display label for a building ghost type. */
+  /**
+   * Faction-aware display label for a building ghost type.
+   * Single source of truth: factionData.getDisplayBuildingName.
+   */
   private getBuildingLabel(ghostType: string): string {
-    const factionLabels: Record<number, Record<string, string>> = {
-      [FactionId.Brabanders]: { barracks: 'Kazerne', lumbercamp: 'Houtzagerij', blacksmith: 'Smederij', housing: 'Woonhuis', tower: 'Wachttoren', tertiary: 'Dorpsweide', upgrade: 'Geavanceerde Smederij', faction1: 'Dorpsweide', faction2: 'Feestzaal', 'siege-workshop': 'Tractorschuur' },
-      [FactionId.Randstad]:   { barracks: 'Vergaderzaal', lumbercamp: 'Starbucks', blacksmith: 'CoworkingSpace', housing: 'Flatgebouw', tower: 'Security Tower', tertiary: 'Kantoor', upgrade: 'Innovatielab', faction1: 'Starbucks HQ', faction2: 'Parkeergarage', 'siege-workshop': 'Bouwplaats', mijnschacht: 'Kantoor' },
-      [FactionId.Limburgers]: { barracks: 'Schuttershal', lumbercamp: 'Vlaaibakkerij', blacksmith: 'Klooster', housing: 'Huuske', tower: 'Wachttoren', tertiary: 'Kolenoven', upgrade: 'Geavanceerde Mijn', faction1: 'Mijnschacht', faction2: 'Mijnwerkerskamp', 'siege-workshop': 'Springstoflab', mijnschacht: 'Mijnschacht' },
-      [FactionId.Belgen]:     { barracks: 'Frituur', lumbercamp: 'Frietfabriek', blacksmith: 'EU-Parlement', housing: 'Brusselse Woning', tower: 'Wachttoren', tertiary: 'Chocolaterie', upgrade: 'Geavanceerd Parlement', faction1: 'Chocolaterie', faction2: 'Rijschool', 'siege-workshop': 'Atelier', chocolaterie: 'Chocolaterie' },
-    };
-    return factionLabels[this.playerFactionId]?.[ghostType]
-      ?? ghostType.charAt(0).toUpperCase() + ghostType.slice(1);
+    const typeId = this.getBuildingTypeIdForGhost(ghostType);
+    return getDisplayBuildingName(this.playerFactionId, typeId);
   }
 
   private exitBuildMode(): void {
