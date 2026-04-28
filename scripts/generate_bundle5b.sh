@@ -242,6 +242,7 @@ declare -a MODELS=(
 "randstad-faction1|randstad-faction1.png|randstad/special1.glb|3D RTS game building, Randstad faction-special structure (HQ skyscraper with roof helipad), cool blue mirror glass and steel, sleek high-tech corporate, stylized low-poly, clean geometry, painted texture, isometric building"
 "limburg-faction1|limburg-faction1.png|limburgers/special1.glb|3D RTS game building, Limburg faction-special structure (basilica / hilltop kasteel), warm sandstone and terracotta, Burgundian splendor, stylized low-poly, clean geometry, painted texture, isometric building"
 "belgen-faction1|belgen-faction1.png|belgen/special1.glb|3D RTS game building, Belgian faction-special structure (cathedral hall / Brussels grand-place facade), deep red brick with gold trim, ornate Flemish gothic, stylized low-poly, clean geometry, painted texture, isometric building"
+"brabant-tertiary|brabant-tertiary.png|brabanders/worstenbroodjeskraam.glb|3D RTS game building, festive Brabant carnival worstenbroodjes food stall (kraampje), warm wooden frame with awning, sausage rolls on counter, oranje-rood-geel carnival theme with small flag accent, painted detail, stylized low-poly, clean geometry, isometric building"
 )
 
 run_one() {

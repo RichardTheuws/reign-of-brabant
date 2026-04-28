@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.37.41] - 2026-04-28 — Bundel 4 finale: Worstenbroodjeskraam GLB + per-gebouw smoke UAT (4B) + mesh-audit Resolved (4C)
+
+### Added — 12e Meshy v6 GLB (asset-generator agent, parallel run)
+- **`public/assets/concepts/buildings/brabant-tertiary.png`** (698KB) — isometrisch concept-art, kraampje met rood-wit luifeltje, worstenbroodjes op counter, oranje-rood-geel carnaval-palet. First-try via Bundle 5 prompt-template (12/12 cumulatief first-try).
+- **`public/assets/models/v02/brabanders/worstenbroodjeskraam.glb`** (7.9MB) — Meshy v6 production image-to-3D, 486s, first-try, geen retries.
+- **`BuildingRenderer.ts`** — `tertiary_0` flipped van `lumbercamp.glb` fallback naar dedicated `worstenbroodjeskraam.glb`. Brabant heeft nu 11/11 unieke GLBs (was 10).
+
+### Added — Bundle 4B per-gebouw smoke UAT (general-purpose agent)
+- **`tests/per-building-smoke.test.ts`** — 177 tests (4 facties × 11 building-types × 3-4 invariants + 5 sanity-checks). Voor elke (factie × type) combinatie:
+  1. `getDisplayBuildingName` returns nooit `'Gebouw'` fallback (factionData of FACTION_BUILDING_NAME_FALLBACKS)
+  2. `BUILDING_MODEL_PATHS[\`${typeKey}_${factionId}\`]` is gedefinieerd en eindigt op `.glb`
+  3. GLB-bestand bestaat fysiek op disk
+  4. Build-menu entry bestaat (TownHall uitgesloten — start-spawn)
+- Dekt regressie waarbij een toekomstige refactor een (type × factie) combinatie zou kunnen vergeten.
+
+### Changed — `BuildingRenderer-mesh-uniqueness.test.ts`
+- Brabanders-test geüpdatet van "10 unique paths (tertiary_0 still maps to lumbercamp until Bundle 4A)" naar "11 unique paths (Bundle 4A v0.37.41 — Worstenbroodjeskraam dedicated)".
+
+### Resolved — Bundel 4C (mesh-audit)
+- **`.claude/plans/BACKLOG.md`** — "12-GLB visuele dubbele-meshes" item gemarkeerd als ✅ Resolved (Bundel 5 leverde 11, Bundel 4A integratie levert de 12e). Test-lock: `tests/BuildingRenderer-mesh-uniqueness.test.ts`.
+
+### Notes
+- Test-suite: 1300 → 1477 (+177).
+- Geen runtime/gameplay-changes — pure asset + test toevoeging.
+- Brabant heeft nu visueel volledig unieke building-line-up.
+
 ## [0.37.40] - 2026-04-28 — Bundel 4A: Brabant Worstenbroodjeskraam (TertiaryResource archetype + 3 functies)
 
 ### Added — archetype + build menu

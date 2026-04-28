@@ -8,6 +8,33 @@ Bij oppakken: subject + commit-SHA invullen onder "Resolved".
 
 ---
 
+## 🌟 v1.0 PERFECTIE — gesignaleerd onderweg (sessie 2026-04-28)
+
+Items die deze sessie zichtbaar werden bij Bundel 5 + Bug-fix-sweep + Bundel 4A. Niet allemaal blokkers, maar in v1.0 perfectie-kader allemaal aan te pakken.
+
+### Multi-stat splitsing op victory screen
+- **Gevonden**: 2026-04-28 (na Bug #3 fix v0.37.38)
+- **Issue**: stat-row "Verzameld" toont nu `goldGathered + woodGathered` als één getal. Voor speler-inzicht (en eventuele OKR/leaderboard-stats) zou aparte "Goud" + "Hout" beter zijn.
+- **Voorstel**: 7e stat-row toevoegen of 2-kolom layout aanpassen. PlayerState heeft de getters al (`getGoldGathered`/`getWoodGathered`).
+
+### TIER_REQUIREMENT_LABELS factie-aware
+- **Gevonden**: 2026-04-28 tijdens Bug #2 refactor
+- **Issue**: `factionBuildMenus.ts:44` heeft `TIER_REQUIREMENT_LABELS[3] = 'Geavanceerde Smederij'`. Voor Brabant-spelers leest de tooltip "Vereist Geavanceerde Smederij" terwijl het Wagenbouwer is. Zelfde voor andere facties (Innovatie Lab / Hoogoven / Diamantslijperij).
+- **Voorstel**: `getTierRequirementLabel(factionId, tier)` helper in factionData.ts die de juiste UpgradeBuilding-naam returnt per factie.
+
+### Heal-aura visual feedback
+- **Gevonden**: 2026-04-28 (na Bundel 4A v0.37.40)
+- **Issue**: Worstenbroodjeskraam heeft passive heal-aura (+0.5 HP/sec in 8u radius), maar geen visuele indicator. Speler ziet niet welke units worden geheeld.
+- **Voorstel**: groene tint op unit-mesh tijdens heal-tick, of subtle particle-pulse. Idem voor Vlaaiwinkel heal (Bundel 3) — die heeft ook geen visual.
+- **Bredere scope**: alle aura-effects (Carnavalstent attack-aura, Carnavalsvuur damage-aura, Worstenbroodjeskraam heal-aura, Vlaaiwinkel heal) verdienen een visuele radius-indicator wanneer de bron-bouw geselecteerd is.
+
+### Stat-tracking voor non-player factions
+- **Gevonden**: 2026-04-28 (na Bug #3 fix)
+- **Issue**: `recordGoldGathered/recordWoodGathered` werken voor ALLE facties, maar de stats worden alleen voor de player getoond bij endMatch. Voor leaderboard/replay-data zou per-faction tracking ook nuttig zijn.
+- **Voorstel**: minimaal tracking blijft in PlayerState; bij endMatch logging naar GitHub feedback API of analytics (Umami custom-event).
+
+---
+
 ## 🌟 v1.0 PERFECTIE — multi-functie audit per gebouw
 
 Per `feedback_v1_perfection_multi_function.md`: voor v1.0 streven we naar **2-3 functies per "specialty"-gebouw** (TertiaryResource / UpgradeBuilding / FactionSpecial1+2). Niet alleen één click-action of passive, maar een combinatie. Status na v0.37.39:
@@ -67,16 +94,12 @@ Per `feedback_v1_perfection_multi_function.md`: voor v1.0 streven we naar **2-3 
 
 ## 🟢 P3 — visuele upgrades / mesh-batch
 
-### Meshy v6 batch — 12 ontbrekende GLBs (4 facties × 3 building-types) — **PRIO BUMP P2 na v0.37.35**
+### ~~Meshy v6 batch — 12 ontbrekende GLBs~~ ✅ RESOLVED (Bundel 5 + 4A integratie)
 - **Gevonden**: 2026-04-28 tijdens Belgen-mapping
-- **2026-04-28 priority-bump**: Bundel 3 deploy maakt het probleem actief gameplay-relevant. Randstad-speler ziet 3 identieke "Starbucks" meshes voor Starbucks/Havermoutmelkbar/Boardroom — kan ze niet onderscheiden van bovenaf. Boardroom-click vereist visuele identifier.
-- **Bundel-fit**: **Bundel 4C** plant dit als mesh-audit *doc* (queue-only). Reële uitvoering = **nieuwe Bundel 5** Meshy-marathon (één sessie, batch-prompting, één BuildingRenderer-rewire-PR).
-- **Scope**:
-  - **HOOG: UpgradeBuilding × 4** — alle 4 facties gebruiken nu `<faction>/blacksmith.glb` als fallback (speler ziet 2× dezelfde Smederij). Brabant=?, Randstad=?, Limburg=?, Belgen=Diamantslijperij.
-  - **HOOG: FactionSpecial1 × 4** — alle 4 gebruiken nu `<faction>/lumbercamp.glb`. Carnavalstent / Boardroom / Vlaaiwinkel / Diplomatiek Salon. Archetypes komen in Bundel 3.
-  - **MEDIUM: TertiaryResource × 4** — alle 4 gebruiken nu `<faction>/lumbercamp.glb`. Worstenbroodjeskraam / Havermoutmelkbar / Mijnschacht / Chocolaterie. Brabant-archetype komt in Bundel 4A.
-- **Aanpak**: per gebouw concept-art prompt (image generatie) → Meshy v6 production image-to-3D → GLB + faction-aesthetic check → BuildingRenderer.ts:56-70 primary-path update → render-test in skirmish.
-- **Volgorde**: na Bundel 4 (alle archetypes + functies LIVE), zodat we tegelijk visueel sluiten.
+- **Resolved**: 2026-04-28
+  - Bundel 5 (v0.37.36) — 11 dedicated GLBs voor 3 randstad/limburgers/belgen × tertiary/upgrade/special1 + brabant upgrade/special1.
+  - Bundel 4A integratie (v0.37.41 — pending) — 12e GLB voor Brabant Worstenbroodjeskraam (TertiaryResource).
+- **Test-lock**: `tests/BuildingRenderer-mesh-uniqueness.test.ts` — per factie 11 unique paden (Brabant 10 → 11 na 4A integratie). Plus fs-existence per V02 path. Voorkomt regressie naar fallback-paths.
 
 ---
 

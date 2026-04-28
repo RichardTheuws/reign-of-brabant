@@ -52,11 +52,11 @@ describe('BuildingRenderer V02 mesh-uniqueness (Bundle 5)', () => {
       expect(new Set(paths).size).toBe(11);
     });
 
-    it('Brabanders has 10 unique GLB paths (tertiary_0 still maps to lumbercamp until Bundle 4A)', () => {
+    it('Brabanders has 11 unique GLB paths (Bundle 4A v0.37.41 — Worstenbroodjeskraam dedicated)', () => {
       const paths = pathsForFaction(0);
       expect(paths).toHaveLength(11);
-      expect(new Set(paths).size).toBe(10);
-      expect(BUILDING_MODEL_PATHS['tertiary_0']).toBe(BUILDING_MODEL_PATHS['lumbercamp_0']);
+      expect(new Set(paths).size).toBe(11);
+      expect(BUILDING_MODEL_PATHS['tertiary_0']).toBe('/assets/models/v02/brabanders/worstenbroodjeskraam.glb');
     });
   });
 

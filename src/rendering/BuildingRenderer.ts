@@ -53,8 +53,8 @@ export const BUILDING_MODEL_PATHS: Record<string, string> = {
   'siege-workshop_1': '/assets/models/v02/randstad/siege-workshop.glb',
   'siege-workshop_2': '/assets/models/v02/limburgers/siege-workshop.glb',
   'siege-workshop_3': '/assets/models/v02/belgen/siege-workshop.glb',
-  // Tertiary resource building — Bundle 5 dedicated meshes (brabant TBD in Bundle 4A)
-  'tertiary_0': '/assets/models/v02/brabanders/lumbercamp.glb',
+  // Tertiary resource building — Bundle 5 dedicated meshes (Brabant via Bundle 4A v0.37.41)
+  'tertiary_0': '/assets/models/v02/brabanders/worstenbroodjeskraam.glb',
   'tertiary_1': '/assets/models/v02/randstad/tertiary.glb',
   'tertiary_2': '/assets/models/v02/limburgers/tertiary.glb',
   'tertiary_3': '/assets/models/v02/belgen/tertiary.glb',
