@@ -476,6 +476,184 @@
     <div class="content">
         <div class="timeline">
 
+            <!-- ── v0.37.35 (Bundel 3 — FactionSpecial1 × 4 facties) ──── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.37.35</span>
+                        <span class="update__date">28 april 2026</span>
+                        <h2 class="update__title">Vier nieuwe factie-specials live: aura, CEO-buff, heal-pulse en diplomatie-events</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Feature</span>
+                            <span class="tag tag--gameplay">Gameplay</span>
+                            <span class="tag tag--feat">Tests</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Bundel 3 levert vier compleet werkende FactionSpecial1 gebouwen — een eerste echte factie-identiteit per gameplay-loop. Hotkey <strong>V</strong> tier 2 voor alle facties, met vier wezenlijk verschillende mechanieken die elk hun eigen system raken.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">VIER FACTIE-SPECIALS</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Carnavalstent (Brabant)</strong> — Aura: alle Brabander units binnen 12u radius krijgen +20% schade. Stapelt multiplicatief op de Carnavalsvuur-aura uit Bundel 2 (1.10 × 1.20 = +32%) en op de tier-bonus van GezelligheidSystem. Niet-stapelend tussen meerdere tents zelf.</li>
+                            <li><strong>Boardroom (Randstad)</strong> — Klik-actie "Activeer Kwartaalcijfers" (hotkey T): 30 seconden +50% productiesnelheid voor alle Randstad-buildings, dan 90 seconden cooldown voor je 'm weer kan inzetten. Vijfde duration-factor in ProductionSystem naast bureaucracy/CEO-hero/AI-Optimization. Volledig getypeerd state-machine met 8 vitest-locks.</li>
+                            <li><strong>Vlaaiwinkel (Limburg)</strong> — Passief heal-pulse elke 5 seconden: alle Limburger units binnen 10u krijgen +10 HP. Meerdere Vlaaiwinkels stapelen (pulses × 10). Pipeline-phase 'combat' direct na CombatSystem zodat heal damage same-tick kan compenseren — defensieve faction-identity vastgenageld.</li>
+                            <li><strong>Diplomatiek Salon (Belgen)</strong> — Random event elke 90 seconden: 33% kans op +50 chocolade (tertiary), 33% +200 gold + 100 wood, 33% een gratis Bierbouwer Worker spawned. Nieuw <code>'diplomatiek-event'</code> bus-event voor toekomstige HUD-toasts. Verse spawn start met volle 90s cooldown om build-rush exploits te voorkomen.</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">WORKFLOW + ASSETS</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Vier subagents parallel</strong> — Explore voor archetype-mapping, twee general-purpose agents voor design-doc 3A (Carnavalstent + Boardroom) en 3B (Vlaaiwinkel + Diplomatiek Salon), plus de Asset Generator agent voor 4 building-portraits. Volledige design-fase in &lt; 5 minuten parallel.</li>
+                            <li><strong>4 building-portraits gegenereerd</strong> — Flux Dev RPG card-art template met building-interior variant. 4-voor-4 success-rate eerste poging. Visueel sterkst: Boardroom (cinematische glazen vergadertafel met skyline) en Vlaaiwinkel (cozy painterly met houten vlaaikast en mergel-stenen muren).</li>
+                        </ul>
+
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--space-md);">Test-suite: <strong>1120 → 1152</strong> (+32). Pipeline van 8 systems naar 10. Backlog: alle 4 FactionSpecial1-gebouwen delen nog dezelfde GLB-mesh als de LumberCamp-equivalent — Meshy v6 batch in de volgende sessie maakt elk gebouw ook visueel uniek.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.37.34 (Bundel 2.5 — ActionCard refactor + 18 portraits) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.37.34</span>
+                        <span class="update__date">28 april 2026</span>
+                        <h2 class="update__title">Research-panels nu in Barracks-card stijl: 18 painted portraits + locked-state UX</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">UI</span>
+                            <span class="tag tag--feat">Assets</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">De Smederij, LumberCamp en UpgradeBuilding panels gebruiken nu dezelfde card-look als de Barracks: portrait-image fill-background, cost-badge linker boven, naam met dark gradient onder. Geen losse tekst-rijen meer — alles voelt nu als één gegoten interface.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">UI UNIFY</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Locked-state toont nu wát komt</strong> — Vroeger werden upgrades met onvervulde prereqs gewoon verborgen. Nu zie je ze grijs met een rood "X" en tooltip "Vereist: Zwaardvechten II + UpgradeBuilding voltooid". Speler kan vooruitplannen.</li>
+                            <li><strong>Smederij T1 verdwijnt zodra T2 done</strong> — Voorkomt dat het paneel 7 buttons toont. Researched T1-bonus blijft actief, alleen UI-slot wordt vrijgemaakt voor relevante keuzes.</li>
+                            <li><strong>18 painted upgrade-portraits</strong> — Asset Generator agent genereerde alle 18 in één parallel sprint via Flux Dev (RPG card-art template). 7 Blacksmith + 3 LumberCamp + 4 T3 universal + 4 faction-unique. Visueel sterkst: <em>move-speed-2</em> (galopperend paard met groene bliksem), <em>diamantgloeiende-wapens</em> (gekruiste wapens op België-vlag), <em>melee-attack-3</em> (gloeiend rune-zwaard).</li>
+                        </ul>
+
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--space-md);">Test-suite: <strong>1119 → 1120</strong> (+1 bij refactor — bestaande tests bevestigen invariants). Visuele queue voor v1.0: alle 18 portraits zijn nu generic; in v1.0 krijgt elke factie zijn eigen versie (4 × 18 = 72 unieke portraits).</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.37.33 (Bundel 2 — UpgradeBuilding research + Watchtower UX + Housing toast) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.37.33</span>
+                        <span class="update__date">28 april 2026</span>
+                        <h2 class="update__title">Tier 3 onderzoek live, Watchtower toont eindelijk z'n bereik, Housing geeft feedback</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Feature</span>
+                            <span class="tag tag--gameplay">Gameplay</span>
+                            <span class="tag tag--feat">UI</span>
+                            <span class="tag tag--feat">Tests</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Drie samenhangende UX-updates. UpgradeBuilding heeft eindelijk z'n eigen research-paneel met 5 buttons per factie (4 T3 universal + 1 factie-uniek). Watchtower laat z'n attack-radius zien als oranje cirkel zodra je 'm selecteert. Housing-completion zorgt nu voor een toast die zegt hoeveel populatie-cap erbij kwam.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">UPGRADEBUILDING RESEARCH (BUNDEL 2A)</h3>
+                        <ul class="update__highlights">
+                            <li><strong>4 T3 universele upgrades</strong> — Zwaardvechten III / Boogschieten III / Bepantsering III / Snelle Mars II. Allemaal gegate door T2 prereq + complete UpgradeBuilding. UpgradeId-range 50-59 nieuw geïntroduceerd om collision met faction-stub IDs (10-19/20-29/etc) te vermijden.</li>
+                            <li><strong>4 factie-unieke upgrades</strong> — Carnavalsvuur (Brabant aura: +10% schade rond TownHall), AI Optimization (Randstad: alle gebouwen +20% productie), Mergelharnas (Limburg: Heavy units +3 armor — gebruikt bestaande affectsUnitTypes-filter, ZERO nieuwe code), Diamantgloeiende Wapens (Belgen: 5% kans per attack op 10× crit damage).</li>
+                            <li><strong>getUpgradeDefinition refactor naar Map</strong> — De array-lookup brak met sparse IDs (14/24/34/44/50-53). Nu een typed Map met expliciete throw bij onbekende ID. Plus een nieuwe optionele <code>world</code> parameter op <code>canResearch</code> en <code>startResearch</code> voor de UpgradeBuilding-gate (defense-in-depth).</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">WATCHTOWER UX (BUNDEL 2B)</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Range-indicator als oranje ring</strong> — Nieuwe <code>TowerRangeRenderer</code> tekent een translucent ring (RingGeometry 14u radius) op de grond rond een geselecteerde DefenseTower. Z-offset voorkomt z-fighting met terrain.</li>
+                            <li><strong>Stats-grid in selection-card</strong> — DefenseTower toont nu Bereik / DPS / Bepantsering. <code>BuildingCardData.stats</code> + <code>infoText</code> velden zijn optional, dus ander gebouw-types zijn niet aangetast. Status-text: "Patrouilleert — schiet automatisch op vijanden".</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">HOUSING FEEDBACK (BUNDEL 2C)</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Completion-toast met populatie-delta</strong> — Bij completion van een Housing-building: <code>"Boerenhoeve klaar — populatie-cap +10 (15/45)"</code> (faction-specifieke naam). Geen guesswork meer over wanneer je cap omhoog ging.</li>
+                            <li><strong>Selection info-text</strong> — Selecteer een Huuske/Vinex-wijk/Brusselse Woning en zie direct "Biedt +10 populatie-cap" onder de status-line.</li>
+                        </ul>
+
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--space-md);">Test-suite: <strong>1092 → 1119</strong> (+27). Drie agents parallel voor design-fase (UpgradeBuilding-explore, 8-upgrades-design, Watchtower+Housing-explore) — alle drie tegelijk klaar in &lt; 4 minuten.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.37.30-32 (Bundel 1 — Blacksmith click-fix + LumberCamp upgrades) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.37.30 – v0.37.32</span>
+                        <span class="update__date">28 april 2026</span>
+                        <h2 class="update__title">Smederij-knoppen reageerden niet — drie deploys later werkt het hele research-flow</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--fix">P0 Hotfix</span>
+                            <span class="tag tag--feat">Feature</span>
+                            <span class="tag tag--feat">Tests</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Bundel 1 startte met een door Richard live-gerapporteerde P0: Blacksmith research-knoppen reageerden niet op clicks. Drie deploys later was het probleem onder de motorkap dieper dan gedacht én was er meteen een complete LumberCamp-upgrade pipeline naast.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">BLACKSMITH CLICK — TWEE LAGEN ROOT CAUSE</h3>
+                        <ul class="update__highlights">
+                            <li><strong>v0.37.30 fix #1: event delegation</strong> — Diagnose: <code>showBlacksmithResearchUI</code> wordt elke frame aangeroepen zolang een Blacksmith geselecteerd is. <code>panel.innerHTML = ''</code> vernietigde alle buttons + listeners elk frame → click race-condition (mousedown ≠ mouseup target). Eerste fix: één delegated listener op het panel-parent dat overleeft de innerHTML-reset.</li>
+                            <li><strong>v0.37.31 fix #2: state-key diff</strong> — Event delegation lost het niet 100% op. Wanneer mousedown.target ≠ mouseup.target dispatcht de browser het click-event op de gemeenschappelijke ancestor (= het panel zelf) — <code>target.closest('button')</code> returnt dan null. Echte oplossing: rebuild de buttons alleen als state daadwerkelijk verandert (JSON-key diff). Buttons blijven dezelfde DOM-instances → click fires correct.</li>
+                            <li><strong>v0.37.32 fix #3: panel-id partitie</strong> — Wood-upgrades (LumberCamp) verschenen ook in de Smederij. Filter toegevoegd zodat Smederij alleen combat/armor/speed (IDs 0-6) toont, LumberCamp alleen wood-IDs (7-9). 4 nieuwe tests locken de partitie tussen de drie panels.</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">LUMBERCAMP WOOD-UPGRADES (BUNDEL 1B)</h3>
+                        <ul class="update__highlights">
+                            <li><strong>3 nieuwe universele upgrades</strong> — Houtdraagkracht I/II (workers dragen +5 / +10 hout per trip, stapelt) en Snelle Kap (+25% gather rate). Enum-IDs 7/8/9 in de universele range — collision met Brabant faction-stubs (10-19) voorkomen door Map-lookup ipv array-index.</li>
+                            <li><strong>Per-factie naming</strong> — Bakkers (Brabant) krijgen "Stevigere Manden / Volkoren Brood / Snellere Bakker", barista's (Randstad) "Latte Capacity / Cold Brew Bonus / Caffeine Kick", vlaaibakkers (Limburg) "Grotere Vlaai / Suiker-Boost / Snellere Oven", frietboeren (Belgen) "XL Patatzak / Mayo-Reserve / Snel Frituren". Twaalf flavour-locks in <code>FACTION_UPGRADE_NAME_OVERRIDES</code>.</li>
+                            <li><strong>Gatherer-component uitbreiding</strong> — Twee nieuwe Float32Array-velden: <code>carryBonus</code> (additief) en <code>gatherSpeedMult</code> (multiplicatief). Factory init verplicht op <code>gatherSpeedMult = 1</code> — een Float32Array zou anders 0 zijn en alle workers zouden 0× hout per tick gaan oogsten. Plus een defense-in-depth guard in GatherSystem.</li>
+                        </ul>
+
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--space-md);">Test-suite: <strong>1059 → 1092</strong> (+33). Drie agents parallel voor de planning-fase (Game-Deployer voor 3D landing restore, Explore voor Blacksmith mapping, general-purpose voor LumberCamp design-doc) — die laatste vond meteen de UpgradeId-collision die het plan zelf miste.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.37.22-29 (Audit Fase 4-5 + post-audit live fixes) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.37.22 – v0.37.29</span>
+                        <span class="update__date">25 april 2026</span>
+                        <h2 class="update__title">Audit fase 4 + 5 + vier P0/P1 live-fixes — gameplay nu &gt; 1000 tests gelocked</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Audit</span>
+                            <span class="tag tag--fix">Bugfix</span>
+                            <span class="tag tag--feat">Tests</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Sessie 25-28 april bracht het project van audit-modus (test-suite-uitbreiding) door naar buildings-functional-modus. Onderweg vier echte live-fixes na deploy — bevestiging dat de pre-deploy gate bestaande regressies vangt maar niet alle game-design fouten.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">AUDIT FASE 4 — COMBAT (v0.37.22-23)</h3>
+                        <ul class="update__highlights">
+                            <li><strong>UAT-scaffold + pre-deploy regression-gate</strong> — Eerst een testbare scaffold (Playwright UAT-01 boot, UAT-02 skirmish-quickstart) gebouwd, daarna een verplichte gate die <code>typecheck → vitest → uat</code> draait vóór elke deploy. Zes deploys via deze gate, nul breakage.</li>
+                            <li><strong>Combat audit 5 stappen, +64 tests</strong> — HoldPosition retaliation, attack-types vs armor-types matrix, splash-damage radius, Aggro-range edge-cases, projectile-flight integration. Gevonden: HoldPosition retaliation respecteerde state niet (gefixt in v0.37.25).</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">AUDIT FASE 5 — TECH-TREE (v0.37.26)</h3>
+                        <ul class="update__highlights">
+                            <li><strong>UpgradeBuilding voor 4 facties geïntroduceerd</strong> — Wagenbouwer / Innovatie Lab / Hoogoven / Diamantslijperij. Zonder deze gebouwen was Tier 3 onbereikbaar in alle facties. Plus retroactive-apply tests die voorkomen dat een nieuwe upgrade alleen bij nieuwe units werkt.</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">VIER ECHTE LIVE-FIXES NA DEPLOY</h3>
+                        <ul class="update__highlights">
+                            <li><strong>v0.37.24 — Mission 1 hout-deadlock</strong> — Tutorial-mission spawnde geen <code>treeResources</code>, dus Carnavalvierder-training (60 hout vereist) was onmogelijk. Plus Brabant building-naming aangepast (vier hardcoded mappings die uit sync waren met factionData).</li>
+                            <li><strong>v0.37.27 — ProductionSystem silent-fail Heavy/Siege/Support</strong> — <code>UNIT_TEMPLATES</code> had alleen entries voor Worker/Infantry/Ranged. Klik op "Train Tractorrijder" deducteerde resources, geen unit, geen event, geen feedback. Trial-and-error voor de speler.</li>
+                            <li><strong>v0.37.28 — Display-namen "Gebouw" / "Unit"</strong> voor T2/T3-buildings + Heavy/Siege/Support — hardcoded mappings in Game.ts uit sync met factionData. Iedere factie zag generieke fallback-tekst voor 4-5 unit-typen.</li>
+                            <li><strong>v0.37.29 — Terrain blanco buitenring</strong> op grote skirmish-maps. <code>Terrain.rebuild()</code> paste alleen <code>features</code> aan, niet de geometry-grootte zelf. Bij map-size 192 bleef de mesh op default 128 staan → bruine buitenring waar geen gebouwen geplaatst konden worden.</li>
+                        </ul>
+
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--space-md);">Test-suite: <strong>797 → 1059</strong> (+262, +33%). Conclusie van deze sprint: de pre-deploy gate werkt prima voor refactor-regressies, maar mist game-design bugs zoals "kan de speler de tutorial überhaupt voltooien". Cross-laag invariant-tests zijn de volgende coverage-gat (zie BACKLOG).</p>
+                    </div>
+                </div>
+            </article>
+
             <!-- ── v0.37.21 (Audit Fase 3b — Training) ──────────────── -->
             <article class="update">
                 <div class="update__card">
