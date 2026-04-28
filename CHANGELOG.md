@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.37.31] - 2026-04-28 — P0 hotfix: research-paneel klik werkte STILL niet op v0.37.30
+
+### Fixed (P0, Richard hands-on report 5 min na v0.37.30 deploy)
+- **Latte Capacity / Caffeine Kick / alle Blacksmith-buttons reageerden nog steeds niet** ondanks v0.37.30 event-delegation fix.
+- **Diepere root cause**: bij per-frame rebuild verschillen `mousedown.target` en `mouseup.target` (oude vs nieuwe DOM-button-instance, beide met `data-research-id`). De browser dispatch het `click` event dan op de **gemeenschappelijke ancestor** (= het panel zelf), niet op de button. `target.closest('button[data-research-id]')` op het panel retourneert `null` → handler exits early → silent.
+- **Fix**: state-key diff op upgrades (id/name/cost/canResearch/canAfford/isResearched/researchProgress.name). Per-frame call met identieke key skipt rebuild — buttons blijven dezelfde DOM-nodes → mousedown en mouseup vinden plaats op zelfde element → click fires correct → delegation handler werkt. Progress-bar fill + remaining-time worden inline ge-update zonder rebuild.
+- **`hideBlacksmithPanel()`** reset state-key zodat een ander gebouw (bv. switch Blacksmith → LumberCamp) altijd een full rebuild krijgt.
+
+### Tests (+3, 1085 → 1088)
+- `tests/HUD-blacksmith-panel.test.ts`:
+  - state-key skip: tweede call met identieke state behoudt button DOM-instance.
+  - state-change rebuild: canAfford flip → button.disabled flip.
+  - progress-bar inline update: zelfde DOM-node, alleen `style.width` muteert.
+
+### Notes
+- Symptoom verklaart waarom Bundel 1 vitest-tests groen waren maar live klik dood: vitest's `btn.click()` fired direct op de button (geen mousedown/mouseup race), terwijl de browser de target-divergence detecteert. De nieuwe state-key tests vangen dit nu wel: ze controleren dat de button-INSTANCE behouden blijft, wat de race vooraf elimineert.
+
 ## [0.37.30] - 2026-04-28 — Bundel 1: Blacksmith click-fix + LumberCamp wood-upgrades
 
 ### Fixed (P0, Richard hands-on report v0.37.29)

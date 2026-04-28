@@ -326,6 +326,12 @@ export class HUD {
   // innerHTML='' rebuild between mousedown and mouseup, killing clicks.
   private blacksmithOnResearch: ((upgradeId: number) => void) | null = null;
   private blacksmithDelegationBound = false;
+  // Diff-key: per-frame call skips DOM rebuild when nothing actionable changed.
+  // Without this, mousedown.target and mouseup.target are different DOM nodes
+  // (rebuilt every frame) → browser dispatches click on the common ancestor
+  // (the panel), and target.closest('button') returns null. Buttons appear
+  // dead. The progress-bar fill/remaining-time still updates inline.
+  private blacksmithStateKey: string | null = null;
 
   // Alert auto-dismiss timers
   private alertTimers: number[] = [];
@@ -1030,7 +1036,8 @@ export class HUD {
     if (!panel) return;
 
     // Bind ONE delegated click listener on the panel parent. This survives
-    // per-frame innerHTML rebuilds (only children are wiped, parent stays).
+    // any future child rebuilds (parent stays). The actionable state-key diff
+    // below ensures we don't rebuild children unnecessarily.
     this.blacksmithOnResearch = onResearch;
     if (!this.blacksmithDelegationBound) {
       const handler = (e: Event) => {
@@ -1048,6 +1055,26 @@ export class HUD {
     }
 
     panel.hidden = false;
+
+    // Compute a key over everything that affects which buttons exist + their
+    // disabled state. Progress remaining-time/fill animate inline, so they're
+    // excluded from the key.
+    const stateKey = JSON.stringify({
+      u: upgrades.map(u => `${u.id}:${u.name}:${u.costGold}:${u.canResearch ? 1 : 0}:${u.canAfford ? 1 : 0}:${u.isResearched ? 1 : 0}`),
+      r: researchProgress ? researchProgress.name : null,
+    });
+
+    if (this.blacksmithStateKey === stateKey) {
+      // No actionable change — only refresh the progress bar in place.
+      if (researchProgress) {
+        const bar = panel.querySelector('.research-bar') as HTMLElement | null;
+        const time = panel.querySelector('.research-time') as HTMLElement | null;
+        if (bar) bar.style.width = `${Math.min(researchProgress.progress, 1) * 100}%`;
+        if (time) time.textContent = `${Math.ceil(researchProgress.remaining)}s`;
+      }
+      return;
+    }
+    this.blacksmithStateKey = stateKey;
     panel.innerHTML = '';
 
     // If currently researching, show progress bar
@@ -1103,6 +1130,9 @@ export class HUD {
       panel.hidden = true;
       panel.innerHTML = '';
     }
+    // Force full re-render on next show — different building (or different
+    // upgrade-set) must rebuild buttons even if its key happens to match.
+    this.blacksmithStateKey = null;
   }
 
   // -----------------------------------------------------------------------

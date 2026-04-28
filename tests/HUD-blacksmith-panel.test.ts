@@ -130,4 +130,45 @@ describe('HUD blacksmith panel — click survives per-frame rebuild', () => {
     btn.click();
     expect(onResearch).toHaveBeenCalledTimes(1);
   });
+
+  it('skips DOM rebuild when state is unchanged (button instance is preserved)', () => {
+    hud.showBlacksmithPanel(ALL_ELIGIBLE, null, onResearch);
+    const firstBtn = document.querySelector(
+      '#cmd-blacksmith button[data-research-id="0"]',
+    ) as HTMLButtonElement;
+    // Per-frame call with identical state.
+    hud.showBlacksmithPanel(ALL_ELIGIBLE, null, onResearch);
+    const secondBtn = document.querySelector(
+      '#cmd-blacksmith button[data-research-id="0"]',
+    ) as HTMLButtonElement;
+    expect(secondBtn).toBe(firstBtn); // same DOM node — no rebuild
+  });
+
+  it('rebuilds when state changes (canAfford flip toggles disabled)', () => {
+    hud.showBlacksmithPanel(ALL_ELIGIBLE, null, onResearch);
+    const cantAfford = ALL_ELIGIBLE.map(u => ({ ...u, canAfford: false }));
+    hud.showBlacksmithPanel(cantAfford, null, onResearch);
+    const btn = document.querySelector(
+      '#cmd-blacksmith button[data-research-id="0"]',
+    ) as HTMLButtonElement;
+    expect(btn.disabled).toBe(true);
+  });
+
+  it('progress bar fills inline without DOM rebuild between frames', () => {
+    hud.showBlacksmithPanel(
+      ALL_ELIGIBLE,
+      { name: 'Zwaardvechten I', progress: 0.1, remaining: 27 },
+      onResearch,
+    );
+    const firstBar = document.querySelector('#cmd-blacksmith .research-bar') as HTMLElement;
+    expect(firstBar.style.width).toBe('10%');
+    hud.showBlacksmithPanel(
+      ALL_ELIGIBLE,
+      { name: 'Zwaardvechten I', progress: 0.5, remaining: 15 },
+      onResearch,
+    );
+    const secondBar = document.querySelector('#cmd-blacksmith .research-bar') as HTMLElement;
+    expect(secondBar).toBe(firstBar); // same node, just inline-updated
+    expect(secondBar.style.width).toBe('50%');
+  });
 });
