@@ -15,8 +15,9 @@ import {
   LIMBURGERS_UNIT_ARCHETYPES,
   BELGEN_UNIT_ARCHETYPES,
 } from '../entities/archetypes';
-import { UnitTypeId, BuildingTypeId, type UnitArchetype } from '../types/index';
+import { UnitTypeId, BuildingTypeId, UpgradeId, type UnitArchetype } from '../types/index';
 import { createCommandIcon, replaceIconText } from './CommandIcons';
+import { getUpgradeImagePath } from './UpgradePortraits';
 import { createBuildingPortraitImg } from './BuildingPortraits';
 
 // ---------------------------------------------------------------------------
@@ -1041,6 +1042,7 @@ export class HUD {
       canAfford: boolean;
       canResearch: boolean;
       isResearched: boolean;
+      prereqText?: string;
     }>,
     researchProgress: { name: string; progress: number; remaining: number } | null,
     onResearch: (upgradeId: number) => void,
@@ -1073,7 +1075,7 @@ export class HUD {
     // disabled state. Progress remaining-time/fill animate inline, so they're
     // excluded from the key.
     const stateKey = JSON.stringify({
-      u: upgrades.map(u => `${u.id}:${u.name}:${u.costGold}:${u.canResearch ? 1 : 0}:${u.canAfford ? 1 : 0}:${u.isResearched ? 1 : 0}`),
+      u: upgrades.map(u => `${u.id}:${u.name}:${u.costGold}:${u.canResearch ? 1 : 0}:${u.canAfford ? 1 : 0}:${u.isResearched ? 1 : 0}:${u.prereqText ?? ''}`),
       r: researchProgress ? researchProgress.name : null,
     });
 
@@ -1104,36 +1106,91 @@ export class HUD {
       panel.appendChild(progressDiv);
     }
 
-    // Upgrade buttons
+    // Card grid — bcard-action-btn styling re-used for visual unity with Barracks.
+    const grid = document.createElement('div');
+    grid.className = 'research-card-grid';
+    panel.appendChild(grid);
+
     for (const upg of upgrades) {
-      const btn = document.createElement('button');
-      btn.className = 'cmd-btn cmd-btn--research';
-      btn.disabled = !upg.canResearch || !upg.canAfford || upg.isResearched || researchProgress !== null;
-
-      if (upg.isResearched) {
-        btn.classList.add('is-researched');
-      }
-      if (!upg.canResearch && !upg.isResearched) {
-        btn.hidden = true; // Hide locked research — prerequisites not met
-        continue;
-      }
-
-      btn.dataset.researchId = String(upg.id);
-      btn.innerHTML = `
-        <span class="btn-icon btn-icon--research"></span>
-        <span class="research-name">${this.escapeHtml(upg.name)}</span>
-        <span class="research-cost">${upg.isResearched ? 'OK' : upg.costGold + 'g'}</span>
-      `;
-      const upgIconSpan = btn.querySelector('.btn-icon') as HTMLElement;
-      if (upgIconSpan) {
-        const upgSvg = createCommandIcon('UPG', 18);
-        if (upgSvg) upgIconSpan.appendChild(upgSvg);
-        else upgIconSpan.textContent = 'UPG';
-      }
-      btn.title = `${upg.name}\n${upg.description}\nKosten: ${upg.costGold} goud`;
-
-      panel.appendChild(btn);
+      grid.appendChild(this.renderResearchCard(upg, researchProgress !== null));
     }
+  }
+
+  private renderResearchCard(
+    upg: {
+      id: number;
+      name: string;
+      description: string;
+      costGold: number;
+      canAfford: boolean;
+      canResearch: boolean;
+      isResearched: boolean;
+      prereqText?: string;
+    },
+    anyResearchActive: boolean,
+  ): HTMLButtonElement {
+    const btn = document.createElement('button');
+    btn.className = 'bcard-action-btn bcard-action-btn--research';
+    btn.dataset.researchId = String(upg.id);
+
+    const lockedByPrereq = !upg.canResearch && !upg.isResearched;
+    const tooExpensive = !upg.canAfford && !upg.isResearched;
+    const disabled = lockedByPrereq || tooExpensive || upg.isResearched || anyResearchActive;
+    btn.disabled = disabled;
+    if (upg.isResearched) btn.classList.add('is-researched');
+    if (lockedByPrereq) btn.classList.add('is-locked');
+
+    // Cost badge (top-left), or 'OK' if researched
+    const costSpan = document.createElement('span');
+    costSpan.className = 'bcard-action-cost';
+    costSpan.textContent = upg.isResearched ? 'OK' : `${upg.costGold}g`;
+    btn.appendChild(costSpan);
+
+    // Portrait image (full-fill background); fallback to SVG icon if image missing.
+    const iconSpan = document.createElement('span');
+    iconSpan.className = 'bcard-action-icon';
+    const imgPath = getUpgradeImagePath(upg.id as UpgradeId);
+    if (imgPath) {
+      const img = document.createElement('img');
+      img.src = imgPath;
+      img.alt = upg.name;
+      img.draggable = false;
+      img.onerror = () => {
+        // Asset hasn't been generated yet — fall back to SVG icon inline.
+        img.remove();
+        const svg = createCommandIcon('UPG', 28);
+        if (svg) iconSpan.appendChild(svg);
+        else iconSpan.textContent = 'UPG';
+      };
+      iconSpan.appendChild(img);
+    } else {
+      const svg = createCommandIcon('UPG', 28);
+      if (svg) iconSpan.appendChild(svg);
+      else iconSpan.textContent = 'UPG';
+    }
+    btn.appendChild(iconSpan);
+
+    // Lock overlay icon (only when prereq missing)
+    if (lockedByPrereq) {
+      const lock = document.createElement('span');
+      lock.className = 'bcard-action-lock';
+      lock.textContent = 'X';
+      btn.appendChild(lock);
+    }
+
+    // Label (bottom)
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'bcard-action-label';
+    labelSpan.textContent = upg.name;
+    btn.appendChild(labelSpan);
+
+    // Tooltip
+    const titleParts = [upg.name, upg.description, `Kosten: ${upg.costGold} goud`];
+    if (lockedByPrereq && upg.prereqText) titleParts.push(`Vereist: ${upg.prereqText}`);
+    if (tooExpensive && !lockedByPrereq) titleParts.push('Te weinig goud.');
+    btn.title = titleParts.join('\n');
+
+    return btn;
   }
 
   /**

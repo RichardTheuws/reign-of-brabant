@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.37.34] - 2026-04-28 — Bundel 2.5: ActionCard refactor — research-panels nu in Barracks-stijl
+
+### Added (UI unify — research-panels match Barracks card-look)
+- **`src/ui/UpgradePortraits.ts`** — `UpgradeId` → image filename map. Resolves `/assets/portraits/upgrades/<key>.png`.
+- **`HUD.renderResearchCard`** — vervangt de oude inline list-render. Card-stijl met:
+  - Portrait-image (256x256 PNG, painted RPG card-art) als fill-background, `<img onerror>` fallback naar generieke SVG icon zodat panel niet breekt als image ontbreekt.
+  - Cost-badge top-left (`gXg` of `OK` voor researched).
+  - Label bottom met dark-gradient overlay.
+  - **Locked state** (canResearch=false): greyout (filter grayscale 0.85 + brightness 0.55), rood "X"-badge centraal, `is-locked` class. **Niet meer hidden** — speler ziet wat er straks beschikbaar wordt + tooltip met prereq-naam ("Vereist: Zwaardvechten II + UpgradeBuilding voltooid").
+  - **Researched state**: groene border + accent op cost-badge.
+- **`Game.buildUpgradeRow`** + **`getPrereqText`** helpers — single source of truth voor de upgrade-row constructie naar de HUD. Prereq-tekst combineert prerequisite-name + UpgradeBuilding-flag.
+- **`Game.isObsoleteT1`** — verbergt T1 zodra T2 (zelfde categorie) onderzocht is. Houdt Smederij-paneel onder 6 buttons zonder informatie te verliezen (T1-effect blijft actief, alleen UI-slot vrijgemaakt).
+
+### Added (assets — Asset Generator parallel batch)
+- **18 upgrade-portraits** gegenereerd via fal.ai Flux Dev (1024×1024, RPG card-art met groen-zwart vignette + goud frame). Stijl-template gevalideerd 18/18 op eerste poging.
+- Bestanden in `public/assets/portraits/upgrades/`: 7 Blacksmith universal + 3 LumberCamp wood + 4 T3 universal + 4 faction-unique. Manifest in `assets-generated.json`.
+
+### Changed
+- **`HUD.showBlacksmithPanel`** signature uitgebreid: per upgrade optional `prereqText?: string`. State-key bevat nu prereq-text zodat lock-text wijziging een rebuild forceert.
+- **CSS in `play/index.html`**: vervangen oude `.cmd-btn--research` row-stijl door `.research-card-grid` (3-col) + `.bcard-action-btn--research` (88×88 cards). Locked-overlay + researched-glow toegevoegd. `.command-panel--blacksmith` is nu column-flex i.p.v. wrap-flex.
+
+### Tests (+1, 1119 → 1120)
+- Update `tests/HUD-blacksmith-panel.test.ts`: locked-research test herzien — buttons zijn niet meer hidden maar `disabled + .is-locked` met prereq-tooltip in `title`. Plus nieuwe test: researched-state shows `OK` cost-text en `.is-researched` class.
+
+### Notes
+- Geen breaking change in API: `showBlacksmithPanel` werkt zonder `prereqText` (optional veld). Game.ts geeft het door, maar bestaande tests die zonder gaven werken nog.
+- DOM-id `cmd-blacksmith` blijft (mutex tussen Blacksmith/LumberCamp/UpgradeBuilding panels).
+- T1-hide-when-T2-done is *visueel-only* — de upgrade blijft researched in TechTreeSystem-state, alleen het slot in de UI verdwijnt.
+
 ## [0.37.33] - 2026-04-28 — Bundel 2: UpgradeBuilding research + Watchtower UX + Housing toast
 
 ### Added (Bundel 2A — UpgradeBuilding research-pakket)

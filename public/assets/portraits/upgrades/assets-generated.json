@@ -1,0 +1,121 @@
+{
+  "generated": "2026-04-28",
+  "model": "fal-ai/flux/dev",
+  "size": "1024x1024",
+  "style": "Painted RPG card-art with ornate gold curved frame, dark green-black moody vignette background, dramatic chiaroscuro lighting, oil painting texture. Match for existing portraits like brabant-prins.png, belgen-frietkoning.png, limburg-mijnbaas.png.",
+  "purpose": "Research-button icons in Smederij/LumberCamp/UpgradeBuilding panels for Reign of Brabant.",
+  "assets": [
+    {
+      "file": "melee-attack-1.png",
+      "label": "Zwaardvechten I",
+      "category": "blacksmith-universal",
+      "prompt": "painted RPG card art, a single gleaming polished medieval sword centered on a dark moody vignette background with green-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting hits the blade, fantasy game upgrade icon, oil painting texture, sharp glowing edges, no text, no characters, museum quality"
+    },
+    {
+      "file": "melee-attack-2.png",
+      "label": "Zwaardvechten II",
+      "category": "blacksmith-universal",
+      "prompt": "painted RPG card art, a single massive two-handed greatsword with intricate jeweled hilt embedded with rubies and emeralds, edges showing battle wear, centered on dark moody vignette background with green-black gradient, ornate gold curved frame border at top, dramatic chiaroscuro lighting reflecting off blade, fantasy game upgrade icon, oil painting texture, no text, no characters, museum quality"
+    },
+    {
+      "file": "ranged-attack-1.png",
+      "label": "Boogschieten I",
+      "category": "blacksmith-universal",
+      "prompt": "painted RPG card art, a single hand-carved wooden longbow with a single arrow nocked, centered on a dark moody vignette background with green-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, fantasy game upgrade icon, oil painting texture, no text, no characters, museum quality"
+    },
+    {
+      "file": "ranged-attack-2.png",
+      "label": "Boogschieten II",
+      "category": "blacksmith-universal",
+      "prompt": "painted RPG card art, a single composite recurve war bow made of horn and sinew with three feathered arrows stacked behind it, intricate craftsmanship details, centered on dark moody vignette background with green-black gradient, ornate gold curved frame border at top, dramatic chiaroscuro lighting, fantasy game upgrade icon, oil painting texture, no text, no characters, museum quality"
+    },
+    {
+      "file": "armor-upgrade-1.png",
+      "label": "Bepantsering I",
+      "category": "blacksmith-universal",
+      "prompt": "painted RPG card art, a single leather brigandine armor cuirass studded with riveted iron plates, brown leather and steel construction, hanging on display, centered on dark moody vignette background with green-black gradient, ornate gold curved frame border at top, dramatic chiaroscuro lighting, fantasy game upgrade icon, oil painting texture, no text, no characters, museum quality"
+    },
+    {
+      "file": "armor-upgrade-2.png",
+      "label": "Bepantsering II",
+      "category": "blacksmith-universal",
+      "prompt": "painted RPG card art, a single full plate armor cuirass with polished steel pauldrons and breastplate, gleaming metal reflections, knightly craftsmanship, centered on dark moody vignette background with green-black gradient, ornate gold curved frame border at top, dramatic chiaroscuro lighting hitting the steel, fantasy game upgrade icon, oil painting texture, no text, no characters, museum quality"
+    },
+    {
+      "file": "move-speed-1.png",
+      "label": "Snelle Mars I",
+      "category": "blacksmith-universal",
+      "prompt": "painted RPG card art, a single pair of leather travelers boots with small feathered wings on the heels, swirling wind streams and motion lines around them indicating speed, centered on dark moody vignette background with green-black gradient, ornate gold curved frame border at top, dramatic chiaroscuro lighting, fantasy game upgrade icon, oil painting texture, no text, no characters, museum quality"
+    },
+    {
+      "file": "wood-carry-1.png",
+      "label": "Houtdraagkracht I (Bakkerij)",
+      "category": "lumbercamp-wood",
+      "prompt": "painted RPG card art, a friendly Brabantian medieval baker holding a giant overflowing wicker basket full of fresh bread loaves and worstenbroodjes sausage rolls, warm flour-dusted apron, centered on dark moody vignette background with green-black gradient, ornate gold curved frame border at top, dramatic chiaroscuro lighting, fantasy game upgrade icon, oil painting texture, no text, museum quality"
+    },
+    {
+      "file": "wood-carry-2.png",
+      "label": "Houtdraagkracht II (Bakkerij)",
+      "category": "lumbercamp-wood",
+      "prompt": "painted RPG card art, a friendly Brabantian medieval baker carrying enormous double-stacked wicker basket overflowing with worstenbroodjes sausage rolls and bread loaves, broad smile, flour-dusted apron, robust strong build, centered on dark moody vignette background with green-black gradient, ornate gold curved frame border at top, dramatic chiaroscuro lighting, fantasy game upgrade icon, oil painting texture, no text, museum quality"
+    },
+    {
+      "file": "wood-gather.png",
+      "label": "Snelle Kap (Snelle Bak)",
+      "category": "lumbercamp-wood",
+      "prompt": "painted RPG card art, a single industrial hand-cranked stone bakers oven with bright yellow-orange flames roaring inside, motion blur and speed lines around it indicating rapid baking, fantasy medieval craftsmanship, centered on dark moody vignette background with green-black gradient, ornate gold curved frame border at top, dramatic chiaroscuro lighting, fantasy game upgrade icon, oil painting texture, no text, no characters, museum quality"
+    },
+    {
+      "file": "melee-attack-3.png",
+      "label": "Zwaardvechten III",
+      "category": "t3-universal",
+      "prompt": "painted RPG card art, a single legendary epic two-handed greatsword with glowing magical runes etched along the blade emitting golden divine light, ornate jeweled hilt, mythic weapon, centered on dark moody vignette background with green-black gradient, ornate gold curved frame border at top, dramatic chiaroscuro lighting with glowing aura, fantasy game upgrade icon, oil painting texture, no text, no characters, museum quality"
+    },
+    {
+      "file": "ranged-attack-3.png",
+      "label": "Boogschieten III",
+      "category": "t3-universal",
+      "prompt": "painted RPG card art, a single masterwork elven longbow with silver inlays and three glowing magical arrows with blue ethereal energy trails, intricate craftsmanship, mythic ranged weapon, centered on dark moody vignette background with green-black gradient, ornate gold curved frame border at top, dramatic chiaroscuro lighting with magic glow, fantasy game upgrade icon, oil painting texture, no text, no characters, museum quality"
+    },
+    {
+      "file": "armor-upgrade-3.png",
+      "label": "Bepantsering III",
+      "category": "t3-universal",
+      "prompt": "painted RPG card art, a single ornate engraved royal knight plate armor with heraldic emblems and golden filigree, brass inlays and steel plates polished mirror-bright, displayed on stand, centered on dark moody vignette background with green-black gradient, ornate gold curved frame border at top, dramatic chiaroscuro lighting hitting steel reflections, fantasy game upgrade icon, oil painting texture, no text, no characters, museum quality"
+    },
+    {
+      "file": "move-speed-2.png",
+      "label": "Snelle Mars II",
+      "category": "t3-universal",
+      "prompt": "painted RPG card art, a single noble warhorse galloping at full speed with lightning bolts and motion blur trails behind, brown coat flowing mane, dramatic action pose, fantasy mythic mount, centered on dark moody vignette background with green-black gradient, ornate gold curved frame border at top, dramatic chiaroscuro lighting, fantasy game upgrade icon, oil painting texture, no text, no rider, museum quality"
+    },
+    {
+      "file": "carnavalsvuur.png",
+      "label": "Carnavalsvuur (Brabant)",
+      "category": "faction-unique",
+      "faction": "Brabant",
+      "prompt": "painted RPG card art, a single Brabantian carnival flame torch with vibrant orange-red fire flames burning brightly, festive carnival atmosphere with subtle confetti embers, centered on a dark moody vignette background with green-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, fantasy game upgrade icon, oil painting texture, no text, no characters"
+    },
+    {
+      "file": "ai-optimization.png",
+      "label": "AI Optimalisatie (Randstad)",
+      "category": "faction-unique",
+      "faction": "Randstad",
+      "prompt": "painted RPG card art, a single futuristic glowing AI processor circuit board with cyan blue and purple LEDs, a sleek modern laptop displaying neural network diagrams, holographic data streams, modern tech aesthetic, centered on dark moody vignette background with deep blue-black gradient, ornate gold curved frame border at top, dramatic chiaroscuro lighting with neon glow, fantasy game upgrade icon, oil painting texture meets cyberpunk, no text, no characters, museum quality"
+    },
+    {
+      "file": "mergelharnas.png",
+      "label": "Mergelharnas (Limburg)",
+      "category": "faction-unique",
+      "faction": "Limburg",
+      "prompt": "painted RPG card art, a single suit of plate armor crafted from pale beige Limburg mergel limestone with rough chiseled stone surface texture, glowing fossil patterns embedded in stone, mining helmet pickaxe symbols, underground mine aesthetic with subtle stalactites in background, centered on dark moody vignette background with green-black gradient, ornate gold curved frame border at top, dramatic chiaroscuro lighting, fantasy game upgrade icon, oil painting texture, no text, no characters, museum quality"
+    },
+    {
+      "file": "diamantgloeiende-wapens.png",
+      "label": "Diamantgloeiende Wapens (Belgen)",
+      "category": "faction-unique",
+      "faction": "Belgen",
+      "prompt": "painted RPG card art, a single pair of crossed weapons (sword and axe) embedded with dazzling sparkling brilliant cut diamonds along the blade edges, glittering refractions, flag of Belgium colors black yellow red ribbon banner draped behind them, regal Belgian heraldry, centered on dark moody vignette background with green-black gradient, ornate gold curved frame border at top, dramatic chiaroscuro lighting with diamond sparkles, fantasy game upgrade icon, oil painting texture, no text, no characters, museum quality"
+    }
+  ]
+}

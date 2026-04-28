@@ -105,19 +105,39 @@ describe('HUD blacksmith panel — click survives per-frame rebuild', () => {
     expect(onResearch).not.toHaveBeenCalled();
   });
 
-  it('hidden locked-research buttons (canResearch=false) do not appear', () => {
+  it('locked-research buttons render with is-locked class + disabled (no longer hidden)', () => {
     const upgrades = [
       { id: 0, name: 'A', description: '', costGold: 100,
         canAfford: true, canResearch: true, isResearched: false },
       { id: 1, name: 'B', description: '', costGold: 100,
-        canAfford: true, canResearch: false, isResearched: false },
+        canAfford: true, canResearch: false, isResearched: false,
+        prereqText: 'Vereist Zwaardvechten II' },
     ];
     hud.showBlacksmithPanel(upgrades, null, onResearch);
-    const visible = document.querySelectorAll(
-      '#cmd-blacksmith button:not([hidden])',
-    );
-    expect(visible.length).toBe(1);
-    expect((visible[0] as HTMLElement).dataset.researchId).toBe('0');
+    const all = document.querySelectorAll<HTMLButtonElement>('#cmd-blacksmith button[data-research-id]');
+    expect(all.length).toBe(2);
+    const lockedBtn = document.querySelector(
+      '#cmd-blacksmith button[data-research-id="1"]',
+    ) as HTMLButtonElement;
+    expect(lockedBtn.disabled).toBe(true);
+    expect(lockedBtn.classList.contains('is-locked')).toBe(true);
+    expect(lockedBtn.title).toContain('Vereist Zwaardvechten II');
+    // Click should still be ignored
+    lockedBtn.click();
+    expect(onResearch).not.toHaveBeenCalled();
+  });
+
+  it('researched button has is-researched class and OK cost-text', () => {
+    const upgrades = [
+      { id: 0, name: 'A', description: '', costGold: 100,
+        canAfford: true, canResearch: false, isResearched: true },
+    ];
+    hud.showBlacksmithPanel(upgrades, null, onResearch);
+    const btn = document.querySelector(
+      '#cmd-blacksmith button[data-research-id="0"]',
+    ) as HTMLButtonElement;
+    expect(btn.classList.contains('is-researched')).toBe(true);
+    expect(btn.querySelector('.bcard-action-cost')?.textContent).toBe('OK');
   });
 
   it('does NOT accumulate listeners across re-renders (single fire per click)', () => {

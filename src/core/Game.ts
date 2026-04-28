@@ -93,6 +93,51 @@ function isBlacksmithUpgrade(id: number): boolean {
   return BLACKSMITH_UPGRADE_IDS.has(id);
 }
 
+/**
+ * T1 is auto-hidden once its T2 (e.g. Zwaardvechten II) is researched —
+ * the T1 cost-tier is irrelevant after that and the panel slot is reclaimed.
+ */
+function isObsoleteT1(id: number): boolean {
+  const t1ToT2 = new Map<UpgradeId, UpgradeId>([
+    [UpgradeId.MeleeAttack1, UpgradeId.MeleeAttack2],
+    [UpgradeId.RangedAttack1, UpgradeId.RangedAttack2],
+    [UpgradeId.ArmorUpgrade1, UpgradeId.ArmorUpgrade2],
+  ]);
+  const t2 = t1ToT2.get(id as UpgradeId);
+  if (t2 === undefined) return false;
+  return techTreeSystem.isResearched(/* any faction works in single-player */ 0, t2)
+      || techTreeSystem.isResearched(1, t2)
+      || techTreeSystem.isResearched(2, t2)
+      || techTreeSystem.isResearched(3, t2);
+}
+
+/** Human-readable prerequisite label for the locked-state tooltip. */
+function getPrereqText(def: { prerequisite: UpgradeId | null; requiresUpgradeBuilding?: boolean }): string | undefined {
+  const parts: string[] = [];
+  if (def.prerequisite !== null) {
+    try { parts.push(getUpgradeDefinition(def.prerequisite).name); } catch { /* ignore */ }
+  }
+  if (def.requiresUpgradeBuilding) parts.push('UpgradeBuilding voltooid');
+  return parts.length > 0 ? parts.join(' + ') : undefined;
+}
+
+function buildUpgradeRow(
+  def: { id: number; name: string; description: string; cost: { gold: number }; prerequisite: UpgradeId | null; requiresUpgradeBuilding?: boolean },
+  factionId: FactionId,
+  ps: typeof playerState,
+) {
+  return {
+    id: def.id as number,
+    name: def.name,
+    description: def.description,
+    costGold: def.cost.gold,
+    canAfford: ps.canAfford(factionId, def.cost.gold),
+    canResearch: techTreeSystem.canResearch(factionId, def.id, world),
+    isResearched: techTreeSystem.isResearched(factionId, def.id),
+    prereqText: getPrereqText(def),
+  };
+}
+
 /** UpgradeIds that the UpgradeBuilding hosts: T3 universal + the faction-unique research. */
 function upgradeBuildingResearchIds(factionId: FactionId): UpgradeId[] {
   const ids: UpgradeId[] = [
@@ -2559,19 +2604,13 @@ export class Game {
     const factionId = this.playerFactionId;
 
     // Blacksmith hosts the universal T1/T2 combat/armor/speed upgrades (IDs 0-6).
-    // Wood-upgrades (7-9) live on LumberCamp; T3 + faction-unique (14/24/34/44, 50-53)
-    // live on UpgradeBuilding.
+    // Wood-upgrades (7-9) live on LumberCamp; T3 + faction-unique live on UpgradeBuilding.
+    // To keep the panel under 6 buttons we hide a T1 once its T2 is researched
+    // (the T1 is implicit-prereq-done, no longer actionable).
     const upgrades = UPGRADE_DEFINITIONS
       .filter(def => isBlacksmithUpgrade(def.id as number))
-      .map(def => ({
-        id: def.id as number,
-        name: def.name,
-        description: def.description,
-        costGold: def.cost.gold,
-        canAfford: this.playerState.canAfford(factionId, def.cost.gold),
-        canResearch: techTreeSystem.canResearch(factionId, def.id, world),
-        isResearched: techTreeSystem.isResearched(factionId, def.id),
-      }));
+      .filter(def => !isObsoleteT1(def.id as number))
+      .map(def => buildUpgradeRow(def, factionId, this.playerState));
 
     // Get current research progress for this Blacksmith
     const progress = techTreeSystem.getResearchProgress(blacksmithEid, factionId);
@@ -2615,15 +2654,8 @@ export class Game {
     const upgrades = WOOD_UPGRADE_IDS.map(id => {
       const def = getUpgradeDefinition(id);
       const display = getDisplayUpgradeName(factionId, id);
-      return {
-        id: def.id as number,
-        name: display.name,
-        description: display.description,
-        costGold: def.cost.gold,
-        canAfford: this.playerState.canAfford(factionId, def.cost.gold),
-        canResearch: techTreeSystem.canResearch(factionId, def.id, world),
-        isResearched: techTreeSystem.isResearched(factionId, def.id),
-      };
+      const row = buildUpgradeRow(def, factionId, this.playerState);
+      return { ...row, name: display.name, description: display.description };
     });
 
     const progress = techTreeSystem.getResearchProgress(lumberCampEid, factionId);
@@ -2662,15 +2694,8 @@ export class Game {
     const upgrades = ids.map(id => {
       const def = getUpgradeDefinition(id);
       const display = getDisplayUpgradeName(factionId, id);
-      return {
-        id: def.id as number,
-        name: display.name,
-        description: display.description,
-        costGold: def.cost.gold,
-        canAfford: this.playerState.canAfford(factionId, def.cost.gold),
-        canResearch: techTreeSystem.canResearch(factionId, def.id, world),
-        isResearched: techTreeSystem.isResearched(factionId, def.id),
-      };
+      const row = buildUpgradeRow(def, factionId, this.playerState);
+      return { ...row, name: display.name, description: display.description };
     });
 
     const progress = techTreeSystem.getResearchProgress(upgradeBuildingEid, factionId);
