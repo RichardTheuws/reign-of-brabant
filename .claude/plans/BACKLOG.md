@@ -37,8 +37,9 @@ Bij oppakken: subject + commit-SHA invullen onder "Resolved".
 
 ## 🟢 P3 — visuele upgrades / mesh-batch
 
-### Meshy v6 batch — 12 ontbrekende GLBs (4 facties × 3 building-types)
+### Meshy v6 batch — 12 ontbrekende GLBs (4 facties × 3 building-types) — **PRIO BUMP P2 na v0.37.35**
 - **Gevonden**: 2026-04-28 tijdens Belgen-mapping
+- **2026-04-28 priority-bump**: Bundel 3 deploy maakt het probleem actief gameplay-relevant. Randstad-speler ziet 3 identieke "Starbucks" meshes voor Starbucks/Havermoutmelkbar/Boardroom — kan ze niet onderscheiden van bovenaf. Boardroom-click vereist visuele identifier.
 - **Bundel-fit**: **Bundel 4C** plant dit als mesh-audit *doc* (queue-only). Reële uitvoering = **nieuwe Bundel 5** Meshy-marathon (één sessie, batch-prompting, één BuildingRenderer-rewire-PR).
 - **Scope**:
   - **HOOG: UpgradeBuilding × 4** — alle 4 facties gebruiken nu `<faction>/blacksmith.glb` als fallback (speler ziet 2× dezelfde Smederij). Brabant=?, Randstad=?, Limburg=?, Belgen=Diamantslijperij.
