@@ -36,6 +36,7 @@ import {
 } from '../types/index';
 import { playerState } from '../core/PlayerState';
 import { eventBus } from '../core/EventBus';
+import { getLimburgTunnelTransitMult } from './MijnschachtSystem';
 import type { GameWorld } from '../ecs/world';
 import type { SystemFn } from './SystemPipeline';
 
@@ -358,7 +359,8 @@ export function createUndergroundSystem(): SystemFn {
     );
     if (exitIdx < 0) return;
 
-    const transitDuration = getTransitDuration(net);
+    // Drukvuur click-buff halves transit duration when active (Limburg only).
+    const transitDuration = getTransitDuration(net) * getLimburgTunnelTransitMult(FactionId.Limburgers);
     const elapsed = world.meta.elapsed;
 
     for (const eid of event.unitEids) {

@@ -191,6 +191,8 @@ import { createTechTreeSystem } from './TechTreeSystem';
 import { createBureaucracySystem } from './BureaucracySystem';
 import { createTertiaryResourceSystem } from './TertiaryResourceSystem';
 import { createHavermoutmelkSystem } from './HavermoutmelkSystem';
+import { createMijnschachtSystem } from './MijnschachtSystem';
+import { createFactionSpecial2PassivesSystem } from './FactionSpecial2Passives';
 import { createWorstenbroodjeskraamSystem } from './WorstenbroodjeskraamSystem';
 import { createUpgradeBuildingPassivesSystem } from './UpgradeBuildingPassivesSystem';
 import { createCarnavalsoptochtSystem } from './CarnavalsoptochtSystem';
@@ -252,6 +254,12 @@ export function createGamePipeline(terrain: Terrain, devMode = false): SystemPip
 
   // Phase 4.805: Havermoutmelk buffs (Randstad faction -- ticks Sprint Mode + Deadline Crunch buff timers)
   pipeline.add('HavermoutmelkSystem', createHavermoutmelkSystem(), 'faction');
+
+  // Phase 4.806a: Mijnschacht buffs (Limburg — ticks Ploegendienst + Drukvuur)
+  pipeline.add('MijnschachtSystem', createMijnschachtSystem(), 'faction');
+
+  // Phase 4.806b: FactionSpecial2 passive — per building +1 sight (cap +3) per factie
+  pipeline.add('FactionSpecial2PassivesSystem', createFactionSpecial2PassivesSystem(), 'faction');
 
   // Phase 4.806: Worstenbroodjeskraam (Brabant TertiaryResource — passive Gez flux + heal aura + Trakteerronde click)
   pipeline.add('WorstenbroodjeskraamSystem', createWorstenbroodjeskraamSystem(), 'faction');

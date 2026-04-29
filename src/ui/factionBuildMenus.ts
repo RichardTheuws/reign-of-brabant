@@ -38,11 +38,35 @@ export const BASE_WORKER_CMDS: WorkerBuildCmd[] = [
   { action: 'stop', icon: 'STP', label: '', hotkey: 'E', iconClass: 'btn-icon--stop' },
 ];
 
-/** Tier requirement labels for locked-building tooltips. */
+/** Generic tier requirement labels — fallback when factionId unavailable. */
 export const TIER_REQUIREMENT_LABELS: Record<number, string> = {
   2: 'Smederij',                // Requires completed Blacksmith
   3: 'Geavanceerde Smederij',   // Requires completed UpgradeBuilding
 };
+
+/**
+ * Faction-aware tier requirement labels. Tooltip on locked build-buttons reads
+ * "Vereist <factie-specifieke building-naam>" instead of the generic English-y
+ * "Geavanceerde Smederij" — Brabant ziet "Wagenbouwer", Randstad "Innovatie Lab",
+ * Limburg "Hoogoven", Belgen "Diamantslijperij".
+ *
+ * Tier 2 labels point at the per-factie Blacksmith name (Smederij blijft generic
+ * voor Brabant; Coworking Space / Klooster / Abdij-smederij voor andere facties).
+ */
+const FACTION_TIER_LABELS: Record<Faction, Record<number, string>> = {
+  brabant:  { 2: 'Smederij',         3: 'Wagenbouwer' },
+  randstad: { 2: 'Coworking Space',  3: 'Innovatie Lab' },
+  limburg:  { 2: 'Klooster',         3: 'Hoogoven' },
+  belgen:   { 2: 'Abdij-smederij',   3: 'Diamantslijperij' },
+};
+
+export function getTierRequirementLabel(faction: Faction | undefined, tier: number): string {
+  if (faction !== undefined) {
+    const labels = FACTION_TIER_LABELS[faction];
+    if (labels && labels[tier]) return labels[tier];
+  }
+  return TIER_REQUIREMENT_LABELS[tier] ?? `Tier ${tier}`;
+}
 
 // Hotkey grid avoids WASD (camera): Q/E/R (row 1), T/F/G (row 2), Z/X (row 3).
 // Tier: 1=always, 2=requires Blacksmith, 3=requires UpgradeBuilding.

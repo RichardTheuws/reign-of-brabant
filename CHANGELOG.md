@@ -1,5 +1,57 @@
 # Changelog
 
+## [0.48.0] - 2026-04-29 — Multi-functie + Polish bundle
+
+### Added — Mijnschacht 2 click-actions (Limburg)
+`src/systems/MijnschachtSystem.ts`:
+- **Ploegendienst** — 30 kolen → +50% Limburg gather rate voor 60s, 90s CD. Wired in `GatherSystem` via `getLimburgGatherMult()`. Stack multiplicatief met andere mults.
+- **Drukvuur** — 50 kolen → tunnel-transit ×0.5 voor 30s, 90s CD. Wired in `UndergroundSystem` via `getLimburgTunnelTransitMult()`. Stack met Geheime Gangen upgrade.
+- HUD-knoppen op Mijnschacht (Limburg TertiaryResource) selectie. Hotkeys T/Y. CommandActions `activate-ploegendienst` + `activate-drukvuur`.
+- 11 vitest cases (`tests/MijnschachtSystem.test.ts`).
+
+### Added — Chocolaterie passive (Belgen)
+`src/systems/ChocolaterieSystem.ts`:
+- **Pralines voor Iedereen** — per 100 chocolade in voorraad: +5% duration op alle Belgen-diplomacy-effecten (Compromis Abilities + Persuasion). Cap +25% bij 500+ voorraad.
+- Wired in `DiplomacySystem.activateCompromis` (Compromis duration) en `attemptPersuade` (Persuasion duration). Stack additief met Salon-protocol cost-discount uit FactionSpecial1Passives.
+- Geen tick-state — pure derived helper. 4 vitest cases.
+
+### Added — FactionSpecial2 sight-range passive (alle 4 facties)
+`src/systems/FactionSpecial2Passives.ts`:
+- **Gewricht-uitstraling** — per active FactionSpecial2 building (Feestzaal/Parkeergarage/Mijnwerkerskamp/EU-Parlement): +1 sight range voor ALLE friendly units van die factie. Cap +3 per factie.
+- Cached counts per UPDATE_INTERVAL=1s. `VisionSystem` leest `getFactionSpecial2SightBonus(factionId)` en stamps de extended radius — geen per-unit Visibility.range mutatie.
+
+### Added — Heal-aura visual ring
+`src/rendering/AuraRingRenderer.ts`:
+- Translucente groene ring op de grond rond geselecteerde heal-aura source. RingGeometry met BORDER_WIDTH=0.4u, scale-per-call zodat verschillende aura-grootes (Worstenbroodjeskraam 8u, Vlaaiwinkel 10u) dezelfde mesh hergebruiken.
+- Game.ts wire: bij select Brabant Worstenbroodjeskraam → 8u ring. Bij select Limburg Vlaaiwinkel → 10u ring. Hide bij andere selecties of unit-selectie.
+
+### Added — TIER_REQUIREMENT_LABELS factie-aware
+`src/ui/factionBuildMenus.ts`:
+- Nieuwe `getTierRequirementLabel(faction, tier)` — Brabant ziet "Wagenbouwer", Randstad "Innovatie Lab", Limburg "Hoogoven", Belgen "Diamantslijperij" voor T3 (i.p.v. generieke "Geavanceerde Smederij").
+- T2-labels ook factie-specifiek (Smederij/Coworking Space/Klooster/Abdij-smederij).
+- HUD-tooltip op locked build-buttons gebruikt nu de factie-specifieke label.
+
+### Added — Multi-stat split victory screen
+- `play/index.html`: stat-rows voor "Goud" + "Hout" apart i.p.v. samengevoegd "Verzameld" (oude stat-row hidden behouden voor backward-compat van GameStats.resourcesGathered consumers).
+- `GameStats` uitgebreid met `goldGathered` + `woodGathered`. `Game.ts` levert beide bij `showGameOver`.
+
+### Files
+- Added: `src/systems/MijnschachtSystem.ts`, `src/systems/ChocolaterieSystem.ts`, `src/systems/FactionSpecial2Passives.ts`, `src/rendering/AuraRingRenderer.ts`
+- Added: `tests/MijnschachtSystem.test.ts`, `tests/ChocolaterieSystem.test.ts`
+- Modified: `src/systems/SystemPipeline.ts` (registratie 2 nieuwe systems)
+- Modified: `src/systems/GatherSystem.ts` (Limburg mult)
+- Modified: `src/systems/UndergroundSystem.ts` (Drukvuur transit mult)
+- Modified: `src/systems/DiplomacySystem.ts` (Pralines duration mult op Compromis + Persuasion)
+- Modified: `src/systems/VisionSystem.ts` (FactionSpecial2 sight bonus)
+- Modified: `src/ui/HUD.ts` (CommandAction types, getTierRequirementLabel call, multi-stat fields)
+- Modified: `src/ui/factionBuildMenus.ts` (FACTION_TIER_LABELS map + helper)
+- Modified: `src/core/Game.ts` (Mijnschacht actions in enrichBuildingInfo, dispatch+tryActivate, AuraRingRenderer, multi-stat output)
+- Modified: `play/index.html` (Goud/Hout stat-rows)
+- Modified: `package.json`, `CHANGELOG.md`
+
+### Tests
+1567 tests groen (was 1554 + 13 nieuwe).
+
 ## [0.47.0] - 2026-04-29 — Faction-painted building & upgrade portraits
 
 ### Added — 84 painted-vignette portraits, factie-flavoured

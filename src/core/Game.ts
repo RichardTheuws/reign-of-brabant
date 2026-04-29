@@ -32,6 +32,7 @@ import { BuildingRenderer } from '../rendering/BuildingRenderer';
 import { PropRenderer } from '../rendering/PropRenderer';
 import { SelectionRenderer, type SelectionData } from '../rendering/SelectionRenderer';
 import { TowerRangeRenderer } from '../rendering/TowerRangeRenderer';
+import { AuraRingRenderer } from '../rendering/AuraRingRenderer';
 import { FogOfWarRenderer } from '../rendering/FogOfWarRenderer';
 import { visionData } from '../systems/VisionSystem';
 import { playerState } from '../core/PlayerState';
@@ -48,6 +49,11 @@ import {
   activateDeadlineCrunch, isDeadlineCrunchReady, getDeadlineCrunchState, DEADLINE_CRUNCH_COST,
   resetHavermoutmelkBuffs,
 } from '../systems/HavermoutmelkSystem';
+import {
+  activatePloegendienst, isPloegendienstReady, getPloegendienstState, PLOEGENDIENST_COST,
+  activateDrukvuur, isDrukvuurReady, getDrukvuurState, DRUKVUUR_COST,
+  resetMijnschachtBuffs,
+} from '../systems/MijnschachtSystem';
 import {
   activateTrakteerronde, isTrakteerrondeReady, getTrakteerrondeState,
   TRAKTEERRONDE_COST, resetWorstenbroodjeskraamBuffs,
@@ -185,6 +191,7 @@ export class Game {
   private propRenderer: PropRenderer;
   private selectionRenderer: SelectionRenderer;
   private towerRangeRenderer: TowerRangeRenderer;
+  private auraRingRenderer: AuraRingRenderer;
   private fogOfWarRenderer: FogOfWarRenderer;
   private selectedEntities: number[] = [];
   private playerState: typeof playerState;
@@ -293,6 +300,7 @@ export class Game {
     this.propRenderer = new PropRenderer(propGroup);
     this.selectionRenderer = new SelectionRenderer(selectionGroup, healthBarGroup);
     this.towerRangeRenderer = new TowerRangeRenderer(scene);
+    this.auraRingRenderer = new AuraRingRenderer(scene);
     this.fogOfWarRenderer = new FogOfWarRenderer();
     scene.add(this.fogOfWarRenderer.mesh);
     this.playerState = playerState;
@@ -977,6 +985,12 @@ export class Game {
       case 'activate-boardroom':
         this.tryActivateBoardroom();
         break;
+      case 'activate-ploegendienst':
+        this.tryActivatePloegendienst();
+        break;
+      case 'activate-drukvuur':
+        this.tryActivateDrukvuur();
+        break;
       case 'cancel-queue':
         // Handled via onQueueCancel callback, not via command action
         break;
@@ -1041,6 +1055,38 @@ export class Game {
       audioManager.playSound('click');
     } else {
       this.hud?.showAlert('Vlaai-Trakteerronde nog op cooldown', 'warning');
+    }
+  }
+
+  /** Ploegendienst (Limburg Mijnschacht) — 30 kolen, +50% mining 60s, 90s CD. */
+  private tryActivatePloegendienst(): void {
+    if (this.playerFactionId !== FactionId.Limburgers) return;
+    if (this.playerState.getTertiary(FactionId.Limburgers) < PLOEGENDIENST_COST) {
+      this.hud?.showAlert(`Niet genoeg Kolen (${PLOEGENDIENST_COST} nodig)`, 'warning');
+      return;
+    }
+    const fired = activatePloegendienst();
+    if (fired) {
+      this.hud?.showAlert('Ploegendienst — mining +50% (60s)', 'info');
+      audioManager.playSound('click');
+    } else {
+      this.hud?.showAlert('Ploegendienst nog op cooldown', 'warning');
+    }
+  }
+
+  /** Drukvuur (Limburg Mijnschacht) — 50 kolen, tunnel-transit −50% 30s, 90s CD. */
+  private tryActivateDrukvuur(): void {
+    if (this.playerFactionId !== FactionId.Limburgers) return;
+    if (this.playerState.getTertiary(FactionId.Limburgers) < DRUKVUUR_COST) {
+      this.hud?.showAlert(`Niet genoeg Kolen (${DRUKVUUR_COST} nodig)`, 'warning');
+      return;
+    }
+    const fired = activateDrukvuur();
+    if (fired) {
+      this.hud?.showAlert('Drukvuur — tunnel-transit −50% (30s)', 'info');
+      audioManager.playSound('click');
+    } else {
+      this.hud?.showAlert('Drukvuur nog op cooldown', 'warning');
     }
   }
 
@@ -2227,6 +2273,26 @@ export class Game {
           this.towerRangeRenderer.hide();
         }
 
+        // Heal-aura ring: show for sources with a heal-aura when complete.
+        // Brabant Worstenbroodjeskraam (TertiaryResource): passive heal in 8u.
+        // Limburg Vlaaiwinkel (FactionSpecial1): heal-pulse in 10u.
+        const auraFid = Faction.id[firstEid];
+        let auraRadius = 0;
+        if (Building.complete[firstEid] === 1) {
+          if (buildingType === BuildingTypeId.TertiaryResourceBuilding && auraFid === FactionId.Brabanders) {
+            auraRadius = 8;
+          } else if (buildingType === BuildingTypeId.FactionSpecial1 && auraFid === FactionId.Limburgers) {
+            auraRadius = 10;
+          }
+        }
+        if (auraRadius > 0) {
+          const tx = Position.x[firstEid];
+          const tz = Position.z[firstEid];
+          this.auraRingRenderer.show(tx, tz, this.terrain.getHeightAt(tx, tz), auraRadius);
+        } else {
+          this.auraRingRenderer.hide();
+        }
+
         if (buildingType === BuildingTypeId.Blacksmith && Building.complete[firstEid] === 1) {
           // Blacksmith: show building card WITHOUT training actions + show research panel
           const cardData = this.buildBuildingCardData(firstEid, buildingType, buildingName, queueItems, true);
@@ -2273,6 +2339,7 @@ export class Game {
         });
         this.hud.showUnitPanel(units);
         this.towerRangeRenderer.hide();
+        this.auraRingRenderer.hide();
 
         // Show worker commands if a worker is selected
         const hasWorker = entityIds.some(eid => hasComponent(world, eid, IsWorker));
@@ -2858,6 +2925,35 @@ export class Game {
         action: 'activate-deadline-crunch',
         icon: 'DDL',
         label: crunchLabel,
+        hotkey: 'Y',
+        iconClass: 'btn-icon--research',
+      });
+    }
+
+    // Mijnschacht (Limburg TertiaryResource) — Ploegendienst + Drukvuur click-actions (v0.48.0).
+    if (buildingType === BuildingTypeId.TertiaryResourceBuilding
+        && this.playerFactionId === FactionId.Limburgers
+        && Building.complete[eid] === 1) {
+      const ploeg = getPloegendienstState();
+      let ploegLabel = `Ploegendienst (${PLOEGENDIENST_COST}k)`;
+      if (ploeg.active) ploegLabel = `Actief ${Math.ceil(ploeg.remaining)}s`;
+      else if (!isPloegendienstReady()) ploegLabel = `CD ${Math.ceil(ploeg.cooldown)}s`;
+      actions.push({
+        action: 'activate-ploegendienst',
+        icon: 'PLG',
+        label: ploegLabel,
+        hotkey: 'T',
+        iconClass: 'btn-icon--research',
+      });
+
+      const druk = getDrukvuurState();
+      let drukLabel = `Drukvuur (${DRUKVUUR_COST}k)`;
+      if (druk.active) drukLabel = `Actief ${Math.ceil(druk.remaining)}s`;
+      else if (!isDrukvuurReady()) drukLabel = `CD ${Math.ceil(druk.cooldown)}s`;
+      actions.push({
+        action: 'activate-drukvuur',
+        icon: 'DRK',
+        label: drukLabel,
         hotkey: 'Y',
         iconClass: 'btn-icon--research',
       });
@@ -3762,6 +3858,8 @@ export class Game {
         resourcesGathered:
           this.playerState.getGoldGathered(this.playerFactionId) +
           this.playerState.getWoodGathered(this.playerFactionId),
+        goldGathered: this.playerState.getGoldGathered(this.playerFactionId),
+        woodGathered: this.playerState.getWoodGathered(this.playerFactionId),
       });
     }
   }
@@ -4056,6 +4154,7 @@ export class Game {
     resetHeroSystem();
     resetBureaucracy();
     resetHavermoutmelkBuffs();
+    resetMijnschachtBuffs();
     resetWorstenbroodjeskraamBuffs();
     resetUpgradeBuildingPassives();
     resetCarnavalsoptocht();

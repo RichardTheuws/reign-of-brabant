@@ -19,6 +19,7 @@ import {
 import { IsDead } from '../ecs/tags';
 import { FOW_UPDATE_RATE, MAP_SIZE } from '../types/index';
 import { gameConfig } from '../core/GameConfig';
+import { getFactionSpecial2SightBonus } from './FactionSpecial2Passives';
 import type { GameWorld } from '../ecs/world';
 
 // ---------------------------------------------------------------------------
@@ -77,7 +78,8 @@ export function createVisionSystem() {
       if (gameConfig.isPlayerFaction(Faction.id[eid])) {
         const wx = Position.x[eid];
         const wz = Position.z[eid];
-        const range = Visibility.range[eid];
+        // FactionSpecial2 passive — per active building +1 sight, cap +3.
+        const range = Visibility.range[eid] + getFactionSpecial2SightBonus(Faction.id[eid]);
 
         // Store source for renderer
         visionData.sources.push({ x: wx, z: wz, range });

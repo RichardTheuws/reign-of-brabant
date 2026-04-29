@@ -43,6 +43,7 @@ import {
   ARMOR_FACTOR,
 } from '../types/index';
 import { getSalonProtocolCostMult } from './FactionSpecial1Passives';
+import { getPralinesDurationMult } from './ChocolaterieSystem';
 import type { GameWorld } from '../ecs/world';
 import type { CombatHitEvent } from '../types/index';
 
@@ -203,12 +204,12 @@ export function activateCompromis(
   const cost = getCompromisCost(type);
   if (!playerState.spendTertiary(FactionId.Belgen, cost)) return false;
 
-  // Activate
+  // Activate — Pralines voor Iedereen passive (Chocolaterie) extends duration.
   const compromis: ActiveCompromis = {
     type,
     targetFaction,
     startTime: world.meta.elapsed,
-    duration: getCompromisDuration(type),
+    duration: getCompromisDuration(type) * getPralinesDurationMult(FactionId.Belgen),
   };
 
   activeCompromissen.push(compromis);
@@ -288,17 +289,20 @@ export function persuadeUnit(world: GameWorld, targetEid: number): boolean {
   const originalFaction = Faction.id[targetEid];
   Faction.id[targetEid] = FactionId.Belgen;
 
+  // Pralines voor Iedereen passive: extend duration based on chocolade voorraad.
+  const duration = PERSUASION_DURATION * getPralinesDurationMult(FactionId.Belgen);
+
   persuadedUnits.push({
     entityId: targetEid,
     originalFaction,
-    returnTime: world.meta.elapsed + PERSUASION_DURATION,
+    returnTime: world.meta.elapsed + duration,
   });
 
   eventBus.emit('unit-persuaded' as keyof import('../types/index').GameEvents, {
     entityId: targetEid,
     originalFaction,
     newFaction: FactionId.Belgen,
-    duration: PERSUASION_DURATION,
+    duration,
   } as never);
 
   return true;

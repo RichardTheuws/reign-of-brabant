@@ -102,6 +102,8 @@ export type CommandAction =
   | 'activate-trakteerronde'
   | 'activate-carnavalsoptocht'
   | 'activate-vlaai-trakteer'
+  | 'activate-ploegendienst'
+  | 'activate-drukvuur'
   | 'noop-info'
   | 'cancel-queue';
 
@@ -174,7 +176,10 @@ export interface GameStats {
   enemiesKilled: number;
   buildingsBuilt: number;
   buildingsDestroyed: number;
+  /** Combined gold + wood total — kept for backward compat / external readers. */
   resourcesGathered: number;
+  goldGathered: number;
+  woodGathered: number;
 }
 
 export interface HeroAbilityData {
@@ -262,6 +267,7 @@ const FACTION_UNIT_NAMES: Record<Faction, { worker: string; infantry: string; ra
 import {
   BASE_WORKER_CMDS,
   TIER_REQUIREMENT_LABELS,
+  getTierRequirementLabel,
   FACTION_WORKER_BUILDS,
   FACTION_BUILDING_LABELS,
   type WorkerBuildCmd,
@@ -343,6 +349,8 @@ export class HUD {
   private statKilled!: HTMLElement;
   private statBuildings!: HTMLElement;
   private statResources!: HTMLElement;
+  private statGold!: HTMLElement;
+  private statWood!: HTMLElement;
 
   // Command panels
   private cmdUnit!: HTMLElement;
@@ -459,6 +467,8 @@ export class HUD {
     this.statKilled = this.el('stat-killed');
     this.statBuildings = this.el('stat-buildings');
     this.statResources = this.el('stat-resources');
+    this.statGold = this.el('stat-gold');
+    this.statWood = this.el('stat-wood');
 
     // Command panels
     this.cmdUnit = this.el('cmd-unit');
@@ -1724,6 +1734,8 @@ export class HUD {
     this.statKilled.textContent = String(stats.enemiesKilled);
     this.statBuildings.textContent = String(stats.buildingsBuilt);
     this.statResources.textContent = String(stats.resourcesGathered);
+    this.statGold.textContent = String(stats.goldGathered);
+    this.statWood.textContent = String(stats.woodGathered);
   }
 
   hideGameOver(): void {
@@ -1968,8 +1980,7 @@ export class HUD {
       if (!baseData) return null;
       // Add tier lock info if building is locked
       if (btn.classList.contains('cmd-btn--locked') && cmdTier > 1) {
-        const reqLabel = TIER_REQUIREMENT_LABELS[cmdTier] ?? `Tier ${cmdTier}`;
-        baseData.desc = `Vereist: ${reqLabel}`;
+        baseData.desc = `Vereist: ${getTierRequirementLabel(this.currentFaction, cmdTier)}`;
       }
       return baseData;
     });

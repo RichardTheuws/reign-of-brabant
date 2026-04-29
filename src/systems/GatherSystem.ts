@@ -31,6 +31,7 @@ import {
   DIMINISHING_RETURNS_GATHER_MULT,
 } from '../types/index';
 import { getRandstadGatherMult } from './HavermoutmelkSystem';
+import { getLimburgGatherMult } from './MijnschachtSystem';
 import type { GameWorld } from '../ecs/world';
 
 // Gather states (matches Gatherer.state u8 values)
@@ -124,6 +125,8 @@ function processGathering(world: GameWorld, eid: number, dt: number): void {
   if (speedMult > 0) effectiveRate *= speedMult;
   // Randstad-only: Sprint Mode buff (click-action) × Stagiairsleger passive (voorraad-based).
   effectiveRate *= getRandstadGatherMult(Faction.id[eid]);
+  // Limburg-only: Ploegendienst click-buff (Mijnschacht).
+  effectiveRate *= getLimburgGatherMult(Faction.id[eid]);
   const harvestAmount = effectiveRate * dt;
   const baseCapacity = Gatherer.carryCapacity[eid] || CARRY_CAPACITY;
   const capacity = baseCapacity + (Gatherer.carryBonus[eid] || 0);
