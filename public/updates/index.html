@@ -476,6 +476,197 @@
     <div class="content">
         <div class="timeline">
 
+            <!-- ── v0.49.1 (Eenheden klinken als hun factie als ze sterven) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.49.1</span>
+                        <span class="update__date">29 april 2026</span>
+                        <h2 class="update__title">Eenheden klinken als hun factie als ze sterven</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Feature</span>
+                            <span class="tag tag--audio">Audio</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Tot nu toe hadden alle facties hetzelfde generieke doodsgerochel — een Brabantse boer ging precies zo van zijn sokken als een Limburgse mijnwerker of een Belgische frietboer. Vanaf v0.49.1 hoor je het verschil: elke factie sterft, valt en herrijst in haar eigen stem.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">FACTIE-STEM OP LEVEN, DOOD &amp; TERUGKEER</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Eenheden sterven in hun eigen taal</strong> — De Brabantse boer kreunt als een Brabander, de Limburgse mijnwerker als een Limburger, en de Belgische frietboer roept nog één keer iets theatraals voor hij valt. Per unit-type een eigen stem waar beschikbaar, anders een factie-generieke uitval.</li>
+                            <li><strong>Helden vallen factie-eigen</strong> — Als je held sneuvelt hoor je niet langer dezelfde generieke kreun voor alle vier de facties; elke factie heeft een eigen toon voor het verlies van haar leider.</li>
+                            <li><strong>Held meldt zich terug na revival</strong> — Zodra je held opnieuw beschikbaar is op het strijdveld, hoor je hem of haar zich melden in de stem van de eigen factie — een duidelijk hoorbaar signaal dat de revival klaar is.</li>
+                        </ul>
+
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--space-md);">Het stem-materiaal lag al klaar — selecteren, bewegen, aanvallen en verzamelen werkten al, maar dood en revival vielen nog terug op generieke geluiden. Die laatste plekken zijn nu aangesloten, en een korte cooldown voorkomt dat het bij grote veldslagen een kakofonie wordt.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.49.0 (Voice & Message Pass — factie-aware HUD-alerts) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.49.0</span>
+                        <span class="update__date">29 april 2026</span>
+                        <h2 class="update__title">Voice &amp; Message Pass — facties klinken nu écht verschillend in de HUD</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Feature</span>
+                            <span class="tag tag--audio">Tone</span>
+                            <span class="tag tag--fix">Fix</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Tot v0.49.0 kreeg élke held-spawn dezelfde melding: <em>"… is verschenen! ALAAF!"</em> — ook als je een Randstad CEO of de Belgische Frietkoning op het veld zette. Vanaf nu spreken de vier facties hun eigen taal in pop-cap, hero-spawn, hero-death, housing-complete en research-complete alerts.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">VIER FACTIES, VIER STEMMEN</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Brabanders</strong> — echt Zuid-Oost dialect: <em>"Den Prins stao d'r — ALAAF!"</em>, <em>"{upgrade} — gemokt!"</em>, <em>"Vol! Bouw d'r un huiske bij."</em> Gecorrigeerd op <strong>un</strong>/<strong>ne</strong>, <strong>vat</strong> i.p.v. "pak", anti-pattern "-ansen" vermeden.</li>
+                            <li><strong>Randstad</strong> — corporate boardroom-toon: <em>"{name} is gearriveerd. Boardroom open."</em>, <em>"{upgrade} live. Rolling out."</em>, <em>"Capacity reached. Schaal kantoorruimte op."</em></li>
+                            <li><strong>Limburgers</strong> — rustige mergel-toon: <em>"{name} is eraan, jong."</em>, <em>"{name} is geboewd. Sjoen."</em>, <em>"Geen plek mie. Bouw nog ne mergelhof."</em></li>
+                            <li><strong>Belgen</strong> — theatraal en gulzig: <em>"{name} betreedt het slagveld!"</em>, <em>"{name} gevallen — de friet huilt."</em>, <em>"{upgrade} ontwikkeld in 't atelier."</em></li>
+                        </ul>
+
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--space-md);">Centrale registry per factie met meerdere varianten per event, dus dezelfde melding klinkt niet elke keer hetzelfde. Toekomstige uitbreidingen (eenheid-spawns, diplomatie, victory-stings) kunnen op dezelfde infrastructuur landen.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.48.2 (Towers visibly defend, faction-tinted projectiles) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.48.2</span>
+                        <span class="update__date">29 april 2026</span>
+                        <h2 class="update__title">Wachttorens vechten zichtbaar terug — met factie-getinte projectielen</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--fix">Fix</span>
+                            <span class="tag tag--visual">Visual</span>
+                            <span class="tag tag--audio">Audio</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Live-feedback: <em>"de wachttorens lijken niet te verdedigen"</em>. Ze deden wel degelijk damage, maar er vloog niets door de lucht en je hoorde geen schot — vijanden gingen "vanzelf" dood binnen range. Dat is gefixt: torens schieten nu zichtbaar én hoorbaar terug.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">PROJECTIEL-CHAIN</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Parabolische pijl</strong> — Vanaf de toren-top boogt het projectiel naar het doel, vluchtduur schaalt met afstand zodat lange schoten realistisch lang in de lucht blijven.</li>
+                            <li><strong>Schoten klinken</strong> — <code>arrow_shoot</code> bij de toren, <code>arrow_impact</code> op het doel, plus dezelfde combat-hit puff die ranged units gebruiken.</li>
+                            <li><strong>Factie-getinte trails</strong> — Brabanders schieten warm oranje-rood, Randstad corporate blauw, Limburgers mergel-geel, Belgen Belgisch goud. Alle projectielen zijn nu factie-tintbaar — toekomstige boogschutters en kanonnen kunnen dezelfde palette gebruiken.</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.48.1 (Build-ghost fix + cooldown overlay) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.48.1</span>
+                        <span class="update__date">29 april 2026</span>
+                        <h2 class="update__title">Placement-preview matcht het juiste gebouw + zichtbare cooldowns op click-actions</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--fix">Fix</span>
+                            <span class="tag tag--ui">UI</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Twee kleine ergernissen weggewerkt: de ghost-preview tijdens placement liet altijd een Barracks zien, ongeacht wat je echt aan het bouwen was, en click-actions als Sprint Mode of Carnavalsoptocht hadden alleen tekst-feedback voor cooldowns — geen visuele timer.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">WAT ER VERANDERT</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Ghost matcht het echte gebouw</strong> — Plaats je een Vlaaiwinkel? Dan zie je een Vlaaiwinkel-ghost. De groen/rood-tint reflecteert nu live of de plek geldig is.</li>
+                            <li><strong>Aura-ring tijdens placement</strong> — Bij gebouwen met een signature radius (Defense Tower-bereik, Worstenbroodjeskraam-heal, Carnavalstent-damage, Vlaaiwinkel-heal) zie je tijdens het plaatsen al de exacte aura-cirkel. Geen verrassingen meer over of een kraam wel de barracks raakt.</li>
+                            <li><strong>Sweep-overlay op click-buttons</strong> — Tijdens een actieve buff licht de knop warm-geel op. Tijdens cooldown zwemt een donkere sweep van boven naar beneden weg — hetzelfde patroon als hero-abilities.</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.48.0 (Multi-functie buildings — Mijnschacht, Chocolaterie, sight-passive, heal-aura) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.48.0</span>
+                        <span class="update__date">29 april 2026</span>
+                        <h2 class="update__title">Multi-functie buildings — Mijnschacht-clicks, Chocolaterie-passive, sight-bonus per factie</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Feature</span>
+                            <span class="tag tag--gameplay">Gameplay</span>
+                            <span class="tag tag--visual">Visual</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Bundel die de late-game faction-identity verder oplaadt: de Limburgse Mijnschacht krijgt twee actieve abilities, de Belgische Chocolaterie een nieuwe passive, élke factie een sight-bonus uit zijn FactionSpecial2, en heal-auras tonen nu een groene grondring.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">VIER MECHANIEKEN</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Limburg — Mijnschacht clicks</strong> — <em>Ploegendienst</em> (30 kolen, 60s +50% gather, 90s CD) en <em>Drukvuur</em> (50 kolen, 30s tunnel-transit ×0.5, 90s CD). Hotkeys T en Y.</li>
+                            <li><strong>Belgen — Pralines voor Iedereen</strong> — Per 100 chocolade in voorraad +5% duration op Compromis-abilities en Persuasion, cap +25% bij 500+ voorraad.</li>
+                            <li><strong>Sight-bonus per FactionSpecial2</strong> — Feestzaal / Parkeergarage / Mijnwerkerskamp / EU-Parlement geven elk +1 sight range aan alle eigen units, cap +3.</li>
+                            <li><strong>Heal-aura ring zichtbaar</strong> — Selecteer een Worstenbroodjeskraam (8u) of Vlaaiwinkel (10u) → translucente groene ring op de grond, zodat je in één oogopslag ziet wie er onder de heal-bubble valt.</li>
+                        </ul>
+
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--space-md);">Daarnaast splitst het victory-screen Goud en Hout uit als aparte stat-rows, en zijn de tier-requirement-labels in build-tooltips factie-specifiek geworden (Brabant ziet "Wagenbouwer", Randstad "Innovatie Lab", enzovoort).</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.47.0 (84 factie-painted building & upgrade portraits) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.47.0</span>
+                        <span class="update__date">29 april 2026</span>
+                        <h2 class="update__title">84 factie-geschilderde portretten — elke factie krijgt zijn eigen art</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--visual">Visual</span>
+                            <span class="tag tag--feat">Feature</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Tot deze release deelden de vier facties grotendeels dezelfde generieke iconen voor gebouwen en research. Vanaf v0.47.0 heeft élke factie zijn eigen geschilderde portret per gebouw én per upgrade — totaal 84 nieuwe assets in de RPG painted-vignette stijl.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">21 PORTRETTEN PER FACTIE</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Brabanders</strong> — warm oranje-rood, Bourgondisch kruis, gezellig-strijdlustig: keep, café-barracks, bakkerij, smederij, worstenbroodjeskraam, wagenbouwer, feestzaal, kerktoren en bijbehorende upgrade-varianten.</li>
+                            <li><strong>Randstad</strong> — corporate blue-grey-white met warm-gele bureaulamp, geen koffie-flavour: hoofdkantoor, vergaderzaal, Starbucks-cafe (zonder logo), coworking, vinex-rijhuis, havermoutmelkbar, innovatie-lab, parkeergarage.</li>
+                            <li><strong>Limburgers</strong> — mergel-geel, kolen-zwart en kersenrood: mergelhoeve, schuttershal, vlaaibakkerij, klooster-smederij, hoogoven, mijnwerkerskamp en mining-flavoured upgrades.</li>
+                            <li><strong>Belgen</strong> — zwart-geel-rood met chocolade-bruin en Trappist-groen: stadhuis, frituur-barracks, abdij-smederij, chocolaterie, diamantslijperij, EU-Parlement, belfort, Manneken-Pis-kanon.</li>
+                        </ul>
+
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--space-md);">Het research-panel toont voortaan ook factie-varianten van dezelfde upgrade — een Brabantse longsword, een Randstad fountain pen, een Limburgse pickaxe en een Belgische rapier voor "Zwaardvechten I". De canvas-fallback blijft staan voor zekerheid, maar in de praktijk zie je overal de painted versie.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.46.0 (Battle visuals + complete HUD asset pass) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.46.0</span>
+                        <span class="update__date">29 april 2026</span>
+                        <h2 class="update__title">Battle visuals — damage popups, attack swings, death-animatie, complete HUD-asset pass</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--visual">Visual</span>
+                            <span class="tag tag--feat">Feature</span>
+                            <span class="tag tag--gameplay">Gameplay</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Gevechten voelden technisch correct maar visueel te stil — units schoten zonder beweging, sterven gebeurde plotseling, en de schade was alleen af te lezen aan een health-bar. v0.46.0 maakt het slagveld leesbaarder zonder de spelregels te veranderen.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">VIER LAGEN FEEDBACK</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Floating damage numbers</strong> — Boven elke geraakte unit of gebouw zweven kort de schade-cijfers omhoog, met aparte gold-glow voor crits en groen voor heals. Pool van 50 zodat ook 200+ units in combat geen DOM-explosie geven.</li>
+                            <li><strong>Attack swing animatie</strong> — Melee-aanvallers leunen kort voorover, ranged-units recoilen naar achter. Procedureel bovenop de bestaande GLB-animaties, dus niemand staat meer "stil te slaan".</li>
+                            <li><strong>Death collapse + fade</strong> — Stervende units zakken in en vervagen over twee seconden, blob-shadow vervaagt mee. De Death-clip blijft spelen — dit komt erbovenop.</li>
+                            <li><strong>23 nieuwe HUD-iconen</strong> — Alle command-buttons in de painted-vignette stijl van Rally en Vlaai-Trakteer. De canvas-drawn fallbacks blijven beschikbaar voor robustness.</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
             <!-- ── v0.45.0 (Defense alarm — nearby idle units verdedigen automatisch) ── -->
             <article class="update">
                 <div class="update__card">

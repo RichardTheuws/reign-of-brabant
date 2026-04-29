@@ -41,3 +41,7 @@ scripts/bundle5b_generation.log
 scripts/bundle5b_status.json
 scripts/bundle5b_stdout.log
 scripts/retry_*.log
+
+# Genormaliseerde voice-output (regenerable via scripts/normalize-voices.sh)
+public/assets/audio/voices-normalized*/
+scripts/normalize-voices.log
