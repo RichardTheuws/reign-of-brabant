@@ -45,3 +45,6 @@ scripts/retry_*.log
 # Genormaliseerde voice-output (regenerable via scripts/normalize-voices.sh)
 public/assets/audio/voices-normalized*/
 scripts/normalize-voices.log
+
+# Local preview assets (cinematic copies for browser A/B; recreatable from source)
+public/_preview/

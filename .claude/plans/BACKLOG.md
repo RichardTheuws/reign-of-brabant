@@ -7,14 +7,15 @@ en niet in scope is van de huidige bundel landt hier, gesorteerd op prioriteit.
 
 ## 🆕 v1.0 PERFECTIE — sessie 2026-04-29 deel 3 (Voice & Message Pass)
 
-### 🔴 P1 — Theme-song "Nie Fokke Mee Brabant" alleen bij Brabander victory
+### ✅ RESOLVED v0.49.2 — Theme-song "Nie Fokke Mee Brabant" alleen bij Brabander victory
 - **Gevonden**: 2026-04-29 (Richard tijdens v0.49.0 fase A)
-- **Issue**: themalied speelt nu vermoedelijk te breed. Richard wil het ALLEEN horen wanneer een speler die als **Brabander** speelt een **missie of skirmish wint**. In-game muziek voor Brabant moet voor de rest net zo neutraal zijn als de andere campagnes; geen Brabant-bias in ambient/battle-music.
-- **Scope**:
-  - `MusicSystem.playVictory()` callsite — switch op `playerFactionId === Brabanders` voor theme-song, anders generic victory-stinger
-  - Audit van alle MUSIC_IDS callsites: in-game battle/ambient mag GEEN Brabantse identifiers gebruiken
-  - Test: 4 facties × victory → assert track-id is generic (behalve Brabanders die NieFokkeMeeBrabant.mp3 krijgt)
-- **Bundel-fit**: v0.49.x of v0.50.0 polish bundle.
+- **Resolved**: 2026-04-29 commit pending — Music-rewire bundel:
+  - `music_brabanders.mp3` was byte-identiek aan themesong `nie-fokke-mee-brabant-v1.mp3` → vervangen door `cinematic/storm-over-low-fields.mp3` (instrumentale ambient, Brabants tintje).
+  - `music_victory_brabanders.mp3` toegevoegd (= themesong v2) — speelt alleen bij Brabander victory.
+  - `music_brabanders_2.mp3` verwijderd (was duplicate themesong).
+  - `MUSIC_IDS.VICTORY_BRABANDERS` toegevoegd, `playVictory(winnerFactionId?)` switch.
+  - 2 Game.ts callsites (mission triggerVictory + skirmish triggerGameOver) → playerFactionId.
+  - 6 lock-tests in `tests/themeSongVictory.test.ts`. Suite 1596 → 1602.
 
 ### 🟠 P2 — Audio-normalisatie pipeline voor 525 voice files
 - **Gevonden**: 2026-04-29 (Richard: "audio moet heel goed normaliseren zodat alle zinnen even duidelijk uitgesproken worden")
@@ -48,6 +49,24 @@ en niet in scope is van de huidige bundel landt hier, gesorteerd op prioriteit.
 - **Gevonden**: 2026-04-29 (asset-inventaris fase A)
 - **Issue**: Belgen heeft Petra Vlaams (vrouw, goedgekeurd). Brabanders + Limburgers: vrouwelijke stem-pogingen Roos / Melanie afgekeurd. Voor diversiteit mannelijke + vrouwelijke units per factie nodig.
 - **Bundel-fit**: ElevenLabs-casting-ronde, Richard goedkeuring per voice. v0.50.0+.
+
+### 🔴 P1 — Brabander mannelijke voice opnieuw casten
+- **Gevonden**: 2026-04-29 (Richard A/B luistertest van voices-normalized-sample/)
+- **Issue**: huidige Brabander stem (Joost) klinkt niet enthousiast en heeft geen mooie stemkleur volgens Richard ("ikzelf ook niet"). Gevolg: 138 Brabander voice-files moeten opnieuw worden gegenereerd zodra nieuwe stem is gekozen. Limburgers/Randstad/Belgen voices zijn WEL goedgekeurd.
+- **Scope**:
+  - ElevenLabs casting-ronde voor nieuwe Brabander mannelijke stem (enthousiast, mooie stemkleur, Brabants accent — voorbeeld referentie nodig: zoek Brabantse stand-up comedians of muziek die de juiste vibe vangt)
+  - Richard kiest 2-3 candidates uit ElevenLabs library + custom-voice mogelijk
+  - Re-generate alle 138 Brabander voice-lines: `scripts/generate_unit_voices.sh` (bestaat al) met nieuwe voice-id
+  - **Volgorde-impact**: dit moet GEBEUREN voordat audio-normalisatie `--all` run zinvol is — anders dubbel werk
+- **Bundel-fit**: v0.50.0 of v0.49.x. Wachten op Richard's voice-cast keuze.
+
+### 🟠 P2 — Brabander vrouwelijke voice (Roos afgekeurd, opnieuw casten)
+- Richard wil ook Brabander vrouwenstem in pipeline (samen met de Brabander herkast hierboven). Voor 8 unit-types waar Brabander vrouwelijke variant past (boerinne specifiek, plus generieke fallbacks).
+- **Bundel-fit**: combineren met Brabander mannelijke recast — dezelfde sessie ElevenLabs-flow.
+
+### 🟢 P3 — Audio-normalize `--all` run uitstellen tot Brabander recast klaar is
+- Sample-normalisatie heeft Limburgers/Randstad/Belgen goedgekeurd. Brabander wordt opnieuw gegenereerd → normalisatie nu zou dubbel werk zijn.
+- Wachten op Brabander-recast voltooiing, dan `bash scripts/normalize-voices.sh --all`.
 
 
 

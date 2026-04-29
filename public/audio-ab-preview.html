@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>Audio A/B Preview — Voice Normalisatie</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #1a1a1f;
+    color: #e8e8ee;
+    margin: 0;
+    padding: 32px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  h1 { color: #f3c969; margin-bottom: 8px; }
+  .intro { color: #a0a0aa; margin-bottom: 24px; line-height: 1.5; }
+  .faction { margin-bottom: 40px; }
+  .faction-title {
+    font-size: 22px;
+    color: #f3c969;
+    border-bottom: 2px solid #3a3a45;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  .pair {
+    display: grid;
+    grid-template-columns: 280px 1fr 1fr;
+    gap: 16px;
+    align-items: center;
+    padding: 12px;
+    background: #25252d;
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+  .pair-name {
+    font-family: ui-monospace, monospace;
+    font-size: 13px;
+    color: #c8c8d0;
+  }
+  .audio-block { display: flex; flex-direction: column; gap: 4px; }
+  .audio-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+  .label-orig { color: #8090a8; }
+  .label-norm { color: #6dd97d; }
+  audio { width: 100%; height: 32px; }
+  .verdict-row {
+    margin-top: 32px;
+    padding: 20px;
+    background: #2a2520;
+    border-left: 4px solid #f3c969;
+    border-radius: 4px;
+  }
+  .verdict-row h2 { margin: 0 0 12px 0; color: #f3c969; }
+  .verdict-row p { margin: 6px 0; line-height: 1.5; }
+  code { background: #1a1a1f; padding: 2px 6px; border-radius: 3px; font-size: 13px; }
+</style>
+</head>
+<body>
+<h1>Audio A/B Preview — Voice Normalisatie</h1>
+<p class="intro">
+  Links: het origineel zoals nu in de game.
+  Rechts: na normalisatie via <code>scripts/normalize-voices.sh --sample</code>
+  (loudnorm -16 LUFS, high-pass 80Hz, presence-boost +1.5dB @ 3kHz, lichte de-essing).
+  Luister per paar of de genormaliseerde versie (a) gelijke loudness over facties heeft,
+  (b) niet te scherp/sissend is, (c) niet te dun in de bas.
+</p>
+
+<div class="faction">
+  <div class="faction-title">Brabanders</div>
+
+  <div class="pair">
+    <div class="pair-name">prins-van-brabant / attack_3</div>
+    <div class="audio-block">
+      <div class="audio-label label-orig">Origineel</div>
+      <audio controls preload="none" src="/assets/audio/voices/brabanders/prins-van-brabant/attack_3.mp3"></audio>
+    </div>
+    <div class="audio-block">
+      <div class="audio-label label-norm">Genormaliseerd</div>
+      <audio controls preload="none" src="/assets/audio/voices-normalized-sample/brabanders/prins-van-brabant/attack_3.mp3"></audio>
+    </div>
+  </div>
+
+  <div class="pair">
+    <div class="pair-name">praalwagen / death_1</div>
+    <div class="audio-block">
+      <div class="audio-label label-orig">Origineel</div>
+      <audio controls preload="none" src="/assets/audio/voices/brabanders/praalwagen/death_1.mp3"></audio>
+    </div>
+    <div class="audio-block">
+      <div class="audio-label label-norm">Genormaliseerd</div>
+      <audio controls preload="none" src="/assets/audio/voices-normalized-sample/brabanders/praalwagen/death_1.mp3"></audio>
+    </div>
+  </div>
+
+  <div class="pair">
+    <div class="pair-name">tractorrijder / idle_2</div>
+    <div class="audio-block">
+      <div class="audio-label label-orig">Origineel</div>
+      <audio controls preload="none" src="/assets/audio/voices/brabanders/tractorrijder/idle_2.mp3"></audio>
+    </div>
+    <div class="audio-block">
+      <div class="audio-label label-norm">Genormaliseerd</div>
+      <audio controls preload="none" src="/assets/audio/voices-normalized-sample/brabanders/tractorrijder/idle_2.mp3"></audio>
+    </div>
+  </div>
+</div>
+
+<div class="faction">
+  <div class="faction-title">Randstad</div>
+
+  <div class="pair">
+    <div class="pair-name">stagiair / select_1</div>
+    <div class="audio-block">
+      <div class="audio-label label-orig">Origineel</div>
+      <audio controls preload="none" src="/assets/audio/voices/randstad/stagiair/select_1.mp3"></audio>
+    </div>
+    <div class="audio-block">
+      <div class="audio-label label-norm">Genormaliseerd</div>
+      <audio controls preload="none" src="/assets/audio/voices-normalized-sample/randstad/stagiair/select_1.mp3"></audio>
+    </div>
+  </div>
+
+  <div class="pair">
+    <div class="pair-name">vastgoedmakelaar / death_1</div>
+    <div class="audio-block">
+      <div class="audio-label label-orig">Origineel</div>
+      <audio controls preload="none" src="/assets/audio/voices/randstad/vastgoedmakelaar/death_1.mp3"></audio>
+    </div>
+    <div class="audio-block">
+      <div class="audio-label label-norm">Genormaliseerd</div>
+      <audio controls preload="none" src="/assets/audio/voices-normalized-sample/randstad/vastgoedmakelaar/death_1.mp3"></audio>
+    </div>
+  </div>
+
+  <div class="pair">
+    <div class="pair-name">idle_1 (generic)</div>
+    <div class="audio-block">
+      <div class="audio-label label-orig">Origineel</div>
+      <audio controls preload="none" src="/assets/audio/voices/randstad/idle_1.mp3"></audio>
+    </div>
+    <div class="audio-block">
+      <div class="audio-label label-norm">Genormaliseerd</div>
+      <audio controls preload="none" src="/assets/audio/voices-normalized-sample/randstad/idle_1.mp3"></audio>
+    </div>
+  </div>
+</div>
+
+<div class="faction">
+  <div class="faction-title">Limburgers</div>
+
+  <div class="pair">
+    <div class="pair-name">schutterij / death_1</div>
+    <div class="audio-block">
+      <div class="audio-label label-orig">Origineel</div>
+      <audio controls preload="none" src="/assets/audio/voices/limburgers/schutterij/death_1.mp3"></audio>
+    </div>
+    <div class="audio-block">
+      <div class="audio-label label-norm">Genormaliseerd</div>
+      <audio controls preload="none" src="/assets/audio/voices-normalized-sample/limburgers/schutterij/death_1.mp3"></audio>
+    </div>
+  </div>
+
+  <div class="pair">
+    <div class="pair-name">mergelridder / idle_2</div>
+    <div class="audio-block">
+      <div class="audio-label label-orig">Origineel</div>
+      <audio controls preload="none" src="/assets/audio/voices/limburgers/mergelridder/idle_2.mp3"></audio>
+    </div>
+    <div class="audio-block">
+      <div class="audio-label label-norm">Genormaliseerd</div>
+      <audio controls preload="none" src="/assets/audio/voices-normalized-sample/limburgers/mergelridder/idle_2.mp3"></audio>
+    </div>
+  </div>
+
+  <div class="pair">
+    <div class="pair-name">idle_1 (generic)</div>
+    <div class="audio-block">
+      <div class="audio-label label-orig">Origineel</div>
+      <audio controls preload="none" src="/assets/audio/voices/limburgers/idle_1.mp3"></audio>
+    </div>
+    <div class="audio-block">
+      <div class="audio-label label-norm">Genormaliseerd</div>
+      <audio controls preload="none" src="/assets/audio/voices-normalized-sample/limburgers/idle_1.mp3"></audio>
+    </div>
+  </div>
+</div>
+
+<div class="faction">
+  <div class="faction-title">Belgen</div>
+
+  <div class="pair">
+    <div class="pair-name">de-frietkoning / idle_2</div>
+    <div class="audio-block">
+      <div class="audio-label label-orig">Origineel</div>
+      <audio controls preload="none" src="/assets/audio/voices/belgen/de-frietkoning/idle_2.mp3"></audio>
+    </div>
+    <div class="audio-block">
+      <div class="audio-label label-norm">Genormaliseerd</div>
+      <audio controls preload="none" src="/assets/audio/voices-normalized-sample/belgen/de-frietkoning/idle_2.mp3"></audio>
+    </div>
+  </div>
+
+  <div class="pair">
+    <div class="pair-name">frietkraamhouder / death_1</div>
+    <div class="audio-block">
+      <div class="audio-label label-orig">Origineel</div>
+      <audio controls preload="none" src="/assets/audio/voices/belgen/frietkraamhouder/death_1.mp3"></audio>
+    </div>
+    <div class="audio-block">
+      <div class="audio-label label-norm">Genormaliseerd</div>
+      <audio controls preload="none" src="/assets/audio/voices-normalized-sample/belgen/frietkraamhouder/death_1.mp3"></audio>
+    </div>
+  </div>
+
+  <div class="pair">
+    <div class="pair-name">idle_1 (generic)</div>
+    <div class="audio-block">
+      <div class="audio-label label-orig">Origineel</div>
+      <audio controls preload="none" src="/assets/audio/voices/belgen/idle_1.mp3"></audio>
+    </div>
+    <div class="audio-block">
+      <div class="audio-label label-norm">Genormaliseerd</div>
+      <audio controls preload="none" src="/assets/audio/voices-normalized-sample/belgen/idle_1.mp3"></audio>
+    </div>
+  </div>
+</div>
+
+<div class="verdict-row">
+  <h2>Verdict-opties</h2>
+  <p><strong>Goed →</strong> zeg "full run" → ik draai <code>scripts/normalize-voices.sh --all</code> over alle 525 files (~10-30 min).</p>
+  <p><strong>Tweaken →</strong> zeg wat: "te scherp" / "te dun bas" / "sissen blijft" → ik pas filter-chain aan in <code>scripts/normalize-voices.sh:64</code> en draai opnieuw <code>--sample</code>.</p>
+  <p><strong>Slechter →</strong> zeg "rollback" → script wordt aangepast of verwijderd.</p>
+</div>
+</body>
+</html>

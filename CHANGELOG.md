@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.49.2] - 2026-04-29 — Themesong "Nie Fokke Mee Brabant" alleen bij Brabander victory
+
+### Fixed — Themesong leakte naar campaign ambient
+`music_brabanders.mp3` was byte-identiek aan `cinematic/.../nie-fokke-mee-brabant-v1.mp3`. Brabanders hadden dus géén instrumentale ambient — de themesong met tekst werd voortdurend afgespeeld tijdens campaign en skirmish. Andere facties hadden wél echte instrumentale tracks (`music_randstad.mp3` etc.).
+
+### Changed — Music files reorganisatie
+- `public/assets/audio/music/music_brabanders.mp3` → vervangen door `cinematic/music/storm-over-low-fields.mp3` (instrumentale ambient, Brabants tintje)
+- `public/assets/audio/music/music_brabanders_2.mp3` → verwijderd (was duplicate themesong)
+- `public/assets/audio/music/music_victory_brabanders.mp3` → toegevoegd (= themesong v2, alleen victory-trigger)
+
+### Added — `MUSIC_IDS.VICTORY_BRABANDERS` + `playVictory(winnerFactionId?)`
+`MusicSystem.playVictory()` accepteert nu een optionele winnerFactionId. Brabanders → themesong-track, andere facties → generieke `music_victory.mp3`. Backwards-compatible: zonder factionId fallt-back op generic.
+
+### Wired — Game.ts callsites
+- `Game.ts:516` mission triggerVictory → `this.playerFactionId` mee
+- `Game.ts:3970` skirmish triggerGameOver → `this.playerFactionId` mee
+
+### Tests — 6 themesong lock-tests
+`tests/themeSongVictory.test.ts`: 4 facties × victory + no-faction fallback + MUSIC_IDS regressie-signaal. Suite: 1596 → 1602.
+
+### Tooling-bonus — Audio + music preview pages
+- `public/audio-ab-preview.html`: A/B luister-page voor genormaliseerde voice-samples
+- `public/music-preview.html`: A/B luister-page voor music tracks (themesong / ambient / cinematic candidates)
+- `public/_preview/` toegevoegd aan `.gitignore` (lokale browser-only assets)
+
+### Niet aangeraakt
+- Latente fallback-bias in `MusicSystem.ts:288` (`return variants ? pickRandom(variants) : MUSIC_IDS.BRABANDERS`) blijft staan — dood-code vandaag (alle 4 facties gemapt). Op BACKLOG voor v1.0 polish.
+
+---
+
 ## [0.49.1] - 2026-04-29 — Voice & Message Pass: audio-laag rewire (saaie generics → factie-voice)
 
 ### Added — Factie-voice op death + hero-revival events

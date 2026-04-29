@@ -513,7 +513,7 @@ export class Game {
     const cb: MissionCallbacks = {
       showMessage: (t) => this._showMsg(t),
       spawnUnits: (u) => this._spawnMissionUnits(u),
-      triggerVictory: (s, t, b) => { this.gameOver = true; this.musicSystem.playVictory(); this.onMissionVictory?.(s, t, b); },
+      triggerVictory: (s, t, b) => { this.gameOver = true; this.musicSystem.playVictory(this.playerFactionId); this.onMissionVictory?.(s, t, b); },
       triggerDefeat: () => { this.gameOver = true; this.musicSystem.playDefeat(); this.onMissionDefeat?.(); },
       getPlayerGold: () => this.playerState.getGold(this.playerFactionId),
       hasPlayerBuilding: (bt) => this._hasPlayerBldg(bt),
@@ -3967,7 +3967,7 @@ export class Game {
     this.gameOver = true;
     // Play victory or defeat stinger
     if (victory) {
-      this.musicSystem.playVictory();
+      this.musicSystem.playVictory(this.playerFactionId);
     } else {
       this.musicSystem.playDefeat();
     }

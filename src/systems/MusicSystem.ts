@@ -33,6 +33,7 @@ export const MUSIC_IDS = {
   BATTLE_HIGH: 'music_battle_high',
   BOSS_BATTLE: 'music_boss_battle',
   VICTORY: 'music_victory',
+  VICTORY_BRABANDERS: 'music_victory_brabanders',
   DEFEAT: 'music_defeat',
   CUTSCENE: 'music_cutscene',
   LOBBY: 'music_lobby',
@@ -44,7 +45,7 @@ export const MUSIC_IDS = {
 // ---------------------------------------------------------------------------
 
 const FACTION_THEME_VARIANTS: Record<number, readonly string[]> = {
-  [FactionId.Brabanders]: ['music_brabanders', 'music_brabanders_2'],
+  [FactionId.Brabanders]: ['music_brabanders'],
   [FactionId.Randstad]: ['music_randstad'],
   [FactionId.Limburgers]: ['music_limburgers'],
   [FactionId.Belgen]: ['music_belgen'],
@@ -153,10 +154,16 @@ export function createMusicSystem(playerFaction: FactionId = FactionId.Brabander
 
   /**
    * Play victory stinger.
+   *
+   * Brabanders krijgen hun themesong "Nie Fokke Mee Brabant" (track met tekst);
+   * andere facties krijgen de generieke instrumentale victory-stinger.
    */
-  function playVictory(): void {
+  function playVictory(winnerFactionId?: number): void {
     state.active = false;
-    playTrack(MUSIC_IDS.VICTORY, false, 1500);
+    const trackId = winnerFactionId === FactionId.Brabanders
+      ? MUSIC_IDS.VICTORY_BRABANDERS
+      : MUSIC_IDS.VICTORY;
+    playTrack(trackId, false, 1500);
   }
 
   /**

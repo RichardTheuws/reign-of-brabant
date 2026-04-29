@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>Music Preview — Theme-Song Audit</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #1a1a1f;
+    color: #e8e8ee;
+    padding: 32px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  h1 { color: #f3c969; margin-bottom: 8px; }
+  .intro { color: #a0a0aa; margin-bottom: 24px; line-height: 1.5; }
+  .section { margin-bottom: 40px; }
+  .section-title {
+    font-size: 22px;
+    color: #f3c969;
+    border-bottom: 2px solid #3a3a45;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  .track {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 16px;
+    align-items: center;
+    padding: 14px;
+    background: #25252d;
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+  .track-meta { display: flex; flex-direction: column; gap: 4px; }
+  .track-name {
+    font-family: ui-monospace, monospace;
+    font-size: 13px;
+    color: #c8c8d0;
+    word-break: break-all;
+  }
+  .track-tag {
+    display: inline-block;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    width: fit-content;
+    margin-top: 2px;
+  }
+  .tag-themesong { background: #5b2a2a; color: #ffaaaa; }
+  .tag-ambient   { background: #2a4a3a; color: #aae0c4; }
+  .tag-victory   { background: #4a4220; color: #f3c969; }
+  .tag-candidate { background: #2a3a5a; color: #aac8ff; }
+  audio { width: 100%; height: 32px; }
+  .verdict {
+    margin-top: 32px;
+    padding: 20px;
+    background: #2a2520;
+    border-left: 4px solid #f3c969;
+    border-radius: 4px;
+  }
+  .verdict h2 { margin: 0 0 12px 0; color: #f3c969; }
+  .verdict p { margin: 8px 0; line-height: 1.55; }
+  code { background: #1a1a1f; padding: 2px 6px; border-radius: 3px; font-size: 13px; }
+  .pre-finding {
+    background: #3a2a20; border-left: 4px solid #ff8830;
+    padding: 14px; margin-bottom: 24px; border-radius: 4px;
+  }
+  .pre-finding strong { color: #ffaa66; }
+</style>
+</head>
+<body>
+<h1>Music Preview — Theme-Song Audit</h1>
+<p class="intro">
+  Doel: vaststellen welke tracks (a) de themesong met tekst zijn, (b) instrumentale ambient zijn,
+  (c) candidates voor Brabantse ambient zijn die we al hebben.
+</p>
+
+<div class="pre-finding">
+  <strong>Bevinding:</strong> <code>music_brabanders.mp3</code> en <code>music_brabanders_2.mp3</code>
+  zijn byte-identiek aan <code>cinematic/.../nie-fokke-mee-brabant-v1.mp3</code> en
+  <code>v2.mp3</code>. Brabanders hebben dus <em>geen</em> instrumentale ambient — de themesong wordt nu als ambient gespeeld. Beslissing nodig: nieuwe Suno-track genereren, of een
+  van de candidates hieronder gebruiken.
+</div>
+
+<div class="section">
+  <div class="section-title">Themesong (= huidige Brabander ambient)</div>
+
+  <div class="track">
+    <div class="track-meta">
+      <div class="track-name">music_brabanders.mp3</div>
+      <span class="track-tag tag-themesong">themesong v1 — met tekst</span>
+    </div>
+    <audio controls preload="none" src="/assets/audio/music/music_brabanders.mp3"></audio>
+  </div>
+
+  <div class="track">
+    <div class="track-meta">
+      <div class="track-name">music_brabanders_2.mp3</div>
+      <span class="track-tag tag-themesong">themesong v2 — met tekst</span>
+    </div>
+    <audio controls preload="none" src="/assets/audio/music/music_brabanders_2.mp3"></audio>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Andere facties (instrumentale ambient — referentie)</div>
+
+  <div class="track">
+    <div class="track-meta">
+      <div class="track-name">music_randstad.mp3</div>
+      <span class="track-tag tag-ambient">ambient instrumentaal</span>
+    </div>
+    <audio controls preload="none" src="/assets/audio/music/music_randstad.mp3"></audio>
+  </div>
+
+  <div class="track">
+    <div class="track-meta">
+      <div class="track-name">music_limburgers.mp3</div>
+      <span class="track-tag tag-ambient">ambient instrumentaal</span>
+    </div>
+    <audio controls preload="none" src="/assets/audio/music/music_limburgers.mp3"></audio>
+  </div>
+
+  <div class="track">
+    <div class="track-meta">
+      <div class="track-name">music_belgen.mp3</div>
+      <span class="track-tag tag-ambient">ambient instrumentaal</span>
+    </div>
+    <audio controls preload="none" src="/assets/audio/music/music_belgen.mp3"></audio>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Generieke victory / defeat (huidig)</div>
+
+  <div class="track">
+    <div class="track-meta">
+      <div class="track-name">music_victory.mp3</div>
+      <span class="track-tag tag-victory">victory — generic, alle facties</span>
+    </div>
+    <audio controls preload="none" src="/assets/audio/music/music_victory.mp3"></audio>
+  </div>
+
+  <div class="track">
+    <div class="track-meta">
+      <div class="track-name">music_defeat.mp3</div>
+      <span class="track-tag tag-victory">defeat — generic, alle facties</span>
+    </div>
+    <audio controls preload="none" src="/assets/audio/music/music_defeat.mp3"></audio>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Cinematic candidates — bestaand Brabants ambient materiaal?</div>
+  <p class="intro">Deze files staan in <code>cinematic/music/</code> en zijn niet in productie. Mogelijk geschikt als Brabander instrumentale ambient zonder dat we Suno hoeven te triggeren.</p>
+
+  <div class="track">
+    <div class="track-meta">
+      <div class="track-name">storm-over-low-fields.mp3</div>
+      <span class="track-tag tag-candidate">candidate — sfeer-instrumentaal</span>
+    </div>
+    <audio controls preload="none" src="/_preview/cinematic/storm-over-low-fields.mp3"></audio>
+  </div>
+
+  <div class="track">
+    <div class="track-meta">
+      <div class="track-name">score-v5.wav</div>
+      <span class="track-tag tag-candidate">candidate — orchestral score (latest v)</span>
+    </div>
+    <audio controls preload="none" src="/_preview/cinematic/score-v5.wav"></audio>
+  </div>
+
+  <div class="track">
+    <div class="track-meta">
+      <div class="track-name">score-30s-v3.wav</div>
+      <span class="track-tag tag-candidate">candidate — score 30s v3</span>
+    </div>
+    <audio controls preload="none" src="/_preview/cinematic/score-30s-v3.wav"></audio>
+  </div>
+
+  <div class="track">
+    <div class="track-meta">
+      <div class="track-name">score-candidate-intro-0-30.mp3</div>
+      <span class="track-tag tag-candidate">candidate — intro 0-30s</span>
+    </div>
+    <audio controls preload="none" src="/_preview/cinematic/score-candidate-intro-0-30.mp3"></audio>
+  </div>
+
+  <div class="track">
+    <div class="track-meta">
+      <div class="track-name">score-candidate-climax-40-70.mp3</div>
+      <span class="track-tag tag-candidate">candidate — climax 40-70s</span>
+    </div>
+    <audio controls preload="none" src="/_preview/cinematic/score-candidate-climax-40-70.mp3"></audio>
+  </div>
+</div>
+
+<div class="verdict">
+  <h2>Beslismatrix</h2>
+  <p><strong>Optie 1 — Cinematic werkt:</strong> kies een van de candidates als Brabander ambient (rename naar <code>music_brabanders.mp3</code>) en hang de themesong om naar victory-only. <em>Geen Suno nodig.</em></p>
+  <p><strong>Optie 2 — Cinematic werkt niet:</strong> ik trigger Suno met een prompt-brief (Brabants tintje, instrumentaal, vergelijkbaar in stijl en lengte met <code>music_randstad.mp3</code> / <code>music_limburgers.mp3</code> / <code>music_belgen.mp3</code>). 1-2 candidates genereren, jij beoordeelt.</p>
+  <p><strong>Optie 3 — Hybride:</strong> begin met candidate als tijdelijk + plan Suno-batch later voor v0.50.0 polish.</p>
+  <p style="margin-top: 16px;">Geef antwoord in 1 regel: <em>"candidate X als ambient"</em> / <em>"genereer Suno"</em> / <em>"hybride met X"</em>.</p>
+</div>
+</body>
+</html>
