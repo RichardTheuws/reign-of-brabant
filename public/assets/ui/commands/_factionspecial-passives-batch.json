@@ -1,0 +1,62 @@
+{
+  "batch": "factionspecial-passives",
+  "generated": "2026-04-29",
+  "model": "fal-ai/flux/dev",
+  "image_size": "square_hd",
+  "num_inference_steps": 28,
+  "guidance_scale": 3.5,
+  "remove_bg": false,
+  "style": "painted RPG card art passive aura icon, ornate gold curved frame border, dark moody vignette, dramatic chiaroscuro, oil painting texture",
+  "anchor_references": [
+    "public/assets/ui/commands/cmd-rally.png",
+    "public/assets/ui/commands/cmd-vlaai-trakteer.png"
+  ],
+  "assets": [
+    {
+      "filename": "cmd-crn-aura.png",
+      "faction": "CRN",
+      "building": "Carnavalstent",
+      "effect": "Aura: +20% schade Brabant-eenheden in 12u radius",
+      "model": "fal-ai/flux/dev",
+      "size_bytes": 1472952,
+      "url": "https://v3b.fal.media/files/b/0a982c0a/FJESZuWFsaQddUEyWO6Ot.jpg",
+      "request_id": "019dd838-55c8-7531-a4d0-1f6e07518572",
+      "prompt": "painted RPG card art passive aura icon, a Brabantian medieval infantry helmet at the center surrounded by an outward-radiating aura of golden-orange carnival fire flames and floating sparks, the helmet's plate armor reflects warm aura light, painted oil texture, centered on dark moody vignette background with green-black gradient and warm orange-red carnival accents, ornate gold curved frame border, dramatic chiaroscuro lighting, fantasy game ability icon, oil painting texture, no text, museum quality"
+    },
+    {
+      "filename": "cmd-brd-passive.png",
+      "faction": "BRD",
+      "building": "Boardroom",
+      "effect": "Passive: per Boardroom +1 efficiency-cap (max +3)",
+      "model": "fal-ai/flux/dev",
+      "size_bytes": 1102491,
+      "url": "https://v3b.fal.media/files/b/0a982c0a/idkM7zhbxY2eockVHhLUw.jpg",
+      "request_id": "019dd838-55d2-7730-8e48-e3d4febc0220",
+      "prompt": "painted RPG card art passive aura icon, a stack of three rising golden corporate efficiency badges or trophy plates each with a small star, ascending in size like a progression chart, soft blue-white efficiency aura glow surrounding them, painted oil texture, centered on dark moody vignette background with deep blue-black gradient and warm yellow desk-lamp accents, ornate gold curved frame border, dramatic chiaroscuro lighting, fantasy game ability icon, oil painting texture, no text, no logos, museum quality"
+    },
+    {
+      "filename": "cmd-vla-aura.png",
+      "faction": "VLA",
+      "building": "Vlaaiwinkel",
+      "effect": "Aura: +10 HP/5s heal Limburg-eenheden in 10u radius",
+      "model": "fal-ai/flux/dev",
+      "size_bytes": 1112164,
+      "url": "https://v3b.fal.media/files/b/0a982c0a/iva4Tj5EInsfu6yDG43gy.jpg",
+      "request_id": "019dd838-55cf-7e90-a483-9fb6a095386c",
+      "prompt": "painted RPG card art passive aura icon, a Limburg cherry vlaai pie at the center with soft green-white healing light radiating outward in concentric pulses, glowing red cherries on top, sparkling motes drifting in the heal aura, painted oil texture, centered on dark moody vignette background with brown-black gradient and warm cherry-red accents, ornate gold curved frame border, dramatic chiaroscuro lighting, fantasy game ability icon, oil painting texture, no text, museum quality"
+    },
+    {
+      "filename": "cmd-dpl-passive.png",
+      "faction": "DPL",
+      "building": "Diplomatiek Salon",
+      "effect": "Passive: per Salon -10% Persuasion-cost (cap -30%)",
+      "model": "fal-ai/flux/dev",
+      "size_bytes": 751880,
+      "url": "https://v3b.fal.media/files/b/0a982c0a/mNsMCRNVDQ4yZUAFAVP4i.jpg",
+      "request_id": "019dd838-55cc-7692-bedc-2a16ca6c969b",
+      "prompt": "painted RPG card art passive aura icon, a refined Belgian diplomatic handshake between two formal-coated forearms with a single chocolate praline floating glowing between their hands, golden negotiation aura surrounding the handshake, painted oil texture, centered on dark moody vignette background with deep black and chocolate-brown gradient with golden-yellow Belgian accents, ornate gold curved frame border, dramatic chiaroscuro lighting, fantasy game ability icon, oil painting texture, no text, no logos, museum quality"
+    }
+  ],
+  "cost_estimate_usd": 0.12,
+  "wallclock_seconds": 4
+}

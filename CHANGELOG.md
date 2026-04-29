@@ -1,5 +1,51 @@
 # Changelog
 
+## [0.46.0] - 2026-04-29 — Battle visuals + complete HUD asset pass
+
+### Added — Attack swing animation
+`UnitRenderer.triggerAttackSwing(eid, isRanged)` — procedurele forward-lean (melee, peak +0.32rad) of recoil (ranged, peak −0.18rad) op de attacker model.rotation.x. Triangular curve (0→peak in 40%, peak→0 in 60%) over `ATTACK_SWING_DURATION = 0.28s`. Stacks bovenop GLB animation clips; auto-clears wanneer geen swing actief is. Driver: combat-hit event-listener in `Game.ts` roept `triggerAttackSwing(event.attackerEid, event.isRanged)` aan na particle/audio. 2 vitest-cases voor API-contract.
+
+### Added — Floating damage numbers
+Nieuwe `src/ui/DamagePopups.ts` — pool van 50 DOM-elements die boven units zweven met "-15" tekst. Pool-grootte voorkomt DOM-explosie bij 200+ units in combat (recycled oudste actieve slot bij vol). World→screen projectie via `RTSCamera.worldToScreen` per frame, fade-up curve 0→60px omhoog over 1.0s, opacity ease-out in laatste 30%. Spawn voor zowel units als gebouwen wanneer Health.current daalt — driver hangt al in `Game.detectDamageFlash`. CSS in `hud.css` met crit/heal data-kind variants (gold-glow voor crit, groen voor heal). 6 vitest-cases dekken pool-bound, kind-attribuut, lifetime-recycle.
+
+### Added — Death animation collapse + fade
+`UnitRenderer.applyDeathTween` — animated units krijgen scale-Y collapse 100%→30% over de 2s DEATH_TIMER, met opacity-fade in de laatste 30%. Werkt naast bestaande GLB Death-clip (stacking). Blob-shadow vervaagt mee. `AnimatedUnit.baseScaleY` cached zodat respawn/visibility-wisselen geen scale-bleed geeft. `Game.syncRenderPositions` exposed `deathProgress` per unit (DeathTimer.elapsed / DEATH_TIMER) op data, die UnitRenderer.update doorgeeft naar updateAnimatedUnit.
+
+### Added — Volledige HUD-asset pass: 23 painted-vignette icons
+On-brand referentie: `cmd-rally.png` + `cmd-vlaai-trakteer.png` (oil-painting, dark vignette, ornate gold curved frame, dramatic chiaroscuro). Alle nieuwe icons matchen deze stijl — eerste batch transparante glyphs (Brabant + Randstad click-actions) is geregenereerd in painted style.
+
+`COMMAND_ICON_IMAGES` in `HUD.ts` uitgebreid + `createCommandButton` switcht naar PNG-first (canvas-drawn building portraits blijven fallback):
+
+- **6 click-actions** — OPT (Carnavalsoptocht), WBR (Trakteerronde), SPR (Sprint Mode), DDL (Deadline Crunch), CEO (Kwartaalcijfers), VLT (Vlaai-Trakteer)
+- **4 combat verbs** — MOV, ATK, STP, HLD (vervangen SVG-fallback)
+- **4 FactionSpecial1 passive aura badges** — CRN (Carnavalstent +damage aura), BRD (Boardroom efficiency-cap), VLA (Vlaaiwinkel heal-pulse), DPL (Diplomatiek Salon Persuasion-discount)
+- **10 build-menu icons** — TH (TownHall), BRK (Barracks), LMB (LumberCamp), BSM (Blacksmith), HSE (Housing), TWR (DefenseTower), SP1 (FactionSpecial1), SP2/ADV (FactionSpecial2), SWK (SiegeWorkshop), TRT (TertiaryResource). Generic cross-factie — factie-flavour zit in label-tekst.
+
+### Added — 16 ontbrekende upgrade-portraits
+Vier Asset Generator subagents parallel (één per factie) genereerden de 16 ontbrekende portretten die `UpgradePortraits.ts` al mapped maar waar geen PNG voor bestond:
+- **Brabant**: gezelligheids-boost, carnavalsrage, brabantse-vlijt, samen-sterk
+- **Randstad**: efficiency-consultant, agile, powerpoint-mastery, vergadering-protocol
+- **Limburg**: diepe-schacht, mergel-pantsering, vlaai-motivatie, mijnbouwexplosief
+- **Belgen**: praline-productie, belgische-verzetskracht, trappist-brouwerij, fritenvet-fundering
+
+Stijl matcht bestaande set (painted RPG card-art, gold curved frame, factie-vignette). Manifests per factie in `public/assets/portraits/_<faction>-batch.json`. Totaal 39 nieuwe + 5 geregenereerde assets, ~$1.42 fal.ai.
+
+### Why
+Pre-v0.46.0 was gameplay solide maar visueel "stil" — geen feedback op damage of dood. Voor crowdfunding-pitch en eerste-indruk is visuele combat-impact essentieel. Asset-pipeline en hit-flash waren al klaar (DAMAGE_FLASH_COLOR, spawnCombatHit, spawnDeathEffect), missing waren de drie items hierboven plus de 16 portretten waar UpgradePortraits.ts naar verwees.
+
+### Tests
+- `tests/DamagePopups.test.ts` (6 cases) — pool grootte, kind-attribuut, lifetime, recycle-cap.
+- `tests/UnitRenderer-attack-swing.test.ts` (2 cases) — triggerAttackSwing API + decay.
+- Volledige suite: 1554 tests groen (was 1546 + 8).
+
+### Files
+- Added: `src/ui/DamagePopups.ts`, `tests/DamagePopups.test.ts`, `tests/UnitRenderer-attack-swing.test.ts`
+- Added: 16 upgrade-portraits + 24 command-icons + 8 batch-manifests in `public/assets/`
+- Modified: `src/core/Game.ts` (damagePopups field/init, detectDamageFlash spawn-call, syncRenderPositions deathProgress + popup update, triggerAttackSwing in combat-hit listener)
+- Modified: `src/rendering/UnitRenderer.ts` (deathProgress in update signature, applyDeathTween, setAnimatedUnitOpacity, AnimatedUnit.baseScaleY, attackSwingTimers + triggerAttackSwing API + procedural rotation in updateAnimatedUnit)
+- Modified: `src/ui/HUD.ts` (COMMAND_ICON_IMAGES uitgebreid met 24 nieuwe keys, createCommandButton PNG-first)
+- Modified: `src/ui/hud.css` (`.damage-popup-layer`, `.damage-popup`, kind-variants)
+
 ## [0.45.1] - 2026-04-29 — docs: updates-page sync v0.41.0 → v0.45.0
 
 ### Updated — `public/updates/index.html`

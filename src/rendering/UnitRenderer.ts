@@ -251,6 +251,8 @@ interface AnimatedUnit {
   clipNames: Set<string>;
   currentAnim: string;
   prevAnim: string;
+  /** Cached spawn-time Y scale so death-tween can restore it. */
+  baseScaleY?: number;
 }
 
 /** Faction team colors: applied as a strong tint to unit materials. */
@@ -267,6 +269,13 @@ const SELECTION_COLOR = new THREE.Color(0.4, 1.0, 0.4);
 /** Damage flash: red flash for 0.1s when a unit takes damage. */
 const DAMAGE_FLASH_DURATION = 0.1;
 const DAMAGE_FLASH_COLOR = new THREE.Color(1.0, 0.2, 0.2);
+
+/** Attack swing animation duration: brief enough that fast attackers chain cleanly. */
+const ATTACK_SWING_DURATION = 0.28;
+/** Peak forward-lean angle (radians) for melee thrust. */
+const MELEE_LEAN_ANGLE = 0.32;
+/** Peak backward-lean angle (radians) for ranged bow-pull recoil. */
+const RANGED_RECOIL_ANGLE = 0.18;
 
 /** Default (neutral) instance color: white = no tinting. */
 const DEFAULT_COLOR = new THREE.Color(1, 1, 1);
@@ -373,6 +382,8 @@ export class UnitRenderer {
 
   /** Damage flash timers: eid -> remaining seconds. */
   private damageFlashTimers = new Map<number, number>();
+  /** Attack swing animation: eid -> { remaining, isRanged }. */
+  private attackSwingTimers = new Map<number, { remaining: number; isRanged: boolean }>();
   /** Previous positions for movement detection. */
   private prevPositions = new Map<number, { x: number; z: number }>();
   /** Movement blend factor per unit: 0 = idle, 1 = walking. */
@@ -937,6 +948,7 @@ export class UnitRenderer {
       isBuffed?: boolean;
       isStunned?: boolean;
       isInvincible?: boolean;
+      deathProgress?: number;
     }>,
   ): void {
     this.elapsedTime += dt;
@@ -948,6 +960,16 @@ export class UnitRenderer {
         this.damageFlashTimers.delete(eid);
       } else {
         this.damageFlashTimers.set(eid, newRemaining);
+      }
+    }
+
+    // Update attack swing timers
+    for (const [eid, swing] of this.attackSwingTimers) {
+      const newRemaining = swing.remaining - dt;
+      if (newRemaining <= 0) {
+        this.attackSwingTimers.delete(eid);
+      } else {
+        this.attackSwingTimers.set(eid, { remaining: newRemaining, isRanged: swing.isRanged });
       }
     }
 
@@ -1108,6 +1130,7 @@ export class UnitRenderer {
       unitTypeId?: number;
       targetX?: number; targetZ?: number;
       isBuffed?: boolean; isStunned?: boolean; isInvincible?: boolean;
+      deathProgress?: number;
     },
     animUnit: AnimatedUnit,
   ): void {
@@ -1137,6 +1160,24 @@ export class UnitRenderer {
     animUnit.model.position.set(data.x, data.y + 1.5, data.z);
     animUnit.model.rotation.y = facingY;
 
+    // --- Attack swing overlay: forward-lean (melee) or recoil (ranged) ---
+    // Triangular curve peaks at 40% of duration: slow wind-up → snap → recover.
+    const swing = this.attackSwingTimers.get(data.eid);
+    if (swing && swing.remaining > 0) {
+      const t = 1 - swing.remaining / ATTACK_SWING_DURATION; // 0 → 1
+      // Wind-up 0..0.4 → 0..1, follow-through 0.4..1.0 → 1..0
+      const intensity = t < 0.4 ? t / 0.4 : Math.max(0, 1 - (t - 0.4) / 0.6);
+      const angle = swing.isRanged ? -RANGED_RECOIL_ANGLE * intensity : MELEE_LEAN_ANGLE * intensity;
+      animUnit.model.rotation.x = angle;
+    } else if (animUnit.model.rotation.x !== 0) {
+      animUnit.model.rotation.x = 0;
+    }
+
+    // --- Death collapse + fade-out (overlays the Death clip) ---
+    // Scale Y collapses 100% → 30% over the death window; opacity fades to 0
+    // in the final 30%. Restore baseline when not dying.
+    this.applyDeathTween(animUnit, data.deathProgress);
+
     // --- Sync proxy position (for raycasting) ---
     const proxy = this.proxies.get(data.eid);
     if (proxy) {
@@ -1148,11 +1189,60 @@ export class UnitRenderer {
     const shadow = this.blobShadows.get(data.eid);
     if (shadow) {
       shadow.position.set(data.x, data.y + 0.05, data.z);
+      // Fade shadow alongside body during death.
+      const shadowMat = shadow.material as THREE.MeshBasicMaterial;
+      const baseOpacity = 0.4;
+      shadowMat.opacity = data.deathProgress !== undefined
+        ? baseOpacity * Math.max(0, 1 - data.deathProgress)
+        : baseOpacity;
     }
 
     // --- Damage flash / selection highlight / buff indicator for animated units ---
     const isFlashing = this.damageFlashTimers.has(data.eid);
     this.setAnimatedUnitEmissive(animUnit, isFlashing, data.selected, data.isBuffed, data.isStunned, data.isInvincible);
+  }
+
+  /**
+   * Apply death visual: vertical collapse + opacity fade. Operates on the
+   * animated-unit model directly so it stacks on top of any Death animation
+   * clip when the GLB has one.
+   */
+  private applyDeathTween(animUnit: AnimatedUnit, deathProgress: number | undefined): void {
+    const baseScaleY = animUnit.baseScaleY ?? animUnit.model.scale.y;
+    if (animUnit.baseScaleY === undefined) {
+      animUnit.baseScaleY = baseScaleY;
+    }
+
+    if (deathProgress === undefined || deathProgress <= 0) {
+      animUnit.model.scale.y = baseScaleY;
+      this.setAnimatedUnitOpacity(animUnit, 1);
+      return;
+    }
+
+    // Y-collapse: 1.0 → 0.3 across the full timer.
+    const collapse = 1 - 0.7 * deathProgress;
+    animUnit.model.scale.y = baseScaleY * collapse;
+
+    // Fade-out only kicks in during the final 30% so the collapse stays visible.
+    const fade = deathProgress < 0.7 ? 1 : 1 - (deathProgress - 0.7) / 0.3;
+    this.setAnimatedUnitOpacity(animUnit, Math.max(0, fade));
+  }
+
+  /**
+   * Set transparency + opacity on every material in the animated unit.
+   * Caches `transparent: true` so future fade frames are cheap.
+   */
+  private setAnimatedUnitOpacity(animUnit: AnimatedUnit, opacity: number): void {
+    animUnit.model.traverse((child) => {
+      if (!(child as THREE.Mesh).isMesh) return;
+      const mesh = child as THREE.Mesh;
+      const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      for (const mat of mats) {
+        const m = mat as THREE.Material & { opacity?: number };
+        if (opacity < 1 && !m.transparent) m.transparent = true;
+        if (m.opacity !== undefined) m.opacity = opacity;
+      }
+    });
   }
 
   /**
@@ -1196,6 +1286,15 @@ export class UnitRenderer {
         }
       }
     });
+  }
+
+  /**
+   * Trigger an attack swing animation on the attacker. Plays a brief
+   * forward-lean (melee) or bow-pull-and-release (ranged) over ATTACK_SWING_DURATION.
+   * Stacks on top of any GLB animation clip (procedural rotation overlay).
+   */
+  triggerAttackSwing(eid: number, isRanged: boolean): void {
+    this.attackSwingTimers.set(eid, { remaining: ATTACK_SWING_DURATION, isRanged });
   }
 
   /**

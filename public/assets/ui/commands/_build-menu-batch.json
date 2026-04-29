@@ -1,0 +1,68 @@
+{
+  "generated": "2026-04-29T07:52:34Z",
+  "model": "fal-ai/flux/dev",
+  "size": "square_hd",
+  "remove_bg": false,
+  "assets": [
+    {
+      "filename": "cmd-th.png",
+      "prompt": "painted RPG card art building icon, a sturdy medieval keep tower with a banner flag flying on top, stone walls with arrow slits, oak entry door, painted oil texture, neutral warm-brown surroundings, centered on dark moody vignette background with warm-brown to black gradient, ornate gold curved frame border, dramatic chiaroscuro lighting, fantasy game build-menu icon, oil painting texture, no text, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982c11/Q9btbnd9tvdtPBZjyFzU-.jpg",
+      "seed": 1177624784
+    },
+    {
+      "filename": "cmd-brk.png",
+      "prompt": "painted RPG card art building icon, a fortified medieval barracks building with crossed-swords symbol over the door, weathered timber-and-stone walls, training-yard fence to one side, painted oil texture, neutral warm-brown surroundings, centered on dark moody vignette background with warm-brown to black gradient, ornate gold curved frame border, dramatic chiaroscuro lighting, fantasy game build-menu icon, oil painting texture, no text, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982c11/gWA4VrkR1uXo-XkBmoK3O.jpg",
+      "seed": 1601255738
+    },
+    {
+      "filename": "cmd-lmb.png",
+      "prompt": "painted RPG card art building icon, a wooden lumber camp with stacked logs and a two-handed axe leaning against a sawhorse, sawdust on the ground, neutral warm-brown surroundings, painted oil texture, centered on dark moody vignette background with warm-brown to black gradient, ornate gold curved frame border, dramatic chiaroscuro lighting, fantasy game build-menu icon, oil painting texture, no text, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982c11/lkyQl1i5ibNKq9FcqxuXA.jpg",
+      "seed": 1635559404
+    },
+    {
+      "filename": "cmd-bsm.png",
+      "prompt": "painted RPG card art building icon, a stone blacksmith forge building with a glowing red anvil out front, hammer and tongs hanging on the wall, smoke rising from a chimney, warm orange forge-glow, painted oil texture, centered on dark moody vignette background with warm-brown to black gradient and orange forge accents, ornate gold curved frame border, dramatic chiaroscuro lighting, fantasy game build-menu icon, oil painting texture, no text, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982c11/zjmPd-7RoHw8dJI2_lArC.jpg",
+      "seed": 1671525229
+    },
+    {
+      "filename": "cmd-hse.png",
+      "prompt": "painted RPG card art building icon, a cozy medieval thatched-roof cottage with smoke rising from the chimney, warm yellow-orange light glowing from the windows, low stone wall around it, painted oil texture, centered on dark moody vignette background with warm-brown to black gradient and warm orange window-glow accents, ornate gold curved frame border, dramatic chiaroscuro lighting, fantasy game build-menu icon, oil painting texture, no text, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982c11/qRiBq6ylJr4ypBwgHfctZ.jpg",
+      "seed": 876553047
+    },
+    {
+      "filename": "cmd-twr.png",
+      "prompt": "painted RPG card art building icon, a tall stone watchtower with crenellated battlements at the top, narrow arrow slits, a single guard's banner flying, painted oil texture, centered on dark moody vignette background with warm-brown to black gradient, ornate gold curved frame border, dramatic chiaroscuro lighting, fantasy game build-menu icon, oil painting texture, no text, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982c11/zWFku3UJqzzEzjpwVyerJ.jpg",
+      "seed": 1757525327
+    },
+    {
+      "filename": "cmd-sp1.png",
+      "prompt": "painted RPG card art building icon, an ornate festive medieval pavilion building with a banner flag and two flaming torches at the entrance suggesting a unique faction landmark, painted oil texture, centered on dark moody vignette background with warm-brown to black gradient and golden festive accents, ornate gold curved frame border, dramatic chiaroscuro lighting, fantasy game build-menu icon, oil painting texture, no text, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982c11/O4zW4BVyhnoIE49PoBE4L.jpg",
+      "seed": 1331647221
+    },
+    {
+      "filename": "cmd-sp2.png",
+      "prompt": "painted RPG card art building icon, an imposing fortified faction-emblem building with a wide arched entrance and a stone medallion crest above the door suggesting a special advanced structure, painted oil texture, centered on dark moody vignette background with warm-brown to black gradient and gold heraldic accents, ornate gold curved frame border, dramatic chiaroscuro lighting, fantasy game build-menu icon, oil painting texture, no text, no specific emblem, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982c11/a3v4EWhdhNmAbiaQhw0r5.jpg",
+      "seed": 137183745
+    },
+    {
+      "filename": "cmd-swk.png",
+      "prompt": "painted RPG card art building icon, a heavy timber siege workshop with a wooden trebuchet half-built inside the open framework, scattered logs and iron tools around, painted oil texture, centered on dark moody vignette background with warm-brown to black gradient, ornate gold curved frame border, dramatic chiaroscuro lighting, fantasy game build-menu icon, oil painting texture, no text, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982c11/0P3RjjHMcUYr7_-QV1Eha.jpg",
+      "seed": 1894996744
+    },
+    {
+      "filename": "cmd-trt.png",
+      "prompt": "painted RPG card art building icon, a quaint medieval market stall with a striped canvas awning, a wooden counter with displayed pastry and clay jugs, painted oil texture, centered on dark moody vignette background with warm-brown to black gradient and warm festive accents, ornate gold curved frame border, dramatic chiaroscuro lighting, fantasy game build-menu icon, oil painting texture, no text, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982c11/3CuwqsGha1v8B8NAlbKA1.jpg",
+      "seed": 1261008231
+    }
+  ]
+}

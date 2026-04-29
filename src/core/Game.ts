@@ -10,9 +10,9 @@ import * as THREE from 'three';
 import { addEntity, addComponent, hasComponent, query, entityExists } from 'bitecs';
 
 import { world, resetGameWorld } from '../ecs/world';
-import { Position, Faction, Health, Attack, Armor, Movement, UnitType, UnitAI, Gatherer, Visibility, Building, Resource, Selected, Production, Rotation, GezeligheidBonus, Hero, HeroAbilities, RallyPoint, StatBuff, Stunned, Invincible } from '../ecs/components';
+import { Position, Faction, Health, Attack, Armor, Movement, UnitType, UnitAI, Gatherer, Visibility, Building, Resource, Selected, Production, Rotation, GezeligheidBonus, Hero, HeroAbilities, RallyPoint, StatBuff, Stunned, Invincible, DeathTimer } from '../ecs/components';
 import { IsUnit, IsBuilding, IsResource, IsWorker, IsDead, IsHero } from '../ecs/tags';
-import { FactionId, UnitTypeId, BuildingTypeId, HeroTypeId, UpgradeId, ResourceType, MAP_SIZE, MAP_SIZES, RESOURCE_PRESETS, UnitAIState, NO_PRODUCTION, NO_ENTITY, HERO_POPULATION_COST, type UnitArchetype, type MapSizeOption, type ResourcePreset } from '../types/index';
+import { FactionId, UnitTypeId, BuildingTypeId, HeroTypeId, UpgradeId, ResourceType, MAP_SIZE, MAP_SIZES, RESOURCE_PRESETS, UnitAIState, NO_PRODUCTION, NO_ENTITY, HERO_POPULATION_COST, DEATH_TIMER, type UnitArchetype, type MapSizeOption, type ResourcePreset } from '../types/index';
 import { UNIT_ARCHETYPES, RANDSTAD_UNIT_ARCHETYPES, LIMBURGERS_UNIT_ARCHETYPES, BELGEN_UNIT_ARCHETYPES, BUILDING_ARCHETYPES } from '../entities/archetypes';
 import { HERO_ARCHETYPES, getHeroTypesForFaction, getHeroArchetype } from '../entities/heroArchetypes';
 import { getFactionUnitArchetype, getDisplayBuildingName, getDisplayUnitName, getDisplayUpgradeName } from '../data/factionData';
@@ -39,6 +39,7 @@ import { eventBus } from '../core/EventBus';
 import { findEntityAtPosition } from '../core/entityPicking';
 import { spawnBuildingEntity } from '../entities/buildingSpawn';
 import { HUD, type SelectedUnit, type CommandAction, type HeroAbilityData, type BuildingCardData, type BuildingCardAction } from '../ui/HUD';
+import { DamagePopups } from '../ui/DamagePopups';
 import { activateCarnavalsrage, getCarnavalsrageState, getCarnavalsrageConfig, resetAbilitySystem } from '../systems/AbilitySystem';
 import { activateHeroAbility, resetHeroSystem } from '../systems/HeroSystem';
 import { resetBureaucracy, activateBoardroom, isBoardroomReady, boardroomBuff } from '../systems/BureaucracySystem';
@@ -188,6 +189,7 @@ export class Game {
   private selectedEntities: number[] = [];
   private playerState: typeof playerState;
   private hud: HUD | null = null;
+  private damagePopups: DamagePopups;
 
   private entityMeshMap = new Map<number, THREE.Object3D>();
   private raycaster = new THREE.Raycaster();
@@ -274,6 +276,7 @@ export class Game {
     this.camera = camera;
     this.eventBus = eventBus;
     this.particles = particles;
+    this.damagePopups = new DamagePopups();
 
     this.pipeline = createGamePipeline(terrain, import.meta.env.DEV);
     this.navMesh = NavMeshManager;
@@ -1939,6 +1942,8 @@ export class Game {
       if (!event.isRanged) {
         this.camera.shake(0.15, 0.15);
       }
+      // Attack swing-anim on attacker (procedural forward-lean).
+      this.unitRenderer.triggerAttackSwing(event.attackerEid, event.isRanged);
     });
 
     // Audio + particles: building placed
@@ -3165,7 +3170,7 @@ export class Game {
   }
 
   /**
-   * Detect HP decreases since last frame and trigger damage flash.
+   * Detect HP decreases since last frame and trigger damage flash + floating popup.
    */
   private detectDamageFlash(): void {
     for (const eid of this.knownUnitEntities) {
@@ -3176,19 +3181,31 @@ export class Game {
       const lastHp = this.lastHpMap.get(eid);
 
       if (lastHp !== undefined && currentHp < lastHp) {
+        const delta = lastHp - currentHp;
         this.unitRenderer.triggerDamageFlash(eid);
+        const wx = Position.x[eid];
+        const wz = Position.z[eid];
+        const wy = this.terrain.getHeightAt(wx, wz) + 2.2;
+        this.damagePopups.spawn(delta, wx, wy, wz, 'damage');
       }
 
       this.lastHpMap.set(eid, currentHp);
     }
 
-    // Also check buildings
+    // Also check buildings — damage popup mirrors unit feedback so the player
+    // notices base-rushes; tint is handled by BuildingRenderer.
     for (const eid of this.knownBuildingEntities) {
       if (!entityExists(world, eid)) continue;
       const currentHp = Health.current[eid];
       const lastHp = this.lastHpMap.get(eid);
+      if (lastHp !== undefined && currentHp < lastHp) {
+        const delta = lastHp - currentHp;
+        const wx = Position.x[eid];
+        const wz = Position.z[eid];
+        const wy = this.terrain.getHeightAt(wx, wz) + 4.0;
+        this.damagePopups.spawn(delta, wx, wy, wz, 'damage');
+      }
       this.lastHpMap.set(eid, currentHp);
-      // Building damage is handled via tint in BuildingRenderer, no flash needed
     }
   }
 
@@ -3200,6 +3217,7 @@ export class Game {
       unitTypeId?: number;
       targetX?: number; targetZ?: number;
       isBuffed?: boolean; isStunned?: boolean; isInvincible?: boolean;
+      deathProgress?: number;
     }> = [];
 
     for (const [eid, mesh] of this.entityMeshMap) {
@@ -3207,6 +3225,10 @@ export class Game {
         if (hasComponent(world, eid, IsUnit)) {
           const isIdle = UnitAI.state[eid] === UnitAIState.Idle;
           const hasTarget = Movement.hasTarget[eid] === 1;
+          let deathProgress: number | undefined;
+          if (hasComponent(world, eid, IsDead) && hasComponent(world, eid, DeathTimer)) {
+            deathProgress = Math.min(1, DeathTimer.elapsed[eid] / DEATH_TIMER);
+          }
           unitPositions.push({
             eid,
             x: Position.x[eid],
@@ -3222,6 +3244,7 @@ export class Game {
             isBuffed: hasComponent(world, eid, StatBuff) && StatBuff.duration[eid] > 0,
             isStunned: hasComponent(world, eid, Stunned) && Stunned.duration[eid] > 0,
             isInvincible: hasComponent(world, eid, Invincible) && Invincible.duration[eid] > 0,
+            deathProgress,
           });
         } else if (!hasComponent(world, eid, IsBuilding)) {
           // Resources: position sync with Y offset to prevent terrain clipping
@@ -3233,6 +3256,9 @@ export class Game {
 
     // Delegate to UnitRenderer for idle bob, damage flash, blob shadows
     this.unitRenderer.update(dt, unitPositions);
+
+    // Project floating damage numbers to screen this frame.
+    this.damagePopups.update(dt, this.camera);
   }
 
   private syncBuildingProgress(dt: number): void {

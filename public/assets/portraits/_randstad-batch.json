@@ -1,0 +1,114 @@
+{
+  "generated": "2026-04-29",
+  "faction": "Randstad",
+  "batch": "randstad-upgrades-and-commands",
+  "models": {
+    "image": "fal-ai/flux/dev",
+    "remove_bg": "fal-ai/birefnet"
+  },
+  "assets": [
+    {
+      "filename": "efficiency-consultant.png",
+      "path": "public/assets/portraits/upgrades/efficiency-consultant.png",
+      "type": "upgrade-portrait",
+      "size": "square_hd",
+      "model": "fal-ai/flux/dev",
+      "remove_bg": false,
+      "faction": "Randstad",
+      "fal_url": "https://v3b.fal.media/files/b/0a982b67/r2j_Q-0gPrdXCZp4-d_dN.jpg",
+      "request_id": "019dd81f-7eb7-7871-9bc5-dc820c2b3f84",
+      "prompt": "painted RPG card art, corporate consultant in tailored navy-blue suit holding open laptop, glowing KPI dashboard with rising line-charts and percentage badges floating beside him, may include 1 small silhouetted office figure as scale, blue-grey-white palette with warm yellow desk-lamp accents, clean cinematic concept art aesthetic, centered on dark moody vignette background with deep blue-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, fantasy game upgrade icon, oil painting texture meets corporate concept art, no text, no logos, museum quality"
+    },
+    {
+      "filename": "agile.png",
+      "path": "public/assets/portraits/upgrades/agile.png",
+      "type": "upgrade-portrait",
+      "size": "square_hd",
+      "model": "fal-ai/flux/dev",
+      "remove_bg": false,
+      "faction": "Randstad",
+      "fal_url": "https://v3b.fal.media/files/b/0a982b68/UWgxr8DPvWed6iQ6t7Xhw.jpg",
+      "request_id": "019dd81f-995b-7c80-b518-fb4bc7ac954d",
+      "prompt": "painted RPG card art, corporate scrum board covered in colorful sticky notes (yellow pink blue green) arranged in sprint columns, marker pen and whiteboard eraser in the foreground, soft directional lighting catching the notes, no characters, blue-grey-white palette with warm yellow desk-lamp accents, clean cinematic concept art aesthetic, centered on dark moody vignette background with deep blue-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, fantasy game upgrade icon, oil painting texture meets corporate concept art, no text, no logos, museum quality"
+    },
+    {
+      "filename": "powerpoint-mastery.png",
+      "path": "public/assets/portraits/upgrades/powerpoint-mastery.png",
+      "type": "upgrade-portrait",
+      "size": "square_hd",
+      "model": "fal-ai/flux/dev",
+      "remove_bg": false,
+      "faction": "Randstad",
+      "fal_url": "https://v3b.fal.media/files/b/0a982b68/ShSNdyEaU45qNsRdvh2m2.jpg",
+      "request_id": "019dd81f-a8e7-75b1-bf6c-ae4e8d84aed7",
+      "prompt": "painted RPG card art, dramatic boardroom presentation scene with a glowing wall-mounted projector screen showing rising business charts and pie graphs, sleek pointer in the foreground, may include 1 small silhouetted presenter figure as scale, blue-grey-white palette with warm yellow desk-lamp accents, clean cinematic concept art aesthetic, centered on dark moody vignette background with deep blue-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, fantasy game upgrade icon, oil painting texture meets corporate concept art, no text, no logos, museum quality"
+    },
+    {
+      "filename": "vergadering-protocol.png",
+      "path": "public/assets/portraits/upgrades/vergadering-protocol.png",
+      "type": "upgrade-portrait",
+      "size": "square_hd",
+      "model": "fal-ai/flux/dev",
+      "remove_bg": false,
+      "faction": "Randstad",
+      "fal_url": "https://v3b.fal.media/files/b/0a982b69/CVEZbIpP18tb9tjjfIG28.jpg",
+      "request_id": "019dd81f-b8aa-76a0-8f52-ad1f0ecd1220",
+      "prompt": "painted RPG card art, formal corporate meeting setup, leather-bound agenda notebook open on a polished mahogany table, fountain pen, neat stack of printed reports, single porcelain coffee cup on saucer, no characters, blue-grey-white palette with warm yellow desk-lamp accents, clean cinematic concept art aesthetic, centered on dark moody vignette background with deep blue-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, fantasy game upgrade icon, oil painting texture meets corporate concept art, no text, no logos, museum quality"
+    },
+    {
+      "filename": "cmd-sprint-mode.png",
+      "path": "public/assets/ui/commands/cmd-sprint-mode.png",
+      "type": "command-icon",
+      "size": "square_hd",
+      "model": "fal-ai/flux/dev",
+      "remove_bg": true,
+      "remove_bg_model": "fal-ai/birefnet",
+      "faction": "Randstad",
+      "fal_url_flux": "https://v3b.fal.media/files/b/0a982b69/v_a3FF2uNOgmC73bTbAS8.jpg",
+      "fal_url_birefnet": "https://v3b.fal.media/files/b/0a982b70/q1_a2x0TDDEC5yITfGopw_zO7qSLRe.png",
+      "request_id_flux": "019dd81f-cfd2-7610-b7d8-44cd0172f75f",
+      "request_id_birefnet": "019dd820-c5cb-7820-a64d-f62bfbba06c0",
+      "prompt": "running corporate intern (stagiair) carrying a sleek silver laptop under one arm, navy-blue blazer flapping, motion speed-streaks behind, dynamic forward-leaning pose, clean low-poly stylized 3D render, soft directional lighting, smooth simple shapes, single object centered on plain white studio background, no text, no logos, no UI overlay, game icon glyph"
+    },
+    {
+      "filename": "cmd-deadline-crunch.png",
+      "path": "public/assets/ui/commands/cmd-deadline-crunch.png",
+      "type": "command-icon",
+      "size": "square_hd",
+      "model": "fal-ai/flux/dev",
+      "remove_bg": true,
+      "remove_bg_model": "fal-ai/birefnet",
+      "faction": "Randstad",
+      "fal_url_flux": "https://v3b.fal.media/files/b/0a982b6a/-j1oehEE1FhTcGwkz65_i.jpg",
+      "fal_url_birefnet": "https://v3b.fal.media/files/b/0a982b70/dlr2mWDCBGZvx7AH7xHCP_ppqi9mZ5.png",
+      "request_id_flux": "019dd81f-de66-7363-92f3-79bb1536476d",
+      "request_id_birefnet": "019dd820-c79e-79f0-82bd-d9985605c6f7",
+      "prompt": "dramatic close-up of a sleek modern wall clock face showing 11:55, glowing red warning ring around the rim, jagged red alert exclamation flashes, clean low-poly stylized 3D render, soft directional lighting, smooth simple shapes, single object centered on plain white studio background, no characters, no text, no logos, no UI overlay, game icon glyph"
+    },
+    {
+      "filename": "cmd-kwartaalcijfers.png",
+      "path": "public/assets/ui/commands/cmd-kwartaalcijfers.png",
+      "type": "command-icon",
+      "size": "square_hd",
+      "model": "fal-ai/flux/dev",
+      "remove_bg": true,
+      "remove_bg_model": "fal-ai/birefnet",
+      "faction": "Randstad",
+      "fal_url_flux": "https://v3b.fal.media/files/b/0a982b6a/KM0bPU7PuIrGSDIgOAkyJ.jpg",
+      "fal_url_birefnet": "https://v3b.fal.media/files/b/0a982b70/imMKLaSNEQ4bruDbBLccr_10ShfnKj.png",
+      "request_id_flux": "019dd81f-e8ee-7c00-9537-3bb1ffc3adc0",
+      "request_id_birefnet": "019dd820-c915-7383-ab39-7277cedd4d55",
+      "prompt": "rising line-and-bar business chart with a large gold euro symbol floating above the topmost bar, green upward arrow, clean low-poly stylized 3D render, soft directional lighting, smooth simple shapes, single object centered on plain white studio background, no characters, no text, no logos, no UI overlay, game icon glyph"
+    }
+  ],
+  "cost_estimate_usd": {
+    "flux_dev": "7 x ~0.025 = ~0.175",
+    "birefnet": "3 x ~0.001 = ~0.003",
+    "total": "~0.18"
+  },
+  "notes": [
+    "Upgrades NOT background-removed (full painted scene)",
+    "Commands BiRefNet processed (transparent PNG glyphs)",
+    "Stagiair = corporate intern, no coffee/barista references"
+  ]
+}

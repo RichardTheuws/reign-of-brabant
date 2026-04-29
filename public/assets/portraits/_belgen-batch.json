@@ -1,0 +1,42 @@
+{
+  "generated": "2026-04-29",
+  "faction": "Belgen",
+  "model": "fal-ai/flux/dev",
+  "image_size": "square_hd",
+  "remove_bg": false,
+  "batch": "belgen-upgrades-optie-a",
+  "assets": [
+    {
+      "filename": "praline-productie.png",
+      "path": "public/assets/portraits/upgrades/praline-productie.png",
+      "model": "fal-ai/flux/dev",
+      "url": "https://v3b.fal.media/files/b/0a982b6f/ZylctguTwxPJ_wC_Ph3tR.jpg",
+      "faction": "Belgen",
+      "prompt": "painted RPG card art, a Belgian master chocolatier in a white apron carefully arranging glossy dark chocolate pralines on a polished silver tray lined with gold foil, dark chocolate streams cascading down a marble slab in the foreground, warm copper tempering pot beside, intricate hand-decorated chocolate bonbons, centered on dark moody vignette background with deep black and warm chocolate-brown gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching gold-foil reflections, fantasy game upgrade icon, oil painting texture, no text, no logos, museum quality"
+    },
+    {
+      "filename": "belgische-verzetskracht.png",
+      "path": "public/assets/portraits/upgrades/belgische-verzetskracht.png",
+      "model": "fal-ai/flux/dev",
+      "url": "https://v3b.fal.media/files/b/0a982b6f/HcRmL7_IYlZOwf-1Yw7zs.jpg",
+      "faction": "Belgen",
+      "prompt": "painted RPG card art, a stoic Belgian resistance soldier holding a heraldic shield emblazoned with a roaring golden lion rampant on black field, faded tricolor sash of black yellow red across his chest, weathered leather armor, determined gaze, defiant stance, centered on dark moody vignette background with deep black and burgundy gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting hitting the gold lion emblem, fantasy game upgrade icon, oil painting texture, no readable text, no modern logos, museum quality"
+    },
+    {
+      "filename": "trappist-brouwerij.png",
+      "path": "public/assets/portraits/upgrades/trappist-brouwerij.png",
+      "model": "fal-ai/flux/dev",
+      "url": "https://v3b.fal.media/files/b/0a982b6f/y4citBSUFrUKVR2b4LvvL.jpg",
+      "faction": "Belgen",
+      "prompt": "painted RPG card art, the warm interior of a Trappist abbey brewery with three large gleaming copper brewing kettles steaming, oak barrels stacked along stone walls, golden Trappist beer glowing in a chalice in the foreground, a hooded monk in brown robes tending the brew in the middle distance as scale, candlelight from iron sconces, centered on dark moody vignette background with Trappist abbey green and warm copper gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting reflecting off copper kettles, fantasy game upgrade icon, oil painting texture, no text, museum quality"
+    },
+    {
+      "filename": "fritenvet-fundering.png",
+      "path": "public/assets/portraits/upgrades/fritenvet-fundering.png",
+      "model": "fal-ai/flux/dev",
+      "url": "https://v3b.fal.media/files/b/0a982b6f/IeSBCgF2vZDfjcdu5FXKx.jpg",
+      "faction": "Belgen",
+      "prompt": "painted RPG card art, a sturdy Belgian frietkraam friet stand foundation with a massive cast-iron deep-fryer kettle filled with golden bubbling frites, billowing steam clouds rising, crisp golden-yellow frites stacked on a paper cone in the foreground, wooden frame stand with a small painted sign suggesting fritkot atmosphere, centered on dark moody vignette background with deep black and golden-yellow gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching the hot oil shimmer, fantasy game upgrade icon, oil painting texture, no readable text, no modern logos, museum quality"
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "generated": "2026-04-29",
+  "faction": "Brabant",
+  "batch": "brabant-upgrades-and-commands-v1",
+  "pipeline": {
+    "upgrades": "fal-ai/flux/dev (square_hd) -> direct download",
+    "commands": "fal-ai/flux/dev (512x512) -> fal-ai/birefnet -> download"
+  },
+  "assets": [
+    {
+      "filename": "public/assets/portraits/upgrades/gezelligheids-boost.png",
+      "purpose": "Brabant upgrade portrait — Gezelligheids-Boost (cozy aura buff)",
+      "model": "fal-ai/flux/dev",
+      "remove_bg": false,
+      "dimensions": "1024x1024",
+      "fal_url": "https://v3b.fal.media/files/b/0a982b67/ugsfS5SCpbYPVUkSq1LqL.jpg",
+      "size_bytes": 291990,
+      "prompt": "painted RPG card art, a warmly lit cozy Brabantian café table scene with three pewter beer mugs clinking in a toast, foamy beer splashing, soft golden glow aura emanating outward, candlelight ambience, oak wood table with carved Bourgondisch cross detail, no characters, centered on dark moody vignette background with green-black gradient and warm orange-red accents, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, fantasy game upgrade icon, oil painting texture, no text, museum quality"
+    },
+    {
+      "filename": "public/assets/portraits/upgrades/carnavalsrage.png",
+      "purpose": "Brabant upgrade portrait — Carnavalsrage (battle fury buff)",
+      "model": "fal-ai/flux/dev",
+      "remove_bg": false,
+      "dimensions": "1024x1024",
+      "fal_url": "https://v3b.fal.media/files/b/0a982b67/DzMa1GctKnziMWStZsZGr.jpg",
+      "size_bytes": 374347,
+      "prompt": "painted RPG card art, a single fierce Brabantian medieval infantry soldier in plate armor mid-battle-roar, surrounded by raging vibrant orange-red-yellow carnival fire aura with confetti embers swirling around him, eyes glowing with battle fury, Bourgondisch cross emblem on shield, intense orange-red accent flames, centered on dark moody vignette background with green-black gradient and warm orange-red accents, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, fantasy game upgrade icon, oil painting texture, no text, museum quality"
+    },
+    {
+      "filename": "public/assets/portraits/upgrades/brabantse-vlijt.png",
+      "purpose": "Brabant upgrade portrait — Brabantse Vlijt (work/economy buff)",
+      "model": "fal-ai/flux/dev",
+      "remove_bg": false,
+      "dimensions": "1024x1024",
+      "fal_url": "https://v3b.fal.media/files/b/0a982b67/zkVewNoGcHhlqahh0Zdrh.jpg",
+      "size_bytes": 247462,
+      "prompt": "painted RPG card art, a hardworking weathered Brabantian medieval peasant farmer with rolled-up sleeves, sweat on his brow, gripping a sturdy wooden-handled pickaxe and a wheat sheaf, traditional linen tunic and leather apron, robust strong build, centered on dark moody vignette background with green-black gradient and warm orange-red accents, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, fantasy game upgrade icon, oil painting texture, no text, museum quality"
+    },
+    {
+      "filename": "public/assets/portraits/upgrades/samen-sterk.png",
+      "purpose": "Brabant upgrade portrait — Samen Sterk (formation/unity buff)",
+      "model": "fal-ai/flux/dev",
+      "remove_bg": false,
+      "dimensions": "1024x1024",
+      "fal_url": "https://v3b.fal.media/files/b/0a982b67/ciTPhX64aALHAbrREzDA_.jpg",
+      "size_bytes": 278924,
+      "prompt": "painted RPG card art, three Brabantian medieval soldiers standing shoulder-to-shoulder in a tight phalanx formation, raising a large Bourgondisch cross banner (red and white cross flag) overhead together, polished plate armor reflecting torchlight, unified determined expressions, centered on dark moody vignette background with green-black gradient and warm orange-red accents, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, fantasy game upgrade icon, oil painting texture, no text, museum quality"
+    },
+    {
+      "filename": "public/assets/ui/commands/cmd-carnavalsoptocht.png",
+      "purpose": "Brabant command icon — Carnavalsoptocht (parade rally command)",
+      "model": "fal-ai/flux/dev + fal-ai/birefnet",
+      "remove_bg": true,
+      "dimensions": "512x512",
+      "fal_url_flux": "https://v3b.fal.media/files/b/0a982b69/x85iN4l5h6aDAgCUTDWla.jpg",
+      "fal_url_birefnet": "https://v3b.fal.media/files/b/0a982b6a/yaO7ligSo4CbEmOzugR5y_3K2U5wEM.png",
+      "size_bytes": 50006,
+      "prompt": "clean game UI icon glyph, a vertical Brabantian carnival parade banner pole featuring a red and white Bourgondisch cross flag, two small festive orange and yellow pennant streamers fluttering off the pole, simple bold silhouette, painted clean linework, centered on plain neutral light background, vibrant warm orange red yellow palette, RTS command-button icon style, no text, no characters, no frame border, no shadow ground, sharp graphic icon"
+    },
+    {
+      "filename": "public/assets/ui/commands/cmd-trakteerronde.png",
+      "purpose": "Brabant command icon — Trakteerronde (treat/morale command)",
+      "model": "fal-ai/flux/dev + fal-ai/birefnet",
+      "remove_bg": true,
+      "dimensions": "512x512",
+      "fal_url_flux": "https://v3b.fal.media/files/b/0a982b69/HYnWbsaTrtYCnwuKYkxZj.jpg",
+      "fal_url_birefnet": "https://v3b.fal.media/files/b/0a982b6a/U1f1OmyIAIv_nSqLjApQ8_P46KnbEz.png",
+      "size_bytes": 116319,
+      "prompt": "clean game UI icon glyph, a single golden-brown Brabantian worstenbroodje sausage roll pastry crossed diagonally with a foaming pewter beer mug, bold simple silhouette, painted clean linework, centered on plain neutral light background, warm orange brown gold palette, RTS command-button icon style, no text, no characters, no frame border, no shadow ground, sharp graphic icon"
+    }
+  ],
+  "summary": {
+    "total_assets": 6,
+    "successful": 6,
+    "failed": 0,
+    "flux_dev_calls": 6,
+    "birefnet_calls": 2,
+    "estimated_cost_usd": 0.27
+  }
+}

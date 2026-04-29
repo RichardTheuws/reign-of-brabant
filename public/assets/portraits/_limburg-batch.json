@@ -1,0 +1,87 @@
+{
+  "generated": "2026-04-29",
+  "batch": "Limburg OPTIE A — match existing painted style",
+  "model": "fal-ai/flux/dev",
+  "image_size": "square_hd (1024x1024)",
+  "post_processing": {
+    "upgrades": "Re-encoded JPG response to PNG at 1024x1024 (RGB)",
+    "commands": "Downsampled 1024 to 512x512 PNG via PIL LANCZOS"
+  },
+  "remove_bg": false,
+  "note": "Painted-style with dark vignette by design — no remove-bg per OPTIE A.",
+  "assets": [
+    {
+      "filename": "diepe-schacht.png",
+      "path": "public/assets/portraits/upgrades/diepe-schacht.png",
+      "type": "upgrade-portrait",
+      "size": "1024x1024",
+      "model": "fal-ai/flux/dev",
+      "faction": "Limburg",
+      "request_id": "019dd820-8b9b-7613-a95e-6eb8319495d5",
+      "seed": 805509295,
+      "url": "https://v3b.fal.media/files/b/0a982b6e/5V7SZyvAOjB4ser4s0aEL.jpg",
+      "prompt": "painted RPG card art, a deep medieval mine shaft descending into darkness with thick wooden support beams forming a square frame, a single Limburger miner with a glowing helmet-lantern climbing down a wooden ladder into the depths, pale beige mergel limestone walls with chisel marks, scattered coal fragments and a pickaxe leaning against the beam, lantern light cutting through coal dust haze, earthen Limburg palette of mergel yellow-tan and coal-black with warm orange lantern glow, centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, fantasy game upgrade icon, oil painting texture, no text, museum quality"
+    },
+    {
+      "filename": "mergel-pantsering.png",
+      "path": "public/assets/portraits/upgrades/mergel-pantsering.png",
+      "type": "upgrade-portrait",
+      "size": "1024x1024",
+      "model": "fal-ai/flux/dev",
+      "faction": "Limburg",
+      "request_id": "019dd820-8b9b-7480-ab0d-b9ebcf9caf8b",
+      "seed": 610047231,
+      "url": "https://v3b.fal.media/files/b/0a982b6e/at7Cx8Z9GX-GMOZN-mDe0.jpg",
+      "prompt": "painted RPG card art, a single suit of medieval war armor carved from pale beige mergel limestone, a chiseled stone helmet and matching breastplate displayed on a wooden stand, rough hand-carved stone surface texture with visible chisel marks and small fossil patterns embedded, a small mining pickaxe symbol etched on the chest plate, earthen Limburg palette of mergel pale yellow-tan and coal-grey, centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting hitting the stone surface, fantasy game upgrade icon, oil painting texture, no text, no characters, museum quality"
+    },
+    {
+      "filename": "vlaai-motivatie.png",
+      "path": "public/assets/portraits/upgrades/vlaai-motivatie.png",
+      "type": "upgrade-portrait",
+      "size": "1024x1024",
+      "model": "fal-ai/flux/dev",
+      "faction": "Limburg",
+      "request_id": "019dd820-8b9e-7dc3-910a-29dbef243383",
+      "seed": 1780117745,
+      "url": "https://v3b.fal.media/files/b/0a982b6e/PNvxwHbqJqwJd0O4z9hHl.jpg",
+      "prompt": "painted RPG card art, a giant Limburg cherry vlaai (round Dutch fruit pie with glossy red kers cherries and lattice crust) sitting on a sturdy wooden tavern table, steam rising from a freshly cut slice, a tin mug and pewter plate beside it, may include 1-2 small Limburger soldiers in chainmail in the background eating slices appreciatively as scale, warm Limburg palette of cherry-red vlaai accent and mergel-tan wood with coal-black shadows, centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, fantasy game upgrade icon, oil painting texture, no text, museum quality"
+    },
+    {
+      "filename": "mijnbouwexplosief.png",
+      "path": "public/assets/portraits/upgrades/mijnbouwexplosief.png",
+      "type": "upgrade-portrait",
+      "size": "1024x1024",
+      "model": "fal-ai/flux/dev",
+      "faction": "Limburg",
+      "request_id": "019dd820-8b9b-7c41-8eb1-5ebc94c206ab",
+      "seed": 1286330574,
+      "url": "https://v3b.fal.media/files/b/0a982b6e/jnSzMSLOJUNZ3mTGKa-vq.jpg",
+      "prompt": "painted RPG card art, a single bundle of three red dynamite sticks wedged into a crack in a mergel limestone mine shaft wall, a burning sparking fuse with bright orange ember crackling at the tip, scattered small rocks and coal dust, dark tunnel atmosphere with one shaft of light from above, earthen Limburg palette of mergel yellow-tan and coal-black with vivid red dynamite and bright orange spark, centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, fantasy game upgrade icon, oil painting texture, no text, no characters, museum quality"
+    },
+    {
+      "filename": "cmd-vlaai-trakteer.png",
+      "path": "public/assets/ui/commands/cmd-vlaai-trakteer.png",
+      "type": "action-icon",
+      "size": "512x512 (downsampled from 1024)",
+      "model": "fal-ai/flux/dev",
+      "faction": "Limburg",
+      "request_id": "019dd820-8b9d-7ad2-ba24-a6b4cd8a6ec9",
+      "seed": 1904747382,
+      "url": "https://v3b.fal.media/files/b/0a982b6e/tvRONGtLsOZ3923091JgR.jpg",
+      "prompt": "painted RPG card art action icon, a single perfect triangular slice of Limburg cherry vlaai on a small pewter plate with glossy red kers cherries glistening, a polished silver butter knife resting beside it, a single small candle flame casting warm light from the side suggesting a treat moment, steam rising softly, warm Limburg palette of cherry-red and mergel-tan with golden candle glow, centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, fantasy game ability icon, oil painting texture, no text, no characters, museum quality"
+    },
+    {
+      "filename": "cmd-kolenrook.png",
+      "path": "public/assets/ui/commands/cmd-kolenrook.png",
+      "type": "action-icon",
+      "size": "512x512 (downsampled from 1024)",
+      "model": "fal-ai/flux/dev",
+      "faction": "Limburg",
+      "request_id": "019dd820-8b9e-7ad0-9eb6-9f65ffb0c9aa",
+      "seed": 704317139,
+      "url": "https://v3b.fal.media/files/b/0a982b6e/w3tE8nZkLiS8pHyLZEK-E.jpg",
+      "prompt": "painted RPG card art action icon, a single tall industrial coal-mine smokestack chimney made of dark soot-stained brick rising from a stone base, thick billowing black-grey coal smoke pouring upward and curling outward in heavy plumes, glowing orange ember sparks rising within the smoke, mergel limestone foundation visible at the bottom, earthen Limburg palette of coal-black smoke and mergel pale yellow-tan brick with orange ember accents, centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching smoke edges, fantasy game ability icon, oil painting texture, no text, no characters, museum quality"
+    }
+  ],
+  "cost_estimate_usd": 0.18
+}

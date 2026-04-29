@@ -35,6 +35,35 @@ const COMMAND_ICON_IMAGES: Record<string, string> = {
   H2:  '/assets/ui/commands/cmd-hero.png',
   RLY: '/assets/ui/commands/cmd-rally.png',
   UPG: '/assets/ui/commands/cmd-upgrade.png',
+  // Faction-specific click-action icons (v0.46.0).
+  OPT: '/assets/ui/commands/cmd-carnavalsoptocht.png',
+  WBR: '/assets/ui/commands/cmd-trakteerronde.png',
+  SPR: '/assets/ui/commands/cmd-sprint-mode.png',
+  DDL: '/assets/ui/commands/cmd-deadline-crunch.png',
+  CEO: '/assets/ui/commands/cmd-kwartaalcijfers.png',
+  VLT: '/assets/ui/commands/cmd-vlaai-trakteer.png',
+  // Combat verbs (v0.46.0 painted-vignette).
+  MOV: '/assets/ui/commands/cmd-mov.png',
+  ATK: '/assets/ui/commands/cmd-atk.png',
+  STP: '/assets/ui/commands/cmd-stp.png',
+  HLD: '/assets/ui/commands/cmd-hld.png',
+  // FactionSpecial1 passive aura icons (v0.46.0).
+  CRN: '/assets/ui/commands/cmd-crn-aura.png',
+  BRD: '/assets/ui/commands/cmd-brd-passive.png',
+  VLA: '/assets/ui/commands/cmd-vla-aura.png',
+  DPL: '/assets/ui/commands/cmd-dpl-passive.png',
+  // Build-menu painted-vignette icons (v0.46.0). Generic across factions —
+  // factie-flavour zit in de label-tekst, niet in het icon-palet.
+  TH:  '/assets/ui/commands/cmd-th.png',
+  BRK: '/assets/ui/commands/cmd-brk.png',
+  LMB: '/assets/ui/commands/cmd-lmb.png',
+  BSM: '/assets/ui/commands/cmd-bsm.png',
+  HSE: '/assets/ui/commands/cmd-hse.png',
+  TWR: '/assets/ui/commands/cmd-twr.png',
+  SP1: '/assets/ui/commands/cmd-sp1.png',
+  ADV: '/assets/ui/commands/cmd-sp2.png',
+  SWK: '/assets/ui/commands/cmd-swk.png',
+  TRT: '/assets/ui/commands/cmd-trt.png',
 };
 
 // ---------------------------------------------------------------------------
@@ -1798,7 +1827,17 @@ export class HUD {
     const iconSpan = document.createElement('span');
     iconSpan.className = 'btn-icon' + (cmd.iconClass ? ` ${cmd.iconClass}` : '');
 
-    if (extCmd.buildingTypeId !== undefined && cmd.action.startsWith('build-')) {
+    // Prefer PNG icon when mapped (v0.46.0 painted set), else fall back to
+    // canvas-drawn building portraits, then SVG glyph, then text.
+    const pngSrc = COMMAND_ICON_IMAGES[cmd.icon];
+    if (pngSrc) {
+      const img = document.createElement('img');
+      img.src = pngSrc;
+      img.alt = cmd.label;
+      img.draggable = false;
+      img.style.display = 'block';
+      iconSpan.appendChild(img);
+    } else if (extCmd.buildingTypeId !== undefined && cmd.action.startsWith('build-')) {
       const portraitImg = createBuildingPortraitImg(extCmd.buildingTypeId, 28, 28);
       portraitImg.style.display = 'block';
       iconSpan.appendChild(portraitImg);

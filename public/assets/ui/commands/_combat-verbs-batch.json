@@ -1,0 +1,57 @@
+{
+  "batch": "combat-verbs",
+  "generated": "2026-04-29",
+  "model": "fal-ai/flux/dev",
+  "size": "square_hd (1024x1024)",
+  "pipeline": "Flux Dev -> curl JPG -> PIL re-encode to PNG (no remove-bg, vignette IS the design)",
+  "anchor_style": "cmd-rally.png + cmd-vlaai-trakteer.png (painted-vignette with ornate gold curved frame)",
+  "scope": "generic combat verbs, faction-agnostic",
+  "assets": [
+    {
+      "file": "cmd-mov.png",
+      "key": "mov",
+      "command": "Move",
+      "size_kb": 1349.6,
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "seed": 684609695,
+      "source_url": "https://v3b.fal.media/files/b/0a982c0b/3YOfg5z5v4hBy5cAk9GwH.jpg",
+      "prompt": "painted RPG card art action icon, a single bold golden arrow pointing forward right with motion-trail energy behind it, painted as if flowing momentum, neutral warm-brown surroundings, painted oil texture, centered on dark moody vignette background with neutral warm-brown to black gradient, ornate gold curved frame border, dramatic chiaroscuro lighting, fantasy game ability icon, oil painting texture, no text, museum quality"
+    },
+    {
+      "file": "cmd-atk.png",
+      "key": "atk",
+      "command": "Attack",
+      "size_kb": 1129.6,
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "seed": 1993053660,
+      "source_url": "https://v3b.fal.media/files/b/0a982c0b/2sdN40H_Yf61BSRHWT48E.jpg",
+      "prompt": "painted RPG card art action icon, two crossed medieval swords in an X pattern with polished steel blades catching dramatic light, ornate cross-guards and leather-wrapped grips, sparks flying where blades cross, painted oil texture, centered on dark moody vignette background with deep red-black gradient and warm orange spark accents, ornate gold curved frame border, dramatic chiaroscuro lighting, fantasy game ability icon, oil painting texture, no text, museum quality"
+    },
+    {
+      "file": "cmd-stp.png",
+      "key": "stp",
+      "command": "Stop",
+      "size_kb": 853.9,
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "seed": 1950187375,
+      "source_url": "https://v3b.fal.media/files/b/0a982c0b/zoHkRYw9YPsP1NsEkSNBd.jpg",
+      "prompt": "painted RPG card art action icon, a stern raised armored gauntlet palm-out in a halt gesture, polished plate-mail glove with riveted finger plates, painted oil texture, centered on dark moody vignette background with neutral warm-brown to black gradient, ornate gold curved frame border, dramatic chiaroscuro lighting, fantasy game ability icon, oil painting texture, no text, museum quality"
+    },
+    {
+      "file": "cmd-hld.png",
+      "key": "hld",
+      "command": "Hold",
+      "size_kb": 915.7,
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "seed": 1438626412,
+      "source_url": "https://v3b.fal.media/files/b/0a982c0b/8EhP-ZxDuZWx4NAYh9EVj.jpg",
+      "prompt": "painted RPG card art action icon, a sturdy medieval kite shield planted firmly on stone ground with a gold heraldic chevron emblem on its face, the shield casts a strong shadow, painted oil texture, centered on dark moody vignette background with neutral warm-brown to black gradient, ornate gold curved frame border, dramatic chiaroscuro lighting, fantasy game ability icon, oil painting texture, no text, no specific faction emblem, museum quality"
+    }
+  ],
+  "cost_estimate_usd": 0.12,
+  "wallclock_seconds": "all 4 COMPLETED in <30s parallel"
+}
