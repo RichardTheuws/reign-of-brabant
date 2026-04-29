@@ -1,5 +1,46 @@
 # Changelog
 
+## [0.47.0] - 2026-04-29 — Faction-painted building & upgrade portraits
+
+### Added — 84 painted-vignette portraits, factie-flavoured
+Volledige factie-pass: elke factie heeft nu 11 unieke building-portraits + 10 unieke upgrade-portrait variants in de RPG card-art stijl. Wegwerken van de canvas-drawn fallback (hoek-icoon op building-card) en de generieke wapens/armor-iconen die in de research-panel stonden — deze waren voorheen identiek over alle facties.
+
+**Per factie 21 portretten** (11 buildings + 10 upgrades = 84 totaal, ~$2.52 fal.ai Flux Dev):
+- **Brabanders** (warm oranje-rood, Bourgondisch kruis, gezellig-strijdlustig): keep, café-barracks, bakkerij-lumber, smederij, boerderij-housing, worstenbroodjeskraam, wagenbouwer, feestzaal, kerktoren, tractorschuur, beek-bridge + 10 melee/ranged/armor/move-speed upgrade-variants
+- **Randstad** (corporate, blue-grey-white + warm yellow desk-lamp, GEEN koffie-flavour): hoofdkantoor, vergaderzaal, Starbucks-cafe (NO logo), coworkingspace, vinex-rijhuis, havermoutmelkbar, innovatie-lab, parkeergarage, kantoor-toren, sloopwerf, viaduct + 10 corporate-flavoured upgrade-variants (fountain pen, KPI suit, etc.)
+- **Limburgers** (mergel yellow-tan + coal-black + cherry-red vlaai): mergelhoeve, schuttershal, vlaaibakkerij, klooster-smederij, mergel-huuske, vlaai-stand, hoogoven, mijnwerkerskamp, mergel-watchtower, mijnkar-werkplaats, stenen-bridge + 10 mining/vlaai-flavoured upgrades (pickaxe, mergel-armor, cherry-stone slingshot)
+- **Belgen** (zwart-geel-rood + chocolate-brown + Trappist-green): stadhuis, frituur-barracks, hoeve, abdij-smederij, rijhuis, chocolaterie, diamantslijperij, EU-Parlement (abstracte cocardes — geen echte EU-vlag), belfort, manneken-pis-kanon, kanaalbrug + 10 frieten/diamond/lion-flavoured upgrades
+
+### Refactored — Faction-aware portrait helpers
+- `src/data/portraitMap.ts`:
+  - Nieuwe `getBuildingPortraitUrl(factionId, buildingTypeId)` → `<faction>-<building>.png` pad of null
+  - Nieuwe `getFactionSlug(factionId)` voor cross-module gebruik
+  - `FACTION_SLUGS` + `BUILDING_SLUGS` maps centraliseren naming-conventie
+- `src/ui/UpgradePortraits.ts`:
+  - `getUpgradeImagePath(id, factionId?)` factie-aware
+  - `FACTION_FLAVOURED_UPGRADES` set whitelist'd welke generic upgrades factie-variants hebben
+  - Factie-specifieke upgrades (Carnavalsvuur, AIOptimization, Mergelharnas, etc.) blijven hun unieke single asset
+- `src/ui/HUD.ts`:
+  - `factionSlugToId()` helper converteert string-slug → FactionId
+  - `showBuildingCard` + `showBuildingPanel` proberen painted PNG eerst, fallback naar canvas-drawn `BuildingPortraits.ts` bij `img.onerror`
+  - `createCommandButton` voor `build-*` actions toont factie-painted icon eerst (ipv generieke cmd-th/cmd-brk/etc), valt terug op generic painted, dan canvas, dan SVG, dan tekst
+  - Research panel (createResearchBtn) geeft `currentFaction` mee aan getUpgradeImagePath
+
+### Wired
+- Building-card top-left portrait: nu painted (bv. EU-Parlement toont de gegenereerde Belgische parlement-painting i.p.v. de canvas-drawn icoon)
+- Build-menu cmd-buttons: nu factie-painted (Brabant ziet brabant-keep, Randstad ziet glass-tower, etc.)
+- Research panel research-buttons: factie-painted upgrade-variants (Brabantse longsword vs Randstad fountain pen vs Limburg pickaxe vs Belgian rapier voor "Zwaardvechten I")
+
+### Files
+- Added: 44 building-portraits + 40 upgrade-variants in `public/assets/portraits/{buildings,upgrades}/`
+- Added: 4 batch-manifests (`_brabant-v047-batch.json`, `_randstad-v047-batch.json`, etc.)
+- Modified: `src/data/portraitMap.ts` (+ FACTION_SLUGS, BUILDING_SLUGS, getBuildingPortraitUrl, getFactionSlug)
+- Modified: `src/ui/UpgradePortraits.ts` (factionId param + FACTION_FLAVOURED_UPGRADES)
+- Modified: `src/ui/HUD.ts` (factionSlugToId helper, factie-painted PNG-first in 3 callsites)
+
+### Tests
+1554 tests groen — geen regressions. Refactor is backward-compatible: helpers met factionId ongedefinieerd geven generic pad, oude callers blijven werken.
+
 ## [0.46.0] - 2026-04-29 — Battle visuals + complete HUD asset pass
 
 ### Added — Attack swing animation

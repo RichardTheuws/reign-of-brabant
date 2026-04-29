@@ -9,13 +9,37 @@
  *   getHeroPortraitUrl(HeroTypeId.PrinsVanBrabant) => '/assets/portraits/brabant-prins.png'
  */
 
-import { FactionId, UnitTypeId, HeroTypeId } from '../types/index';
+import { FactionId, UnitTypeId, HeroTypeId, BuildingTypeId } from '../types/index';
 
 // ---------------------------------------------------------------------------
 // Base path (relative to public root, Vite resolves this at build time)
 // ---------------------------------------------------------------------------
 
 const PORTRAIT_BASE = '/assets/portraits';
+
+/** factionId → URL-safe slug used as filename prefix. */
+const FACTION_SLUGS: Record<number, string> = {
+  [FactionId.Brabanders]: 'brabant',
+  [FactionId.Randstad]: 'randstad',
+  [FactionId.Limburgers]: 'limburg',
+  [FactionId.Belgen]: 'belgen',
+};
+
+/** BuildingTypeId → URL-safe key used as filename suffix. */
+const BUILDING_SLUGS: Record<number, string> = {
+  [BuildingTypeId.TownHall]: 'townhall',
+  [BuildingTypeId.Barracks]: 'barracks',
+  [BuildingTypeId.LumberCamp]: 'lumbercamp',
+  [BuildingTypeId.Blacksmith]: 'blacksmith',
+  [BuildingTypeId.Housing]: 'housing',
+  [BuildingTypeId.TertiaryResourceBuilding]: 'tertiary',
+  [BuildingTypeId.UpgradeBuilding]: 'upgrade',
+  [BuildingTypeId.FactionSpecial1]: 'faction-special-1',
+  [BuildingTypeId.FactionSpecial2]: 'faction-special-2',
+  [BuildingTypeId.DefenseTower]: 'defense-tower',
+  [BuildingTypeId.SiegeWorkshop]: 'siege-workshop',
+  [BuildingTypeId.Bridge]: 'bridge',
+};
 
 // ---------------------------------------------------------------------------
 // Hero portrait filenames indexed by HeroTypeId
@@ -99,4 +123,27 @@ export function getPortraitUrl(
     return getHeroPortraitUrl(heroTypeId);
   }
   return getUnitPortraitUrl(factionId, unitTypeId);
+}
+
+/**
+ * Get the painted building portrait URL for a faction's specific building type.
+ *
+ * Naming convention: `/assets/portraits/buildings/<faction>-<building>.png`
+ * (e.g. `belgen-faction-special-2.png`). Returns null if either slug is unknown
+ * — callers fall back to the canvas-drawn portrait from BuildingPortraits.ts.
+ *
+ * The PNG may not exist yet (asset is generated lazily); the browser shows a
+ * broken image until the canvas-drawn fallback handles it. To preflight we
+ * could HEAD the URL but that doubles requests — instead we trust the asset
+ * pipeline keeps `public/assets/portraits/buildings/` in sync with this map.
+ */
+export function getBuildingPortraitUrl(factionId: FactionId, buildingTypeId: BuildingTypeId): string | null {
+  const factionSlug = FACTION_SLUGS[factionId];
+  const buildingSlug = BUILDING_SLUGS[buildingTypeId];
+  if (!factionSlug || !buildingSlug) return null;
+  return `${PORTRAIT_BASE}/buildings/${factionSlug}-${buildingSlug}.png`;
+}
+
+export function getFactionSlug(factionId: FactionId): string | null {
+  return FACTION_SLUGS[factionId] ?? null;
 }

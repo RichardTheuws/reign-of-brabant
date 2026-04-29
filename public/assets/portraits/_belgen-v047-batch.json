@@ -1,0 +1,176 @@
+{
+  "generated": "2026-04-29",
+  "batch": "belgen-v047",
+  "model": "fal-ai/flux/dev",
+  "size": "square_hd (1024x1024)",
+  "assets": [
+    {
+      "file": "belgen-townhall.png",
+      "out_dir": "buildings",
+      "prompt": "painted RPG card art, Belgian medieval town hall (stadhuis) with gothic stone facade, tricolor banner of black-yellow-red draped from balcony, tall slender spire crowned with a golden lion crest, leaded glass windows glowing warm, Belgian palette of deep black, golden yellow, accent red, warm chocolate brown, and Trappist abbey green, centered on dark moody vignette background with deep gold-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, no readable text, no modern logos, no EU flag, no brand logos, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982e9e/HLxWfxab0a-VDwtT_72n5.jpg",
+      "seed": 837382758,
+      "size": "square_hd"
+    },
+    {
+      "file": "belgen-barracks.png",
+      "out_dir": "buildings",
+      "prompt": "painted RPG card art, fortified Belgian Frituur barracks (fortified frietkraam), timber-and-stone food stall reinforced with iron bands, crossed paper frietzakjes (fries cones) hung as signage above the counter, hearty black-yellow-red Belgian flag pennant, golden frites visible piled in the window, Belgian palette of deep black, golden yellow, accent red, warm chocolate brown, and Trappist abbey green, centered on dark moody vignette background with deep gold-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, no readable text, no modern logos, no EU flag, no brand logos, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982e9e/vWK9AWTJ2stG4-Buc3k8S.jpg",
+      "seed": 1324608091,
+      "size": "square_hd"
+    },
+    {
+      "file": "belgen-lumbercamp.png",
+      "out_dir": "buildings",
+      "prompt": "painted RPG card art, Belgian boerderij hoeve (farmhouse lumber camp), stone and timber farmhouse with weathered wooden door, neatly stacked oak firewood along the wall, golden hay bales in the foreground, mossy thatched roof, Belgian palette of deep black, golden yellow, accent red, warm chocolate brown, and Trappist abbey green, centered on dark moody vignette background with deep gold-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, no readable text, no modern logos, no EU flag, no brand logos, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982e9e/NFNXhaplVzdtND5wVVfBf.jpg",
+      "seed": 1112008597,
+      "size": "square_hd"
+    },
+    {
+      "file": "belgen-blacksmith.png",
+      "out_dir": "buildings",
+      "prompt": "painted RPG card art, Belgian Trappist abbey blacksmith (abdij-smederij), stone vaulted workshop with glowing forge fire, monk's anvil in the foreground, a gleaming copper Trappist brewing kettle beside the forge, hooded silhouette of a monk-smith at work, hammer and tongs on the bench, Belgian palette of deep black, golden yellow, accent red, warm chocolate brown, and Trappist abbey green, centered on dark moody vignette background with deep gold-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, no readable text, no modern logos, no EU flag, no brand logos, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982e9e/rtnWIYweFp3jtQI2dVkjc.jpg",
+      "seed": 580697223,
+      "size": "square_hd"
+    },
+    {
+      "file": "belgen-housing.png",
+      "out_dir": "buildings",
+      "prompt": "painted RPG card art, Belgian rijhuis (narrow terraced rowhouse), tall and slim chocolate-brown brickwork facade with crow-stepped gable, ornate wooden door, lace curtains in leaded windows, warm lantern glowing by the doorstep, cobblestone stoop, Belgian palette of deep black, golden yellow, accent red, warm chocolate brown, and Trappist abbey green, centered on dark moody vignette background with deep gold-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, no readable text, no modern logos, no EU flag, no brand logos, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982e9e/Tg-GsKuPREZwJSgaU_YRG.jpg",
+      "seed": 503723074,
+      "size": "square_hd"
+    },
+    {
+      "file": "belgen-tertiary.png",
+      "out_dir": "buildings",
+      "prompt": "painted RPG card art, Belgian chocolaterie (chocolate shop), warm-lit display window with rows of glossy pralines on golden trays, a copper tempering pot in the foreground with dark chocolate streaming down, cocoa dust accents, brass scales on the counter, Belgian palette of deep black, golden yellow, accent red, warm chocolate brown, and Trappist abbey green, centered on dark moody vignette background with deep gold-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, no readable text, no modern logos, no EU flag, no brand logos, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982e9e/Hq3jakab7xDqQH6O1yiM5.jpg",
+      "seed": 1524273286,
+      "size": "square_hd"
+    },
+    {
+      "file": "belgen-upgrade.png",
+      "out_dir": "buildings",
+      "prompt": "painted RPG card art, Antwerp-style diamantslijperij (diamond cutting workshop), wooden workbench with crystal-cutting tools, brass magnifying lens on a stand, scattered sparkling cut diamonds catching candlelight, soft directional lamp glow, Belgian palette of deep black, golden yellow, accent red, warm chocolate brown, and Trappist abbey green, centered on dark moody vignette background with deep gold-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, no readable text, no modern logos, no EU flag, no brand logos, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982e9e/QDNLXSfMUUdL5BrUuDfiW.jpg",
+      "seed": 606315358,
+      "size": "square_hd"
+    },
+    {
+      "file": "belgen-faction-special-2.png",
+      "out_dir": "buildings",
+      "prompt": "painted RPG card art, grand Belgian-style EU-Parlement hemicycle interior, tiered curved rows of dark wooden seats, central podium with a banner showing an abstract circle of golden cocarde-stars (NOT the actual EU flag, NOT specific national emblems), a single gold-trimmed black-yellow-red rosette draped over the lectern, warm chandelier light from above, modern parliamentary architecture, Belgian palette of deep black, golden yellow, accent red, warm chocolate brown, and Trappist abbey green, centered on dark moody vignette background with deep gold-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, no readable text, no modern logos, no EU flag, no brand logos, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982e9e/yEn8PXOGarmC-uCDxdJ-M.jpg",
+      "seed": 1854639213,
+      "size": "square_hd"
+    },
+    {
+      "file": "belgen-defense-tower.png",
+      "out_dir": "buildings",
+      "prompt": "painted RPG card art, Belgian belfort (gothic belfry defense tower), tall stone tower with crenellated top, narrow arrow slits, golden lion banner hanging from a side window, cobbled square at base, dramatic moonlit silhouette, Belgian palette of deep black, golden yellow, accent red, warm chocolate brown, and Trappist abbey green, centered on dark moody vignette background with deep gold-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, no readable text, no modern logos, no EU flag, no brand logos, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982e9e/JH9q4Wahkh-ZeX23OVekQ.jpg",
+      "seed": 2095690956,
+      "size": "square_hd"
+    },
+    {
+      "file": "belgen-siege-workshop.png",
+      "out_dir": "buildings",
+      "prompt": "painted RPG card art, Belgian Manneken-Pis-kanon werkplaats (cannon workshop), open-front timber barn with tools racked on the wall, a polished bronze cannon mounted on a wheeled wooden carriage in the center, stacked iron cannonballs, leather aprons hanging, Belgian palette of deep black, golden yellow, accent red, warm chocolate brown, and Trappist abbey green, centered on dark moody vignette background with deep gold-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, no readable text, no modern logos, no EU flag, no brand logos, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982e9e/yhzQR9oFkQyiXENrAYu4B.jpg",
+      "seed": 1149045070,
+      "size": "square_hd"
+    },
+    {
+      "file": "belgen-bridge.png",
+      "out_dir": "buildings",
+      "prompt": "painted RPG card art, Belgian arched stone bridge over a canal, cobblestone walkway crossing the stone arches, mossy stonework, calm water reflection, small Belgian tricolor pennant on a side post, distant rowhouses in fog, Belgian palette of deep black, golden yellow, accent red, warm chocolate brown, and Trappist abbey green, centered on dark moody vignette background with deep gold-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, no readable text, no modern logos, no EU flag, no brand logos, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982e9e/YTMox5Cw8IEd-UiJtvZUD.jpg",
+      "seed": 942998951,
+      "size": "square_hd"
+    },
+    {
+      "file": "belgen-melee-attack-1.png",
+      "out_dir": "upgrades",
+      "prompt": "painted RPG card art upgrade icon, Belgian sturdy short-sword laid diagonally across a velvet cloth, polished steel blade, golden cross-guard with a small engraved lion emblem on the hilt, leather-wrapped grip, single iconic weapon, Belgian palette of deep black, golden yellow, accent red, warm chocolate brown, and Trappist abbey green, centered on dark moody vignette background with deep gold-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, no readable text, no modern logos, no EU flag, no brand logos, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982e9e/r3hNGL0-Sm5pYV-izoOQ9.jpg",
+      "seed": 1971098961,
+      "size": "square_hd"
+    },
+    {
+      "file": "belgen-melee-attack-2.png",
+      "out_dir": "upgrades",
+      "prompt": "painted RPG card art upgrade icon, Belgian war-saber (curved cavalry sabre), ornate brass basket-hilt, chocolate-brown leather-wrapped grip, etched fuller along the blade, single iconic weapon centered, Belgian palette of deep black, golden yellow, accent red, warm chocolate brown, and Trappist abbey green, centered on dark moody vignette background with deep gold-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, no readable text, no modern logos, no EU flag, no brand logos, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982e9e/BuAP4HuVwihcNghjdMzqR.jpg",
+      "seed": 349844025,
+      "size": "square_hd"
+    },
+    {
+      "file": "belgen-melee-attack-3.png",
+      "out_dir": "upgrades",
+      "prompt": "painted RPG card art upgrade icon, masterwork Belgian rapier with diamond-encrusted pommel, swept gold-filigree hilt, slender mirror-polished blade catching candlelight, single iconic weapon, Belgian palette of deep black, golden yellow, accent red, warm chocolate brown, and Trappist abbey green, centered on dark moody vignette background with deep gold-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, no readable text, no modern logos, no EU flag, no brand logos, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982e9e/qwg6CUV2Ud6CmjawR1GTl.jpg",
+      "seed": 949635580,
+      "size": "square_hd"
+    },
+    {
+      "file": "belgen-ranged-attack-1.png",
+      "out_dir": "upgrades",
+      "prompt": "painted RPG card art upgrade icon, Belgian short bow with chocolate-brown wood, string drawn taut, three arrows with chocolate-brown fletching arranged beside it, single iconic weapon set, Belgian palette of deep black, golden yellow, accent red, warm chocolate brown, and Trappist abbey green, centered on dark moody vignette background with deep gold-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, no readable text, no modern logos, no EU flag, no brand logos, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982e9e/R-ZdsqnFwvEnTD0wZG4Ch.jpg",
+      "seed": 1397155263,
+      "size": "square_hd"
+    },
+    {
+      "file": "belgen-ranged-attack-2.png",
+      "out_dir": "upgrades",
+      "prompt": "painted RPG card art upgrade icon, Belgian arquebus matchlock firearm, dark walnut stock with brass fittings and engraved sideplate, slow-match smoldering, early-firearm flavour, single iconic weapon centered, Belgian palette of deep black, golden yellow, accent red, warm chocolate brown, and Trappist abbey green, centered on dark moody vignette background with deep gold-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, no readable text, no modern logos, no EU flag, no brand logos, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982e9e/DOsU_aOwdLAEdDGl3zvT-.jpg",
+      "seed": 1596666252,
+      "size": "square_hd"
+    },
+    {
+      "file": "belgen-ranged-attack-3.png",
+      "out_dir": "upgrades",
+      "prompt": "painted RPG card art upgrade icon, masterwork Belgian wheellock pistol-bow hybrid, ornate wheellock mechanism with gold inlay, small folding bow arms, polished hardwood stock, single iconic weapon centered, Belgian palette of deep black, golden yellow, accent red, warm chocolate brown, and Trappist abbey green, centered on dark moody vignette background with deep gold-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, no readable text, no modern logos, no EU flag, no brand logos, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982e9e/gw5te925VBs9a5DBo_cAL.jpg",
+      "seed": 958428292,
+      "size": "square_hd"
+    },
+    {
+      "file": "belgen-armor-upgrade-1.png",
+      "out_dir": "upgrades",
+      "prompt": "painted RPG card art upgrade icon, Belgian leather doublet armor on a wooden mannequin stand, rich chocolate-brown tooled leather with golden-yellow stitched trim along the hem and sleeves, brass buckles, single iconic armor piece, Belgian palette of deep black, golden yellow, accent red, warm chocolate brown, and Trappist abbey green, centered on dark moody vignette background with deep gold-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, no readable text, no modern logos, no EU flag, no brand logos, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982e9e/ZoeK-rKGwjj1N2qK-bH2Z.jpg",
+      "seed": 326777655,
+      "size": "square_hd"
+    },
+    {
+      "file": "belgen-armor-upgrade-2.png",
+      "out_dir": "upgrades",
+      "prompt": "painted RPG card art upgrade icon, Belgian plate breastplate displayed on a stand, polished steel cuirass with an engraved golden lion crest centered on the chest, brass shoulder rivets, single iconic armor piece, Belgian palette of deep black, golden yellow, accent red, warm chocolate brown, and Trappist abbey green, centered on dark moody vignette background with deep gold-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, no readable text, no modern logos, no EU flag, no brand logos, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982e9e/VXmuH0YC_dDJHPmBdPw_g.jpg",
+      "seed": 428452698,
+      "size": "square_hd"
+    },
+    {
+      "file": "belgen-armor-upgrade-3.png",
+      "out_dir": "upgrades",
+      "prompt": "painted RPG card art upgrade icon, masterwork Belgian gilt-edged plate harness, full polished plate cuirass and pauldrons with gold-filigree edges and engraved lion motifs, displayed on an oak stand, single iconic armor piece, Belgian palette of deep black, golden yellow, accent red, warm chocolate brown, and Trappist abbey green, centered on dark moody vignette background with deep gold-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, no readable text, no modern logos, no EU flag, no brand logos, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982e9e/uuH8qmgYolw5MAd4zH5M7.jpg",
+      "seed": 385414655,
+      "size": "square_hd"
+    },
+    {
+      "file": "belgen-move-speed-1.png",
+      "out_dir": "upgrades",
+      "prompt": "painted RPG card art upgrade icon, pair of Belgian leather riding boots standing upright, warm chocolate-brown polished leather, golden brass buckles along the side, sturdy soles, single iconic equipment piece, Belgian palette of deep black, golden yellow, accent red, warm chocolate brown, and Trappist abbey green, centered on dark moody vignette background with deep gold-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, no readable text, no modern logos, no EU flag, no brand logos, museum quality",
+      "url": "https://v3b.fal.media/files/b/0a982e9e/gm0Sb8_QrGnvDlIqTeseg.jpg",
+      "seed": 18064714,
+      "size": "square_hd"
+    }
+  ]
+}

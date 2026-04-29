@@ -19,6 +19,7 @@ import { UnitTypeId, BuildingTypeId, UpgradeId, type UnitArchetype } from '../ty
 import { createCommandIcon, replaceIconText } from './CommandIcons';
 import { getUpgradeImagePath } from './UpgradePortraits';
 import { createBuildingPortraitImg } from './BuildingPortraits';
+import { getBuildingPortraitUrl } from '../data/portraitMap';
 
 // ---------------------------------------------------------------------------
 // Command icon image mapping — fal.ai generated painted icons
@@ -742,16 +743,37 @@ export class HUD {
 
     this.buildingName.textContent = building.name;
 
-    // Canvas-drawn building portrait (replaces text placeholder)
+    // Building portrait — prefer painted PNG, fall back to canvas-drawn.
     const buildingTypeId = this.buildingTypeToId(building.type);
     const placeholder = this.buildingPortrait.querySelector('.portrait-placeholder') as HTMLElement | null;
     const existingImg = this.buildingPortrait.querySelector('img');
     if (existingImg) existingImg.remove();
-    const pxSize = 88;
-    const img = createBuildingPortraitImg(buildingTypeId, pxSize, pxSize);
-    img.style.borderRadius = '4px';
-    this.buildingPortrait.appendChild(img);
     if (placeholder) placeholder.style.display = 'none';
+
+    const factionId = this.factionSlugToId(this.currentFaction);
+    const paintedUrl = getBuildingPortraitUrl(factionId, buildingTypeId);
+    const pxSize = 88;
+    if (paintedUrl) {
+      const img = document.createElement('img');
+      img.src = paintedUrl;
+      img.alt = building.name;
+      img.draggable = false;
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'cover';
+      img.style.borderRadius = '4px';
+      img.onerror = () => {
+        img.remove();
+        const fallback = createBuildingPortraitImg(buildingTypeId, pxSize, pxSize);
+        fallback.style.borderRadius = '4px';
+        this.buildingPortrait.appendChild(fallback);
+      };
+      this.buildingPortrait.appendChild(img);
+    } else {
+      const fallback = createBuildingPortraitImg(buildingTypeId, pxSize, pxSize);
+      fallback.style.borderRadius = '4px';
+      this.buildingPortrait.appendChild(fallback);
+    }
 
     // HP bar
     const ratio = building.maxHp > 0 ? building.hp / building.maxHp : 0;
@@ -804,17 +826,37 @@ export class HUD {
     this.buildingCard.hidden = false;
     this.currentBuildingId = data.id;
 
-    // Canvas-drawn building portrait (replaces text abbreviation)
+    // Building card portrait — prefer painted PNG, fall back to canvas-drawn.
     const portraitText = this.bcardPortrait.querySelector('.bcard-portrait-text');
     const existingImg = this.bcardPortrait.querySelector('img');
     if (existingImg) existingImg.remove();
-
-    // Portrait container is 44x44 CSS px; draw at 2x for retina
-    const pxSize = 88;
-    const img = createBuildingPortraitImg(data.buildingTypeId as BuildingTypeId, pxSize, pxSize);
-    img.style.borderRadius = '4px';
-    this.bcardPortrait.appendChild(img);
     if (portraitText) (portraitText as HTMLElement).style.display = 'none';
+
+    const factionId = this.factionSlugToId(this.currentFaction);
+    const paintedUrl = getBuildingPortraitUrl(factionId, data.buildingTypeId as BuildingTypeId);
+    const pxSize = 88;
+    if (paintedUrl) {
+      const img = document.createElement('img');
+      img.src = paintedUrl;
+      img.alt = data.name;
+      img.draggable = false;
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'cover';
+      img.style.borderRadius = '4px';
+      img.onerror = () => {
+        // PNG missing — swap in the canvas-drawn fallback in-place.
+        img.remove();
+        const fallback = createBuildingPortraitImg(data.buildingTypeId as BuildingTypeId, pxSize, pxSize);
+        fallback.style.borderRadius = '4px';
+        this.bcardPortrait.appendChild(fallback);
+      };
+      this.bcardPortrait.appendChild(img);
+    } else {
+      const fallback = createBuildingPortraitImg(data.buildingTypeId as BuildingTypeId, pxSize, pxSize);
+      fallback.style.borderRadius = '4px';
+      this.bcardPortrait.appendChild(fallback);
+    }
 
     // Name and faction
     this.bcardName.textContent = data.name;
@@ -1190,7 +1232,7 @@ export class HUD {
     // Portrait image (full-fill background); fallback to SVG icon if image missing.
     const iconSpan = document.createElement('span');
     iconSpan.className = 'bcard-action-icon';
-    const imgPath = getUpgradeImagePath(upg.id as UpgradeId);
+    const imgPath = getUpgradeImagePath(upg.id as UpgradeId, this.factionSlugToId(this.currentFaction));
     if (imgPath) {
       const img = document.createElement('img');
       img.src = imgPath;
@@ -1745,6 +1787,16 @@ export class HUD {
   // Faction theming
   // -----------------------------------------------------------------------
 
+  private factionSlugToId(faction: Faction): FactionId {
+    switch (faction) {
+      case 'randstad':  return FactionId.Randstad;
+      case 'limburg':   return FactionId.Limburgers;
+      case 'belgen':    return FactionId.Belgen;
+      case 'brabant':
+      default:          return FactionId.Brabanders;
+    }
+  }
+
   setFaction(faction: Faction): void {
     this.currentFaction = faction;
     document.body.dataset.faction = faction;
@@ -1827,15 +1879,34 @@ export class HUD {
     const iconSpan = document.createElement('span');
     iconSpan.className = 'btn-icon' + (cmd.iconClass ? ` ${cmd.iconClass}` : '');
 
-    // Prefer PNG icon when mapped (v0.46.0 painted set), else fall back to
-    // canvas-drawn building portraits, then SVG glyph, then text.
-    const pngSrc = COMMAND_ICON_IMAGES[cmd.icon];
+    // Faction-painted building portrait wins when this is a build-* button
+    // and we have a painted PNG for the current faction. Otherwise fall back
+    // to the generic painted PNG from COMMAND_ICON_IMAGES, then canvas-drawn,
+    // then SVG glyph, then text.
+    const buildingPainted = (extCmd.buildingTypeId !== undefined && cmd.action.startsWith('build-'))
+      ? getBuildingPortraitUrl(this.factionSlugToId(this.currentFaction), extCmd.buildingTypeId)
+      : null;
+    const pngSrc = buildingPainted ?? COMMAND_ICON_IMAGES[cmd.icon];
     if (pngSrc) {
       const img = document.createElement('img');
       img.src = pngSrc;
       img.alt = cmd.label;
       img.draggable = false;
       img.style.display = 'block';
+      img.onerror = () => {
+        // Painted PNG missing — swap to canvas-drawn for build-* buttons,
+        // generic glyph otherwise.
+        img.remove();
+        if (extCmd.buildingTypeId !== undefined && cmd.action.startsWith('build-')) {
+          const fallback = createBuildingPortraitImg(extCmd.buildingTypeId, 28, 28);
+          fallback.style.display = 'block';
+          iconSpan.appendChild(fallback);
+        } else {
+          const svgIcon = createCommandIcon(cmd.icon, 20);
+          if (svgIcon) iconSpan.appendChild(svgIcon);
+          else iconSpan.textContent = cmd.icon;
+        }
+      };
       iconSpan.appendChild(img);
     } else if (extCmd.buildingTypeId !== undefined && cmd.action.startsWith('build-')) {
       const portraitImg = createBuildingPortraitImg(extCmd.buildingTypeId, 28, 28);

@@ -1,0 +1,242 @@
+{
+  "batch": "limburg-v047",
+  "generated": "2026-04-29",
+  "model": "fal-ai/flux/dev",
+  "size": "square_hd",
+  "remove_bg": false,
+  "style_anchor": "buildings/limburg-faction-special-1.png + upgrades/diepe-schacht.png + upgrades/mergel-pantsering.png",
+  "palette": "mergel yellow-tan + coal black + iron grey + cherry-red vlaai accents + warm copper",
+  "assets": [
+    {
+      "file": "buildings/limburg-townhall.png",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, Limburg Mergelhoeve town hall \u2014 a sturdy mergel pale-yellow limestone manor with steep gabled stone roof, heavy iron-bound oak gate flanked by short towers, narrow leaded windows glowing warm copper, a vlaai-cherry-red banner hanging from the gate-arch, wooden support beams, weathered cobblestone forecourt, earthen Limburg palette (mergel yellow-tan + coal black + iron grey + cherry-red vlaai accents + warm copper), centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching the mergel stonework, oil painting texture, no text, no logos, museum quality",
+      "image_url": "https://v3b.fal.media/files/b/0a982ea0/cHmHwOvMjCylRdzKSd_Ms.jpg",
+      "seed": 354511184,
+      "saved": "/Users/richardtheuws/Documents/games/reign-of-brabant/public/assets/portraits/buildings/limburg-townhall.png",
+      "size_bytes": 1549990,
+      "error": null
+    },
+    {
+      "file": "buildings/limburg-barracks.png",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, Limburg Schuttershal militia drill hall \u2014 sturdy mergel-stone-and-timber lodge with crossed wooden crossbows hung above heavy double doors, slate roof with chimney, target butts of straw and timber against the side wall, vlaai-red banner over the entrance, weathered iron lanterns flanking the door, training grounds with packed earth, earthen Limburg palette (mergel yellow-tan + coal black + iron grey + cherry-red accents + warm copper), centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching the iron crossbow heads, oil painting texture, no text, no logos, museum quality",
+      "image_url": "https://v3b.fal.media/files/b/0a982e9f/t2mDXPOWY33qtr6JfnnB5.jpg",
+      "seed": 1174622190,
+      "saved": "/Users/richardtheuws/Documents/games/reign-of-brabant/public/assets/portraits/buildings/limburg-barracks.png",
+      "size_bytes": 1449303,
+      "error": null
+    },
+    {
+      "file": "buildings/limburg-lumbercamp.png",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, Limburg Vlaaibakkerij \u2014 a cozy mergel-stone bakery with brick oven dome, neatly stacked firewood logs against the wall feeding the oven, a wooden cooling rack outside the open door with golden cherry vlaai cooling on it, copper kettle steaming, smoke curling from a stone chimney, leaded windows glowing warm yellow, earthen Limburg palette (mergel yellow-tan + coal black + iron grey + cherry-red vlaai accents + warm copper), centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching the cherry-red vlaai filling, oil painting texture, no text, no logos, museum quality",
+      "image_url": "https://v3b.fal.media/files/b/0a982ea0/cXpepKj4wVGnWXdMIQ6oI.jpg",
+      "seed": 1681021465,
+      "saved": "/Users/richardtheuws/Documents/games/reign-of-brabant/public/assets/portraits/buildings/limburg-lumbercamp.png",
+      "size_bytes": 1564390,
+      "error": null
+    },
+    {
+      "file": "buildings/limburg-blacksmith.png",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, Limburg Klooster monastery-forge \u2014 a Romanesque mergel-stone monastery with rounded arches, single bell-tower, stained-glass window glowing red and amber, side annex repurposed as a forge with anvil visible through an open archway and orange forge-glow spilling onto the courtyard, monk's tools and a heavy iron anvil, wrought-iron cross detail, earthen Limburg palette (mergel yellow-tan + coal black + iron grey + warm copper + cherry-red glass accents), centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching the forge glow, oil painting texture, no text, no logos, museum quality",
+      "image_url": "https://v3b.fal.media/files/b/0a982e9f/eikMmcnBzXGnoQ6ernscS.jpg",
+      "seed": 1666098003,
+      "saved": "/Users/richardtheuws/Documents/games/reign-of-brabant/public/assets/portraits/buildings/limburg-blacksmith.png",
+      "size_bytes": 1572462,
+      "error": null
+    },
+    {
+      "file": "buildings/limburg-housing.png",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, Limburg Huuske cottage \u2014 a small mergel-stone cottage with thatched roof, cherry-red painted wooden shutters thrown open, a curl of warm grey smoke rising from a small stone chimney, a freshly baked golden cherry vlaai cooling on the wooden windowsill, weathered wooden door with iron hinges, ivy creeping along one wall, earthen Limburg palette (mergel yellow-tan + coal black + iron grey + cherry-red shutters and vlaai + warm copper window glow), centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching the windowsill, oil painting texture, no text, no logos, museum quality",
+      "image_url": "https://v3b.fal.media/files/b/0a982e9f/0NkZhFtPpOpNbRmu1T2tA.jpg",
+      "seed": 876971130,
+      "saved": "/Users/richardtheuws/Documents/games/reign-of-brabant/public/assets/portraits/buildings/limburg-housing.png",
+      "size_bytes": 1744064,
+      "error": null
+    },
+    {
+      "file": "buildings/limburg-tertiary.png",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, Limburg market vlaai-stand \u2014 a wooden market stall with a striped red-and-white awning, golden cherry vlaai on a clean white linen, a polished butter-knife resting on a small board, a steaming copper coffee-pot on a glowing brazier, a small chalk price-board, baskets of fresh cherries beneath the counter, weathered timber posts, earthen Limburg palette (mergel yellow-tan + coal black + iron grey + cherry-red vlaai + warm copper), centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching the cherry-red filling and copper pot, oil painting texture, no readable text, no logos, museum quality",
+      "image_url": "https://v3b.fal.media/files/b/0a982e9f/179QIuNvoV_ACHuM22Il9.jpg",
+      "seed": 1686646946,
+      "saved": "/Users/richardtheuws/Documents/games/reign-of-brabant/public/assets/portraits/buildings/limburg-tertiary.png",
+      "size_bytes": 1067422,
+      "error": null
+    },
+    {
+      "file": "buildings/limburg-upgrade.png",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, Limburg Hoogoven blast-furnace research lab \u2014 a towering cylindrical mergel-stone blast furnace with iron bands, molten iron glowing fierce orange-red at the base spilling onto a mould-bed, ore-cart tracks leading to the furnace mouth with a single ore-cart half full of dark coal, brick-and-stone supports, billowing dark smoke from the top mixing into the vignette, sturdy wooden support beams, scattered ingots and tongs, earthen Limburg palette (mergel yellow-tan + coal black + iron grey + warm copper + molten orange-red accents), centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching the molten metal, oil painting texture, no text, no logos, museum quality",
+      "image_url": "https://v3b.fal.media/files/b/0a982e9f/tPRPgQGidUT4FopW5QYmG.jpg",
+      "seed": 135091619,
+      "saved": "/Users/richardtheuws/Documents/games/reign-of-brabant/public/assets/portraits/buildings/limburg-upgrade.png",
+      "size_bytes": 1442749,
+      "error": null
+    },
+    {
+      "file": "buildings/limburg-faction-special-2.png",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, Limburg Mijnwerkerskamp miners' camp \u2014 wooden A-frame headframe pithead structure with a large pulley wheel at the top, ore-cart tracks descending into a mergel-stone-mouthed mine shaft glowing warm orange from lantern-light below, scattered pickaxes and a coal-stained ore-cart, a small canvas tent and wooden lean-to barracks, weathered timber beams, mergel limestone outcrops around the shaft mouth, earthen Limburg palette (mergel yellow-tan + coal black + iron grey + warm copper lantern glow + cherry-red banner accent), centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching the headframe wheel and shaft glow, oil painting texture, no text, no logos, museum quality",
+      "image_url": "https://v3b.fal.media/files/b/0a982e9f/QhLmkufLzFhOe20UnOsHq.jpg",
+      "seed": 1378355072,
+      "saved": "/Users/richardtheuws/Documents/games/reign-of-brabant/public/assets/portraits/buildings/limburg-faction-special-2.png",
+      "size_bytes": 1448721,
+      "error": null
+    },
+    {
+      "file": "buildings/limburg-defense-tower.png",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, Limburg Wachttoren watchtower \u2014 a tall square mergel pale-yellow limestone tower with crenellated battlements at the top, narrow vertical arrow slits running up the sides, an iron-bound wooden door at the base, a vlaai-red banner snapping from the top crenellations, weathered stonework with moss, a wooden brazier glowing on top, sturdy iron-clamp reinforcements, earthen Limburg palette (mergel yellow-tan + coal black + iron grey + cherry-red banner + warm copper brazier glow), centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching the battlements, oil painting texture, no text, no logos, museum quality",
+      "image_url": "https://v3b.fal.media/files/b/0a982e9f/BO6VeW-ZmlekGdM3URYXd.jpg",
+      "seed": 395857702,
+      "saved": "/Users/richardtheuws/Documents/games/reign-of-brabant/public/assets/portraits/buildings/limburg-defense-tower.png",
+      "size_bytes": 1164379,
+      "error": null
+    },
+    {
+      "file": "buildings/limburg-siege-workshop.png",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, Limburg Mijnkar-werkplaats siege ore-cart workshop \u2014 a heavy timber-framed barn with mergel-stone foundation, the wide doors thrown open revealing a half-built siege ore-cart trebuchet on a low platform, wooden scaffolding and ropes, stacked dynamite crates labeled with simple ideogram (no readable text) and red fuses coiled, iron tools and a heavy mallet on a workbench, sawdust and coal dust on the floor, earthen Limburg palette (mergel yellow-tan + coal black + iron grey + cherry-red dynamite fuses + warm copper lantern glow), centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching the half-built siege engine, oil painting texture, no readable text, no logos, museum quality",
+      "image_url": "https://v3b.fal.media/files/b/0a982e9f/LxET5kxYoqE6FNEaSu90z.jpg",
+      "seed": 1763741391,
+      "saved": "/Users/richardtheuws/Documents/games/reign-of-brabant/public/assets/portraits/buildings/limburg-siege-workshop.png",
+      "size_bytes": 1725188,
+      "error": null
+    },
+    {
+      "file": "buildings/limburg-bridge.png",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, sturdy Limburg stone arch bridge spanning a Maas-river tributary \u2014 a single broad mergel pale-yellow limestone arch bridge with mergel paving stones on top, low parapet walls, weathered iron lanterns at each end glowing warm copper, dark river water reflecting the lantern light below, a hint of forested riverbank in the deep background, mossy stones at the waterline, earthen Limburg palette (mergel yellow-tan + coal black + iron grey + warm copper lantern glow + dark river-blue accents), centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching the arch keystone, oil painting texture, no text, no logos, museum quality",
+      "image_url": "https://v3b.fal.media/files/b/0a982e9f/pOrXEE2H0-B-xYVEznp52.jpg",
+      "seed": 994378419,
+      "saved": "/Users/richardtheuws/Documents/games/reign-of-brabant/public/assets/portraits/buildings/limburg-bridge.png",
+      "size_bytes": 1549595,
+      "error": null
+    },
+    {
+      "file": "upgrades/limburg-melee-attack-1.png",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, Limburg miner's pickaxe wielded as a melee weapon \u2014 sturdy iron pickaxe head with one sharp pointed end and one flat adze, mounted on a polished oak handle wrapped with a leather grip, leaning prominently against a chunk of mergel limestone with a few coal lumps, earthen Limburg palette (mergel yellow-tan + coal black + iron grey + warm copper handle accents), centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching the iron pickaxe head, fantasy game upgrade icon, oil painting texture, no text, no logos, museum quality",
+      "image_url": "https://v3b.fal.media/files/b/0a982e9f/lRHWoK3ZkqxBfECofbGUY.jpg",
+      "seed": 248017564,
+      "saved": "/Users/richardtheuws/Documents/games/reign-of-brabant/public/assets/portraits/upgrades/limburg-melee-attack-1.png",
+      "size_bytes": 1152095,
+      "error": null
+    },
+    {
+      "file": "upgrades/limburg-melee-attack-2.png",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, masterwork Limburg warhammer \u2014 a heavy two-handed warhammer with a head carved from polished mergel limestone with iron banding and rivets, oak haft wrapped with iron strapwork and a leather grip, a small cherry-red vlaai-emblem inlaid on the pommel, displayed standing upright on a stone block, earthen Limburg palette (mergel yellow-tan + coal black + iron grey + cherry-red emblem + warm copper rivets), centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching the carved stone head, fantasy game upgrade icon, oil painting texture, no text, no logos, museum quality",
+      "image_url": "https://v3b.fal.media/files/b/0a982e9f/y2lDgkQaFkB-Pjy1B5bKp.jpg",
+      "seed": 299917180,
+      "saved": "/Users/richardtheuws/Documents/games/reign-of-brabant/public/assets/portraits/upgrades/limburg-melee-attack-2.png",
+      "size_bytes": 746086,
+      "error": null
+    },
+    {
+      "file": "upgrades/limburg-melee-attack-3.png",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, diamond-glowing masterwork Limburg warhammer \u2014 a heavy ornate warhammer with a forged iron head, a brilliant cut diamond crystal embedded prominently in the centre of the head emitting a soft cool blue-white glow, gold filigree along the edges of the head, polished oak haft wrapped with copper bands and a black leather grip, displayed standing upright with motes of crystalline light drifting around it, earthen Limburg palette (mergel yellow-tan + coal black + iron grey + cool diamond blue-white glow + warm copper bands + cherry-red leather accents), centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching the diamond glow, fantasy game upgrade icon, oil painting texture, no text, no logos, museum quality",
+      "image_url": "https://v3b.fal.media/files/b/0a982e9f/A4c6Qtfcf1BUR7eozmUqh.jpg",
+      "seed": 1801785560,
+      "saved": "/Users/richardtheuws/Documents/games/reign-of-brabant/public/assets/portraits/upgrades/limburg-melee-attack-3.png",
+      "size_bytes": 859331,
+      "error": null
+    },
+    {
+      "file": "upgrades/limburg-ranged-attack-1.png",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, Limburg slingshot with cherry-stone ammo pouch \u2014 a forked oak-branch slingshot with a sturdy leather sling pouch, a small open burlap pouch beside it spilling glossy dark cherry pits used as ammunition, a single fresh cherry with stem on the wooden surface, earthen Limburg palette (mergel yellow-tan + coal black + iron grey + cherry-red fruit + warm copper accents on the leather), centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching the cherry, fantasy game upgrade icon, oil painting texture, no text, no logos, museum quality",
+      "image_url": "https://v3b.fal.media/files/b/0a982e9f/uoZZvg2oFDBu-qGO1Vcnb.jpg",
+      "seed": 349713371,
+      "saved": "/Users/richardtheuws/Documents/games/reign-of-brabant/public/assets/portraits/upgrades/limburg-ranged-attack-1.png",
+      "size_bytes": 1178147,
+      "error": null
+    },
+    {
+      "file": "upgrades/limburg-ranged-attack-2.png",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, Limburg crossbow with mergel-stone bolts \u2014 a sturdy wooden crossbow with a polished oak stock, an iron prod and steel string mechanism, a quiver of bolts beside it with each bolt tipped in pale carved mergel limestone fletched with dark feathers, leather grip wrapping the stock, displayed at a slight angle on a stone slab, earthen Limburg palette (mergel yellow-tan + coal black + iron grey + warm copper inlay + cherry-red leather strap), centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching the iron prod, fantasy game upgrade icon, oil painting texture, no text, no logos, museum quality",
+      "image_url": "https://v3b.fal.media/files/b/0a982e9f/LGpLpgN2Rif_DNstgy5H5.jpg",
+      "seed": 150446643,
+      "saved": "/Users/richardtheuws/Documents/games/reign-of-brabant/public/assets/portraits/upgrades/limburg-ranged-attack-2.png",
+      "size_bytes": 749484,
+      "error": null
+    },
+    {
+      "file": "upgrades/limburg-ranged-attack-3.png",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, masterwork Limburg mining-grade crossbow \u2014 an ornate heavy crossbow with a polished dark oak stock, intricate warm copper inlay along the stock with engraved mining motifs (pickaxe and ore-cart), a heavy steel prod with copper trim, a foot-stirrup of iron, a quiver of bolts with copper-tipped heads, displayed prominently on a wooden surface, earthen Limburg palette (mergel yellow-tan + coal black + iron grey + warm copper trim + cherry-red leather grip accents), centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching the copper inlay, fantasy game upgrade icon, oil painting texture, no text, no logos, museum quality",
+      "image_url": "https://v3b.fal.media/files/b/0a982e9f/TH8hpZL06vEj4eSOhH7Yz.jpg",
+      "seed": 2060548687,
+      "saved": "/Users/richardtheuws/Documents/games/reign-of-brabant/public/assets/portraits/upgrades/limburg-ranged-attack-3.png",
+      "size_bytes": 1134302,
+      "error": null
+    },
+    {
+      "file": "upgrades/limburg-armor-upgrade-1.png",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, Limburg leather miner's apron reinforced with iron plates \u2014 a heavy dark leather apron worn over a linen shirt, reinforced across the chest with riveted iron plates, leather shoulder straps with iron buckles, a small cherry-red vlaai-emblem stitched at the collar, displayed on a wooden mannequin frame, earthen Limburg palette (mergel yellow-tan + coal black + iron grey + cherry-red emblem + warm copper buckle accents), centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching the iron plates, fantasy game upgrade icon, oil painting texture, no text, no logos, museum quality",
+      "image_url": "https://v3b.fal.media/files/b/0a982e9f/59nuCEIDxUt_AAzZMJnjO.jpg",
+      "seed": 568673621,
+      "saved": "/Users/richardtheuws/Documents/games/reign-of-brabant/public/assets/portraits/upgrades/limburg-armor-upgrade-1.png",
+      "size_bytes": 643232,
+      "error": null
+    },
+    {
+      "file": "upgrades/limburg-armor-upgrade-2.png",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, Limburg mergel-stone breastplate \u2014 a sturdy carved breastplate hewn from pale mergel limestone polished smooth, with iron banding around the edges and at the shoulder pauldrons, simple chiseled mining-pickaxe-and-cherry motif on the chest, leather and iron buckle straps on the sides, displayed on a wooden mannequin frame, earthen Limburg palette (mergel yellow-tan + coal black + iron grey + cherry-red leather strap + warm copper buckles), centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching the carved stone, fantasy game upgrade icon, oil painting texture, no text, no logos, museum quality",
+      "image_url": "https://v3b.fal.media/files/b/0a982ea0/CH9UY_hwQk9DZoX1E3AFk.jpg",
+      "seed": 1783549604,
+      "saved": "/Users/richardtheuws/Documents/games/reign-of-brabant/public/assets/portraits/upgrades/limburg-armor-upgrade-2.png",
+      "size_bytes": 811699,
+      "error": null
+    },
+    {
+      "file": "upgrades/limburg-armor-upgrade-3.png",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, masterwork Limburg mergel-iron composite plate harness \u2014 a full ornate breastplate combining polished mergel limestone panels and dark iron plates joined with warm copper rivets and gold filigree edging, large pauldrons with carved cherry-and-pickaxe heraldry, a cherry-red leather underlining peeking at the joints, displayed on an elegant wooden mannequin, earthen Limburg palette (mergel yellow-tan + coal black + iron grey + warm copper rivets + cherry-red leather + gold filigree), centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching the gold filigree and stone panels, fantasy game upgrade icon, oil painting texture, no text, no logos, museum quality",
+      "image_url": "https://v3b.fal.media/files/b/0a982e9f/JjUd5b1o2WeYqIgqHPRYf.jpg",
+      "seed": 2093034357,
+      "saved": "/Users/richardtheuws/Documents/games/reign-of-brabant/public/assets/portraits/upgrades/limburg-armor-upgrade-3.png",
+      "size_bytes": 1001033,
+      "error": null
+    },
+    {
+      "file": "upgrades/limburg-move-speed-1.png",
+      "model": "fal-ai/flux/dev",
+      "size": "square_hd",
+      "prompt": "painted RPG card art, Limburg sturdy iron-toed mining boots \u2014 a pair of well-worn dark leather mining boots with reinforced iron toecaps and iron heel-plates, thick rugged soles with cleated tread, leather laces wrapped tight, a hint of mergel limestone dust on the toes, displayed on a wooden surface with a coil of rope and a single cherry beside them as scale anchor, earthen Limburg palette (mergel yellow-tan dust + coal-black leather + iron grey toecaps + cherry-red lace accents + warm copper eyelets), centered on dark moody vignette background with brown-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting catching the iron toecaps, fantasy game upgrade icon, oil painting texture, no text, no logos, museum quality",
+      "image_url": "https://v3b.fal.media/files/b/0a982ea0/twyDqK4leroiP1NQfqlNv.jpg",
+      "seed": 1782868640,
+      "saved": "/Users/richardtheuws/Documents/games/reign-of-brabant/public/assets/portraits/upgrades/limburg-move-speed-1.png",
+      "size_bytes": 1216530,
+      "error": null
+    }
+  ]
+}

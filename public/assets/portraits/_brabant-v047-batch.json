@@ -1,0 +1,222 @@
+{
+  "batch": "brabant-v047-portraits",
+  "generated": "2026-04-29",
+  "model": "fal-ai/flux/dev",
+  "image_size": "square_hd",
+  "post_processing": "none (vignette + gold frame painted IN)",
+  "wallclock_seconds": 21.7,
+  "ok": 21,
+  "fail": 0,
+  "assets": [
+    {
+      "filename": "buildings/brabant-defense-tower.png",
+      "status": "ok",
+      "prompt": "painted RPG card art, Brabantian Kerktoren (church bell tower) repurposed as a defense tower, red roof tiles, weathered stone walls, narrow archer slits, centered on dark moody vignette background with green-black gradient and warm orange-red accents (Brabant), ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, fantasy game card icon, no text, no logos, museum quality",
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "url": "https://v3b.fal.media/files/b/0a982e93/P0de2oVtv0T4qU4wXz_WJ.jpg",
+      "seed": 1111775220,
+      "bytes": 375345
+    },
+    {
+      "filename": "upgrades/brabant-melee-attack-2.png",
+      "status": "ok",
+      "prompt": "painted RPG card art, finer Brabantian sword with golden hilt and a carnival-orange ribbon tied around the grip, centered on dark moody vignette background with green-black gradient and warm orange-red accents (Brabant), ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, fantasy game upgrade icon, no text, no logos, museum quality",
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "url": "https://v3b.fal.media/files/b/0a982e93/vNNacgahjPjIwE6SnBeVO.jpg",
+      "seed": 1443523685,
+      "bytes": 187465
+    },
+    {
+      "filename": "upgrades/brabant-ranged-attack-1.png",
+      "status": "ok",
+      "prompt": "painted RPG card art, Brabantian longbow with oak shaft, single arrow nocked, leather grip wrapping the handle, centered on dark moody vignette background with green-black gradient and warm orange-red accents (Brabant), ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, fantasy game upgrade icon, no text, no logos, museum quality",
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "url": "https://v3b.fal.media/files/b/0a982e93/XcBQP46Nic1zY1QQKHYvS.jpg",
+      "seed": 1587706050,
+      "bytes": 175654
+    },
+    {
+      "filename": "upgrades/brabant-move-speed-1.png",
+      "status": "ok",
+      "prompt": "painted RPG card art, sturdy Brabantian leather marching boots with iron buckles, oak floorboards beneath, centered on dark moody vignette background with green-black gradient and warm orange-red accents (Brabant), ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, fantasy game upgrade icon, no text, no logos, museum quality",
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "url": "https://v3b.fal.media/files/b/0a982e93/T1vX3LtBi_mmf0IptbOs6.jpg",
+      "seed": 24887685,
+      "bytes": 230326
+    },
+    {
+      "filename": "upgrades/brabant-armor-upgrade-3.png",
+      "status": "ok",
+      "prompt": "painted RPG card art, masterwork knight's plate harness with gilded edges and ornate embossed shoulder pieces, centered on dark moody vignette background with green-black gradient and warm orange-red accents (Brabant), ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, fantasy game upgrade icon, no text, no logos, museum quality",
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "url": "https://v3b.fal.media/files/b/0a982e93/X6fKDkUFldzordIZEQDtR.jpg",
+      "seed": 382473230,
+      "bytes": 272204
+    },
+    {
+      "filename": "upgrades/brabant-armor-upgrade-1.png",
+      "status": "ok",
+      "prompt": "painted RPG card art, Brabantian leather brigandine with iron studs displayed on a wooden mannequin, centered on dark moody vignette background with green-black gradient and warm orange-red accents (Brabant), ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, fantasy game upgrade icon, no text, no logos, museum quality",
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "url": "https://v3b.fal.media/files/b/0a982e93/9PiC3d4gGt_2OqaZ-SvNc.jpg",
+      "seed": 467165366,
+      "bytes": 226959
+    },
+    {
+      "filename": "buildings/brabant-blacksmith.png",
+      "status": "ok",
+      "prompt": "painted RPG card art, Brabantian Smederij (blacksmith) with bright forge-glow, anvil under wooden eaves, red-and-white Bourgondisch banner hung on the timber, centered on dark moody vignette background with green-black gradient and warm orange-red accents (Brabant), ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, fantasy game card icon, no text, no logos, museum quality",
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "url": "https://v3b.fal.media/files/b/0a982e93/Ikh2XTowy8HfW2HDUTzyJ.jpg",
+      "seed": 354901682,
+      "bytes": 304036
+    },
+    {
+      "filename": "buildings/brabant-townhall.png",
+      "status": "ok",
+      "prompt": "painted RPG card art, Brabantian medieval keep with red-and-white Bourgondisch cross banner flying from the tower, oak-framed entrance, warm torch-light glow, centered on dark moody vignette background with green-black gradient and warm orange-red accents (Brabant), ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, fantasy game card icon, no text, no logos, museum quality",
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "url": "https://v3b.fal.media/files/b/0a982e93/oT9efyunkfpDpEs-HwHJM.jpg",
+      "seed": 983738809,
+      "bytes": 351536
+    },
+    {
+      "filename": "upgrades/brabant-ranged-attack-3.png",
+      "status": "ok",
+      "prompt": "painted RPG card art, masterwork crossbow with gilded mechanism, polished walnut stock, taut bowstring, centered on dark moody vignette background with green-black gradient and warm orange-red accents (Brabant), ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, fantasy game upgrade icon, no text, no logos, museum quality",
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "url": "https://v3b.fal.media/files/b/0a982e93/02FW6nR7g1meZn1RPysDB.jpg",
+      "seed": 2096347470,
+      "bytes": 201311
+    },
+    {
+      "filename": "buildings/brabant-lumbercamp.png",
+      "status": "ok",
+      "prompt": "painted RPG card art, Brabantian Bakkerij (bakery) doubling as lumber camp, stacked oak fire-wood beside a wooden bread oven, baker's pickaxe leaning against the wall, centered on dark moody vignette background with green-black gradient and warm orange-red accents (Brabant), ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, fantasy game card icon, no text, no logos, museum quality",
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "url": "https://v3b.fal.media/files/b/0a982e93/xd8BhWu1QYBBOWAhvpL2C.jpg",
+      "seed": 1113217279,
+      "bytes": 375272
+    },
+    {
+      "filename": "upgrades/brabant-melee-attack-1.png",
+      "status": "ok",
+      "prompt": "painted RPG card art, Brabantian medieval longsword laid on a heavy oak table, polished steel catching the light, centered on dark moody vignette background with green-black gradient and warm orange-red accents (Brabant), ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, fantasy game upgrade icon, no text, no logos, museum quality",
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "url": "https://v3b.fal.media/files/b/0a982e93/sEO-PvTc7bEIaEnGIxFSL.jpg",
+      "seed": 1944617024,
+      "bytes": 235591
+    },
+    {
+      "filename": "buildings/brabant-siege-workshop.png",
+      "status": "ok",
+      "prompt": "painted RPG card art, Brabantian Tractorschuur (tractor barn), heavy wooden barn with a half-built tractor cannon visible inside, oak beams, hanging tools, centered on dark moody vignette background with green-black gradient and warm orange-red accents (Brabant), ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, fantasy game card icon, no text, no logos, museum quality",
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "url": "https://v3b.fal.media/files/b/0a982e93/1OvScEJUh7o1TF8mmctjP.jpg",
+      "seed": 517133189,
+      "bytes": 355506
+    },
+    {
+      "filename": "upgrades/brabant-melee-attack-3.png",
+      "status": "ok",
+      "prompt": "painted RPG card art, masterwork Brabantian greatsword crossing a furled red-and-white pennant, gilded crossguard, centered on dark moody vignette background with green-black gradient and warm orange-red accents (Brabant), ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, fantasy game upgrade icon, no text, no logos, museum quality",
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "url": "https://v3b.fal.media/files/b/0a982e93/3nONpOfOgsBiiLRXaupo1.jpg",
+      "seed": 2011374255,
+      "bytes": 238367
+    },
+    {
+      "filename": "buildings/brabant-tertiary.png",
+      "status": "ok",
+      "prompt": "painted RPG card art, Brabant Worstenbroodjeskraam (sausage roll stall), striped canvas awning over a wooden counter with golden-brown pastries on display, foaming beer mug beside them, centered on dark moody vignette background with green-black gradient and warm orange-red accents (Brabant), ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, fantasy game card icon, no text, no logos, museum quality",
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "url": "https://v3b.fal.media/files/b/0a982e93/u-_r2UAIuADJUng1Wnhz9.jpg",
+      "seed": 4996965,
+      "bytes": 319617
+    },
+    {
+      "filename": "buildings/brabant-upgrade.png",
+      "status": "ok",
+      "prompt": "painted RPG card art, Brabant Wagenbouwer (wagon-builder workshop), wooden frame, half-built ox cart on the floor, scattered carpenter tools and bales of hay, centered on dark moody vignette background with green-black gradient and warm orange-red accents (Brabant), ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, fantasy game card icon, no text, no logos, museum quality",
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "url": "https://v3b.fal.media/files/b/0a982e93/kGz8fgkK2g3r8VlWnSMIf.jpg",
+      "seed": 1960410753,
+      "bytes": 272415
+    },
+    {
+      "filename": "upgrades/brabant-armor-upgrade-2.png",
+      "status": "ok",
+      "prompt": "painted RPG card art, Brabantian plate cuirass engraved with a Bourgondisch cross emblem on the chest, centered on dark moody vignette background with green-black gradient and warm orange-red accents (Brabant), ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, fantasy game upgrade icon, no text, no logos, museum quality",
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "url": "https://v3b.fal.media/files/b/0a982e93/wj6VhAfjDi9W0YmlTJmqm.jpg",
+      "seed": 596089164,
+      "bytes": 344054
+    },
+    {
+      "filename": "upgrades/brabant-ranged-attack-2.png",
+      "status": "ok",
+      "prompt": "painted RPG card art, recurve longbow next to an arrow quiver filled with carnival-orange feathered arrows, centered on dark moody vignette background with green-black gradient and warm orange-red accents (Brabant), ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, fantasy game upgrade icon, no text, no logos, museum quality",
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "url": "https://v3b.fal.media/files/b/0a982e93/AEGLFL07z9-TA4QeyNSSO.jpg",
+      "seed": 1716892194,
+      "bytes": 199233
+    },
+    {
+      "filename": "buildings/brabant-housing.png",
+      "status": "ok",
+      "prompt": "painted RPG card art, Brabantian Boerderij (farmhouse) with thatched roof, red-and-white painted shutters, smoke curling from the chimney, centered on dark moody vignette background with green-black gradient and warm orange-red accents (Brabant), ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, fantasy game card icon, no text, no logos, museum quality",
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "url": "https://v3b.fal.media/files/b/0a982e93/3oZfxl5JVKeGnsj7fi7QA.jpg",
+      "seed": 2088696210,
+      "bytes": 391156
+    },
+    {
+      "filename": "buildings/brabant-barracks.png",
+      "status": "ok",
+      "prompt": "painted RPG card art, Brabantian medieval Cafe used as barracks: timbered fortified tavern with crossed swords sign hanging, carnival pennants strung above the door, centered on dark moody vignette background with green-black gradient and warm orange-red accents (Brabant), ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, fantasy game card icon, no text, no logos, museum quality",
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "url": "https://v3b.fal.media/files/b/0a982e93/znCNMtdZNI5QatDqCJFFK.jpg",
+      "seed": 1289954422,
+      "bytes": 430969
+    },
+    {
+      "filename": "buildings/brabant-faction-special-2.png",
+      "status": "ok",
+      "prompt": "painted RPG card art, Brabant Feestzaal (festival hall), grand timbered hall with carnival banners hanging across the rafters, oak doors thrown open, festive lanterns lighting the entrance, centered on dark moody vignette background with green-black gradient and warm orange-red accents (Brabant), ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, fantasy game card icon, no text, no logos, museum quality",
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "url": "https://v3b.fal.media/files/b/0a982e93/y95t-avgsmRxwjCLyLdm8.jpg",
+      "seed": 1044696993,
+      "bytes": 446008
+    },
+    {
+      "filename": "buildings/brabant-bridge.png",
+      "status": "ok",
+      "prompt": "painted RPG card art, wooden plank bridge over a Brabant beek (creek), Bourgondisch red-and-white standard planted at the entrance, mossy banks and reeds, centered on dark moody vignette background with green-black gradient and warm orange-red accents (Brabant), ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, oil painting texture, fantasy game card icon, no text, no logos, museum quality",
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "url": "https://v3b.fal.media/files/b/0a982e93/0B9-PJWR8ti8i1pmvyLHC.jpg",
+      "seed": 1697130585,
+      "bytes": 419642
+    }
+  ]
+}
