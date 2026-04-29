@@ -71,6 +71,7 @@ export type CommandAction =
   | 'activate-deadline-crunch'
   | 'activate-trakteerronde'
   | 'activate-carnavalsoptocht'
+  | 'activate-vlaai-trakteer'
   | 'noop-info'
   | 'cancel-queue';
 

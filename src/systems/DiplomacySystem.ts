@@ -42,6 +42,7 @@ import {
   MIN_DAMAGE,
   ARMOR_FACTOR,
 } from '../types/index';
+import { getSalonProtocolCostMult } from './FactionSpecial1Passives';
 import type { GameWorld } from '../ecs/world';
 import type { CombatHitEvent } from '../types/index';
 
@@ -279,8 +280,9 @@ export function persuadeUnit(world: GameWorld, targetEid: number): boolean {
   // Already persuaded?
   if (persuadedUnits.some((p) => p.entityId === targetEid)) return false;
 
-  // Check Chocolade cost
-  if (!playerState.spendTertiary(FactionId.Belgen, PERSUASION_COST)) return false;
+  // Check Chocolade cost (Salon-protocol passive: per Diplomatiek Salon -10%, cap -30%).
+  const persuasionCost = Math.ceil(PERSUASION_COST * getSalonProtocolCostMult(FactionId.Belgen));
+  if (!playerState.spendTertiary(FactionId.Belgen, persuasionCost)) return false;
 
   // Switch faction
   const originalFaction = Faction.id[targetEid];

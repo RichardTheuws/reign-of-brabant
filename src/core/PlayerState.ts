@@ -281,16 +281,25 @@ class PlayerStateManager {
   }
 
   /**
-   * Add an efficiency stack (Randstad only). Capped at BUREAUCRACY_MAX_STACKS.
+   * Add an efficiency stack (Randstad only). Capped at BUREAUCRACY_MAX_STACKS
+   * + extra cap injected by `extraStackCapProvider` (Corporate Synergy).
    * Returns the new stack count.
    */
   addEfficiencyStack(factionId: number): number {
     const p = this.players[factionId];
-    if (p.efficiencyStacks < BUREAUCRACY_MAX_STACKS) {
+    const extra = this.extraStackCapProvider(factionId);
+    const cap = BUREAUCRACY_MAX_STACKS + extra;
+    if (p.efficiencyStacks < cap) {
       p.efficiencyStacks++;
     }
     return p.efficiencyStacks;
   }
+
+  /**
+   * Provider for extra stack-cap (default 0). Set externally by
+   * FactionSpecial1Passives to wire Corporate Synergy. Avoids circular import.
+   */
+  extraStackCapProvider: (factionId: number) => number = () => 0;
 
   /**
    * Get the bureaucracy speed modifier for a faction.

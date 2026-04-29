@@ -56,6 +56,10 @@ import {
   activateCarnavalsoptocht, isCarnavalsoptochtReady, getCarnavalsoptochtState,
   CARNAVALSOPTOCHT_COST, resetCarnavalsoptocht,
 } from '../systems/CarnavalsoptochtSystem';
+import {
+  activateVlaaiTrakteer, isVlaaiTrakteerReady, getVlaaiTrakteerState,
+  VLAAI_TRAKTEER_COST, resetFactionSpecial1Passives,
+} from '../systems/FactionSpecial1Passives';
 import { resetDiplomacy } from '../systems/DiplomacySystem';
 import { audioManager } from '../audio/AudioManager';
 import { playUnitVoice } from '../audio/UnitVoices';
@@ -961,6 +965,9 @@ export class Game {
       case 'activate-carnavalsoptocht':
         this.tryActivateCarnavalsoptocht();
         break;
+      case 'activate-vlaai-trakteer':
+        this.tryActivateVlaaiTrakteer();
+        break;
       case 'activate-boardroom':
         this.tryActivateBoardroom();
         break;
@@ -1011,6 +1018,26 @@ export class Game {
    * havermoutmelk for 30s of +50% movement speed for Randstad workers
    * (stagiairs). 90s cooldown.
    */
+  /**
+   * Vlaai-Trakteerronde click-action (Limburg Vlaaiwinkel). Spends 100
+   * Kolen for 30s waarin alle Vlaaiwinkels heal-interval halveren
+   * (5s → 2.5s). 90s cooldown.
+   */
+  private tryActivateVlaaiTrakteer(): void {
+    if (this.playerFactionId !== FactionId.Limburgers) return;
+    if (this.playerState.getTertiary(FactionId.Limburgers) < VLAAI_TRAKTEER_COST) {
+      this.hud?.showAlert(`Niet genoeg Kolen (${VLAAI_TRAKTEER_COST} nodig)`, 'warning');
+      return;
+    }
+    const fired = activateVlaaiTrakteer();
+    if (fired) {
+      this.hud?.showAlert('Vlaai-Trakteerronde — heal × 2 (30s)', 'info');
+      audioManager.playSound('click');
+    } else {
+      this.hud?.showAlert('Vlaai-Trakteerronde nog op cooldown', 'warning');
+    }
+  }
+
   /**
    * Carnavalsoptocht click-action (Brabant Carnavalstent). Spends 75
    * Gezelligheid for 30s of +25% movement speed for all Brabant units
@@ -2714,9 +2741,9 @@ export class Game {
         && Building.complete[eid] === 1) {
       const passiveByFaction: Record<number, { icon: string; label: string }> = {
         [FactionId.Brabanders]: { icon: 'CRN', label: 'Aura: +20% schade Brabant-eenheden in 12u radius' },
-        [FactionId.Randstad]:   { icon: 'BRD', label: 'Click-buff: Kwartaalcijfers (zie hieronder)' },
+        [FactionId.Randstad]:   { icon: 'BRD', label: 'Passive: per Boardroom +1 efficiency-cap (max +3)' },
         [FactionId.Limburgers]: { icon: 'VLA', label: 'Aura: +10 HP/5s heal Limburg-eenheden in 10u radius' },
-        [FactionId.Belgen]:     { icon: 'DPL', label: 'Diplomatie: passief +1 diplomaat per 10s, click voor Persuasion' },
+        [FactionId.Belgen]:     { icon: 'DPL', label: 'Passive: per Salon -10% Persuasion-cost (cap -30%)' },
       };
       const passive = passiveByFaction[this.playerFactionId];
       if (passive) {
@@ -2742,6 +2769,23 @@ export class Game {
       actions.push({
         action: 'activate-carnavalsoptocht',
         icon: 'OPT',
+        label,
+        hotkey: 'T',
+        iconClass: 'btn-icon--research',
+      });
+    }
+
+    // Vlaai-Trakteerronde (Limburg Vlaaiwinkel click-action, v0.42.0).
+    if (buildingType === BuildingTypeId.FactionSpecial1
+        && this.playerFactionId === FactionId.Limburgers
+        && Building.complete[eid] === 1) {
+      const vt = getVlaaiTrakteerState();
+      let label = `Trakteer (${VLAAI_TRAKTEER_COST}k)`;
+      if (vt.active) label = `Actief ${Math.ceil(vt.remaining)}s`;
+      else if (!isVlaaiTrakteerReady()) label = `CD ${Math.ceil(vt.cooldown)}s`;
+      actions.push({
+        action: 'activate-vlaai-trakteer',
+        icon: 'VLT',
         label,
         hotkey: 'T',
         iconClass: 'btn-icon--research',
@@ -3985,6 +4029,7 @@ export class Game {
     resetWorstenbroodjeskraamBuffs();
     resetUpgradeBuildingPassives();
     resetCarnavalsoptocht();
+    resetFactionSpecial1Passives();
     resetDiplomacy();
 
     // Stop music system

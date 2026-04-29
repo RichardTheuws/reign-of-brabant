@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.42.0] - 2026-04-29 — FactionSpecial1 second-functies (Randstad/Limburg/Belgen) + Salon-protocol cost-discount
+
+Sluit de v1.0 perfectie multi-functie audit voor FactionSpecial1 af. Brabant Carnavalstent kreeg z'n second-functie in v0.41.0 (Carnavalsoptocht); deze release voegt de symmetrische second-functies toe voor de overige drie facties. Per `feedback_v1_perfection_multi_function`.
+
+### Added — `FactionSpecial1Passives.ts`
+
+| Factie | Building | Existing | Toegevoegd in v0.42.0 |
+|--------|----------|----------|------------------------|
+| Randstad | Boardroom | Click Kwartaalcijfers (+50% production 30s) | **Corporate Synergy** passive — per actief Boardroom +1 efficiency-stack-cap. Cap +3 (BUREAUCRACY_MAX_STACKS 20 → 23 max). |
+| Limburg | Vlaaiwinkel | Heal aura (+10HP/5s in 10u) | **Vlaai-Trakteerronde** click — kost 100 Kolen → 30s alle Vlaaiwinkels heal-interval halveert (5s → 2.5s). 90s cooldown. Hotkey T. |
+| Belgen | Diplomatiek Salon | Diplomats / Persuasion | **Salon-protocol** passive — per Salon -10% Persuasion-cost (Chocolade), cap -30% (3 Salons). |
+
+### Changed — system integration
+- **`SystemPipeline.ts`** — `FactionSpecial1PassivesSystem` toegevoegd (faction-phase 4.809). Caches Boardroom + Salon counts elke 1.0s; ticked Vlaai-Trakteer buff every-frame.
+- **`PlayerState.addEfficiencyStack`** — gebruikt nu `extraStackCapProvider` (default 0). FactionSpecial1Passives zet de provider naar `getCorporateSynergyExtraCap` bij module-load (setter-pattern voorkomt circular import).
+- **`DiplomacySystem.ts`** — Persuasion-cost berekend als `Math.ceil(PERSUASION_COST × getSalonProtocolCostMult())`.
+- **`VlaaiwinkelSystem.ts`** — `effectiveInterval = UPDATE_INTERVAL × getVlaaiwinkelIntervalMult()`. Tijdens Vlaai-Trakteer is interval 2.5s ipv 5s.
+- **`Game.ts`** — `tryActivateVlaaiTrakteer` handler + Vlaaiwinkel building-card click-action (hotkey T). Reset-hook in `endMatch`.
+
+### Updated — building-card info-rows
+Eerder generieke labels nu accuraat:
+- Randstad Boardroom info-row: "Passive: per Boardroom +1 efficiency-cap (max +3)" (was placeholder "Click-buff: Kwartaalcijfers (zie hieronder)").
+- Belgen Diplomatiek Salon info-row: "Passive: per Salon -10% Persuasion-cost (cap -30%)" (was placeholder).
+
+### Added — tests (+17)
+- **`tests/FactionSpecial1Passives.test.ts`** dekt: Boardroom-count caching, Corporate Synergy linear+cap, factie-isolation, PlayerState stack-cap extension, Salon-count + cost-mult linear+cap, Vlaai-Trakteer ready-state, cost-gating, interval-halving, expire+cooldown, reset.
+
+### Notes
+- Test-suite: 1506 → 1523 (+17).
+- v1.0 perfectie multi-functie status: alle 4 FactionSpecial1's hebben nu 2-functies, alle 4 UpgradeBuildings hebben passive aura, alle 4 TertiaryResources hebben unique mechanics. Volgende: FactionSpecial2 audit (4 gebouwen produceren Heavy/Hero zonder unique mechanics) — kandidaat voor v0.43.0.
+
 ## [0.41.1] - 2026-04-29 — UI fix: info-row layout + button-label truncation
 
 ### Fixed

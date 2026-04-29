@@ -8,6 +8,25 @@ Bij oppakken: subject + commit-SHA invullen onder "Resolved".
 
 ---
 
+## 🌟 v1.0 PERFECTIE — gesignaleerd onderweg (sessie 2026-04-29)
+
+### Complete audit van in-game meldingen voor factie-specificiteit
+- **Gevonden**: 2026-04-29 (Richard live-test na v0.41.1)
+- **Issue**: meerdere in-game messages zijn niet factie-aware. Voorbeelden:
+  - Lumberjack "ready" / drop-off-callouts spreken algemene tekst, niet factie-flavoured (Brabant houtzager moet Brabants klinken, Randstad stagiair corporate, Limburg vlaaibakker dialect, Belgen frietboer Vlaams).
+  - Randstad hero "ready"-bericht zegt "Alaaf" — dat is Brabant carnaval-jargon, klopt niet voor Randstad CEO.
+- **Scope**: audit alle eventBus-emits, audio-callouts (UnitVoices.ts), HUD.showAlert calls, Building/Unit completion messages. Per locatie checken of factie-id wordt gebruikt voor flavour-keuze.
+- **Voorstel**: nieuwe `tests/factie-message-audit.test.ts` die per (factie × event-type) controleert dat de gekozen string uit een factie-specifieke pool komt. Plus refactor zodat alle messages via een `getFactionMessage(factionId, eventKey)` helper lopen.
+- **Bundel-fit**: kandidaat voor eigen MINOR (v0.43.0 of later "Bundel: Voice & Message Pass").
+
+### Info-row CSS niet perfect (CRN icon overlap)
+- **Gevonden**: 2026-04-29 (na v0.41.1 deploy)
+- **Issue**: in de info-row van de FactionSpecial1 building-card overlapt de icon-letter (CRN) gedeeltelijk met de label-tekst — icon zit niet correct uitgelijnd ernaast maar achter/onder de eerste paar letters van het label.
+- **Voorstel**: icon `display: flex` + `align-items: center` + `flex: 0 0 22px`; plus expliciete `gap` of `margin-right`. Mogelijk dat het container `.bcard-action-icon` standaard z-index of position-styling heeft die het info-row-context verstoort. Eigen audit nodig.
+- **Bundel-fit**: kleine UI-polish, kan in volgende patch (v0.41.2) of geïntegreerd in volgende minor.
+
+---
+
 ## 🌟 v1.0 PERFECTIE — gesignaleerd onderweg (sessie 2026-04-28)
 
 Items die deze sessie zichtbaar werden bij Bundel 5 + Bug-fix-sweep + Bundel 4A. Niet allemaal blokkers, maar in v1.0 perfectie-kader allemaal aan te pakken.

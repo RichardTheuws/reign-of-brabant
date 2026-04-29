@@ -13,6 +13,7 @@ import { query, hasComponent } from 'bitecs';
 import { Position, Faction, Building, Health } from '../ecs/components';
 import { IsUnit, IsDead, IsBuilding } from '../ecs/tags';
 import { FactionId, BuildingTypeId } from '../types/index';
+import { getVlaaiwinkelIntervalMult } from './FactionSpecial1Passives';
 import type { GameWorld } from '../ecs/world';
 
 const VLAAIWINKEL_RADIUS_SQ = 100;   // 10u
@@ -24,8 +25,10 @@ export function createVlaaiwinkelSystem() {
 
   return function vlaaiwinkelSystem(world: GameWorld, dt: number): void {
     accumulator += dt;
-    if (accumulator < UPDATE_INTERVAL) return;
-    accumulator -= UPDATE_INTERVAL;
+    // Vlaai-Trakteer click-buff halves the interval (5s → 2.5s) while active.
+    const effectiveInterval = UPDATE_INTERVAL * getVlaaiwinkelIntervalMult();
+    if (accumulator < effectiveInterval) return;
+    accumulator -= effectiveInterval;
 
     // Cache complete Limburger Vlaaiwinkel positions
     const tents: Array<{ x: number; z: number }> = [];

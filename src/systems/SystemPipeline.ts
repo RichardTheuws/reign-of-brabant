@@ -194,6 +194,7 @@ import { createHavermoutmelkSystem } from './HavermoutmelkSystem';
 import { createWorstenbroodjeskraamSystem } from './WorstenbroodjeskraamSystem';
 import { createUpgradeBuildingPassivesSystem } from './UpgradeBuildingPassivesSystem';
 import { createCarnavalsoptochtSystem } from './CarnavalsoptochtSystem';
+import { createFactionSpecial1PassivesSystem } from './FactionSpecial1Passives';
 import { createUndergroundSystem } from './UndergroundSystem';
 import { createDiplomacySystem } from './DiplomacySystem';
 import { createSeparationSystem } from './SeparationSystem';
@@ -260,6 +261,9 @@ export function createGamePipeline(terrain: Terrain, devMode = false): SystemPip
 
   // Phase 4.808: Carnavalsoptocht (Brabant Carnavalstent click — buff-timer tick only)
   pipeline.add('CarnavalsoptochtSystem', createCarnavalsoptochtSystem(), 'faction');
+
+  // Phase 4.809: FactionSpecial1 passives (Boardroom + Salon counts, Vlaai-Trakteer buff timer)
+  pipeline.add('FactionSpecial1PassivesSystem', createFactionSpecial1PassivesSystem(), 'faction');
 
   // Phase 4.81: Underground tunnels (Limburgers faction -- needs Kolen from TertiaryResourceSystem)
   pipeline.add('UndergroundSystem', createUndergroundSystem(), 'faction');
