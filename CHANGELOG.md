@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.41.1] - 2026-04-29 — UI fix: info-row layout + button-label truncation
+
+### Fixed
+- **Info-row** in FactionSpecial1 building-cards rendered als 300px-vierkant met giant CRN-portret in het midden (kreeg `aspect-ratio: 1` + `min-height: 52px` van standaard `.bcard-action-btn`). Nu compact horizontale rij: icon links, label rechts, height auto.
+  - CSS-overrides: `aspect-ratio: auto`, `min-height: 0`, `flex-direction: row`, `padding: 6px 8px`.
+- **Button-labels** afgekapt op smalle 3-kolom grid (~80px per cell). Verkort:
+  - `Carnavalsoptocht (75 Gez)` → `Optocht (75g)`
+  - `Trakteerronde (50 Gez)` → `Trakteer (50g)`
+  - `Sprint Mode (30h)` → `Sprint (30h)`
+  - `Deadline Crunch (50h)` → `Crunch (50h)`
+  - `Activeer Kwartaalcijfers` → `Kwartaalcijfers`
+- Active/cooldown labels ingekort: `Optocht actief (28s)` → `Actief 28s`, `cooldown (45s)` → `CD 45s`.
+
 ## [0.41.0] - 2026-04-28 — Carnavalsoptocht (Brabant click) + FactionSpecial1 info-display rows
 
 ### Added — `CarnavalsoptochtSystem.ts`

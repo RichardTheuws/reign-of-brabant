@@ -2736,9 +2736,9 @@ export class Game {
         && this.playerFactionId === FactionId.Brabanders
         && Building.complete[eid] === 1) {
       const opt = getCarnavalsoptochtState();
-      let label = `Carnavalsoptocht (${CARNAVALSOPTOCHT_COST} Gez)`;
-      if (opt.active) label = `Optocht actief (${Math.ceil(opt.remaining)}s)`;
-      else if (!isCarnavalsoptochtReady()) label = `Optocht cd (${Math.ceil(opt.cooldown)}s)`;
+      let label = `Optocht (${CARNAVALSOPTOCHT_COST}g)`;
+      if (opt.active) label = `Actief ${Math.ceil(opt.remaining)}s`;
+      else if (!isCarnavalsoptochtReady()) label = `CD ${Math.ceil(opt.cooldown)}s`;
       actions.push({
         action: 'activate-carnavalsoptocht',
         icon: 'OPT',
@@ -2752,9 +2752,9 @@ export class Game {
     if (buildingType === BuildingTypeId.FactionSpecial1
         && this.playerFactionId === FactionId.Randstad
         && Building.complete[eid] === 1) {
-      let label = 'Activeer Kwartaalcijfers';
-      if (boardroomBuff.active) label = `Actief (${Math.ceil(boardroomBuff.remaining)}s)`;
-      else if (!isBoardroomReady()) label = `Cooldown (${Math.ceil(boardroomBuff.cooldown)}s)`;
+      let label = 'Kwartaalcijfers';
+      if (boardroomBuff.active) label = `Actief ${Math.ceil(boardroomBuff.remaining)}s`;
+      else if (!isBoardroomReady()) label = `CD ${Math.ceil(boardroomBuff.cooldown)}s`;
       actions.push({
         action: 'activate-boardroom',
         icon: 'CEO',
@@ -2769,9 +2769,9 @@ export class Game {
         && this.playerFactionId === FactionId.Brabanders
         && Building.complete[eid] === 1) {
       const trakteer = getTrakteerrondeState();
-      let label = `Trakteerronde (${TRAKTEERRONDE_COST} Gez)`;
-      if (trakteer.active) label = `Trakteerronde actief (${Math.ceil(trakteer.remaining)}s)`;
-      else if (!isTrakteerrondeReady()) label = `Trakteerronde cd (${Math.ceil(trakteer.cooldown)}s)`;
+      let label = `Trakteer (${TRAKTEERRONDE_COST}g)`;
+      if (trakteer.active) label = `Actief ${Math.ceil(trakteer.remaining)}s`;
+      else if (!isTrakteerrondeReady()) label = `CD ${Math.ceil(trakteer.cooldown)}s`;
       actions.push({
         action: 'activate-trakteerronde',
         icon: 'WBR',
@@ -2786,9 +2786,9 @@ export class Game {
         && this.playerFactionId === FactionId.Randstad
         && Building.complete[eid] === 1) {
       const sprint = getSprintModeState();
-      let sprintLabel = `Sprint Mode (${SPRINT_MODE_COST}h)`;
-      if (sprint.active) sprintLabel = `Sprint Mode actief (${Math.ceil(sprint.remaining)}s)`;
-      else if (!isSprintModeReady()) sprintLabel = `Sprint Mode cd (${Math.ceil(sprint.cooldown)}s)`;
+      let sprintLabel = `Sprint (${SPRINT_MODE_COST}h)`;
+      if (sprint.active) sprintLabel = `Actief ${Math.ceil(sprint.remaining)}s`;
+      else if (!isSprintModeReady()) sprintLabel = `CD ${Math.ceil(sprint.cooldown)}s`;
       actions.push({
         action: 'activate-sprint-mode',
         icon: 'SPR',
@@ -2798,9 +2798,9 @@ export class Game {
       });
 
       const crunch = getDeadlineCrunchState();
-      let crunchLabel = `Deadline Crunch (${DEADLINE_CRUNCH_COST}h)`;
-      if (crunch.active) crunchLabel = `Crunch actief (${Math.ceil(crunch.remaining)}s)`;
-      else if (!isDeadlineCrunchReady()) crunchLabel = `Crunch cd (${Math.ceil(crunch.cooldown)}s)`;
+      let crunchLabel = `Crunch (${DEADLINE_CRUNCH_COST}h)`;
+      if (crunch.active) crunchLabel = `Actief ${Math.ceil(crunch.remaining)}s`;
+      else if (!isDeadlineCrunchReady()) crunchLabel = `CD ${Math.ceil(crunch.cooldown)}s`;
       actions.push({
         action: 'activate-deadline-crunch',
         icon: 'DDL',
