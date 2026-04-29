@@ -1,5 +1,41 @@
 # Changelog
 
+## [0.48.2] - 2026-04-29 — Towers visibly defend, faction-tinted projectiles
+
+### Fixed — Watchtowers leken niet te verdedigen
+Live-bug Richard 2026-04-29: "de wachttorens lijken niet te verdedigen".
+Root cause: `TowerSystem` past damage direct toe op de target en emit een `tower-attack` event — maar er was NERGENS een listener voor dat event. ProjectileRenderer bestond als code maar werd niet eens geïnstantieerd. Resultaat: wachttoren staat stil terwijl vijanden binnen range "vanzelf" doodgaan.
+
+### Added — ProjectileRenderer wired in main.ts
+- `ProjectileRenderer` krijgt eigen `projectileGroup` aan de scene en wordt geladen via `preload()` op boot.
+- Update-tick toegevoegd in main render loop (`projectiles.update(dt)`).
+- Game-constructor neemt nu een `ProjectileRenderer` parameter.
+
+### Added — Tower-attack visual + audio chain
+`Game` luistert nu op `tower-attack`:
+- Spawnt parabolic-arc projectiel van toren-top (terrain Y + 6) naar target body (terrain Y + 1)
+- Vluchtduur ~22u/s zodat lange schoten realistisch lang vliegen, korte ~0.2s
+- Speelt `arrow_shoot` op de toren-locatie en `arrow_impact` op het doel
+- Spawnt `spawnCombatHit` particle puff op target — dezelfde feedback als unit-ranged-hits
+
+### Added — Faction-tinted tower projectiles
+`ProjectileSpawnData.tintColor?: number` — RGB hex die de trail-vertex-colors en spark/impact tint stuurt. Per factie:
+- **Brabanders** → `#ff8830` warm oranje-rood (Bourgondisch)
+- **Randstad** → `#6090ff` corporate blauw
+- **Limburgers** → `#d9b766` mergel coal-geel
+- **Belgen** → `#ffd24a` Belgisch goud
+
+### Side-effect: alle projectielen zijn nu factie-tintbaar
+De extensie van `ProjectileSpawnData` met `tintColor` werkt voor élke projectiel-spawn (niet alleen towers). Toekomstige unit-ranged callers kunnen dezelfde tints hergebruiken.
+
+### Files
+- Modified: `src/main.ts` (ProjectileRenderer instance + group + preload + update tick)
+- Modified: `src/rendering/ProjectileRenderer.ts` (tintColor field, ActiveProjectile.tintR/G/B, vertex-color tinting)
+- Modified: `src/core/Game.ts` (projectiles field + tower-attack listener met factie-tint table)
+- Modified: `package.json`, `CHANGELOG.md`
+
+1567 tests blijven groen.
+
 ## [0.48.1] - 2026-04-29 — Build-ghost fixes + ability cooldown overlay
 
 ### Fixed — Build-ghost preview altijd 'barracks'

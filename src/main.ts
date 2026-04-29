@@ -17,6 +17,7 @@ import { initAtmosphere, updateAtmosphere } from './rendering/Atmosphere';
 import { updateWater } from './world/Terrain';
 import { PostProcessing } from './rendering/PostProcessing';
 import { ParticleSystem } from './rendering/ParticleSystem';
+import { ProjectileRenderer } from './rendering/ProjectileRenderer';
 
 // ---------------------------------------------------------------------------
 // Version (injected by Vite from package.json)
@@ -120,7 +121,13 @@ const eventBus = new EventBus();
 // Game instance (created but NOT initialized until loading state)
 // ---------------------------------------------------------------------------
 const particles = new ParticleSystem(scene);
-const game = new Game(scene, terrain, rtsCamera, eventBus, particles);
+// Projectile group attached to scene; preloaded async during boot.
+const projectileGroup = new THREE.Group();
+projectileGroup.name = 'projectiles';
+scene.add(projectileGroup);
+const projectiles = new ProjectileRenderer(projectileGroup);
+projectiles.preload().catch((err) => console.warn('[main] projectile preload failed', err));
+const game = new Game(scene, terrain, rtsCamera, eventBus, particles, projectiles);
 
 if (import.meta.env.DEV) {
   (globalThis as { __rob?: { game: Game; eventBus: typeof eventBus } }).__rob = { game, eventBus };
@@ -552,6 +559,7 @@ function render(_alpha: number): void {
   updateAtmosphere(dt);
   updateWater(renderElapsed);
   particles.update(dt);
+  projectiles.update(dt);
   postProcessing.render();
   devStats?.update();
 }

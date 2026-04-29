@@ -33,6 +33,7 @@ import { PropRenderer } from '../rendering/PropRenderer';
 import { SelectionRenderer, type SelectionData } from '../rendering/SelectionRenderer';
 import { TowerRangeRenderer } from '../rendering/TowerRangeRenderer';
 import { AuraRingRenderer } from '../rendering/AuraRingRenderer';
+import type { ProjectileRenderer } from '../rendering/ProjectileRenderer';
 import { FogOfWarRenderer } from '../rendering/FogOfWarRenderer';
 import { visionData } from '../systems/VisionSystem';
 import { playerState } from '../core/PlayerState';
@@ -186,6 +187,7 @@ export class Game {
   private camera: RTSCamera;
   private eventBus: EventBusType;
   private particles: ParticleSystem;
+  private projectiles: ProjectileRenderer;
   private pipeline: SystemPipeline;
   private map!: GeneratedMap;
 
@@ -281,12 +283,13 @@ export class Game {
   private inputSetup = false;
   private eventListenersSetup = false;
 
-  constructor(scene: THREE.Scene, terrain: Terrain, camera: RTSCamera, eventBus: EventBusType, particles: ParticleSystem) {
+  constructor(scene: THREE.Scene, terrain: Terrain, camera: RTSCamera, eventBus: EventBusType, particles: ParticleSystem, projectiles: ProjectileRenderer) {
     this.scene = scene;
     this.terrain = terrain;
     this.camera = camera;
     this.eventBus = eventBus;
     this.particles = particles;
+    this.projectiles = projectiles;
     this.damagePopups = new DamagePopups();
 
     this.pipeline = createGamePipeline(terrain, import.meta.env.DEV);
@@ -1978,6 +1981,46 @@ export class Game {
 
     // Hero ability + heal visual effects
     initAbilityEffects(this.particles, this.camera);
+
+    // Tower defense visuals — projectile arc + audio + faction-tinted trail.
+    // Tower-attack damage is applied directly by TowerSystem; here we only
+    // produce the visual feedback (no second damage application).
+    const FACTION_TOWER_TINT: Record<number, number> = {
+      [FactionId.Brabanders]: 0xff8830, // warm orange-red
+      [FactionId.Randstad]:   0x6090ff, // corporate blue
+      [FactionId.Limburgers]: 0xd9b766, // mergel coal-yellow
+      [FactionId.Belgen]:     0xffd24a, // Belgian gold
+    };
+    eventBus.on('tower-attack' as never, (event: { towerEid: number; targetEid: number; damage: number }) => {
+      const tEid = event.towerEid;
+      const uEid = event.targetEid;
+      if (!entityExists(world, tEid) || !entityExists(world, uEid)) return;
+
+      const sx = Position.x[tEid];
+      const sz = Position.z[tEid];
+      const sy = this.terrain.getHeightAt(sx, sz) + 6.0; // tower top
+      const tx = Position.x[uEid];
+      const tz = Position.z[uEid];
+      const ty = this.terrain.getHeightAt(tx, tz) + 1.0; // body height
+
+      const dx = tx - sx;
+      const dz = tz - sz;
+      const dist = Math.sqrt(dx * dx + dz * dz);
+      const duration = Math.max(0.18, dist / 22); // ~22u/s flight speed
+
+      const factionId = Faction.id[tEid];
+      this.projectiles.spawn({
+        startX: sx, startY: sy, startZ: sz,
+        targetX: tx, targetY: ty, targetZ: tz,
+        duration,
+        projectileType: 'arrow',
+        tintColor: FACTION_TOWER_TINT[factionId],
+      });
+
+      audioManager.playSound('arrow_shoot', { x: sx, z: sz });
+      audioManager.playSound('arrow_impact', { x: tx, z: tz });
+      this.particles.spawnCombatHit(tx, ty, tz, true);
+    });
 
     // Audio + particles: combat hits
     eventBus.on('combat-hit', (event) => {

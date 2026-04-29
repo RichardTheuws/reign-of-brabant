@@ -55,6 +55,13 @@ export interface ProjectileSpawnData {
   duration: number;
   /** Projectile type: 'arrow' (default) or 'siege' (larger, fiery arc). */
   projectileType?: 'arrow' | 'siege';
+  /**
+   * RGB hex tint applied to the trail + impact dust + spark spawns.
+   * Used to give faction-specific tower projectiles a recognisable colour
+   * (Brabant red, Randstad blue, Limburg coal-yellow, Belgen gold).
+   * Undefined falls back to the default warm-amber palette.
+   */
+  tintColor?: number;
 }
 
 interface ActiveProjectile {
@@ -84,6 +91,10 @@ interface ActiveProjectile {
   fadeOut: number;
   /** Projectile type for rendering differences. */
   projectileType: 'arrow' | 'siege';
+  /** Trail head colour (RGB 0-1 floats). Tail fades to black via vertex colours. */
+  tintR: number;
+  tintG: number;
+  tintB: number;
 }
 
 /** A single dust particle in an impact effect. */
@@ -219,6 +230,10 @@ export class ProjectileRenderer {
         active: false,
         fadeOut: 0,
         projectileType: 'arrow',
+        // Default warm-white head (matches the legacy hard-coded tail fade).
+        tintR: 1.0,
+        tintG: 0.93,
+        tintB: 0.7,
       });
     }
 
@@ -263,6 +278,14 @@ export class ProjectileRenderer {
 
     const isSiege = data.projectileType === 'siege';
     slot.projectileType = isSiege ? 'siege' : 'arrow';
+
+    if (data.tintColor !== undefined) {
+      slot.tintR = ((data.tintColor >> 16) & 0xff) / 255;
+      slot.tintG = ((data.tintColor >> 8) & 0xff) / 255;
+      slot.tintB = (data.tintColor & 0xff) / 255;
+    } else {
+      slot.tintR = 1.0; slot.tintG = 0.93; slot.tintB = 0.7;
+    }
 
     slot.startX = data.startX;
     slot.startY = data.startY;
@@ -446,10 +469,9 @@ export class ProjectileRenderer {
     for (let i = 0; i < p.trailCount; i++) {
       const alpha = p.trailCount > 1 ? i / (p.trailCount - 1) : 1;
       const ci = i * 3;
-      // Warm white at head (1.0, 0.93, 0.7), fading toward dark amber at tail
-      colors[ci]     = alpha * 1.0;   // R
-      colors[ci + 1] = alpha * 0.93;  // G
-      colors[ci + 2] = alpha * 0.7;   // B
+      colors[ci]     = alpha * p.tintR;
+      colors[ci + 1] = alpha * p.tintG;
+      colors[ci + 2] = alpha * p.tintB;
     }
 
     // Update geometry
