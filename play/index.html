@@ -941,6 +941,22 @@
     .bcard-action-btn:disabled {
       opacity: 0.35; cursor: not-allowed;
     }
+    /* Cooldown sweep overlay for click-action buttons.
+       Mirrors the hero-ability pattern: clip-path inset reveals from bottom up
+       as the cooldown ticks down. */
+    .bcard-action-btn.is-on-cooldown {
+      opacity: 1; /* override the generic disabled fade so the sweep stays visible */
+    }
+    .bcard-action-cd-overlay {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.65);
+      pointer-events: none; z-index: 5;
+      transition: clip-path 0.25s linear;
+    }
+    .bcard-action-cd-overlay.is-active-buff {
+      background: rgba(255, 200, 60, 0.20);
+      box-shadow: inset 0 0 12px rgba(255, 215, 100, 0.45);
+    }
     .bcard-action-icon {
       position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;

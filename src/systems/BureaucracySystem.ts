@@ -94,7 +94,7 @@ const fatiguedUnits = new Map<number, { attack: number; speed: number }>();
 export const boardroomBuff = { active: false, remaining: 0, cooldown: 0 };
 
 const BOARDROOM_DURATION = 30;
-const BOARDROOM_COOLDOWN = 120;
+export const BOARDROOM_COOLDOWN = 120;
 /** Production duration multiplier when Boardroom buff is active (0.667 = +50% speed). */
 export const BOARDROOM_PRODUCTION_MULT = 0.667;
 

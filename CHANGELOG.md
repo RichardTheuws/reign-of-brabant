@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.48.1] - 2026-04-29 — Build-ghost fixes + ability cooldown overlay
+
+### Fixed — Build-ghost preview altijd 'barracks'
+`Game.updateBuildGhost` had hardcoded `ghostModel = 'barracks'` als comment "Use 'barracks' ghost model for buildings without dedicated model". Resultaat: elke placement-preview toonde Barracks-mesh, niet het daadwerkelijk geplaatste gebouw. Vervangen door `getBuildingRendererType(getBuildingTypeIdForGhost(...))` zodat de ghost-mesh nu matcht met de target building. Ook de `valid`-tint reflecteert nu de live `validateBuildingPlacement` check (groen kan, rood blokkeert).
+
+### Added — Activity-circle preview tijdens placement
+Bij placement van gebouwen met een signature radius wordt nu de aura-ring meegerenderd op de cursor:
+- DefenseTower → tower attack range (TowerRangeRenderer, oranje)
+- Brabant Worstenbroodjeskraam → 8u heal aura
+- Brabant Carnavalstent → 12u damage aura
+- Limburg Vlaaiwinkel → 10u heal pulse
+
+Plaatsing van gebouwen zonder bekend aura toont alleen de ghost-mesh. Beide renderers verbergen netjes bij `exitBuildMode`.
+
+### Added — Cooldown sweep overlay op click-action buttons
+Building-card click-actions (Sprint Mode / Carnavalsoptocht / Trakteerronde / Vlaai-Trakteer / Kwartaalcijfers / Ploegendienst / Drukvuur / Deadline Crunch) hadden alleen tekst-feedback ("CD 30s" in label). Nu ook visueel:
+- `BuildingCardAction` uitgebreid met `buffRemaining` + `cooldownRemaining` + `cooldownMax`
+- HUD rendert een `bcard-action-cd-overlay` div met `clip-path: inset(...)` sweep — matcht het bestaande hero-ability patroon
+- Tijdens actieve buff: warm-gele tint + glow zodat speler ziet dat het effect nog loopt
+- Tijdens cooldown: dark sweep van top-naar-bottom als de timer afloopt
+- Nieuwe `HUD.updateBuildingCardActionCooldowns(actions)` updatet overlays in-place per frame zonder DOM rebuild — geen flicker
+- Cooldown-constants nu geëxporteerd (BOARDROOM_COOLDOWN, VLAAI_TRAKTEER_COOLDOWN, TRAKTEERRONDE_COOLDOWN, en de nieuwe Mijnschacht/HavermoutmelkSystem cooldowns) zodat HUD ze kan tonen
+
+### Files
+- Modified: `src/core/Game.ts` (build-ghost fix, placement aura preview, exitBuildMode cleanup, cooldown fields op alle click-actions, per-frame cooldown refresh)
+- Modified: `src/ui/HUD.ts` (BuildingCardAction velden, render-time + tick-time cooldown overlay)
+- Modified: `play/index.html` (`.bcard-action-cd-overlay` CSS, `.is-active-buff` styling)
+- Modified: `src/systems/BureaucracySystem.ts` (export BOARDROOM_COOLDOWN)
+
+1567 tests blijven groen.
+
 ## [0.48.0] - 2026-04-29 — Multi-functie + Polish bundle
 
 ### Added — Mijnschacht 2 click-actions (Limburg)

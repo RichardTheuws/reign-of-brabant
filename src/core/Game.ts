@@ -43,29 +43,33 @@ import { HUD, type SelectedUnit, type CommandAction, type HeroAbilityData, type 
 import { DamagePopups } from '../ui/DamagePopups';
 import { activateCarnavalsrage, getCarnavalsrageState, getCarnavalsrageConfig, resetAbilitySystem } from '../systems/AbilitySystem';
 import { activateHeroAbility, resetHeroSystem } from '../systems/HeroSystem';
-import { resetBureaucracy, activateBoardroom, isBoardroomReady, boardroomBuff } from '../systems/BureaucracySystem';
+import { resetBureaucracy, activateBoardroom, isBoardroomReady, boardroomBuff, BOARDROOM_COOLDOWN } from '../systems/BureaucracySystem';
 import {
-  activateSprintMode, isSprintModeReady, getSprintModeState, SPRINT_MODE_COST,
-  activateDeadlineCrunch, isDeadlineCrunchReady, getDeadlineCrunchState, DEADLINE_CRUNCH_COST,
+  activateSprintMode, isSprintModeReady, getSprintModeState,
+  SPRINT_MODE_COST, SPRINT_MODE_COOLDOWN,
+  activateDeadlineCrunch, isDeadlineCrunchReady, getDeadlineCrunchState,
+  DEADLINE_CRUNCH_COST, DEADLINE_CRUNCH_COOLDOWN,
   resetHavermoutmelkBuffs,
 } from '../systems/HavermoutmelkSystem';
 import {
-  activatePloegendienst, isPloegendienstReady, getPloegendienstState, PLOEGENDIENST_COST,
-  activateDrukvuur, isDrukvuurReady, getDrukvuurState, DRUKVUUR_COST,
+  activatePloegendienst, isPloegendienstReady, getPloegendienstState,
+  PLOEGENDIENST_COST, PLOEGENDIENST_COOLDOWN,
+  activateDrukvuur, isDrukvuurReady, getDrukvuurState,
+  DRUKVUUR_COST, DRUKVUUR_COOLDOWN,
   resetMijnschachtBuffs,
 } from '../systems/MijnschachtSystem';
 import {
   activateTrakteerronde, isTrakteerrondeReady, getTrakteerrondeState,
-  TRAKTEERRONDE_COST, resetWorstenbroodjeskraamBuffs,
+  TRAKTEERRONDE_COST, TRAKTEERRONDE_COOLDOWN, resetWorstenbroodjeskraamBuffs,
 } from '../systems/WorstenbroodjeskraamSystem';
 import { resetUpgradeBuildingPassives } from '../systems/UpgradeBuildingPassivesSystem';
 import {
   activateCarnavalsoptocht, isCarnavalsoptochtReady, getCarnavalsoptochtState,
-  CARNAVALSOPTOCHT_COST, resetCarnavalsoptocht,
+  CARNAVALSOPTOCHT_COST, CARNAVALSOPTOCHT_COOLDOWN, resetCarnavalsoptocht,
 } from '../systems/CarnavalsoptochtSystem';
 import {
   activateVlaaiTrakteer, isVlaaiTrakteerReady, getVlaaiTrakteerState,
-  VLAAI_TRAKTEER_COST, resetFactionSpecial1Passives,
+  VLAAI_TRAKTEER_COST, VLAAI_TRAKTEER_COOLDOWN, resetFactionSpecial1Passives,
 } from '../systems/FactionSpecial1Passives';
 import { resetDiplomacy } from '../systems/DiplomacySystem';
 import { audioManager } from '../audio/AudioManager';
@@ -1341,6 +1345,9 @@ export class Game {
     this.buildMode = false;
     this.buildGhostType = null;
     this.buildingRenderer.hideGhost();
+    // Clear placement-preview rings so they don't linger after build mode.
+    this.auraRingRenderer.hide();
+    this.towerRangeRenderer.hide();
     this.hud?.hideModeIndicator();
     const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
     if (canvas) canvas.style.cursor = 'default';
@@ -2107,16 +2114,55 @@ export class Game {
 
     if (hits.length > 0) {
       const point = hits[0].point;
-      // Use 'barracks' ghost model for buildings without dedicated model
-      const ghostModel = 'barracks';
+      const buildingTypeId = this.getBuildingTypeIdForGhost(this.buildGhostType);
+      const ghostModel = this.getBuildingRendererType(buildingTypeId);
+      // Validate placement live so the tint reflects "can build here?".
+      const placement = validateBuildingPlacement(world, buildingTypeId, this.playerFactionId, point.x, point.z, this.terrain);
       this.buildingRenderer.showGhost(
         ghostModel,
         this.playerFactionId,
         point.x,
         point.y,
         point.z,
-        true
+        placement.valid,
       );
+
+      // Activity-circle preview: show the relevant range / aura at the cursor
+      // so the player can see the impact zone before committing.
+      this.updatePlacementAuraPreview(buildingTypeId, point.x, point.z);
+    }
+  }
+
+  /**
+   * Show a translucent ring matching the building's signature radius while
+   * the placement ghost is on the cursor. Hides when the building has no
+   * such circle.
+   */
+  private updatePlacementAuraPreview(buildingTypeId: BuildingTypeId, x: number, z: number): void {
+    const fid = this.playerFactionId;
+    let radius = 0;
+    let isTowerRange = false;
+
+    if (buildingTypeId === BuildingTypeId.DefenseTower) {
+      isTowerRange = true; // dedicated renderer with the live tower range
+    } else if (buildingTypeId === BuildingTypeId.TertiaryResourceBuilding && fid === FactionId.Brabanders) {
+      radius = 8;  // Worstenbroodjeskraam heal aura
+    } else if (buildingTypeId === BuildingTypeId.FactionSpecial1 && fid === FactionId.Limburgers) {
+      radius = 10; // Vlaaiwinkel heal pulse
+    } else if (buildingTypeId === BuildingTypeId.FactionSpecial1 && fid === FactionId.Brabanders) {
+      radius = 12; // Carnavalstent damage aura
+    }
+
+    const y = this.terrain.getHeightAt(x, z);
+    if (isTowerRange) {
+      this.towerRangeRenderer.show(x, z, y);
+      this.auraRingRenderer.hide();
+    } else if (radius > 0) {
+      this.auraRingRenderer.show(x, z, y, radius);
+      this.towerRangeRenderer.hide();
+    } else {
+      this.auraRingRenderer.hide();
+      this.towerRangeRenderer.hide();
     }
   }
 
@@ -2848,6 +2894,9 @@ export class Game {
         label,
         hotkey: 'T',
         iconClass: 'btn-icon--research',
+        buffRemaining: opt.active ? opt.remaining : 0,
+        cooldownRemaining: opt.cooldown,
+        cooldownMax: CARNAVALSOPTOCHT_COOLDOWN,
       });
     }
 
@@ -2865,6 +2914,9 @@ export class Game {
         label,
         hotkey: 'T',
         iconClass: 'btn-icon--research',
+        buffRemaining: vt.active ? vt.remaining : 0,
+        cooldownRemaining: vt.cooldown,
+        cooldownMax: VLAAI_TRAKTEER_COOLDOWN,
       });
     }
 
@@ -2881,6 +2933,9 @@ export class Game {
         label,
         hotkey: 'T',
         iconClass: 'btn-icon--research',
+        buffRemaining: boardroomBuff.active ? boardroomBuff.remaining : 0,
+        cooldownRemaining: boardroomBuff.cooldown,
+        cooldownMax: BOARDROOM_COOLDOWN,
       });
     }
 
@@ -2898,6 +2953,9 @@ export class Game {
         label,
         hotkey: 'T',
         iconClass: 'btn-icon--research',
+        buffRemaining: trakteer.active ? trakteer.remaining : 0,
+        cooldownRemaining: trakteer.cooldown,
+        cooldownMax: TRAKTEERRONDE_COOLDOWN,
       });
     }
 
@@ -2915,6 +2973,9 @@ export class Game {
         label: sprintLabel,
         hotkey: 'T',
         iconClass: 'btn-icon--research',
+        buffRemaining: sprint.active ? sprint.remaining : 0,
+        cooldownRemaining: sprint.cooldown,
+        cooldownMax: SPRINT_MODE_COOLDOWN,
       });
 
       const crunch = getDeadlineCrunchState();
@@ -2927,6 +2988,9 @@ export class Game {
         label: crunchLabel,
         hotkey: 'Y',
         iconClass: 'btn-icon--research',
+        buffRemaining: crunch.active ? crunch.remaining : 0,
+        cooldownRemaining: crunch.cooldown,
+        cooldownMax: DEADLINE_CRUNCH_COOLDOWN,
       });
     }
 
@@ -2944,6 +3008,9 @@ export class Game {
         label: ploegLabel,
         hotkey: 'T',
         iconClass: 'btn-icon--research',
+        buffRemaining: ploeg.active ? ploeg.remaining : 0,
+        cooldownRemaining: ploeg.cooldown,
+        cooldownMax: PLOEGENDIENST_COOLDOWN,
       });
 
       const druk = getDrukvuurState();
@@ -2956,6 +3023,9 @@ export class Game {
         label: drukLabel,
         hotkey: 'Y',
         iconClass: 'btn-icon--research',
+        buffRemaining: druk.active ? druk.remaining : 0,
+        cooldownRemaining: druk.cooldown,
+        cooldownMax: DRUKVUUR_COOLDOWN,
       });
     }
 
@@ -3557,6 +3627,12 @@ export class Game {
             // Update production queue display with cancel buttons
             const queueItems = this.getBuildingQueue(firstEid);
             this.hud.updateProductionQueueDisplay(queueItems);
+
+            // Refresh click-action cooldown overlays + countdown labels in-place.
+            const buildingType = Building.typeId[firstEid];
+            const buildingName = getDisplayBuildingName(this.playerFactionId, buildingType);
+            const cardData = this.buildBuildingCardData(firstEid, buildingType, buildingName, queueItems, false);
+            this.hud.updateBuildingCardActionCooldowns(cardData.actions);
           }
 
           // Update legacy production queue (backward compat)

@@ -138,6 +138,12 @@ export interface BuildingCardAction {
   isHero?: boolean;    // Hero training button
   isRally?: boolean;   // Rally point button
   isInfo?: boolean;    // Non-clickable info-row (passive effect description)
+  /** Active buff seconds remaining; when > 0 the button is "in use". */
+  buffRemaining?: number;
+  /** Cooldown seconds remaining (0 when ready). */
+  cooldownRemaining?: number;
+  /** Total cooldown duration so the HUD can render a sweep fraction. */
+  cooldownMax?: number;
 }
 
 export interface BuildingCardData {
@@ -907,6 +913,28 @@ export class HUD {
       btn.dataset.action = act.action;
       btn.dataset.hotkey = act.hotkey;
 
+      // Cooldown / active-buff overlay (clip-path sweep) for click-actions.
+      const cdRemaining = act.cooldownRemaining ?? 0;
+      const cdMax = act.cooldownMax ?? 0;
+      const buffRemaining = act.buffRemaining ?? 0;
+      if (cdMax > 0 && (cdRemaining > 0 || buffRemaining > 0)) {
+        const overlay = document.createElement('div');
+        overlay.className = 'bcard-action-cd-overlay';
+        // While the buff is active, show a subtle "active" tint (full coverage).
+        // While on cooldown, sweep from bottom to top: at start fraction=1 (full
+        // overlay), at ready fraction=0 (uncovered).
+        if (buffRemaining > 0) {
+          overlay.classList.add('is-active-buff');
+          overlay.style.clipPath = 'inset(0 0 0 0)';
+        } else {
+          const fraction = Math.max(0, Math.min(1, cdRemaining / cdMax));
+          overlay.style.clipPath = `inset(${(1 - fraction) * 100}% 0 0 0)`;
+        }
+        btn.appendChild(overlay);
+        btn.classList.add('is-on-cooldown');
+        btn.disabled = true;
+      }
+
       const iconSpan = document.createElement('span');
       iconSpan.className = 'bcard-action-icon';
       if (act.iconClass) iconSpan.classList.add(act.iconClass);
@@ -975,6 +1003,51 @@ export class HUD {
 
     // Production queue display (with cancel buttons)
     this.renderProductionQueue(data.queue);
+  }
+
+  /**
+   * Tick cooldown overlays + label text on existing bcard-action buttons
+   * without rebuilding the DOM. Called every render frame so the sweep is
+   * smooth. Matches by `data-action` so order changes don't break it.
+   */
+  updateBuildingCardActionCooldowns(actions: BuildingCardAction[]): void {
+    for (const act of actions) {
+      const btn = this.bcardActions.querySelector<HTMLButtonElement>(`[data-action="${act.action}"]`);
+      if (!btn) continue;
+
+      const cdMax = act.cooldownMax ?? 0;
+      const cdRemaining = act.cooldownRemaining ?? 0;
+      const buffRemaining = act.buffRemaining ?? 0;
+      let overlay = btn.querySelector<HTMLDivElement>('.bcard-action-cd-overlay');
+
+      if (cdMax > 0 && (cdRemaining > 0 || buffRemaining > 0)) {
+        if (!overlay) {
+          overlay = document.createElement('div');
+          overlay.className = 'bcard-action-cd-overlay';
+          btn.appendChild(overlay);
+        }
+        if (buffRemaining > 0) {
+          overlay.classList.add('is-active-buff');
+          overlay.style.clipPath = 'inset(0 0 0 0)';
+        } else {
+          overlay.classList.remove('is-active-buff');
+          const fraction = Math.max(0, Math.min(1, cdRemaining / cdMax));
+          overlay.style.clipPath = `inset(${(1 - fraction) * 100}% 0 0 0)`;
+        }
+        btn.classList.add('is-on-cooldown');
+        btn.disabled = true;
+      } else if (overlay) {
+        overlay.remove();
+        btn.classList.remove('is-on-cooldown');
+        btn.disabled = false;
+      }
+
+      // Refresh label text so countdown numbers stay current ("CD 12s" → "11s").
+      const labelEl = btn.querySelector<HTMLElement>('.bcard-action-label');
+      if (labelEl && labelEl.textContent !== act.label) {
+        labelEl.textContent = act.label;
+      }
+    }
   }
 
   /**
