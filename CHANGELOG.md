@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.49.0] - 2026-04-29 — Voice & Message Pass: factie-aware HUD-alerts (ronde 1)
+
+### Added — `src/data/factionMessages.ts` registry
+Centrale `getFactionMessage(factionId, eventKey, params)` helper met pools per factie. Vervangt hardcoded NL-strings in 5 hot-spot HUD.showAlert callsites. Placeholder-substitution `{name}` / `{upgrade}` met letterlijke fallback bij ontbrekende keys (regressie-signaal). Random pick over pool zodat toekomstige variatie zonder code-changes kan groeien.
+
+### Fixed — "ALAAF!" leak naar non-Brabant facties
+Live-bug: `Game.ts:1633` toonde voor élke held-spawn _"${name} is verschenen! ALAAF!"_, óók voor Randstad CEO en Belgische Frietkoning. Nu factie-specifiek:
+- **Brabanders** (Zuid-Oost dialect): _"Den Prins stao d'r — ALAAF!"_, _"Den Prins is gevalle… vat un pilske, jonge."_, _"{name} is klaor — schôn wèrk!"_, _"{upgrade} — gemokt!"_, _"Vol! Bouw d'r un huiske bij."_
+- **Randstad** (corporate): _"{name} is gearriveerd. Boardroom open."_, _"{name} offline. ETA 60s. Sprint blijft staan."_, _"{name} opgeleverd. Conform planning."_, _"{upgrade} live. Rolling out."_, _"Capacity reached. Schaal kantoorruimte op."_
+- **Limburgers** (mergel-toon): _"{name} is eraan, jong."_, _"{name}… terug naor de steen."_, _"{name} is geboewd. Sjoen."_, _"{upgrade}. Goe doende."_, _"Geen plek mie. Bouw nog ne mergelhof."_
+- **Belgen** (theatraal): _"{name} betreedt het slagveld!"_, _"{name} gevallen — de friet huilt."_, _"{name} voltooid — voila!"_, _"{upgrade} ontwikkeld in 't atelier."_, _"Vol! Allez, nog 'n gildehuis erbij."_
+
+### Wired callsites
+`Game.ts:1556` (pop-cap), `Game.ts:1633` (hero-spawn), `Game.ts:1970` (hero-death), `Game.ts:2058` (housing-complete), `Game.ts:2093` (research-complete).
+
+### Tests — 29 lock-tests
+`tests/factionMessages.test.ts`: 4 facties × 5 events coverage matrix + tone-anchor leakage check (regex per factie) + ALAAF-leakage regression test + placeholder substitution + fallback bij onbekende factionId. Suite: 1567 → 1596 (+29).
+
+### Tone-bron
+Brabants-correcties van Richard verwerkt: **un** (vrouwelijk/onzijdig) vs **ne** (mannelijk), **vat** ipv "pak", **gemokt** voor "voor elkaar". Anti-pattern "-ansen" suffix vermeden. Andere facties op basis van scenario-writer agent + `feedback_rob_tone.md`.
+
+---
+
 ## [0.48.2] - 2026-04-29 — Towers visibly defend, faction-tinted projectiles
 
 ### Fixed — Watchtowers leken niet te verdedigen

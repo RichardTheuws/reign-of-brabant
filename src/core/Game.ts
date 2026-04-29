@@ -16,6 +16,7 @@ import { FactionId, UnitTypeId, BuildingTypeId, HeroTypeId, UpgradeId, ResourceT
 import { UNIT_ARCHETYPES, RANDSTAD_UNIT_ARCHETYPES, LIMBURGERS_UNIT_ARCHETYPES, BELGEN_UNIT_ARCHETYPES, BUILDING_ARCHETYPES } from '../entities/archetypes';
 import { HERO_ARCHETYPES, getHeroTypesForFaction, getHeroArchetype } from '../entities/heroArchetypes';
 import { getFactionUnitArchetype, getDisplayBuildingName, getDisplayUnitName, getDisplayUpgradeName } from '../data/factionData';
+import { getFactionMessage } from '../data/factionMessages';
 import { getPortraitUrl } from '../data/portraitMap';
 import { createHero, isHeroActive } from '../entities/heroFactory';
 import { createGamePipeline, type SystemPipeline } from '../systems/SystemPipeline';
@@ -1553,7 +1554,7 @@ export class Game {
         return;
       }
       if (!this.playerState.hasPopulationRoom(this.playerFactionId)) {
-        this.hud?.showAlert('Populatie vol! Bouw Huusjes.', 'warning');
+        this.hud?.showAlert(getFactionMessage(this.playerFactionId, 'pop-cap-full'), 'warning');
         return;
       }
 
@@ -1630,7 +1631,7 @@ export class Game {
         this.entityMeshMap.set(heroEid, mesh);
       }
       this.knownUnitEntities.add(heroEid);
-      this.hud?.showAlert(`${arch.name} is verschenen! ALAAF!`, 'info');
+      this.hud?.showAlert(getFactionMessage(this.playerFactionId, 'hero-spawn', { name: arch.name }), 'info');
     }
   }
 
@@ -1967,7 +1968,7 @@ export class Game {
     // Hero events
     eventBus.on('hero-died', (event) => {
       const archetype = HERO_ARCHETYPES[event.heroTypeId];
-      if (archetype) this.hud?.showAlert(`${archetype.name} is gevallen! Revival in 60s...`, 'warning');
+      if (archetype) this.hud?.showAlert(getFactionMessage(this.playerFactionId, 'hero-death', { name: archetype.name }), 'warning');
       audioManager.playSound('hero_death');
     });
 
@@ -2055,7 +2056,8 @@ export class Game {
           const popCur = this.playerState.getPopulation(this.playerFactionId);
           const popMax = this.playerState.getPopulationMax(this.playerFactionId);
           const houseName = getDisplayBuildingName(this.playerFactionId, BuildingTypeId.Housing);
-          this.hud?.showAlert(`${houseName} klaar — populatie-cap +${provided} (${popCur}/${popMax})`, 'info');
+          const baseMsg = getFactionMessage(this.playerFactionId, 'building-complete', { name: houseName });
+          this.hud?.showAlert(`${baseMsg} +${provided} (${popCur}/${popMax})`, 'info');
         }
       }
     });
@@ -2090,7 +2092,7 @@ export class Game {
     // Tech tree: research completed notification
     eventBus.on('research-completed', (event) => {
       if (event.factionId === this.playerFactionId) {
-        this.hud?.showAlert(`Onderzoek voltooid: ${event.upgradeName}`, 'info');
+        this.hud?.showAlert(getFactionMessage(this.playerFactionId, 'research-complete', { upgrade: event.upgradeName }), 'info');
         audioManager.playSound('upgrade_complete');
       }
     });
