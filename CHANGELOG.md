@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.49.3] - 2026-04-29 — Voice-cast locked + 8 easter-egg signature lines
+
+### Locked — Nieuwe voice-cast (alle 4 facties)
+Na uitgebreide ElevenLabs-casting via `voice-cast-preview.html`:
+- **Brabanders male**: Richard (`KJMAev3goFD3WOh1hVBT`) vervangt Joost
+- **Brabanders female**: Emma natural (`OlBRrVAItyi00MuGMbna`) — nieuwe stem
+- **Limburgers male**: Reinoud (`5tiZStRJQ98Xw420MFFx`) vervangt Luk
+- **Limburgers female**: Nick (`PrYUlaJFEdOSVy6jaEaG`) origineel — geen pitch-shift, "transgender Limburger" framing voor karakter-variatie
+- **Belgen 2e female**: Sharon Vlaams (`g7B5PNoscIXomLNUmHAb`) naast bestaande Petra
+
+Volledige voice-pipeline regeneratie met deze ids staat op P1 in BACKLOG (138 Brabander + 138 Limburgers files te regen, plus nieuwe female pools).
+
+### Added — 8 easter-egg signature lines (5% kans op select/idle/ready)
+Warcraft-style flavour: rare random replacement van normale voice-pool. 5% probability, alleen op select/idle/ready actions.
+
+| Factie | Lines |
+|---|---|
+| **Brabanders** (Richard) | _"Vat anders gewoon urst ekkes een pilske!"_ — _"NAAIT EM!"_ |
+| **Randstad** (Serge) | _"IK DOE NIET MEER MEE!"_ — _"Mag ik even iets tegen je aanhouden?"_ |
+| **Limburgers** (Reinoud) | _"Neeje da wil ik nie!"_ — _"Ik goa naor hoes!"_ |
+| **Belgen** (Hans) | _"Amai!!"_ — _"Een patat is hier een aardappel meneer, het is FRIET"_ |
+
+Files: `public/assets/audio/voices/{faction}/easter-egg/{01,02}-XX.mp3`. Pool kan groeien zonder code-changes.
+
+### Implementation — `src/audio/UnitVoices.ts`
+- `EASTER_EGG_LINES` pool per factie + `EASTER_EGG_PROBABILITY = 0.05` + `EASTER_EGG_ACTIONS = {select, idle, ready}`
+- `__easterEggRng` hook voor deterministische tests
+- 800ms cooldown blijft van toepassing — geen voice-stacking
+
+### Tests — 4 easter-egg lock-tests
+`tests/easterEggLines.test.ts`: low-random triggert easter-egg, high-random niet, attack-action triggert nooit, alle 4 facties hebben eigen pool met juiste filenames. Suite: 1602 → 1606.
+
+### Voice-cast-preview pages
+`public/voice-cast-preview.html`: alle ronden 1-4 + Reinoud + Sharon-bonus voor toekomstige reviews. Files in `public/_preview/voice-cast/` (gitignored).
+
+---
+
 ## [0.49.2] - 2026-04-29 — Themesong "Nie Fokke Mee Brabant" alleen bij Brabander victory
 
 ### Fixed — Themesong leakte naar campaign ambient

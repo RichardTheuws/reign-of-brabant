@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>Voice-Cast Preview — Brabants & Limburgs Recasting</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #1a1a1f; color: #e8e8ee;
+    padding: 32px; max-width: 1100px; margin: 0 auto;
+  }
+  h1 { color: #f3c969; margin-bottom: 8px; }
+  .intro { color: #a0a0aa; margin-bottom: 24px; line-height: 1.5; }
+  .test-line {
+    background: #2a2520; border-left: 4px solid #f3c969;
+    padding: 12px 16px; margin: 16px 0; font-size: 16px;
+    font-style: italic; color: #ffd180;
+  }
+  .section { margin-bottom: 40px; }
+  .section-title {
+    font-size: 22px; color: #f3c969;
+    border-bottom: 2px solid #3a3a45; padding-bottom: 8px;
+    margin-bottom: 16px; text-transform: uppercase; letter-spacing: 2px;
+  }
+  .candidate {
+    display: grid; grid-template-columns: 280px 1fr; gap: 16px;
+    align-items: center; padding: 14px;
+    background: #25252d; border-radius: 8px; margin-bottom: 8px;
+  }
+  .meta { display: flex; flex-direction: column; gap: 4px; }
+  .candidate-name { font-size: 15px; color: #c8c8d0; font-weight: 600; }
+  .candidate-id { font-family: ui-monospace, monospace; font-size: 11px; color: #707088; }
+  .candidate-tag {
+    display: inline-block; font-size: 10px; text-transform: uppercase;
+    letter-spacing: 1px; padding: 2px 8px; border-radius: 3px;
+    width: fit-content; margin-top: 2px;
+  }
+  .tag-native { background: #2a4a3a; color: #aae0c4; }
+  .tag-cinematic { background: #4a4220; color: #f3c969; }
+  .tag-warm { background: #3a3050; color: #c8a8e8; }
+  audio { width: 100%; height: 32px; }
+  .verdict {
+    margin-top: 32px; padding: 20px;
+    background: #2a2520; border-left: 4px solid #f3c969; border-radius: 4px;
+  }
+  .verdict h2 { margin: 0 0 12px 0; color: #f3c969; }
+  .verdict p { margin: 8px 0; line-height: 1.55; }
+  code { background: #1a1a1f; padding: 2px 6px; border-radius: 3px; font-size: 13px; }
+</style>
+</head>
+<body>
+<h1>Voice-Cast Preview — Brabants & Limburgs Recasting</h1>
+<p class="intro">
+  ElevenLabs <code>eleven_multilingual_v2</code>, settings: stability 0.45, similarity 0.85, style 0.55, speaker_boost on.
+  Identieke test-zinnen per regio zodat je puur op stem kunt vergelijken.
+</p>
+
+<div class="section">
+  <div class="section-title">Brabants — Mannelijk (huidige Joost vervangen)</div>
+  <div class="test-line">"Vat mar een lekker pilske!"</div>
+
+  <div class="candidate">
+    <div class="meta">
+      <div class="candidate-name">Richard</div>
+      <div class="candidate-id">KJMAev3goFD3WOh1hVBT</div>
+      <span class="candidate-tag tag-native">native Brabants accent</span>
+    </div>
+    <audio controls preload="none" src="/_preview/voice-cast/brabants-male/richard.mp3"></audio>
+  </div>
+
+  <div class="candidate">
+    <div class="meta">
+      <div class="candidate-name">Eric — Deep, Epic, Cinematic</div>
+      <div class="candidate-id">vY9oBYvK4JJ9fCOB5lmn</div>
+      <span class="candidate-tag tag-cinematic">diep, theatraal — voor Den Prins</span>
+    </div>
+    <audio controls preload="none" src="/_preview/voice-cast/brabants-male/eric-deep.mp3"></audio>
+  </div>
+
+  <div class="candidate">
+    <div class="meta">
+      <div class="candidate-name">Bart</div>
+      <div class="candidate-id">eWrnzOwO7JvyjacVxTzV</div>
+      <span class="candidate-tag tag-warm">middle-aged, warmte + depth</span>
+    </div>
+    <audio controls preload="none" src="/_preview/voice-cast/brabants-male/bart.mp3"></audio>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Brabants — Vrouwelijk (nieuw)</div>
+  <div class="test-line">"Vat mar een lekker pilske!"</div>
+
+  <div class="candidate">
+    <div class="meta">
+      <div class="candidate-name">Roos — cheerful</div>
+      <div class="candidate-id">7qdUFMklKPaaAVMsBTBt</div>
+      <span class="candidate-tag tag-warm">fresh, young, warm — Boerinne</span>
+    </div>
+    <audio controls preload="none" src="/_preview/voice-cast/brabants-female/roos-cheerful.mp3"></audio>
+  </div>
+
+  <div class="candidate">
+    <div class="meta">
+      <div class="candidate-name">Emma — natural conversation</div>
+      <div class="candidate-id">OlBRrVAItyi00MuGMbna</div>
+      <span class="candidate-tag tag-warm">calm, natural, dagelijkse spraak</span>
+    </div>
+    <audio controls preload="none" src="/_preview/voice-cast/brabants-female/emma-natural.mp3"></audio>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Limburgs — Vrouwelijk (ronde 4: pitch-shift Nick met Limburgs accent)</div>
+  <div class="test-line">"Zeg, ben jij weer vergeten de Maas dicht te draaien?"</div>
+  <p class="intro" style="margin-top:-8px;">
+    Geen Dutch-female voice in de ElevenLabs library heeft Limburgs accent. Strategie: pak <strong>Nick</strong>
+    (mannelijk, "Clear smooth Dutch Limburgish coaching voice") en pitch-shift omhoog via ffmpeg <code>rubberband</code>.
+    Drie shift-niveaus: +3, +5, +7 semitones. Hogere shift = chipmunk-effect; lager = nog mannelijk-tintje.
+  </p>
+
+  <div class="candidate">
+    <div class="meta">
+      <div class="candidate-name">Nick — origineel (mannelijk, referentie)</div>
+      <div class="candidate-id">PrYUlaJFEdOSVy6jaEaG</div>
+      <span class="candidate-tag tag-native">Limburgs accent — geen pitch-shift</span>
+    </div>
+    <audio controls preload="none" src="/_preview/voice-cast/limburgs-female/nick-original.mp3"></audio>
+  </div>
+
+  <div class="candidate">
+    <div class="meta">
+      <div class="candidate-name">Nick — pitch +3 semitones</div>
+      <div class="candidate-id">rubberband=pitch=1.189</div>
+      <span class="candidate-tag tag-warm">+3st — subtiel, nog richting man</span>
+    </div>
+    <audio controls preload="none" src="/_preview/voice-cast/limburgs-female/nick-pitched-up3st.mp3"></audio>
+  </div>
+
+  <div class="candidate">
+    <div class="meta">
+      <div class="candidate-name">Nick — pitch +5 semitones</div>
+      <div class="candidate-id">rubberband=pitch=1.335</div>
+      <span class="candidate-tag tag-warm">+5st — sweet spot voor vrouwelijke conversie</span>
+    </div>
+    <audio controls preload="none" src="/_preview/voice-cast/limburgs-female/nick-pitched-up5st.mp3"></audio>
+  </div>
+
+  <div class="candidate">
+    <div class="meta">
+      <div class="candidate-name">Nick — pitch +7 semitones</div>
+      <div class="candidate-id">rubberband=pitch=1.498</div>
+      <span class="candidate-tag tag-warm">+7st — hoog, mogelijk te chipmunk</span>
+    </div>
+    <audio controls preload="none" src="/_preview/voice-cast/limburgs-female/nick-pitched-up7st.mp3"></audio>
+  </div>
+
+  <details style="margin-top: 16px; color: #707088;">
+    <summary style="cursor: pointer;">Eerdere ronden (Engels-multilingual, native NL females, dialect-zin) — niet bruikbaar</summary>
+    <div class="candidate" style="margin-top: 8px;">
+      <div class="meta"><div class="candidate-name">Marianne (ronde 3, "Maas")</div></div>
+      <audio controls preload="none" src="/_preview/voice-cast/limburgs-female/marianne-senior-maas.mp3"></audio>
+    </div>
+    <div class="candidate">
+      <div class="meta"><div class="candidate-name">Jolanda (ronde 3, "Maas")</div></div>
+      <audio controls preload="none" src="/_preview/voice-cast/limburgs-female/jolanda-soothing-maas.mp3"></audio>
+    </div>
+    <div class="candidate">
+      <div class="meta"><div class="candidate-name">Marlies (ronde 3, "Maas")</div></div>
+      <audio controls preload="none" src="/_preview/voice-cast/limburgs-female/marlies-podcast-maas.mp3"></audio>
+    </div>
+    <div class="candidate">
+      <div class="meta"><div class="candidate-name">Sharon Vlaams (ronde 3) — bruikbaar voor Belgen vrouw</div></div>
+      <audio controls preload="none" src="/_preview/voice-cast/limburgs-female/sharon-vlaams-maas.mp3"></audio>
+    </div>
+    <div class="candidate">
+      <div class="meta"><div class="candidate-name">Lily Velvety (ronde 1)</div></div>
+      <audio controls preload="none" src="/_preview/voice-cast/limburgs-female/lily-velvety.mp3"></audio>
+    </div>
+    <div class="candidate">
+      <div class="meta"><div class="candidate-name">Bella Bright (ronde 1)</div></div>
+      <audio controls preload="none" src="/_preview/voice-cast/limburgs-female/bella-bright.mp3"></audio>
+    </div>
+  </details>
+</div>
+
+<div class="section">
+  <div class="section-title">Limburgs — Mannelijk (Reinoud — vervangt Luk?)</div>
+  <div class="test-line">"Zeg, ben jij weer vergeten de Maas dicht te draaien?"</div>
+  <p class="intro" style="margin-top:-8px;">
+    Voor flink stemverschil tussen man/vrouw: Limburgs vrouw = pitched-up Nick (Limburgs coaching voice),
+    Limburgs man = <strong>Reinoud</strong> ("De nasale limburger"). Eerdere keuze (Luk) blijft eventueel als alt.
+  </p>
+
+  <div class="candidate">
+    <div class="meta">
+      <div class="candidate-name">Reinoud — Serious, Friendly, Nasal Limburger</div>
+      <div class="candidate-id">5tiZStRJQ98Xw420MFFx</div>
+      <span class="candidate-tag tag-native">Limburgs accent, middle-aged, nasaal</span>
+    </div>
+    <audio controls preload="none" src="/_preview/voice-cast/limburgs-male/reinoud.mp3"></audio>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Bonus — Sharon Vlaams als Belgen vrouwelijk?</div>
+  <p class="intro" style="margin-top:-8px;">
+    Je zei dat Sharon "perfect voor het Vlaamse vrouwelijke karakter" was. Belgen heeft nu Petra (jong/casual)
+    als enige vrouwelijke stem. Sharon (jong/Vlaams news reporter) zou kunnen toegevoegd of vervangen.
+    Beslissing voor BACKLOG of nu meenemen?
+  </p>
+</div>
+
+<div class="verdict">
+  <h2>Locked keuzes (jouw input)</h2>
+  <ul>
+    <li><strong>Brabants male</strong>: ✅ Richard (KJMAev3goFD3WOh1hVBT)</li>
+    <li><strong>Brabants female</strong>: ✅ Emma natural (OlBRrVAItyi00MuGMbna)</li>
+    <li><strong>Limburgs male</strong>: ⏳ Reinoud (5tiZStRJQ98Xw420MFFx) — luisteren hierboven, vervangt Luk?</li>
+    <li><strong>Limburgs female</strong>: ⏳ Pitch-shifted Nick (+3/+5/+7st) — kies welke shift</li>
+    <li><strong>Belgen female</strong> (bonus): Sharon Vlaams als 2e stem? (huidige Petra blijft)</li>
+  </ul>
+  <p>Na keuze: ik draai <code>scripts/generate_unit_voices.sh</code> met de gekozen voice-id's. Voor Limburgs female: pipeline genereert via Nick + post-processed pitch-shift. Daarna <code>scripts/normalize-voices.sh --all</code>.</p>
+</div>
+</body>
+</html>

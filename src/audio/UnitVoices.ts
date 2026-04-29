@@ -246,6 +246,40 @@ const GENERIC_VOICE_LINES: Record<number, Record<VoiceAction, string[]>> = {
 };
 
 // ---------------------------------------------------------------------------
+// Easter-egg lines — rare random replacements (Warcraft-style flavour)
+// ---------------------------------------------------------------------------
+
+/**
+ * Per-faction easter-egg pool. Triggers as a 5% replacement on select/idle/ready
+ * actions, voiced by the faction's signature voice (Richard / Reinoud / Serge / Hans).
+ * Lines are intentionally distinctive en moeten zelden vallen.
+ */
+const EASTER_EGG_LINES: Record<number, string[]> = {
+  0: [
+    '/assets/audio/voices/brabanders/easter-egg/01-vat-pilske.mp3',
+    '/assets/audio/voices/brabanders/easter-egg/02-naait-em.mp3',
+  ],
+  1: [
+    '/assets/audio/voices/randstad/easter-egg/01-doe-niet-mee.mp3',
+    '/assets/audio/voices/randstad/easter-egg/02-aanhouden.mp3',
+  ],
+  2: [
+    '/assets/audio/voices/limburgers/easter-egg/01-neeje.mp3',
+    '/assets/audio/voices/limburgers/easter-egg/02-naar-hoes.mp3',
+  ],
+  3: [
+    '/assets/audio/voices/belgen/easter-egg/01-amai.mp3',
+    '/assets/audio/voices/belgen/easter-egg/02-friet.mp3',
+  ],
+};
+
+const EASTER_EGG_PROBABILITY = 0.05;
+const EASTER_EGG_ACTIONS: ReadonlySet<VoiceAction> = new Set(['select', 'idle', 'ready']);
+
+/** Hook for tests: deterministic random source. */
+export const __easterEggRng = { random: () => Math.random() };
+
+// ---------------------------------------------------------------------------
 // Preload tracking — avoid retrying files that don't exist
 // ---------------------------------------------------------------------------
 
@@ -280,6 +314,23 @@ export function playUnitVoice(
 ): void {
   const now = Date.now();
   if (now - lastVoiceTime < VOICE_COOLDOWN) return;
+
+  // Easter-egg: 5% kans op signature line (alleen op select/idle/ready)
+  if (EASTER_EGG_ACTIONS.has(action) && __easterEggRng.random() < EASTER_EGG_PROBABILITY) {
+    const easterPool = EASTER_EGG_LINES[factionId]?.filter(p => !failedPaths.has(p));
+    if (easterPool && easterPool.length > 0) {
+      const src = easterPool[Math.floor(__easterEggRng.random() * easterPool.length)];
+      const sound = new Howl({
+        src: [src],
+        volume: 0.7,
+        onplay: () => audioManager.duckMusic(2000),
+        onloaderror: () => failedPaths.add(src),
+      });
+      sound.play();
+      lastVoiceTime = now;
+      return;
+    }
+  }
 
   // Try unit-type-specific lines first
   let lines: string[] | undefined;

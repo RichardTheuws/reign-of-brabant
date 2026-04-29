@@ -50,6 +50,25 @@ en niet in scope is van de huidige bundel landt hier, gesorteerd op prioriteit.
 - **Issue**: Belgen heeft Petra Vlaams (vrouw, goedgekeurd). Brabanders + Limburgers: vrouwelijke stem-pogingen Roos / Melanie afgekeurd. Voor diversiteit mannelijke + vrouwelijke units per factie nodig.
 - **Bundel-fit**: ElevenLabs-casting-ronde, Richard goedkeuring per voice. v0.50.0+.
 
+### 🔒 LOCKED — Voice-cast keuzes (sessie 2026-04-29)
+- **Brabanders male**: ✅ **Richard** (`KJMAev3goFD3WOh1hVBT`) — vervangt Joost
+- **Brabanders female**: ✅ **Emma natural** (`OlBRrVAItyi00MuGMbna`) — nieuwe stem
+- **Limburgers male**: ✅ **Reinoud** (`5tiZStRJQ98Xw420MFFx`, "De nasale limburger") — vervangt Luk
+- **Limburgers female**: ✅ **Nick** (`PrYUlaJFEdOSVy6jaEaG`) origineel — geen pitch-shift, "transgender Limburger" framing
+- **Belgen female (2e)**: ✅ **Sharon Vlaams** (`g7B5PNoscIXomLNUmHAb`) — naast bestaande Petra
+- **Randstad male**: ✅ Serge de Beer (bestaand, blijft)
+- **Belgen male**: ✅ Hans Claesen + Walter (bestaand, blijft)
+
+### 🔴 P1 — Volledige voice-pipeline regeneratie met locked voice-ids
+- **Scope**: regenerate alle ~525+ voice files met de nieuwe voice-ids:
+  - 138 Brabander files met Richard (was Joost)
+  - 138 Limburgers files met Reinoud (was Luk)
+  - Nieuwe Limburgers female files via Nick
+  - Nieuwe Belgen female files via Sharon
+- `scripts/generate_unit_voices.sh` updaten met locked voice-ids
+- Daarna `scripts/normalize-voices.sh --all` voor uniforme loudness
+- **Bundel-fit**: v0.50.0 of dedicated voice-batch-sessie. Asset-werk, geen code-werk.
+
 ### 🔴 P1 — Brabander mannelijke voice opnieuw casten
 - **Gevonden**: 2026-04-29 (Richard A/B luistertest van voices-normalized-sample/)
 - **Issue**: huidige Brabander stem (Joost) klinkt niet enthousiast en heeft geen mooie stemkleur volgens Richard ("ikzelf ook niet"). Gevolg: 138 Brabander voice-files moeten opnieuw worden gegenereerd zodra nieuwe stem is gekozen. Limburgers/Randstad/Belgen voices zijn WEL goedgekeurd.
