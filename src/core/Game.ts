@@ -1954,6 +1954,7 @@ export class Game {
       const pos = this.entityMeshMap.get(eid)?.position;
       if (pos) {
         audioManager.playSound('unit_death', { x: pos.x, z: pos.z });
+        playUnitVoice(event.factionId, 'death', event.unitTypeId);
         const factionColor = FACTION_DEATH_COLORS[event.factionId] ?? 0x4a4a5a;
         this.particles.spawnDeathEffect(pos.x, pos.y, pos.z, factionColor);
       }
@@ -1970,6 +1971,7 @@ export class Game {
       const archetype = HERO_ARCHETYPES[event.heroTypeId];
       if (archetype) this.hud?.showAlert(getFactionMessage(this.playerFactionId, 'hero-death', { name: archetype.name }), 'warning');
       audioManager.playSound('hero_death');
+      playUnitVoice(event.factionId, 'death');
     });
 
     eventBus.on('hero-revived', (event) => {
@@ -1977,6 +1979,7 @@ export class Game {
       const archetype = HERO_ARCHETYPES[event.heroTypeId];
       if (archetype) this.hud?.showAlert(`${archetype.name} is terug!`, 'info');
       audioManager.playSound('hero_spawn');
+      playUnitVoice(event.factionId, 'ready');
       // Mesh creation is handled by detectAndRenderNewEntities
     });
 

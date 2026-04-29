@@ -3,6 +3,54 @@
 Gestart **2026-04-28** tijdens Bundel 1 sessie. Alles wat we *onderweg* tegenkomen
 en niet in scope is van de huidige bundel landt hier, gesorteerd op prioriteit.
 
+---
+
+## 🆕 v1.0 PERFECTIE — sessie 2026-04-29 deel 3 (Voice & Message Pass)
+
+### 🔴 P1 — Theme-song "Nie Fokke Mee Brabant" alleen bij Brabander victory
+- **Gevonden**: 2026-04-29 (Richard tijdens v0.49.0 fase A)
+- **Issue**: themalied speelt nu vermoedelijk te breed. Richard wil het ALLEEN horen wanneer een speler die als **Brabander** speelt een **missie of skirmish wint**. In-game muziek voor Brabant moet voor de rest net zo neutraal zijn als de andere campagnes; geen Brabant-bias in ambient/battle-music.
+- **Scope**:
+  - `MusicSystem.playVictory()` callsite — switch op `playerFactionId === Brabanders` voor theme-song, anders generic victory-stinger
+  - Audit van alle MUSIC_IDS callsites: in-game battle/ambient mag GEEN Brabantse identifiers gebruiken
+  - Test: 4 facties × victory → assert track-id is generic (behalve Brabanders die NieFokkeMeeBrabant.mp3 krijgt)
+- **Bundel-fit**: v0.49.x of v0.50.0 polish bundle.
+
+### 🟠 P2 — Audio-normalisatie pipeline voor 525 voice files
+- **Gevonden**: 2026-04-29 (Richard: "audio moet heel goed normaliseren zodat alle zinnen even duidelijk uitgesproken worden")
+- **Issue**: voice-clips uit ElevenLabs op verschillende dagen/met verschillende stem-IDs hebben ongelijke loudness en EQ-balance. In-game voelt sommige stem te zacht, andere te scherp.
+- **Voorstel**:
+  - `scripts/normalize-voices.sh` — batch ffmpeg loudnorm pass over alle `public/assets/audio/voices/{faction}/{unit}/*.mp3`
+  - Target: **-16 LUFS integrated, peak max -1 dBTP** (broadcast game-norm)
+  - EQ-match: high-pass 80Hz, low-shelf -2dB onder 200Hz, presence-boost +1.5dB bij 3kHz
+  - De-essing voor scherpere stemmen (Limburgers Luk had sissen op preview)
+  - A/B vergelijking: 3 random clips per factie voor/na, Richard luistert
+- **Bundel-fit**: aparte v0.49.x of v0.50.0 polish bundle. Geen content-werk.
+
+### 🟠 P2 — Voice & Message pool-uitbreiding ronde 2 (Warcraft-context-clicks)
+- **Gevonden**: 2026-04-29 (na v0.49.0 fase A)
+- **Issue**: huidige `factionMessages.ts` pools hebben **1 zin per event**. Saai bij herhaling. Warcraft-flavour vereist 3-5 varianten per event zodat je niet steeds dezelfde zin hoort.
+- **Scope**:
+  - 5 events × 4 facties × 5 zinnen = **100 nieuwe zinnen**
+  - Richard schrijft Brabants zelf (toon-anchor); andere facties via scenario-writer subagent + Richard-keuring
+  - ElevenLabs voor audio-versies (we hebben subscription, geen budget-cap meer)
+  - Eventueel context-click pattern: 3x klikken op held → 3e zin is grap (Warcraft 3 idiom)
+- **Bundel-fit**: v0.50.0 of later, na audio-laag rewire (fase C) en normalisatie.
+
+### 🟠 P2 — Generic SFX → factie-specifieke voice rewire (fase C huidige sessie!)
+- **Gevonden**: 2026-04-29 (Richard: "we hebben nog een aantal hele saaie generic sounds")
+- **Status**: **IN PROGRESS** sessie 2026-04-29 deel 3.
+- **Scope**: `playSound('unit_death' | 'arrow_shoot' | 'arrow_impact' | 'sword_hit' | 'building_complete' | 'building_destroy' | 'gold_deposit' | 'upgrade_complete' | 'select_unit' | 'hero_death' | 'hero_spawn')` callsites in `Game.ts`/`AbilityEffects.ts` → `playUnitVoice(factionId, action, unitTypeId)` waar mogelijk.
+- **Discovery in fase A**: 525 voice files staan klaar in `UnitVoices.ts` — generic events maken er nog geen gebruik van.
+- **Bundel-fit**: v0.49.1 of v0.49.2.
+
+### 🟢 P3 — Vrouwelijke voice-stemmen Brabanders + Limburgers
+- **Gevonden**: 2026-04-29 (asset-inventaris fase A)
+- **Issue**: Belgen heeft Petra Vlaams (vrouw, goedgekeurd). Brabanders + Limburgers: vrouwelijke stem-pogingen Roos / Melanie afgekeurd. Voor diversiteit mannelijke + vrouwelijke units per factie nodig.
+- **Bundel-fit**: ElevenLabs-casting-ronde, Richard goedkeuring per voice. v0.50.0+.
+
+
+
 Iedere entry: **datum-gevonden | tijdens-bundel | status | beknopte beschrijving**.
 Bij oppakken: subject + commit-SHA invullen onder "Resolved".
 

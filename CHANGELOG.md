@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.49.1] - 2026-04-29 — Voice & Message Pass: audio-laag rewire (saaie generics → factie-voice)
+
+### Added — Factie-voice op death + hero-revival events
+3 nieuwe `playUnitVoice` callsites in `Game.ts` event-handlers, naast de bestaande generic SFX (positionele cue blijft):
+- `unit-died` (Game.ts:1957) → `playUnitVoice(event.factionId, 'death', event.unitTypeId)` — Brabant boer sterft als Brabander, Limburgs mijnwerker als Limburger, etc. Gebruikt unit-type-specifieke voice waar beschikbaar, factie-generic anders.
+- `hero-died` (Game.ts:1973) → `playUnitVoice(event.factionId, 'death')` — generieke factie-death-voice voor heroes (heroTypeId mapt niet 1:1 op UnitTypeId, dus generic fallback).
+- `hero-revived` (Game.ts:1981) → `playUnitVoice(event.factionId, 'ready')` — held meldt zich met factie-voice na revival.
+
+### Why
+525 voice files in `UnitVoices.ts` (4 facties × 8 actions × 8 units + generics) waren nog deels orphaned: select/move/attack/gather/idle waren gewired, death + ready/revival nog niet. Nu wordt dat materiaal echt gebruikt.
+
+### Side-effects
+- Voice-cooldown 800ms in `playUnitVoice` voorkomt overload bij massa-deaths in battle.
+- Music-ducking 1500ms blijft per voice-trigger.
+- Geen tests toegevoegd: het is event-handler wire-up, geen logica om te isoleren. Bestaande 29 lock-tests + suite van 1596 blijven groen.
+
+---
+
 ## [0.49.0] - 2026-04-29 — Voice & Message Pass: factie-aware HUD-alerts (ronde 1)
 
 ### Added — `src/data/factionMessages.ts` registry
