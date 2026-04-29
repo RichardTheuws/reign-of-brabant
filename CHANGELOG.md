@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.44.0] - 2026-04-29 — Building-card UI uniform pass: research-panel nu binnen building-card
+
+### Changed — `#cmd-blacksmith` is nu een DOM-child van `#building-card`
+Live-feedback Richard 2026-04-29: Coworking Space / Starbucks / Boardroom toonden research-cards als drijvend panel boven het building-card kastje (vooral bij Blacksmith / LumberCamp / UpgradeBuilding). Inconsistent met Barracks waar alle actie-knoppen netjes binnen de card zitten.
+
+- **`play/index.html`**: `<div id="cmd-blacksmith">` verplaatst van top-level command-panel-zone naar binnen `<div id="building-card">` (na `bcard-actions`). Modifier-class `bcard-research-panel` toegevoegd voor nested-styling.
+- **CSS-override**: `#building-card .bcard-research-panel { position: static; transform: none; left/right/bottom: auto; width: auto; max-width: none; box-shadow: none; border: none; border-top: 1px solid …; border-radius: 0 0 10px 10px; background: rgba(15,12,8,0.6); }` — disable't de drijvende absolute-positioning, geeft het panel een onderste-sectie look.
+- **Research-card-grid**: `grid-template-columns: repeat(3, 88px)` → `repeat(3, 1fr)` zodat de grid de full card-width benut. Padding aligned met `bcard-actions` (8px 12px 10px).
+- **Verwijderd**: oude regel `#building-card:not([hidden]) ~ #cmd-blacksmith { bottom: 230px; }` — niet meer nodig nu het nested zit.
+
+### Visual impact
+Speler ziet nu één samenhangend building-card paneel met:
+- Header (icon + faction)
+- HP + status
+- Action-grid (Barracks-style)
+- Research-grid (LumberCamp / Blacksmith / UpgradeBuilding only)
+
+Geen 2 losse drijvende blokken meer. Look-and-feel matcht v1.0 perfectie regel.
+
+### Added — tests (+4)
+- **`tests/building-card-research-panel-nested.test.ts`** — source-level invariants: `#cmd-blacksmith` zit binnen `#building-card`, modifier-class aanwezig, geen tweede instance, CSS-override regel met `position: static` aanwezig. Voorkomt regressie naar drijvend panel.
+
+### Notes
+- Test-suite: 1533 → 1537 (+4).
+- Resterende UI-uniformity items (info-row icon-styling fine-tuning, drijvende sub-panels for non-research building-types als die komen) staan in BACKLOG.
+
 ## [0.43.0] - 2026-04-29 — Town Halls bouwbaar + info-row CSS overlap fix
 
 ### Added — TownHall buildable feature

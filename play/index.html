@@ -1066,11 +1066,22 @@
       .bcard-action-btn { min-height: 40px; }
     }
 
-    /* When building card is visible (blacksmith), position research panel above it */
-    #building-card:not([hidden]) ~ #cmd-blacksmith:not([hidden]),
-    #building-card:not([hidden]) ~ .command-panel#cmd-blacksmith:not([hidden]) {
-      bottom: 230px;
+    /* v0.44.0: research-panel zit nu binnen building-card. Override de drijvende
+       command-panel positioning zodat hij flow met de card als onderste sectie. */
+    #building-card .bcard-research-panel {
+      position: static;
+      transform: none;
+      left: auto; right: auto; bottom: auto;
+      width: auto;
+      max-width: none;
+      margin: 0;
+      box-shadow: none;
+      border: none;
+      border-top: 1px solid rgba(212, 168, 83, 0.18);
+      border-radius: 0 0 10px 10px;
+      background: rgba(15, 12, 8, 0.6);
     }
+    #building-card .bcard-research-panel[hidden] { display: none !important; }
 
     /* ---- Blacksmith / research upgrade panel ---- */
     .command-panel--blacksmith {
@@ -1112,12 +1123,14 @@
       text-align: right;
       font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
     }
-    /* Research card grid — visual parity with .bcard-actions (Barracks). */
+    /* Research card grid — visual parity with .bcard-actions (Barracks).
+       v0.44.0: kolombreedte naar 1fr zodat grid de full building-card-width
+       benut (geen drijvend wide-panel meer; research zit nu binnen card). */
     .research-card-grid {
       display: grid;
-      grid-template-columns: repeat(3, 88px);
-      gap: 6px;
-      padding: 4px 0 2px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      padding: 8px 12px 10px;
     }
     .bcard-action-btn--research {
       min-height: 88px;
@@ -2656,6 +2669,8 @@
           <div class="bcard-actions" id="bcard-actions">
             <!-- Dynamically populated by HUD.showBuildingCard() -->
           </div>
+          <!-- Blacksmith / LumberCamp / UpgradeBuilding research panel (v0.44.0: nu binnen building-card voor uniforme look) -->
+          <div class="command-panel command-panel--blacksmith bcard-research-panel" id="cmd-blacksmith" hidden></div>
         </div>
 
         <div class="command-panel" id="cmd-unit" hidden>
@@ -2680,8 +2695,6 @@
           <button class="cmd-btn cmd-btn--hero" data-action="train-hero-boer" data-hotkey="Y"><span class="btn-icon btn-icon--hero">H2</span><span>Boer Hero</span><span class="hotkey">Y</span></button>
           <button class="cmd-btn cmd-btn--rally" data-action="rally-point" data-hotkey="R"><span class="btn-icon btn-icon--rally">RLY</span><span>Rally</span><span class="hotkey">R</span></button>
         </div>
-        <!-- Blacksmith research panel (dynamically populated by HUD.showBlacksmithPanel) -->
-        <div class="command-panel command-panel--blacksmith" id="cmd-blacksmith" hidden></div>
         <!-- Hero ability panel (shown when a hero is selected) -->
         <div class="command-panel command-panel--hero" id="cmd-hero" hidden>
           <div class="hero-ability-group">
