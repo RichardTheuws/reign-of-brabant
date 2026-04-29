@@ -876,6 +876,9 @@ export class Game {
       case 'hold':
         queueCommand({ type: 'hold' });
         break;
+      case 'build-townhall':
+        this.enterBuildMode('townhall');
+        break;
       case 'build-barracks':
         this.enterBuildMode('barracks');
         break;
@@ -1260,6 +1263,7 @@ export class Game {
   /** Map a build ghost type string to a BuildingTypeId enum. */
   private getBuildingTypeIdForGhost(type: string): BuildingTypeId {
     switch (type) {
+      case 'townhall': return BuildingTypeId.TownHall;
       case 'blacksmith': return BuildingTypeId.Blacksmith;
       case 'lumbercamp': return BuildingTypeId.LumberCamp;
       case 'mijnschacht': return BuildingTypeId.TertiaryResourceBuilding;

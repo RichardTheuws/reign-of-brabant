@@ -8,7 +8,49 @@ Bij oppakken: subject + commit-SHA invullen onder "Resolved".
 
 ---
 
-## 🌟 v1.0 PERFECTIE — gesignaleerd onderweg (sessie 2026-04-29)
+## 🌟 v1.0 PERFECTIE — gesignaleerd onderweg (sessie 2026-04-29 deel 2)
+
+### 🔴 P1 — Building-card UI is niet uniform over building-types
+- **Gevonden**: 2026-04-29 (Richard live-test na v0.42.0)
+- **Issue**: Barracks/Vergaderzaal toont een mooie **3-koloms portrait-grid** met train-actions (Manager/Consultant/HR-Medewerker) + bottom-row research-actions (CEO/Politicus/Rally). Andere gebouwen tonen wildly verschillende layouts:
+  - **Coworking Space (Blacksmith)**: research-cards drijven boven het gebouw-kaart-blokje, niet inside the card.
+  - **Starbucks (LumberCamp)**: kleine drijvende research-grid bovenop, gebouw-kaart eronder los.
+  - **Boardroom (FactionSpecial1)**: info-row text overlapt met icon-letters (BRD overlay) — CSS-bug uit v0.41.0.
+- **Doel**: ALLE building-cards uniform layout zoals Barracks: header + HP/status + grid van portrait-action-buttons (train + research + click-buffs + info-rows allemaal in dezelfde grid). Geen drijvende sub-panels meer.
+- **Voorstel**: refactor `Game.enrichBuildingInfo` zodat alle action-types via dezelfde array lopen. Research-panel-component en info-row als grid-cells in `bcard-actions`. Deprecate de drijvende research-panel.
+- **Bundel-fit**: kandidaat voor v0.43.0 of v0.44.0 — fundamenteel voor v1.0.
+
+### 🔴 P1 — Town Halls niet bouwbaar (gold mine deplete = stuck)
+- **Gevonden**: 2026-04-29 (Richard live-test)
+- **Issue**: Speler kan geen nieuwe TownHall bouwen. Wanneer alle gold mines opdrogen heb je geen manier om naar een nieuw mining-cluster te expanderen — economy dries up.
+- **Voorstel**:
+  - `factionBuildMenus.ts`: voeg `build-townhall` action toe aan alle 4 facties (tier 3 of vereist UpgradeBuilding-complete? Of beschikbaar from start?).
+  - Cost: 400 gold + 250 hout (RTS-conventie: nieuwe TH duur).
+  - Hotkey: B (vrij) of via menu-toggle.
+  - PlayerState/PopulationMax behoeft check: meerdere TH's stapelen pop-cap of niet?
+- **Bundel-fit**: v0.43.0 — gameplay-blocker.
+
+### 🟠 P2 — Defense mechanism in skirmish niet optimaal
+- **Gevonden**: 2026-04-29 (Richard live-test)
+- **Issue**: bij aanval op base reageren units niet optimaal — retaliation/idle-defense lijkt te traag of te passief. Test-cases in `CombatSystem-attack-move.test.ts` bestaan, maar live-gedrag voelt niet juist.
+- **Onderzoek nodig**: zelf-verdedigingstrigger: damage triggert retaliation alleen als unit `UnitAI.state` == Idle? Anders genegeerd? Hold-position juist gedrag? AI-units detecten threats binnen sight-range automatisch?
+- **Bundel-fit**: gameplay-bug, 1-2 dedicated debug-sessies. v0.43.0 of v0.44.0.
+
+### 🟠 P2 — Battle/damage animaties drastisch verbeteren
+- **Gevonden**: 2026-04-29 (Richard live-test)
+- **Issue**: huidige damage-feedback minimaal: alleen HP-bars, geen visual punch. Voor v1.0 nodig:
+  - Hit-flash (rood tint op target-mesh ~0.1s).
+  - Damage-popup-numbers (-15 floating text upward).
+  - Attack swing-animation (melee: idle → attack → idle clip; ranged: bow-pull projectile).
+  - Death animation (collapse + fade-out, niet instant despawn).
+  - Splash-FX voor siege/AoE.
+- **Bundel-fit**: visual-polish bundle, eigen MINOR (v0.44.0 of v0.45.0). Vereist Asset Generator agent voor sprite-sheets / particle textures.
+
+### 🟠 P2 — Randstad Barracks mesh visueel te similar aan Town Hall
+- **Gevonden**: 2026-04-29 (Richard "barracks is hetzelfde gebouw als town hall")
+- **Issue**: file MD5 verschilt (barracks.glb 2.9MB vs townhall.glb 3.1MB), dus het zijn echt verschillende meshes. Maar Meshy v6 genereerde beide als kantoor-stijl — visueel onvoldoende onderscheidend in-game vanuit top-down view.
+- **Voorstel**: regenerate Randstad barracks concept-art met explicit "auditorium" / "presentation hall" / "amphitheater"-feel ipv generic kantoor. Daarna Meshy v6 → flip path.
+- **Bundel-fit**: kleine asset-batch, 1 concept + 1 GLB. Combineren met andere mesh-regens als die opkomen.
 
 ### Complete audit van in-game meldingen voor factie-specificiteit
 - **Gevonden**: 2026-04-29 (Richard live-test na v0.41.1)

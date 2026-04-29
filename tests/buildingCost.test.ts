@@ -60,8 +60,11 @@ describe('getBuildingCost', () => {
   });
 
   it('returns wood=0 for buildings without a wood cost', () => {
-    // Find any archetype with costWood undefined/0
-    const cheapType = BUILDING_ARCHETYPES.findIndex(a => !a.costWood);
+    // Find any archetype with costWood undefined/0. Skip TownHall — it
+    // has a build-mode override (400/250) for player-built expansion.
+    const cheapType = BUILDING_ARCHETYPES.findIndex(
+      (a, idx) => !a.costWood && idx !== BuildingTypeId.TownHall,
+    );
     if (cheapType >= 0) {
       const cost = getBuildingCost(cheapType as BuildingTypeId);
       expect(cost.woodCost).toBe(0);
@@ -191,5 +194,52 @@ describe('checkBuildingAffordability + chargeBuildingCost — together', () => {
     // Caller pattern: only charge if check passed. State must still be 10/10000.
     expect(state.gold).toBe(10);
     expect(state.wood).toBe(10000);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// TownHall build-cost override (v0.43.0)
+//
+// Live-bug Richard 2026-04-29: speler kan geen tweede TownHall bouwen wanneer
+// startbase gold-mines opdrogen. Fix: TownHall is buildable via factionBuild-
+// Menus.{factie} met hotkey H. Archetype heeft costGold=0 (start-spawn), maar
+// build-mode-cost is hardcoded 400/250.
+// ---------------------------------------------------------------------------
+describe('TownHall — build-mode cost override', () => {
+  it('getBuildingCost(TownHall) returns 400 gold + 250 wood (NOT archetype 0/0)', () => {
+    const cost = getBuildingCost(BuildingTypeId.TownHall);
+    expect(cost.goldCost).toBe(400);
+    expect(cost.woodCost).toBe(250);
+  });
+
+  it('TownHall affordability: 399 gold = insufficient', () => {
+    const state = makeState(399, 1000);
+    const result = checkBuildingAffordability(BuildingTypeId.TownHall, FactionId.Brabanders, state);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.missing).toBe('gold');
+      expect(result.required).toBe(400);
+    }
+  });
+
+  it('TownHall affordability: 400 gold + 249 wood = insufficient (wood)', () => {
+    const state = makeState(400, 249);
+    const result = checkBuildingAffordability(BuildingTypeId.TownHall, FactionId.Brabanders, state);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.missing).toBe('wood');
+      expect(result.required).toBe(250);
+    }
+  });
+
+  it('TownHall affordability: 400/250 = ok, charging deducts both', () => {
+    const state = makeState(500, 300);
+    const result = checkBuildingAffordability(BuildingTypeId.TownHall, FactionId.Brabanders, state);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      chargeBuildingCost(result.goldCost, result.woodCost, FactionId.Brabanders, state);
+      expect(state.gold).toBe(100); // 500 - 400
+      expect(state.wood).toBe(50);  // 300 - 250
+    }
   });
 });

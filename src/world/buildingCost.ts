@@ -14,10 +14,19 @@
  * "two-resource deduct" contract explicit and machine-verifiable.
  */
 import { BUILDING_ARCHETYPES } from '../entities/archetypes';
-import type { BuildingTypeId } from '../types/index';
+import { BuildingTypeId } from '../types/index';
 
 /** Default fallback when an archetype is missing (defensive). */
 const FALLBACK_GOLD_COST = 150;
+
+/**
+ * Town Hall build-cost (player-built expansion). Het archetype zelf staat op
+ * 0/0 want het is start-spawn — die hoeft niet te kosten. Wanneer een speler
+ * een tweede TownHall bouwt (gold-mine in startbase opgedroogd) is de cost
+ * fors zodat het strategisch is, niet spammable.
+ */
+export const TOWNHALL_BUILD_GOLD = 400;
+export const TOWNHALL_BUILD_WOOD = 250;
 
 /** Minimal slice of PlayerState the cost helpers need (for testability). */
 export interface BuildingCostPlayerState {
@@ -38,6 +47,10 @@ export type BuildingAffordResult =
 
 /** Look up the gold + wood cost of a building from its archetype. */
 export function getBuildingCost(buildingTypeId: BuildingTypeId): BuildingCost {
+  // TownHall override: archetype = 0/0 (start-spawn), build-mode = 400/250.
+  if (buildingTypeId === BuildingTypeId.TownHall) {
+    return { goldCost: TOWNHALL_BUILD_GOLD, woodCost: TOWNHALL_BUILD_WOOD };
+  }
   const arch = buildingTypeId < BUILDING_ARCHETYPES.length ? BUILDING_ARCHETYPES[buildingTypeId] : null;
   return {
     goldCost: arch?.costGold ?? FALLBACK_GOLD_COST,

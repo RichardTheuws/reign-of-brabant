@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.43.0] - 2026-04-29 — Town Halls bouwbaar + info-row CSS overlap fix
+
+### Added — TownHall buildable feature
+Live-feedback Richard 2026-04-29: "we moeten ook zorgen dat we de town halls zelf ook kunnen bouwen, voor als de gold mines opdrogen". Voor v0.43.0 was TownHall alleen start-spawn.
+
+- **`build-townhall`** action toegevoegd aan alle 4 facties (`factionBuildMenus.ts`), hotkey **H**, tier 1 (always available — vereist alleen worker selectie).
+- Factie-aware labels: Brabant "Hoofdkantoor" / Randstad "Hoofdkantoor" / Limburg "Mergelhoeve" / Belgen "Stadhuis".
+- Build-mode cost: **400 gold + 250 hout** (override op archetype 0/0 dat alleen voor start-spawn geldt). Constants: `TOWNHALL_BUILD_GOLD` / `TOWNHALL_BUILD_WOOD` in `world/buildingCost.ts`.
+- `getBuildingCost(BuildingTypeId.TownHall)` heeft een special-case voor TH dat ervoor zorgt dat de archetype-cost (0/0 voor start-spawn) niet onbedoeld als build-cost wordt gebruikt.
+- Strategisch: nieuwe TownHall geeft toegang tot expansion mining-clusters wanneer de startbase opdroogt. Cost-balance: 400g+250h is duur genoeg om strategisch te zijn, niet spammable.
+
+### Fixed — info-row CSS icon-overlap
+- **Build-card info-row** (FactionSpecial1 passive descriptions toegevoegd in v0.41.0) toonde icon-tekst (BRD/CRN) overlappend met label-tekst — `.bcard-action-icon` erfde `position: absolute` van standaard button-styling waardoor het icon over de label heen werd gerendered.
+- Fix: `.bcard-action-btn--info .bcard-action-icon` krijgt expliciet `position: static`, een vaste 28×22px box met dark background-tint, gecenterd icon-letter. Plus `.bcard-action-btn--info .bcard-action-label` ook `position: static` om overerving te resetten.
+
+### Added — tests (+10)
+- **`tests/buildingCost.test.ts`** uitgebreid met TownHall override-tests (cost lookup, gold-insufficient gate, wood-insufficient gate, 400/250 charge deducts both). Plus skip-clause in bestaande "wood=0" test (TownHall is uitzondering).
+- **`tests/build-townhall-menu.test.ts`** (nieuw) — per-factie hotkey-H entry, factie-aware labels (≥3 unique), hotkey-H uniqueness per factie.
+
+### Changed
+- `Game.getBuildingTypeIdForGhost` mapt `'townhall'` → `BuildingTypeId.TownHall` (was niet in de switch — fall-through naar Barracks).
+- `Game` switch-case dispatch heeft `case 'build-townhall'` met `enterBuildMode('townhall')`.
+
+### Notes
+- Test-suite: 1523 → 1533 (+10).
+- Backlog uitgebreid met 5 P1/P2 items uit live-feedback: building-card UI uniformity (Coworking/Starbucks/Boardroom layouts inconsistent met Barracks), Randstad Barracks mesh visueel te similar aan Town Hall, defense mechanism in skirmish niet optimaal, battle/damage animaties drastisch verbeteren, in-game messages factie-audit.
+
 ## [0.42.0] - 2026-04-29 — FactionSpecial1 second-functies (Randstad/Limburg/Belgen) + Salon-protocol cost-discount
 
 Sluit de v1.0 perfectie multi-functie audit voor FactionSpecial1 af. Brabant Carnavalstent kreeg z'n second-functie in v0.41.0 (Carnavalsoptocht); deze release voegt de symmetrische second-functies toe voor de overige drie facties. Per `feedback_v1_perfection_multi_function`.

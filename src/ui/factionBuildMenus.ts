@@ -48,6 +48,7 @@ export const TIER_REQUIREMENT_LABELS: Record<number, string> = {
 // Tier: 1=always, 2=requires Blacksmith, 3=requires UpgradeBuilding.
 export const FACTION_WORKER_BUILDS: Record<Faction, WorkerBuildCmdExt[]> = {
   brabant: [
+    { action: 'build-townhall',        icon: 'TH',  label: 'Hoofdkantoor',    hotkey: 'H', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.TownHall,                  tier: 1 },
     { action: 'build-barracks',        icon: 'BRK', label: 'Kazerne',         hotkey: 'Q', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Barracks,                 tier: 1 },
     { action: 'build-lumbercamp',      icon: 'LMB', label: 'Houtzagerij',     hotkey: 'E', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.LumberCamp,               tier: 1 },
     { action: 'build-blacksmith',      icon: 'BSM', label: 'Smederij',        hotkey: 'R', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Blacksmith,                tier: 1 },
@@ -62,6 +63,7 @@ export const FACTION_WORKER_BUILDS: Record<Faction, WorkerBuildCmdExt[]> = {
     { action: 'build-tertiary',        icon: 'TRT', label: 'Worstenbroodjeskraam', hotkey: 'X', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.TertiaryResourceBuilding, tier: 2 },
   ],
   randstad: [
+    { action: 'build-townhall',        icon: 'TH',  label: 'Hoofdkantoor',    hotkey: 'H', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.TownHall,                  tier: 1 },
     { action: 'build-barracks',        icon: 'BRK', label: 'Vergaderzaal',    hotkey: 'Q', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Barracks,                 tier: 1 },
     { action: 'build-lumbercamp',      icon: 'LMB', label: 'Starbucks',       hotkey: 'E', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.LumberCamp,               tier: 1 },
     { action: 'build-blacksmith',      icon: 'BSM', label: 'CoworkingSpace',  hotkey: 'R', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Blacksmith,                tier: 1 },
@@ -79,6 +81,7 @@ export const FACTION_WORKER_BUILDS: Record<Faction, WorkerBuildCmdExt[]> = {
     { action: 'build-tertiary',        icon: 'TRT', label: 'Havermoutmelkbar', hotkey: 'X', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.TertiaryResourceBuilding,  tier: 2 },
   ],
   limburg: [
+    { action: 'build-townhall',        icon: 'TH',  label: 'Mergelhoeve',     hotkey: 'H', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.TownHall,                  tier: 1 },
     { action: 'build-barracks',        icon: 'BRK', label: 'Schuttershal',    hotkey: 'Q', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Barracks,                 tier: 1 },
     { action: 'build-lumbercamp',      icon: 'LMB', label: 'Vlaaibakkerij',   hotkey: 'E', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.LumberCamp,               tier: 1 },
     { action: 'build-blacksmith',      icon: 'BSM', label: 'Klooster',        hotkey: 'R', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Blacksmith,                tier: 1 },
@@ -91,6 +94,7 @@ export const FACTION_WORKER_BUILDS: Record<Faction, WorkerBuildCmdExt[]> = {
     { action: 'build-mijnschacht',     icon: 'TRT', label: 'Mijnschacht',     hotkey: 'X', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.TertiaryResourceBuilding,  tier: 2 },
   ],
   belgen: [
+    { action: 'build-townhall',        icon: 'TH',  label: 'Stadhuis',        hotkey: 'H', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.TownHall,                  tier: 1 },
     { action: 'build-barracks',        icon: 'BRK', label: 'Frituur',         hotkey: 'Q', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Barracks,                 tier: 1 },
     { action: 'build-lumbercamp',      icon: 'LMB', label: 'Frietfabriek',    hotkey: 'E', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.LumberCamp,               tier: 1 },
     { action: 'build-blacksmith',      icon: 'BSM', label: 'EU-Parlement',    hotkey: 'R', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Blacksmith,                tier: 1 },

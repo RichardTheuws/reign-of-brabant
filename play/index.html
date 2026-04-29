@@ -1000,7 +1000,8 @@
       flex-direction: row;       /* override column layout */
       align-items: center;
       justify-content: flex-start;
-      gap: 6px;
+      gap: 8px;
+      position: relative;        /* establish stacking context */
     }
     .bcard-action-btn--info:disabled {
       opacity: 1;
@@ -1010,10 +1011,19 @@
       box-shadow: none;
     }
     .bcard-action-btn--info .bcard-action-icon {
-      flex: 0 0 auto;
-      width: 22px; height: 22px;
-      font-size: 0.65rem;
-      padding: 0;
+      flex: 0 0 28px;
+      width: 28px; height: 22px;
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 2px 0;
+      position: static;          /* override absolute from base — info-row is row-flex */
+      top: auto; left: auto; right: auto; bottom: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #f0d060;
+      background: rgba(0,0,0,0.25);
+      border-radius: 3px;
     }
     .bcard-action-btn--info .bcard-action-label {
       white-space: normal;
@@ -1023,6 +1033,8 @@
       line-height: 1.25;
       padding: 0;
       max-width: none;
+      position: static;
+      top: auto; left: auto; right: auto; bottom: auto;
     }
     .bcard-action-btn--info .bcard-action-hotkey { display: none; }
     .btn-icon--info {
