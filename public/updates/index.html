@@ -476,6 +476,167 @@
     <div class="content">
         <div class="timeline">
 
+            <!-- ── v0.45.0 (Defense alarm — nearby idle units verdedigen automatisch) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.45.0</span>
+                        <span class="update__date">29 april 2026</span>
+                        <h2 class="update__title">Defense alarm — nabijgelegen idle combat-units schieten automatisch terug bij aanval</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Feature</span>
+                            <span class="tag tag--gameplay">Gameplay</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Pre-v0.45.0 reageerde alleen het direct geraakte slachtoffer op binnenkomende damage — vier soldaten naast je belegerde toren stonden Idle terwijl de toren afgebrand werd. Met de nieuwe Defense Alarm wordt elke aanval een lokaal alarm: alle nabije bevriende combat-units switchen autonoom naar Attacking-state op de aggressor.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">TRIGGERNEARBYDEFENSE — REGELS</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Radius 12u</strong> — Bij elke incoming attack zoekt <code>triggerNearbyDefense</code> alle bevriende combat-units binnen 12 units rond het slachtoffer. Cap <strong>ALARM_MAX = 5</strong>: maximaal 5 verdedigers per alarm, zodat een grote pulk niet collectief van basis verlaat.</li>
+                            <li><strong>Alleen idle combat-units</strong> — Workers blijven gathering (priority op economie), units die al een commando uitvoeren (Moving / Attacking / Building) worden niet onderbroken. <strong>HoldPosition</strong>-stance is preserved: een unit die HoldPosition heeft blijft staan en negeert het alarm.</li>
+                            <li><strong>State-switch op de aggressor</strong> — Verdedigers krijgen direct Attacking-state met de aggressor als target. Geen pathing-glitch: als de aggressor wegloopt blijft de Attacking-state de afstand sluiten tot in-range, daarna fire.</li>
+                        </ul>
+
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--space-md);">Schaalt mee met de v0.42.0 FactionSpecial1-passives en de v0.40.0 UpgradeBuilding-aura's: een verdedigde Limburg-basis triggert dus 5 verdedigers met +1 armor van de Hoogoven-aura, en Belgen-verdedigers krijgen de +5% crit van de Diamantslijperij.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.44.0 (Building-card UI uniform — research-panel binnen card) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.44.0</span>
+                        <span class="update__date">29 april 2026</span>
+                        <h2 class="update__title">Building-card UI uniform — research-panel zit nu binnen #building-card als onderste sectie</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Feature</span>
+                            <span class="tag tag--ui">UI</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Het research-panel (Blacksmith / LumberCamp / UpgradeBuilding) leefde voorheen als drijvende overlay boven de building-card — visueel los, twee kolomen aan informatie, geen duidelijke hiërarchie. Vanaf v0.44.0 is dat panel een onderste sectie binnen <code>#building-card</code>: één scrollende kolom, één visuele eenheid.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">UNIFORME LAYOUT — DRIE PANEL-TYPEN</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Genest binnen #building-card</strong> — Blacksmith, LumberCamp én UpgradeBuilding research-panels worden nu gerenderd ALS sectie ONDER de standaard building-info (icon-row, stats, click-actions). Dezelfde card-rand, dezelfde scroll-context.</li>
+                            <li><strong>CSS-overrides voor nested cmd-blacksmith</strong> — Het bestaande <code>#cmd-blacksmith</code> styleblok had hardgecodeerde positionering die buiten de card werkte. Voor de nested variant nu een full-width grid-override zodat research-buttons niet meer met fixed widths buiten de card-rand uitsteken.</li>
+                            <li><strong>Research-grid full-width binnen card</strong> — Alle research-grids vullen 100% van de card-breedte. Geen drijvende panels meer, geen z-index oorlog tussen building-card en research-panel.</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.43.0 (Town Halls bouwbaar — H-hotkey, factie-aware label) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.43.0</span>
+                        <span class="update__date">29 april 2026</span>
+                        <h2 class="update__title">Town Halls bouwbaar — uitbreidbare basis voor wanneer startbase gold-mines opdrogen</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Feature</span>
+                            <span class="tag tag--gameplay">Gameplay</span>
+                            <span class="tag tag--fix">UI fix</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Tot v0.43.0 was je beperkt tot één Town Hall — die waar je mee startte. Wanneer de startbase-gold-mine leeg liep, moest je workers handmatig naar verre mines walken zonder uitbreidingsoptie. Vanaf nu staat een tweede (en derde) Town Hall in het worker-build-menu, met factie-aware naamgeving zodat de UI niet generiek "Town Hall" toont.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">BOUW-CONTRACT</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Hotkey H</strong> — Werker geselecteerd → druk H → ghost-placement van een nieuwe Town Hall. Standaard build-flow (groen = valide, rood = collision/buiten map).</li>
+                            <li><strong>Kost: 400 goud + 250 hout</strong> — Ongeveer 2× de kosten van een standaard productie-gebouw. Bewust duur: een tweede TH is een major economic commit, geen tussenoplossing.</li>
+                            <li><strong>Factie-aware label</strong> — Brabant: <strong>Mergelhoeve</strong>, Randstad: <strong>Hoofdkantoor</strong>, Belgen: <strong>Stadhuis</strong> (Limburgers houden Mergelhoeve-naam waar relevant). Single source of truth via <code>getDisplayBuildingName</code> in factionData — zelfde regel die we sinds v0.37.37 hanteren.</li>
+                            <li><strong>UI fix: info-row icon overlap</strong> — In de building-card overlapte de icon-letter ("M" / "H" / "S") met de label-text bij smalle viewport-widths. Layout aangepast naar flex-row met gap zodat icon en text netjes naast elkaar staan.</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.42.0 (FactionSpecial1 second-functies — Randstad/Limburg/Belgen) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.42.0</span>
+                        <span class="update__date">29 april 2026</span>
+                        <h2 class="update__title">FactionSpecial1 second-functies — Randstad / Limburg / Belgen krijgen elk een tweede passive of click-action</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Feature</span>
+                            <span class="tag tag--gameplay">Gameplay</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Brabant kreeg in v0.41.0 al een tweede functie op zijn FactionSpecial1 (Carnavalsoptocht). v0.42.0 trekt die parity-line door naar de andere drie facties — elk krijgt een tweede mechaniek bovenop de bestaande passive uit Bundel 3 (v0.37.35).</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">DRIE NIEUWE PASSIVE/CLICK-COMBINATIES</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Randstad — Boardroom passive "Corporate Synergy"</strong> — Per actieve Boardroom +1 efficiency-stack-cap. Cap op +3 boardrooms, dus de bureaucratie-stack groeit van <strong>BUREAUCRACY_MAX_STACKS 20 → 23</strong>. Multi-boardroom builds krijgen écht hogere ceiling.</li>
+                            <li><strong>Limburg — Vlaaiwinkel click "Vlaai-Trakteerronde"</strong> — Kost 100 Kolen → voor 30 seconden halveert de heal-pulse-interval (van 5s naar 2.5s). Past op het Limburg defensieve heal-archetype: dubbele healing-density tijdens een belegering.</li>
+                            <li><strong>Belgen — Diplomatiek Salon passive "Salon-protocol"</strong> — Per actief Salon -10% Persuasion-cost, met cap op -30%. Maakt diplomatieke conversies (de Belgen-signature) significant goedkoper bij multi-salon builds.</li>
+                        </ul>
+
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--space-md);">Met v0.42.0 hebben alle vier facties een primaire (Bundel 3) plus een secundaire functie op de FactionSpecial1, en een derde via de UpgradeBuilding (v0.40.0). Late-game faction-identity is daarmee structureel ingelegd in drie afzonderlijke gebouwen per factie.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.41.1 (UI fix — info-row layout + button label truncation) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.41.1</span>
+                        <span class="update__date">29 april 2026</span>
+                        <h2 class="update__title">UI fix — info-row layout compact, button-labels ingekort tegen 3-koloms truncation</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--fix">Fix</span>
+                            <span class="tag tag--ui">UI</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">v0.41.0 voegde info-rows toe aan alle vier FactionSpecial1's. In de praktijk renderde dat als een 300px-vierkant blok met een gigantische CRN ("Carnavalsoptocht-icon") — niet de bedoeling. Ook truncatten de click-action button-labels op het 3-koloms grid binnen de building-card.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">WAT ER IS GEFIXT</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Info-row compact rij</strong> — Was: 300px-vierkant met giant icon. Wordt: één compacte horizontale row met klein icon + label + waarde. Past nu correct binnen de building-card zonder layout te dwingen.</li>
+                            <li><strong>Button-labels ingekort</strong> — "Optocht (75g)" / "Trakteer (50g)" / "Sprint (30h)" / "Crunch (50h)" / "Kwartaalcijfers". Korte labels zodat ze in de 3-koloms grid niet truncaten met ellipsis.</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.41.0 (Carnavalsoptocht + FactionSpecial1 info-rows) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.41.0</span>
+                        <span class="update__date">29 april 2026</span>
+                        <h2 class="update__title">Carnavalsoptocht — Brabant click-action + info-rows op alle 4 FactionSpecial1's</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Feature</span>
+                            <span class="tag tag--gameplay">Gameplay</span>
+                            <span class="tag tag--ui">UI</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Brabant krijgt zijn tweede functie op de Carnavalstent: een themagerichte click-action die past bij de Gezelligheid-economie. Plus: alle vier FactionSpecial1's krijgen vaste info-rows zodat de passive effects altijd zichtbaar zijn — geen tooltip-only meer.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">CARNAVALSOPTOCHT (BRABANT)</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Carnavalstent click-action "Carnavalsoptocht"</strong> — Kost 75 Gezelligheid → voor 30 seconden krijgen <em>alle</em> Brabant units +25% movement speed. Cooldown 90s.</li>
+                            <li><strong>Synergie</strong> — Stapelt mee met Worstenbroodjeskraam-buffs en bestaande Brabant-momentumloops; zet je optocht in vlak voor een raid voor maximale tempo-spike.</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">INFO-ROWS OP ALLE 4 FACTIONSPECIAL1'S</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Altijd-zichtbaar passive display</strong> — Carnavalstent (Brabant), Boardroom (Randstad), Vlaaiwinkel (Limburg), Diplomatiek Salon (Belgen) — elk krijgt info-rows in de building-card die het actieve passive-effect tonen, zonder dat je tooltips hoeft te triggeren.</li>
+                            <li><strong>Voorbereiding op v0.42.0</strong> — Met info-rows op alle vier panels was de UI klaar om in v0.42.0 ook second-functies (Salon-protocol, Vlaai-Trakteerronde, Corporate Synergy) zichtbaar te maken zonder layout-rework.</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
             <!-- ── v0.40.0 (v1.0 perfectie milestone — UpgradeBuilding passives × 4) ── -->
             <article class="update">
                 <div class="update__card">

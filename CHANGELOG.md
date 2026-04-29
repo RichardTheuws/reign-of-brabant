@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.45.1] - 2026-04-29 — docs: updates-page sync v0.41.0 → v0.45.0
+
+### Updated — `public/updates/index.html`
+6 nieuwe entries (newest-first): v0.45.0 (Defense alarm), v0.44.0 (Building-card UI uniform), v0.43.0 (Town Halls + info-row CSS), v0.42.0 (FactionSpecial1 second-functies), v0.41.1 (UI fix), v0.41.0 (Carnavalsoptocht). Bestaande tag-classes hergebruikt (`tag--feat` / `tag--fix` / `tag--gameplay` / `tag--ui`). Datum 2026-04-29 op alle 6 entries.
+
+### Notes
+- Geen code-changes, alleen docs.
+- Voorbereidende commit voor sessie-end. Volgende sessie: zie `project_rob_next_session_plan.md` (memory) — aanbeveling v0.46.0 Battle/damage animaties of polish-bundle alternatief.
+
 ## [0.45.0] - 2026-04-29 — Defense alarm: nearby idle defenders retaliate automatisch
 
 ### Added — `triggerNearbyDefense` in CombatSystem
