@@ -1,5 +1,52 @@
 # Changelog
 
+## [0.50.0] - 2026-04-29 — Voice-pipeline complete swap + audio-normalisatie batch
+
+### Regenerated — Brabander voices (Richard, ~138 fresh files)
+Joost/Adam stem volledig vervangen door Richard (`KJMAev3goFD3WOh1hVBT`, native Zuid-Oost Brabants). 8 units × 20+ lines fresh geschreven in echt dialect — **geen "-ansen" antipatroon meer**:
+- "un / ne / den" lidwoorden, "-ke" verkleinwoorden, "vat" ipv "pak", "gemokt", "klaor", "stao", "schôn"
+- ALAAF alleen bij carnaval-context (carnavalvierder, praalwagen)
+- Karakter per unit: boer (calm), carnavalvierder (loud euphoric), sluiper (whispery), tractorrijder (brommig), frituurmeester (trots-vet), boerinne (warm), praalwagen (feestelijk), prins-van-brabant (charismatisch leider)
+- Settings per unit aangepast: stability 0.35-0.55, style 0.40-0.70 voor karakter-fit
+- Script: `scripts/generate-brabander-voices.sh` (herbruikbaar)
+
+### Regenerated — Limburgers voices (Reinoud, ~180 fresh files)
+Luk Balcer stem vervangen door Reinoud (`5tiZStRJQ98Xw420MFFx`, "De nasale limburger"). +40 nieuwe gather/ready files (ontbraken in oude set):
+- Limburgs dialect: "ich/dich/doow", "neet/waat/sjoen", "Gluck auf!", "hajje!", "noa/naor", "hoes"
+- Mergel-toon, water/mineraal-metaforen voor death-lines
+- Mijnbaas houdt minimalisme-regel (max 4 woorden, gezag via stilte)
+- Settings: stability 0.45 (hoger voor Reinoud's nasale rust)
+- Script: `scripts/generate-limburgers-voices.sh`
+
+### Added — Sharon Vlaams als 2e Belgen vrouwelijke stem (20 generic files)
+`g7B5PNoscIXomLNUmHAb` — naast bestaande Petra. Ge-mixed in pool zonder Hans/Walter/Petra te vervangen:
+- Nieuwe `subPoolLines(faction, sub, action, count)` helper in `UnitVoices.ts`
+- `GENERIC_VOICE_LINES[3]` (Belgen) breidt nu uit met `[...genericLines, ...subPoolLines('belgen', 'sharon', ...)]` per actie
+- Random-select-mechanism mixt automatisch
+- Vlaams: "voila", "allez", "amai", "ge/gij", droog-Belgisch
+- Files in `public/assets/audio/voices/belgen/sharon/{action}_{N}.mp3`
+- Script: `scripts/generate-belgen-sharon.sh`
+
+### Normalized — alle 595 voice-files (audio-normalisatie batch)
+`scripts/normalize-voices.sh --all` over volledige stack:
+- **Loudnorm**: -16 LUFS integrated, peak max -1 dBTP
+- **EQ-match**: high-pass 80Hz, low-shelf -2dB onder 200Hz, presence-boost +1.5dB @ 3kHz
+- **De-essing**: lichte compand voor sissende stemmen
+- **875/875** files succesvol verwerkt, 0 skipped, 0 failed (dubbele path-resolution na .bak cleanup)
+- Voices-normalized/ swapped in-place via rsync, oude voices/ vervangen door genormaliseerde versie
+
+### Cleanup — `.bak` folders opgeruimd
+`voices/brabanders.bak/` (oude Joost) + `voices/limburgers.bak/` (oude Luk) verwijderd. Git-history bewaart de oude content indien rollback nodig.
+
+### Niet aangeraakt
+- Limburgs female pool via Nick → P1 in BACKLOG. Vereist gender-aware code in `UnitVoices.ts` (per-unit gender-mapping + male/female pool-split). Bundel voor v0.51.0.
+- Brabander female (Emma) en Belgen Sharon zijn nu mixed-pool ipv gender-aware. Zelfde refactor zal die ook gender-isolatie geven.
+
+### Tests
+Geen nieuwe lock-tests (audio-bestanden zelf zijn niet code-testbaar). Bestaande 1606 lock-tests groen, type-check clean.
+
+---
+
 ## [0.49.3] - 2026-04-29 — Voice-cast locked + 8 easter-egg signature lines
 
 ### Locked — Nieuwe voice-cast (alle 4 facties)

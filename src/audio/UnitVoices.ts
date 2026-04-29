@@ -127,6 +127,25 @@ function genericLines(faction: string, action: VoiceAction, count: number): stri
 }
 
 /**
+ * Sub-pool generic lines — for additional voice actors mixed into a faction's
+ * generic pool (e.g. Sharon Vlaams as 2nd female Belgen voice alongside Petra).
+ * Files live in `<faction>/<sub>/<action>_N.mp3` and are appended to the
+ * existing pool so the random-select picks them organically.
+ */
+function subPoolLines(
+  faction: string,
+  sub: string,
+  action: VoiceAction,
+  count: number,
+): string[] {
+  const paths: string[] = [];
+  for (let i = 1; i <= count; i++) {
+    paths.push(`${VOICE_BASE}${faction}/${sub}/${action}_${i}.mp3`);
+  }
+  return paths;
+}
+
+/**
  * Helper: generates a standard voice line set for a unit.
  * - select/move/attack: 3 variants
  * - death: 2 variants
@@ -234,14 +253,41 @@ const GENERIC_VOICE_LINES: Record<number, Record<VoiceAction, string[]>> = {
     ready: genericLines('limburgers', 'idle', 2),
   },
   3: {
-    select: genericLines('belgen', 'select', 3),
-    move: genericLines('belgen', 'move', 3),
-    attack: genericLines('belgen', 'attack', 3),
-    gather: genericLines('belgen', 'gather', 3),
-    death: genericLines('belgen', 'death', 2),
-    ability: genericLines('belgen', 'ability', 2),
-    idle: genericLines('belgen', 'idle', 2),
-    ready: genericLines('belgen', 'idle', 2),
+    // Belgen pool: Hans/Walter/Petra (base) + Sharon Vlaams (2nd female voice).
+    // The random-select mechanism in playUnitVoice() mixes all entries equally,
+    // so appending Sharon paths gives organic per-call rotation across actors.
+    select: [
+      ...genericLines('belgen', 'select', 3),
+      ...subPoolLines('belgen', 'sharon', 'select', 3),
+    ],
+    move: [
+      ...genericLines('belgen', 'move', 3),
+      ...subPoolLines('belgen', 'sharon', 'move', 3),
+    ],
+    attack: [
+      ...genericLines('belgen', 'attack', 3),
+      ...subPoolLines('belgen', 'sharon', 'attack', 3),
+    ],
+    gather: [
+      ...genericLines('belgen', 'gather', 3),
+      ...subPoolLines('belgen', 'sharon', 'gather', 3),
+    ],
+    death: [
+      ...genericLines('belgen', 'death', 2),
+      ...subPoolLines('belgen', 'sharon', 'death', 2),
+    ],
+    ability: [
+      ...genericLines('belgen', 'ability', 2),
+      ...subPoolLines('belgen', 'sharon', 'ability', 2),
+    ],
+    idle: [
+      ...genericLines('belgen', 'idle', 2),
+      ...subPoolLines('belgen', 'sharon', 'idle', 2),
+    ],
+    ready: [
+      ...genericLines('belgen', 'idle', 2),
+      ...subPoolLines('belgen', 'sharon', 'ready', 2),
+    ],
   },
 };
 

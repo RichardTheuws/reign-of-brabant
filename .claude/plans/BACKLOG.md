@@ -59,15 +59,22 @@ en niet in scope is van de huidige bundel landt hier, gesorteerd op prioriteit.
 - **Randstad male**: ✅ Serge de Beer (bestaand, blijft)
 - **Belgen male**: ✅ Hans Claesen + Walter (bestaand, blijft)
 
-### 🔴 P1 — Volledige voice-pipeline regeneratie met locked voice-ids
-- **Scope**: regenerate alle ~525+ voice files met de nieuwe voice-ids:
-  - 138 Brabander files met Richard (was Joost)
-  - 138 Limburgers files met Reinoud (was Luk)
-  - Nieuwe Limburgers female files via Nick
-  - Nieuwe Belgen female files via Sharon
-- `scripts/generate_unit_voices.sh` updaten met locked voice-ids
-- Daarna `scripts/normalize-voices.sh --all` voor uniforme loudness
-- **Bundel-fit**: v0.50.0 of dedicated voice-batch-sessie. Asset-werk, geen code-werk.
+### ✅ RESOLVED v0.50.0 — Voice-pipeline regeneratie (Brabander + Limburgers + Sharon)
+- **Resolved**: 2026-04-29 — drie parallel ElevenLabs-agents:
+  - **Brabander** (Richard `KJMAev3goFD3WOh1hVBT`): 138 fresh files in echt Zuid-Oost Brabants (geen "-ansen"), `scripts/generate-brabander-voices.sh`
+  - **Limburgers** (Reinoud `5tiZStRJQ98Xw420MFFx`): 180 files (140 + 40 nieuwe gather/ready) in Limburgs dialect, `scripts/generate-limburgers-voices.sh`
+  - **Belgen Sharon Vlaams** (`g7B5PNoscIXomLNUmHAb`): 20 generic files toegevoegd aan pool, `scripts/generate-belgen-sharon.sh`. UnitVoices.ts `subPoolLines` helper toegevoegd, ge-mixed in random-select via `GENERIC_VOICE_LINES[3]`.
+- Backups intact: `voices/brabanders.bak/` + `voices/limburgers.bak/`
+- Daarna `scripts/normalize-voices.sh --all` over 722+ files
+
+### 🔴 P1 — Limburgs female pool via Nick + gender-aware UnitVoices.ts (volgende bundel)
+- Nick origineel (`PrYUlaJFEdOSVy6jaEaG`) als Limburgs female gepland (zie 2026-04-29 sessie, "transgender Limburger" framing)
+- Vereist gender-mapping in `UnitVoices.ts`:
+  - Per UNIT_TYPE een `gender: 'male' | 'female' | 'mixed'` flag (boer = male, boerinne = female, mixed = random pick)
+  - Voice-pool selection: `MALE_VOICE_LINES[fid][unit]` vs `FEMALE_VOICE_LINES[fid][unit]`, met fallback
+- Genereer ~24 generic Limburgs female files via Nick voor pool
+- Optioneel: Brabander female (Emma) + Belgen Sharon ook gender-aware ipv mixed-pool
+- **Bundel-fit**: v0.51.0 of dedicated gender-refactor
 
 ### 🔴 P1 — Brabander mannelijke voice opnieuw casten
 - **Gevonden**: 2026-04-29 (Richard A/B luistertest van voices-normalized-sample/)
