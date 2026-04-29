@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.45.0] - 2026-04-29 — Defense alarm: nearby idle defenders retaliate automatisch
+
+### Added — `triggerNearbyDefense` in CombatSystem
+Live-feedback Richard 2026-04-29: "het defense mechanism van de troops nu niet optimaal te functioneren als je aangevallen wordt in skirmish". Pre-v0.45.0 retaliation triggerde alleen voor de DIRECT geraakte unit — nearby idle defenders deden niets, speler moest manueel selecteren+commanden.
+
+Fix: bij ELKE damage-resolution scant het systeem nearby friendly combat-units (binnen `ALARM_RADIUS` = 12u) en switcht ze automatisch naar Attacking met de aggressor als target.
+
+### Rules (anti-thrash + anti-stampede)
+- **Workers blijven gathering**: `IsWorker` units worden overgeslagen — te kwetsbaar om in te springen, plus gameplay-flow blijft intact.
+- **HoldPosition respect**: HoldPosition stance preserved; enkel `targetEid` wordt gezet zodat `processHoldPosition` next tick op de aggressor schiet (geen state-switch, geen movement).
+- **Already-Attacking niet gestoord**: units die al een ander target hebben switchen niet (no thrash).
+- **Cap `ALARM_MAX` = 5**: max 5 defenders alerted per damage-event. Voorkomt dat één pijl de hele base op één scout laat stormen.
+- **Niet-combat skip**: `Attack.damage <= 0` (rare non-combat units) worden overgeslagen.
+- **Dead/Stunned skip**: vanzelfsprekend.
+- **Enemy faction skip**: alleen units met dezelfde `Faction.id` als de victim.
+
+### Triggers
+Aangeroepen in beide combat-paths in `CombatSystem`:
+1. Idle/Attacking-state damage resolution (regel ~261).
+2. HoldPosition fire-path damage resolution (regel ~456).
+
+Wanneer een building OF unit damage neemt, alarm wordt afgevuurd.
+
+### Added — tests (+9)
+- **`tests/CombatSystem-defense-alarm.test.ts`** dekt: alarm switch + target-acquire, ALARM_RADIUS edge (binnen/buiten), worker-skip, enemy-faction-skip, already-Attacking no-thrash, HoldPosition state-preserve+target-set, ALARM_MAX cap, dead-skip, non-combat-skip.
+
+### Notes
+- Test-suite: 1537 → 1546 (+9).
+- Backlog: visual indicator voor alarm-trigger (groene pulse op victim, rode pulse op aggressor) — kandidaat voor v0.46.0 battle-animations bundel.
+
 ## [0.44.0] - 2026-04-29 — Building-card UI uniform pass: research-panel nu binnen building-card
 
 ### Changed — `#cmd-blacksmith` is nu een DOM-child van `#building-card`

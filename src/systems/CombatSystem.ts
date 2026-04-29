@@ -286,6 +286,9 @@ function processAttacking(world: GameWorld, eid: number, dt: number): void {
     }
   }
 
+  // v0.45.0: nearby idle friendly combat-units alerted (anti-base-rush).
+  triggerNearbyDefense(world, targetEid, eid);
+
   // Emit combat-hit event for audio
   const isRanged = Attack.range[eid] > MINIMUM_MELEE_RANGE;
   eventBus.emit('combat-hit', {
@@ -458,6 +461,9 @@ function processHoldPosition(
             applySplashDamage(world, eid, currentTarget, effectiveDamage, holdSplash);
           }
 
+          // v0.45.0: alarm friendly defenders near the hit target.
+          triggerNearbyDefense(world, currentTarget, eid);
+
           Attack.timer[eid] = Attack.speed[eid];
 
           const isRangedHold = Attack.range[eid] > MINIMUM_MELEE_RANGE;
@@ -563,6 +569,77 @@ function processSelfDefense(world: GameWorld, eid: number, allUnits: { readonly 
 
 /** Splash damage falloff: 50% at the edge of the radius. */
 const SPLASH_FALLOFF = 0.5;
+
+/**
+ * Defense-alarm: when a unit/building takes damage, nearby IDLE friendly
+ * combat-units switch to Attacking with the aggressor as target.
+ *
+ * Why this is needed: pre-v0.45.0 only the directly-hit unit retaliated.
+ * If an enemy stormed the base and shot at a building or a single Soldier,
+ * surrounding idle defenders did nothing — the player had to manually
+ * select+command them to fight back. Live-feedback Richard 2026-04-29:
+ * "het defense mechanism van de troops nu niet optimaal te functioneren".
+ *
+ * Rules:
+ * - Workers do NOT respond (too fragile; they keep gathering).
+ * - HoldPosition units do NOT switch state (their stance is the user
+ *   command and we respect it). They DO acquire the aggressor as target
+ *   (so processHoldPosition can fire next tick).
+ * - Already-Attacking units do NOT switch target (no thrash).
+ * - Up to ALARM_MAX defenders alarmed per damage-event.
+ */
+export const ALARM_RADIUS = 12;
+const ALARM_RADIUS_SQ = ALARM_RADIUS * ALARM_RADIUS;
+export const ALARM_MAX = 5;
+
+export function triggerNearbyDefense(
+  world: GameWorld,
+  victimEid: number,
+  aggressorEid: number,
+): void {
+  if (!hasComponent(world, victimEid, Position) || !hasComponent(world, victimEid, Faction)) return;
+  if (!hasComponent(world, aggressorEid, Position)) return;
+
+  const victimFaction = Faction.id[victimEid];
+  const vx = Position.x[victimEid];
+  const vz = Position.z[victimEid];
+
+  const units = query(world, [Position, UnitAI, IsUnit, Health, Attack]);
+  let alerted = 0;
+
+  for (const other of units) {
+    if (alerted >= ALARM_MAX) break;
+    if (other === victimEid || other === aggressorEid) continue;
+    if (Faction.id[other] !== victimFaction) continue;
+    if (hasComponent(world, other, IsDead) || Health.current[other] <= 0) continue;
+    if (hasComponent(world, other, IsWorker)) continue;       // workers blijven gatheren
+    if (Attack.damage[other] <= 0) continue;                   // non-combat unit
+    if (hasComponent(world, other, Stunned) && Stunned.duration[other] > 0) continue;
+
+    const state = UnitAI.state[other];
+    if (state === UnitAIState.Attacking) continue;             // al actief
+    if (state === UnitAIState.Dead) continue;
+
+    const dx = Position.x[other] - vx;
+    const dz = Position.z[other] - vz;
+    if (dx * dx + dz * dz > ALARM_RADIUS_SQ) continue;
+
+    if (state === UnitAIState.HoldPosition) {
+      // Respect HoldPosition stance — only acquire target so they fire next tick.
+      if (UnitAI.targetEid[other] === NO_ENTITY) {
+        UnitAI.targetEid[other] = aggressorEid;
+        alerted++;
+      }
+      continue;
+    }
+
+    // Idle / Moving / Patrolling defenders: switch to Attacking the aggressor.
+    UnitAI.state[other] = UnitAIState.Attacking;
+    UnitAI.targetEid[other] = aggressorEid;
+    Movement.hasTarget[other] = 0;
+    alerted++;
+  }
+}
 
 /**
  * Apply splash damage to all enemies near the primary target.
