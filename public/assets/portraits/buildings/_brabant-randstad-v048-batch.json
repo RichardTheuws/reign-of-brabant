@@ -1,0 +1,229 @@
+{
+  "generated": "2026-04-30",
+  "wallclock_s": 17.7,
+  "model": "fal-ai/flux/dev",
+  "image_size": "square_hd",
+  "num_inference_steps": 28,
+  "guidance_scale": 3.5,
+  "negative_prompt": "blurry, photorealistic photograph, watermark, signature, gibberish text, real-world brand logos, recognizable corporate logos, EU flag, national flag, anime, cartoon, ugly, deformed, multiple buildings cluttered, stick figures",
+  "brabant_style_suffix": "centered on dark moody vignette background with deep green-black gradient and warm orange-red carnival accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture, museum quality, no readable text, no modern logos, no people figures dominating composition",
+  "randstad_style_suffix": "centered on dark moody vignette background with deep slate-blue-black gradient and warm yellow desk-lamp accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture meets corporate concept art, museum quality, no readable text, no real-world brand logos, no people figures dominating composition",
+  "assets": [
+    {
+      "file": "brabant-barracks.png",
+      "faction": "brabant",
+      "prompt": "painted RPG card art, Brabantian barracks (kazerne), sturdy red-brick longhouse with thatched-and-tile roof, oak training-yard fence in front, wooden weapon rack with practice halberds and shields, carnival pennants strung above the doorway, orange-and-red festive accents, warm forge-glow from a side window, centered on dark moody vignette background with deep green-black gradient and warm orange-red carnival accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture, museum quality, no readable text, no modern logos, no people figures dominating composition",
+      "seed": 1211715733,
+      "url": "https://v3b.fal.media/files/b/0a9856ff/mXpyes-A3KLa_Qu-k1p6q.jpg",
+      "bytes": 1465159,
+      "status": "ok"
+    },
+    {
+      "file": "brabant-upgrade.png",
+      "faction": "brabant",
+      "prompt": "painted RPG card art, Brabantian upgrade workshop (verbeterwerkplaats), red-brick artisan hall with tall arched window showing a master craftsman silhouette at an oak workbench, scattered hammers chisels and folio scrolls, glowing alchemical vial on a shelf, copper instruments hanging from beam, warm orange forge-glow, centered on dark moody vignette background with deep green-black gradient and warm orange-red carnival accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture, museum quality, no readable text, no modern logos, no people figures dominating composition",
+      "seed": 429932137,
+      "url": "https://v3b.fal.media/files/b/0a9856ff/etcRa_viSHoWfy5m-cNJp.jpg",
+      "bytes": 1484642,
+      "status": "ok"
+    },
+    {
+      "file": "brabant-tertiary.png",
+      "faction": "brabant",
+      "prompt": "painted RPG card art, Brabantian worstenbroodjes food stall (worstenbroodjeskraam), warm wooden timber-framed kraam with red-and-orange striped awning, golden-brown sausage rolls displayed on a wooden counter, copper kettle steaming with coffee, small chalkboard with no readable text, carnival fairy-lights strung along the awning, festive rural-Brabant atmosphere, centered on dark moody vignette background with deep green-black gradient and warm orange-red carnival accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture, museum quality, no readable text, no modern logos, no people figures dominating composition",
+      "seed": 912572463,
+      "url": "https://v3b.fal.media/files/b/0a9856ff/x4Puv5OyPEr6M9efn7lSh.jpg",
+      "bytes": 1346123,
+      "status": "ok"
+    },
+    {
+      "file": "brabant-lumbercamp.png",
+      "faction": "brabant",
+      "prompt": "painted RPG card art, Brabantian lumber camp (houthakkerskamp), rustic timber shed with split-log walls and red-brick chimney, large two-handed felling axe embedded in a chopping block, stacks of split firewood, ox-cart loaded with logs, small orange carnival pennant on the roof ridge, warm hearth-glow inside, centered on dark moody vignette background with deep green-black gradient and warm orange-red carnival accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture, museum quality, no readable text, no modern logos, no people figures dominating composition",
+      "seed": 1460446882,
+      "url": "https://v3b.fal.media/files/b/0a9856ff/bMkjupymreEPe5ZUUDsyN.jpg",
+      "bytes": 1499085,
+      "status": "ok"
+    },
+    {
+      "file": "brabant-townhall.png",
+      "faction": "brabant",
+      "prompt": "painted RPG card art, Brabantian town hall (raadhuis), rural-folkloric fieldstone-and-red-brick building with stepped gable, warm wooden double doors, small belltower with weathervane, orange-and-yellow festive pennant banners strung from the eaves, hay bales by the entrance, lit lanterns flanking the door, centered on dark moody vignette background with deep green-black gradient and warm orange-red carnival accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture, museum quality, no readable text, no modern logos, no people figures dominating composition",
+      "seed": 1437552815,
+      "url": "https://v3b.fal.media/files/b/0a9856ff/rtTAEA9t7F6qP7ac-cSju.jpg",
+      "bytes": 1615811,
+      "status": "ok"
+    },
+    {
+      "file": "brabant-housing.png",
+      "faction": "brabant",
+      "prompt": "painted RPG card art, Brabantian peasant cottages (boerderijen), cluster of two small red-brick houses with thatched roofs and white-painted shutters, smoke curling from chimneys, hay stacks beside the wall, wooden cart wheel leaning against the side, orange-and-yellow carnival flag bunting strung between the houses, warm window-glow at dusk, centered on dark moody vignette background with deep green-black gradient and warm orange-red carnival accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture, museum quality, no readable text, no modern logos, no people figures dominating composition",
+      "seed": 1853493115,
+      "url": "https://v3b.fal.media/files/b/0a9856ff/V-o2vSynl_SeqKuyQEbUM.jpg",
+      "bytes": 1124771,
+      "status": "ok"
+    },
+    {
+      "file": "brabant-faction-special-1.png",
+      "faction": "brabant",
+      "prompt": "painted RPG card art, Brabantian carnival tent (carnavalstent), large festive circus-style striped tent in orange yellow and red with golden tassel trim, warm fairy-lights strung along the entrance flap, wooden barrels stacked beside the entrance, golden cross-and-star Bourgondisch banner hanging above, festive torch-glow spilling out, no characters dominating, centered on dark moody vignette background with deep green-black gradient and warm orange-red carnival accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture, museum quality, no readable text, no modern logos, no people figures dominating composition",
+      "seed": 1123626247,
+      "url": "https://v3b.fal.media/files/b/0a9856ff/M7fhySZC8hGK2xy1KYrA7.jpg",
+      "bytes": 1251490,
+      "status": "ok"
+    },
+    {
+      "file": "brabant-blacksmith.png",
+      "faction": "brabant",
+      "prompt": "painted RPG card art, Brabantian blacksmith forge (smederij), red-brick smithy with low-slung tile roof, glowing orange forge-fire visible through wide arched window, anvil and bellows on the porch, hammers and tongs hanging from beam, iron horseshoe nailed above the door for luck, warm carnival pennant accent, centered on dark moody vignette background with deep green-black gradient and warm orange-red carnival accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture, museum quality, no readable text, no modern logos, no people figures dominating composition",
+      "seed": 723630651,
+      "url": "https://v3b.fal.media/files/b/0a9856ff/6IaDBpgf7NwoiU8oXNxaP.jpg",
+      "bytes": 1448046,
+      "status": "ok"
+    },
+    {
+      "file": "brabant-siege-workshop.png",
+      "faction": "brabant",
+      "prompt": "painted RPG card art, Brabantian siege workshop (belegeringswerkplaats), large open-fronted timber barn with heavy oak beams and red-brick foundation, partially assembled wooden ballista visible inside, stacks of timber and iron-banded wagon wheels, blacksmith's anvil at the side, carnival pennant on the roof ridge, warm forge-glow from interior, centered on dark moody vignette background with deep green-black gradient and warm orange-red carnival accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture, museum quality, no readable text, no modern logos, no people figures dominating composition",
+      "seed": 1942465291,
+      "url": "https://v3b.fal.media/files/b/0a985700/ICuwMjDA4FfrYY84sEGE8.jpg",
+      "bytes": 1446903,
+      "status": "ok"
+    },
+    {
+      "file": "brabant-defense-tower.png",
+      "faction": "brabant",
+      "prompt": "painted RPG card art, Brabantian defense tower (verdedigingstoren), squat red-brick watchtower with crenellated stone top and conical tile roof, narrow arrow-slit windows, oak reinforced door at base, wooden palisade around the foot, Bourgondisch orange-and-yellow banner flying from the spire, single lit lantern at the top window, sturdy fortified appearance, centered on dark moody vignette background with deep green-black gradient and warm orange-red carnival accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture, museum quality, no readable text, no modern logos, no people figures dominating composition",
+      "seed": 1887103674,
+      "url": "https://v3b.fal.media/files/b/0a985700/0CPu6c8-2xWx80AM2ULjk.jpg",
+      "bytes": 1292875,
+      "status": "ok"
+    },
+    {
+      "file": "brabant-faction-special-2.png",
+      "faction": "brabant",
+      "prompt": "painted RPG card art, Brabantian feestzaal (festive hall), warm timber-framed long hall with arched red-brick entrance, colorful stained-glass windows showing abstract carnival motifs, orange-and-yellow streamers crossing the facade, two wooden beer-barrels flanking the doorway, golden lantern light pouring from within, festive bunting strung along the eaves, centered on dark moody vignette background with deep green-black gradient and warm orange-red carnival accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture, museum quality, no readable text, no modern logos, no people figures dominating composition",
+      "seed": 1641181690,
+      "url": "https://v3b.fal.media/files/b/0a985700/7GqH14yLi9-qxbiL5KyC8.jpg",
+      "bytes": 1662427,
+      "status": "ok"
+    },
+    {
+      "file": "randstad-barracks.png",
+      "faction": "randstad",
+      "prompt": "painted RPG card art, Randstad corporate training auditorium (vergaderzaal), low-rise rectangular concrete-and-glass presentation hall with green sedum roof, rows of theatre-seating visible through the curtain-wall glass facade, podium with holographic dashboard display inside, slate-blue accent panels, brushed steel entrance, sterile efficient corporate atmosphere, centered on dark moody vignette background with deep slate-blue-black gradient and warm yellow desk-lamp accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture meets corporate concept art, museum quality, no readable text, no real-world brand logos, no people figures dominating composition",
+      "seed": 952133021,
+      "url": "https://v3b.fal.media/files/b/0a985700/1F5ZMKzLHQU9ycGfpAAhA.jpg",
+      "bytes": 1297620,
+      "status": "ok"
+    },
+    {
+      "file": "randstad-townhall.png",
+      "faction": "randstad",
+      "prompt": "painted RPG card art, Randstad corporate headquarters (hoofdkantoor), tall modern glass-and-steel office tower with sharp geometric facade, slate-blue spandrel panels and reflective glazing, sleek cantilevered entrance canopy, minimalist landscaping with low concrete planters, warm yellow window-grid glow from offices working late, slick anti-folkloric aesthetic, centered on dark moody vignette background with deep slate-blue-black gradient and warm yellow desk-lamp accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture meets corporate concept art, museum quality, no readable text, no real-world brand logos, no people figures dominating composition",
+      "seed": 1484122347,
+      "url": "https://v3b.fal.media/files/b/0a985700/zTXkSf6--A68vLiHxxTyy.jpg",
+      "bytes": 1298441,
+      "status": "ok"
+    },
+    {
+      "file": "randstad-lumbercamp.png",
+      "faction": "randstad",
+      "prompt": "painted RPG card art, Randstad sustainable resource processing facility, modern industrial warehouse with pre-cast concrete panels and tall glass loading-bay doors, ESG-compliant signage placard with abstract leaf icon (no readable text), stacked machine-cut timber pallets in neat geometric arrangement, slate-blue trim, forklift parked outside, sterile efficient corporate-industrial aesthetic, centered on dark moody vignette background with deep slate-blue-black gradient and warm yellow desk-lamp accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture meets corporate concept art, museum quality, no readable text, no real-world brand logos, no people figures dominating composition",
+      "seed": 793477487,
+      "url": "https://v3b.fal.media/files/b/0a985700/_jSxL3SMLUwc0eS6e7uRe.jpg",
+      "bytes": 1257979,
+      "status": "ok"
+    },
+    {
+      "file": "brabant-bridge.png",
+      "faction": "brabant",
+      "prompt": "painted RPG card art, Brabantian stone bridge (brug), arched red-brick bridge spanning a small canal, mossy stone parapet, two warm-glowing lanterns on iron posts at each end, wooden cart with hay crossing the span, orange-and-yellow carnival pennants strung along the parapet, willow trees on the banks, warm rural-Brabant evening atmosphere, centered on dark moody vignette background with deep green-black gradient and warm orange-red carnival accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture, museum quality, no readable text, no modern logos, no people figures dominating composition",
+      "seed": 1734467750,
+      "url": "https://v3b.fal.media/files/b/0a985700/AzQE6gNi8Okrc8a3Jt_UO.jpg",
+      "bytes": 1419553,
+      "status": "ok"
+    },
+    {
+      "file": "randstad-blacksmith.png",
+      "faction": "randstad",
+      "prompt": "painted RPG card art, Randstad CNC fabrication workshop (industriele werkplaats), modern light-industrial unit with corrugated slate-grey steel siding and large glass roller-door, orange sparks visible from a robotic welding arm inside, stacks of machined steel components, slate-blue trim, brushed metal signage, warm yellow interior workshop lighting, anti-folkloric corporate efficiency, centered on dark moody vignette background with deep slate-blue-black gradient and warm yellow desk-lamp accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture meets corporate concept art, museum quality, no readable text, no real-world brand logos, no people figures dominating composition",
+      "seed": 773977850,
+      "url": "https://v3b.fal.media/files/b/0a985700/i46FeVkJ1-aw6w2US3spZ.jpg",
+      "bytes": 926680,
+      "status": "ok"
+    },
+    {
+      "file": "randstad-housing.png",
+      "faction": "randstad",
+      "prompt": "painted RPG card art, Randstad mid-rise residential block (woontoren), uniform modern apartment building with grid of identical balconies in slate-blue and white concrete, glass railings, geometric stair tower at one end, narrow strip of corporate landscaping with low boxwood hedges, warm yellow grid of window glow at dusk, sterile commuter-housing aesthetic, centered on dark moody vignette background with deep slate-blue-black gradient and warm yellow desk-lamp accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture meets corporate concept art, museum quality, no readable text, no real-world brand logos, no people figures dominating composition",
+      "seed": 1383816146,
+      "url": "https://v3b.fal.media/files/b/0a985700/2yD1Fw_P3_ekUGRwx-KiO.jpg",
+      "bytes": 1589618,
+      "status": "ok"
+    },
+    {
+      "file": "randstad-tertiary.png",
+      "faction": "randstad",
+      "prompt": "painted RPG card art, Randstad havermoutmelkbar oat-milk cafe, modern minimalist glass-fronted corporate cafe storefront with brushed-steel counter visible inside, abstract geometric crown emblem signage above the door (invented brand mark), slate-blue interior with warm yellow pendant lights, glass dispensers of pastel-colored grain bowls on display, NO espresso machine, NO barista, sterile efficient, centered on dark moody vignette background with deep slate-blue-black gradient and warm yellow desk-lamp accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture meets corporate concept art, museum quality, no readable text, no real-world brand logos, no people figures dominating composition",
+      "seed": 1857480327,
+      "url": "https://v3b.fal.media/files/b/0a985700/9mfNY3aobOegAOlMylLkd.jpg",
+      "bytes": 1238380,
+      "status": "ok"
+    },
+    {
+      "file": "randstad-upgrade.png",
+      "faction": "randstad",
+      "prompt": "painted RPG card art, Randstad innovation R&D lab, modern open-plan corporate office interior visible through floor-to-ceiling glass facade, holographic KPI dashboard projection floating mid-air, scrum-board with pastel sticky notes on the wall (no readable text), slate-blue walls and brushed-steel desks, warm yellow desk-lamp accents, sterile innovation-theatre atmosphere, centered on dark moody vignette background with deep slate-blue-black gradient and warm yellow desk-lamp accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture meets corporate concept art, museum quality, no readable text, no real-world brand logos, no people figures dominating composition",
+      "seed": 1555714736,
+      "url": "https://v3b.fal.media/files/b/0a985700/u5_-NNseChA-wgyEiXj6Q.jpg",
+      "bytes": 1288213,
+      "status": "ok"
+    },
+    {
+      "file": "randstad-faction-special-1.png",
+      "faction": "randstad",
+      "prompt": "painted RPG card art, Randstad executive boardroom (bestuurskamer), corporate boardroom interior with long obsidian-black conference table reflecting overhead spotlights, twelve identical leather executive chairs, floor-to-ceiling window showing a slate-grey skyline at dusk, holographic line-graph dashboard on the side wall, single warm yellow desk-lamp in corner, anti-folkloric corporate power, centered on dark moody vignette background with deep slate-blue-black gradient and warm yellow desk-lamp accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture meets corporate concept art, museum quality, no readable text, no real-world brand logos, no people figures dominating composition",
+      "seed": 1625579097,
+      "url": "https://v3b.fal.media/files/b/0a985700/0tl7wSMu8dLhxvUk3pRnV.jpg",
+      "bytes": 994319,
+      "status": "ok"
+    },
+    {
+      "file": "randstad-faction-special-2.png",
+      "faction": "randstad",
+      "prompt": "painted RPG card art, Randstad multi-storey corporate parking garage (parkeergarage), open-frame concrete parking structure with horizontal slate-blue louver panels, ramp spiraling up between levels, rows of identical parked sedans in neat geometric arrangement, single warm yellow sodium-vapor lamp glow on each level, ESG-compliant electric-charging station bays, sterile efficient utilitarian, centered on dark moody vignette background with deep slate-blue-black gradient and warm yellow desk-lamp accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture meets corporate concept art, museum quality, no readable text, no real-world brand logos, no people figures dominating composition",
+      "seed": 2082188201,
+      "url": "https://v3b.fal.media/files/b/0a985700/Cw7ByDzfSHVYAdQbZedJR.jpg",
+      "bytes": 1530343,
+      "status": "ok"
+    },
+    {
+      "file": "randstad-siege-workshop.png",
+      "faction": "randstad",
+      "prompt": "painted RPG card art, Randstad heavy-equipment R&D hangar, large modern industrial hangar with corrugated steel siding and oversized glass roller-doors, partially assembled drone-siege-engine on a hydraulic lift inside (modern industrial design, sleek slate-blue panels, exposed wiring), gantry crane overhead, stacks of crated components, warm yellow workshop-lamp accents, anti-folkloric corporate-industrial, centered on dark moody vignette background with deep slate-blue-black gradient and warm yellow desk-lamp accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture meets corporate concept art, museum quality, no readable text, no real-world brand logos, no people figures dominating composition",
+      "seed": 1023387861,
+      "url": "https://v3b.fal.media/files/b/0a985700/bSQYTm_08_PKADMgVVfLa.jpg",
+      "bytes": 1210529,
+      "status": "ok"
+    },
+    {
+      "file": "randstad-defense-tower.png",
+      "faction": "randstad",
+      "prompt": "painted RPG card art, Randstad corporate security observation tower, modern monolithic concrete-and-steel observation tower with reflective slate-blue mirror-glass top floor, surveillance camera arrays mounted at the corners, narrow horizontal slit windows, sleek geometric base with ID-card access door, single warm yellow LED beacon at the apex, anti-folkloric corporate panopticon aesthetic, centered on dark moody vignette background with deep slate-blue-black gradient and warm yellow desk-lamp accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture meets corporate concept art, museum quality, no readable text, no real-world brand logos, no people figures dominating composition",
+      "seed": 533951056,
+      "url": "https://v3b.fal.media/files/b/0a985700/JPAs4MbhEHOZDMMi7VKy3.jpg",
+      "bytes": 1063614,
+      "status": "ok"
+    },
+    {
+      "file": "randstad-bridge.png",
+      "faction": "randstad",
+      "prompt": "painted RPG card art, Randstad modern highway viaduct (snelwegviaduct), sleek cable-stayed concrete bridge with single tall slate-blue pylon and steel cables fanning down to the deck, smooth pre-cast concrete parapet, modern LED roadway lighting in warm yellow at regular intervals, dual-carriageway visible across the span, geometric anti-folkloric infrastructure aesthetic, dusk lighting, centered on dark moody vignette background with deep slate-blue-black gradient and warm yellow desk-lamp accent lighting, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture meets corporate concept art, museum quality, no readable text, no real-world brand logos, no people figures dominating composition",
+      "seed": 231897107,
+      "url": "https://v3b.fal.media/files/b/0a985700/viMT3Bmbmq8Ev-1-P02ji.jpg",
+      "bytes": 1478217,
+      "status": "ok"
+    }
+  ]
+}

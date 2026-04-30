@@ -1,0 +1,201 @@
+{
+  "assets": {
+    "brabant-worker": {
+      "file": "public/assets/portraits/brabant-worker.png",
+      "prompt": "painted RPG card art portrait of a Brabantian peasant farmer, mid-30s sturdy man in a faded orange-and-white check linen work-shirt with rolled sleeves, leather suspenders over a coarse cream apron, holding a well-worn wooden hay-fork over one shoulder with calloused hands, wind-tousled chestnut hair, weathered tan complexion with a few days of stubble, calm steady countryside expression with a hint of a knowing smile, distinctly rural Dutch farmer (no carnival costume, no jester elements), oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with deep green-black gradient and warm orange-red carnival accent lighting (Brabant palette), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the wooden hay-fork shaft and weathered hands, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, carnival costume, jester hat, festival mask, modern clothing",
+      "url": "https://v3b.fal.media/files/b/0a985709/Cv5-4M-ftFAJme8buPReu.jpg",
+      "bytes": 345264,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": "brabant-worker.bak.png"
+    },
+    "belgen-ranged": {
+      "file": "public/assets/portraits/belgen-ranged.png",
+      "prompt": "painted RPG card art portrait of a Belgian Brusselian musketeer, late-20s lean man in a deep-black doublet with a slim red-and-green silk sash diagonally across the chest as a small national accent, holding a polished bronze hand-cannon at the ready with both hands, a wide-brimmed black hat with a small golden feather, mischievous half-grin, neatly trimmed dark moustache and goatee, oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with deep gold-black gradient and warm chocolate-brown accent lighting (Belgian palette: deep black, golden yellow, accent red, Trappist abbey green), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the polished bronze hand-cannon barrel and red-green sash, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, modern rifle, military camouflage, full armor",
+      "url": "https://v3b.fal.media/files/b/0a98570b/OZlJz3Cx6L_hJWGZhL6qV.jpg",
+      "bytes": 269807,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": "belgen-ranged.bak.png"
+    },
+    "randstad-worker": {
+      "file": "public/assets/portraits/randstad-worker.png",
+      "prompt": "painted RPG card art portrait of a Randstad corporate intern (stagiair), early-20s nervous thin young man in a slightly oversized off-the-rack charcoal suit jacket that doesn't quite fit at the shoulders, white shirt buttoned to the top with a thin navy tie knotted a bit askew, clutching a brown clipboard with stacked papers tightly to his chest with both hands, anxious wide-eyed expression with raised eyebrows and a tense smile, neatly combed but boyish hair, slate-blue corporate ambience, oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with deep blue-black gradient and warm yellow desk-lamp accent lighting (Randstad palette), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the clipboard edges and slightly oversized suit shoulders, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, barista, espresso machine, coffee shop, latte cup, confident posture",
+      "url": "https://v3b.fal.media/files/b/0a98570b/VXa2eWqEUIrq_PbTHxF7V.jpg",
+      "bytes": 229352,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": "randstad-worker.bak.png"
+    },
+    "brabant-ranged": {
+      "file": "public/assets/portraits/brabant-ranged.png",
+      "prompt": "painted RPG card art portrait of a Brabantian tractor-rider crossbowman, late-20s broad-shouldered man wearing a hand-knitted bright orange carnival beanie cap pulled low over weathered brow, sturdy brown canvas farmer-jacket with leather elbow patches, holding a heavy hand-cranked steel crossbow at the ready, freckled face with a determined squint, focused hunter expression, oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with deep green-black gradient and warm orange-red carnival accent lighting (Brabant palette), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the steel crossbow limbs and orange knit cap, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, modern firearms, sniper rifle, motorcycle helmet",
+      "url": "https://v3b.fal.media/files/b/0a98570b/uRAJ7bhlQDIugHkmTWMfT.jpg",
+      "bytes": 355752,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": "brabant-ranged.bak.png"
+    },
+    "brabant-infantry": {
+      "file": "public/assets/portraits/brabant-infantry.png",
+      "prompt": "painted RPG card art portrait of a Brabantian carnaval-fighter village brawler, mid-20s wiry man in a battered dark-brown leather jacket with brass buttons over a faded orange undershirt, a short orange festival sash diagonally across his chest, knuckle-wrapped fists, tousled dark hair and a smirking jaw with a small scar through one eyebrow, defiant village-rebel expression, lit by warm orange torchlight from below, oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with deep green-black gradient and warm orange-red carnival accent lighting (Brabant palette), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the worn leather jacket lapels and brass buttons, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, full carnival costume, jester crown, ornate prince robes",
+      "url": "https://v3b.fal.media/files/b/0a98570b/7o7zNqzrKOv_puVLLfpQh.jpg",
+      "bytes": 360689,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": "brabant-infantry.bak.png"
+    },
+    "limburg-ranged": {
+      "file": "public/assets/portraits/limburg-ranged.png",
+      "prompt": "painted RPG card art portrait of a Limburg vlaai-thrower baker-soldier, late-20s burly man in a flour-dusted cream apron over a rolled-sleeve white linen shirt, gripping a long wooden baker's peel-paddle like a polearm in one hand and a small woven basket of round cherry-vlaai pastries hooked under the other arm, ruddy cheerful complexion with a determined grin, flour streaks on his forearms, cherry-red accents on the vlaai pastries, oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with brown-black gradient and warm copper-amber lantern glow (earthen Limburg mergel-yellow + coal-black + iron-grey palette), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the wooden baker's peel and flour-dusted apron, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, modern chef hat, kitchen scene, pizza, restaurant",
+      "url": "https://v3b.fal.media/files/b/0a98570b/yRB1iw9iMVP81e3VqFiD8.jpg",
+      "bytes": 334021,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": "limburg-ranged.bak.png"
+    },
+    "limburg-worker": {
+      "file": "public/assets/portraits/limburg-worker.png",
+      "prompt": "painted RPG card art portrait of a Limburg coal miner, mid-30s rugged man in a battered ochre canvas mining jacket dusted with coal-black streaks across the shoulders, a brass-rimmed mining helmet with a small lit oil-lamp glowing warm amber on the front, dark leather chest-strap holding a pickaxe handle visible at the shoulder, soot-smudged stubbled face with bright determined eyes, weathered miner's hands, oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with brown-black gradient and warm copper-amber lantern glow (earthen Limburg mergel-yellow + coal-black + iron-grey palette), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the brass mining-helmet lamp glowing warm amber, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, modern hardhat, fluorescent vest, headphones",
+      "url": "https://v3b.fal.media/files/b/0a98570b/cLzE8gfFYXJ0iwgXlRp_z.jpg",
+      "bytes": 355313,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": "limburg-worker.bak.png"
+    },
+    "limburg-infantry": {
+      "file": "public/assets/portraits/limburg-infantry.png",
+      "prompt": "painted RPG card art portrait of a Limburg mergel-knight footsoldier, mid-30s broad-shouldered man in studded dark-leather mining-armour over a coarse cream tunic, a roughly-hewn pale mergel-limestone shield strapped to one forearm, gripping a sturdy iron-tipped spear shaft, a coal-dust streaked face with a stoic stern jaw, short dark hair under a banded leather cap, oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with brown-black gradient and warm copper-amber lantern glow (earthen Limburg mergel-yellow + coal-black + iron-grey palette), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the polished mergel-stone shield and iron spear-tip, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, shining plate armor, polished knight, modern tactical gear",
+      "url": "https://v3b.fal.media/files/b/0a98570b/iPFtUi_z4LHsnFwyD2ujY.jpg",
+      "bytes": 376120,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": "limburg-infantry.bak.png"
+    },
+    "belgen-worker": {
+      "file": "public/assets/portraits/belgen-worker.png",
+      "prompt": "painted RPG card art portrait of a Belgian frituur-stall owner, late-30s portly jolly man in a navy-and-white striped apron over a rolled-sleeve white shirt, holding a paper cone overflowing with golden Belgian frites in one hand and a long-handled wire frying ladle in the other, round friendly red-cheeked face with a broad warm grin and bushy moustache, neatly slicked dark hair, warm chocolate-brown and golden-yellow tones, oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with deep gold-black gradient and warm chocolate-brown accent lighting (Belgian palette: deep black, golden yellow, accent red, Trappist abbey green), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the golden frites in the paper cone and ladle, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, thin athletic build, modern fast-food uniform, McDonald's",
+      "url": "https://v3b.fal.media/files/b/0a98570b/KsUTA6JFpI1EqxUjIwUOp.jpg",
+      "bytes": 329546,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": "belgen-worker.bak.png"
+    },
+    "belgen-infantry": {
+      "file": "public/assets/portraits/belgen-infantry.png",
+      "prompt": "painted RPG card art portrait of a Belgian frituur-knight footsoldier, mid-30s blond stocky man in a dark-leather jerkin over a Trappist-green tabard with a small golden lion crest at the chest, gripping a broad heavy steel kitchen spatula re-forged into a short-sword in one hand, slightly frizzed blond hair framing a confident half-smirk, a fine pale-blond moustache, warm gold and chocolate-brown lighting, oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with deep gold-black gradient and warm chocolate-brown accent lighting (Belgian palette: deep black, golden yellow, accent red, Trappist abbey green), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the steel spatula-sword and Trappist-green tabard accent, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, Viking horns, full helmet covering face, modern soldier",
+      "url": "https://v3b.fal.media/files/b/0a98570b/4qv3zqs4GgBPUINoFnz_i.jpg",
+      "bytes": 329709,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": "belgen-infantry.bak.png"
+    },
+    "randstad-ranged": {
+      "file": "public/assets/portraits/randstad-ranged.png",
+      "prompt": "painted RPG card art portrait of a Randstad strategy consultant, early-30s sharp-eyed man in a slim-cut slate-blue two-piece suit with a crisp white shirt and dark navy tie, thin silver wire-rim glasses, a sleek leather laptop satchel slung diagonally across his chest, holding a slim takeaway paper coffee cup in one hand as a minor character-detail (NOT a barista), neatly slicked-back dark hair, slightly sceptical half-smile, urban executive energy, oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with deep blue-black gradient and warm yellow desk-lamp accent lighting (Randstad palette), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the laptop bag strap and silver wire-rim glasses, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, full coffee shop scene, espresso machine, barista apron, rural clothing",
+      "url": "https://v3b.fal.media/files/b/0a98570b/ZEUHa1JXklPm3WbcNBGsH.jpg",
+      "bytes": 310307,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": "randstad-ranged.bak.png"
+    },
+    "randstad-ceo": {
+      "file": "public/assets/portraits/randstad-ceo.png",
+      "prompt": "painted RPG card art portrait of De CEO hero, sharp commanding mid-40s man in a flawlessly tailored slate-blue three-piece pinstripe suit, crisp white shirt with a deep-navy silk tie and a small gold lapel pin, holding a slim porcelain espresso cup as a minor character-detail in one hand, slicked-back salt-and-pepper hair, piercing pale-blue eyes, slight knowing smirk, dominant urban executive presence, oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with deep blue-black gradient and warm yellow desk-lamp accent lighting (Randstad palette), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the lapel pin and the slim espresso cup edge, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, casual clothes, beard, smiling broadly, t-shirt",
+      "url": "https://v3b.fal.media/files/b/0a98570b/jOV1kbRzXj_qWemF5pH78.jpg",
+      "bytes": 246713,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": "randstad-ceo.bak.png"
+    },
+    "brabant-prins": {
+      "file": "public/assets/portraits/brabant-prins.png",
+      "prompt": "painted RPG card art portrait of the Prins van Brabant carnival prince hero, regal mid-40s man in a deep-orange velvet cape lined with white ermine fur trim across the shoulders, wearing a tall ornate gold-embroidered carnival steek-hat (tricorn) crowned with lush white ostrich plumes, a polished gold sceptre with carnival ribbons gripped in one hand, regal trimmed dark beard, jovial confident benevolent expression, royal yet warm-folk presence, oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with deep green-black gradient and warm orange-red carnival accent lighting (Brabant palette), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the gold steek-hat plumes and ermine collar, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, modern king costume, crown of gold gems, chess king",
+      "url": "https://v3b.fal.media/files/b/0a98570b/SQJqrC6pqjd5Q2ekVPcKv.jpg",
+      "bytes": 367467,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": "brabant-prins.bak.png"
+    },
+    "randstad-politicus": {
+      "file": "public/assets/portraits/randstad-politicus.png",
+      "prompt": "painted RPG card art portrait of the Stadhouder politician hero, mid-50s polished orator in a charcoal-grey wool suit with a sky-blue shirt and a deep-navy silk tie clipped with a silver tie-clip, gripping a chrome handheld microphone in mid-debate gesture with one outstretched hand, neatly parted greying hair, earnest furrowed-brow rhetorical expression, formal podium-ready presence, oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with deep blue-black gradient and warm yellow desk-lamp accent lighting (Randstad palette), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the chrome microphone and silver tie-clip, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, casual outfit, wild hair, smiling jovially, sunglasses",
+      "url": "https://v3b.fal.media/files/b/0a98570b/OQuG7QJ2XQWIhshEGe-Ox.jpg",
+      "bytes": 250268,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": "randstad-politicus.bak.png"
+    },
+    "belgen-abdijbrouwer": {
+      "file": "public/assets/portraits/belgen-abdijbrouwer.png",
+      "prompt": "painted RPG card art portrait of De Abdijbrouwer hero, devout round-bellied mid-50s Trappist monk-brewer in a deep-brown wool monk's habit with a hood draped at the shoulders and a knotted rope cinch at the waist, holding a tall brown ceramic stein of foaming amber Trappist abbey beer in one hand and a small worn wooden cross necklace at his chest, tonsured hair ring around a balding crown, jolly ruddy cheeks with a warm contemplative smile, pious yet jovial vibe, oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with deep gold-black gradient and warm chocolate-brown accent lighting (Belgian palette: deep black, golden yellow, accent red, Trappist abbey green), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the foaming amber Trappist beer and wooden cross, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, modern bartender, thin athletic build, fantasy wizard, witch hat",
+      "url": "https://v3b.fal.media/files/b/0a98570b/C5aBQv6iHD2njnQjK9E0h.jpg",
+      "bytes": 271897,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": "belgen-abdijbrouwer.bak.png"
+    },
+    "brabant-boer": {
+      "file": "public/assets/portraits/brabant-boer.png",
+      "prompt": "painted RPG card art portrait of De Boer hero, an authoritative late-50s old farmer with weathered tanned face and silver-streaked beard, wearing a brick-red work-shirt under a heavy dark-brown leather vest with brass buttons, a faded bright-orange neck-scarf knotted at the throat, gripping a long-handled iron pitchfork upright like a staff, deep-set knowing eyes with crow's feet, broad shoulders, calm patriarch energy of a village elder, oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with deep green-black gradient and warm orange-red carnival accent lighting (Brabant palette), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the worn pitchfork tines and orange neck-scarf, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, young farmer, smooth face, beardless, modern overalls",
+      "url": "https://v3b.fal.media/files/b/0a98570b/nZ2ut7miSod1FQ667h7G_.jpg",
+      "bytes": 310482,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": "brabant-boer.bak.png"
+    },
+    "limburg-maasmeester": {
+      "file": "public/assets/portraits/limburg-maasmeester.png",
+      "prompt": "painted RPG card art portrait of De Vlaaibaas Maasmeester hero, kindly late-50s old master-baker with flour-dusted forearms and a flour-streaked cream apron over a rolled-sleeve white linen shirt, holding a long polished bread-knife in one hand and resting the other on a freshly-baked golden cherry-vlaai on a wooden tray, full silver beard, ruddy cheeks, warm grandfatherly knowing smile, eyes crinkled with kindness, oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with brown-black gradient and warm copper-amber lantern glow (earthen Limburg mergel-yellow + coal-black + iron-grey palette), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the long bread-knife blade and flour-dusted apron, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, modern bakery, white chef hat, electric mixer",
+      "url": "https://v3b.fal.media/files/b/0a98570b/PoM8MPNeBpYWSRDWuReyP.jpg",
+      "bytes": 298103,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": "limburg-maasmeester.bak.png"
+    },
+    "belgen-frietkoning": {
+      "file": "public/assets/portraits/belgen-frietkoning.png",
+      "prompt": "painted RPG card art portrait of De Frietkoning hero, regal jolly mid-40s portly king with a tall ornate gold-and-deep-red royal robe trimmed with small embroidered frietzakje motifs along the shoulder, wearing an ornate stylised crown made of standing golden frites pieces around a gold band, gripping a large paper cone of golden frites like a royal sceptre in one hand, round red-cheeked face with a broad benevolent grin and bushy reddish-blond moustache, regal yet warmly funny presence, oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with deep gold-black gradient and warm chocolate-brown accent lighting (Belgian palette: deep black, golden yellow, accent red, Trappist abbey green), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the golden frites-crown and paper cone sceptre, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, thin king, dark sinister mood, real Belgian royal family",
+      "url": "https://v3b.fal.media/files/b/0a98570b/RwVOgdrPebJL_5_nRvCcn.jpg",
+      "bytes": 370819,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": "belgen-frietkoning.bak.png"
+    },
+    "limburg-mijnbaas": {
+      "file": "public/assets/portraits/limburg-mijnbaas.png",
+      "prompt": "painted RPG card art portrait of De Mijnbaas hero, authoritative late-50s veteran mine-foreman with deep-tanned coal-streaked face and grey-streaked thick beard, wearing a heavy dark-leather miner's coat with a wide brass-buckle chest-strap, a brass-rimmed miner's helmet tucked under one arm with its small oil-lamp glowing warm amber, dark-soot smudges on weathered hands, stern commanding expression with deep-set wise eyes, gravitas of a lifetime underground, oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with brown-black gradient and warm copper-amber lantern glow (earthen Limburg mergel-yellow + coal-black + iron-grey palette), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the heavy brass-buckle leather chest-strap and lamp, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, young miner, smooth face, modern industrial gear",
+      "url": "https://v3b.fal.media/files/b/0a98570b/sByt1H9IhzVAC1hKXQDld.jpg",
+      "bytes": 345137,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": "limburg-mijnbaas.bak.png"
+    }
+  },
+  "generated": "2026-04-30",
+  "style_anchor": [
+    "public/assets/portraits/randstad-infantry.png",
+    "public/assets/portraits/brabant-support.png"
+  ],
+  "model": "fal-ai/flux/dev",
+  "pipeline": "Flux Dev square_hd 1024x1024 -> PIL LANCZOS 512x512 -> PNG (NO BiRefNet, vignette+frame is design)"
+}

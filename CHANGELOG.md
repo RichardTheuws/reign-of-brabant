@@ -1,5 +1,51 @@
 # Changelog
 
+## [0.53.0] - 2026-04-30 — Painted-vignette portrait pass (43 portraits regen)
+
+### Why
+Richard's bug-rapport: "al onze karakters en gebouwen hebben eigen HUD afbeeldingen nodig die passen bij de karakters". Coverage was al compleet (alle factie-mappings hadden een PNG), maar de stijl was inconsistent: Limburg/Belgen building-portraits stonden op painted-vignette quality (1.0-1.7 MB), Brabant/Randstad buildings op 243-436 KB (oude generator-pas). Unit-portraits idem: meeste op 62-107 KB old-style, alleen `randstad-infantry` (Manager v0.52.0) en `brabant-support` op painted-vignette quality (272-326 KB). Resultaat: HUD-cards zagen er per factie wisselend uit.
+
+### Asset regen — 24 building portraits (Brabant + Randstad)
+Twee parallelle Asset Generator agents via fal.ai Flux Dev `square_hd` (28 steps, ThreadPoolExecutor 8 workers). Elk overschreven origineel als `<file>.bak.png` (idempotent — bestaande backups onaangeroerd). Style anchor: `limburg-barracks.png` + `belgen-barracks.png` als reference.
+
+**Brabant 12** (1.1-1.6 MB): townhall, barracks, lumbercamp, blacksmith, housing, tertiary, upgrade, faction-special-1, faction-special-2, defense-tower, siege-workshop, bridge — ruraal-folkloric warm-orange carnival-flavour, red-brick + thatched roofs, festive pennants, gold filigree corner-frame.
+
+**Randstad 12** (905 KB-1.6 MB): townhall, barracks, lumbercamp, blacksmith, housing, tertiary, upgrade, faction-special-1, faction-special-2, defense-tower, siege-workshop, bridge — corporate slate-blue glass-and-steel, geometric facades, warm yellow window-glow, anti-folkloric. `randstad-tertiary` (havermoutmelkbar) kreeg expliciete `NO espresso machine, NO barista` guard om Flux van koffie-default af te houden. `randstad-faction-special-2` (parkeergarage) als interior-shot voor card-frame fit.
+
+Cost: 24 × Flux Dev = ~$0.72.
+
+### Asset regen — 19 unit + hero portraits
+Style anchor: `randstad-infantry.png` (Manager re-vamp v0.52.0) + `brabant-support.png` als references. Pipeline: Flux Dev → PIL LANCZOS 512×512 → PNG (geen BiRefNet — gold-frame en vignette zijn IN het beeld, niet transparent overlay; memory regel "vignette + gold frame IS het design" wint).
+
+**10 generic units** (224-367 KB): brabant-worker/infantry/ranged, randstad-worker/ranged, limburg-worker/infantry/ranged, belgen-worker/infantry/ranged. Stagiair = nervous corporate intern (anti-barista guard). Brabant-units = authentiek-rural (anti-jester guard). Vlaaienwerper = bakker met deeg-spatel + manden.
+
+**8 heroes** (240-362 KB): brabant-prins/boer, randstad-ceo/politicus, limburg-mijnbaas/maasmeester, belgen-frietkoning/abdijbrouwer. Trappist Abdijbrouwer = monk-brewer (first-try). Frietkoning kreeg traditional gem-crown + paper-cone frites-sceptre. Brabant-prins = carnaval-prins met hermelijn-mantel + steek-hoed.
+
+Cost: 19 × Flux Dev = ~$0.57.
+
+### Niet aangeraakt (anchors + buiten scope)
+- `randstad-infantry.png` (272 KB) en `brabant-support.png` (326 KB) — gebruikt als style anchors, niet vervangen.
+- `limburg-faction-special-1.png` (355 KB) en `belgen-faction-special-1.png` (279 KB) — pre-painted-vignette artifacts uit een eerdere batch. Niet in deze bundle, maar gemarkeerd in `portrait-asset-coverage.test.ts` quality-lock. Toekomstige bundle kan deze 2 ook regen.
+
+### Tests (+71, geen regressions)
+`tests/portrait-asset-coverage.test.ts` (71 tests):
+- **48 building coverage tests** — voor elke (factie × 12 building-types) combinatie: `getBuildingPortraitUrl()` returned URL én PNG bestaat op disk.
+- **13 unit coverage tests** — voor elke (factie × valid unit-type): `getUnitPortraitUrl()` returned URL én PNG bestaat. Brabant heeft 4 types (incl. Support), andere 3.
+- **8 hero coverage tests** — voor elke gemapped HeroTypeId: `getHeroPortraitUrl()` returned URL én PNG bestaat.
+- **2 quality-lock tests** — alle building portraits ≥ 250 KB en alle unit/hero portraits ≥ 200 KB. Voorkomt dat iemand per ongeluk een tiny placeholder terugzet. Drempels: 250 KB (building) en 200 KB (unit/hero) — toleert de 2 pre-painted-vignette outliers. Tighten naar 800 KB zodra die twee geregen zijn.
+
+Test-suite: 1657 → 1728. `npm test` 4.5s, alle 1728 groen.
+
+### Reproducibility
+- Building script: `scripts/regen_building_portraits_v048.py` + manifest `_brabant-randstad-v048-batch.json`
+- Unit script: `scripts/regen_unit_portraits_v053.py` + manifest `unit_portraits_v053.json`
+- Prompt-templates en faction-palettes geüpdatet in `.claude/agents/memory/asset-generator.md`
+
+### Why MINOR (0.53.0 ipv 0.52.4)
+Asset bundle conform `versioning.md` — features/bundles = MINOR-bump, ook bij visuele upgrades zonder code-wijziging in de game-loop. 43 nieuwe portraits + 71 lock-tests = bundle.
+
+---
+
 ## [0.52.3] - 2026-04-30 — HUD build-button BEM CSS fix (cost + label visible)
 
 ### Fixed — `.cmd-btn__cost`, `.cmd-btn__label`, `.btn-icon`, `.hotkey` now styled
