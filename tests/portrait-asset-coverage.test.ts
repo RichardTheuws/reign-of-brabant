@@ -63,9 +63,9 @@ describe('Portrait asset coverage — every mapped portrait has a PNG on disk', 
   describe('Units (4 factions × 3-4 unit types)', () => {
     const factionUnitTypes: Record<FactionId, UnitTypeId[]> = {
       [FactionId.Brabanders]: [UnitTypeId.Worker, UnitTypeId.Infantry, UnitTypeId.Ranged, UnitTypeId.Support],
-      [FactionId.Randstad]: [UnitTypeId.Worker, UnitTypeId.Infantry, UnitTypeId.Ranged],
-      [FactionId.Limburgers]: [UnitTypeId.Worker, UnitTypeId.Infantry, UnitTypeId.Ranged],
-      [FactionId.Belgen]: [UnitTypeId.Worker, UnitTypeId.Infantry, UnitTypeId.Ranged],
+      [FactionId.Randstad]: [UnitTypeId.Worker, UnitTypeId.Infantry, UnitTypeId.Ranged, UnitTypeId.Support],
+      [FactionId.Limburgers]: [UnitTypeId.Worker, UnitTypeId.Infantry, UnitTypeId.Ranged, UnitTypeId.Support],
+      [FactionId.Belgen]: [UnitTypeId.Worker, UnitTypeId.Infantry, UnitTypeId.Ranged, UnitTypeId.Support],
     };
 
     for (const factionId of FACTIONS) {

@@ -130,20 +130,15 @@ describe('Building-card action buttons use faction-painted portraits', () => {
       expect(img.src).toContain('limburg-ranged.png');
     });
 
-    it('train-support shows limburg-worker fallback when no support portrait', () => {
-      // Limburg has no Support unit-type portrait. getUnitPortraitUrl returns
-      // null, so caller falls back to COMMAND_ICON_IMAGES via the act.icon key.
+    it('train-support shows limburg-support (Sjpion) portrait', () => {
+      // v0.54.0: every faction has its own Support portrait.
       hud.showBuildingCard(makeBuildingCard(BuildingTypeId.Barracks, [
         { action: 'train-support', icon: 'UNIT_S', label: 'Sjpion', hotkey: 'D' },
       ]));
       const btn = document.querySelector<HTMLButtonElement>('[data-action="train-support"]')!;
-      const img = btn.querySelector('img');
-      // Either the support PNG (if added later) OR the generic UNIT_S icon —
-      // but NEVER the wrong faction's portrait.
-      if (img) {
-        expect(img.src).not.toContain('brabant-support.png');
-        expect(img.src).not.toContain('belgen');
-      }
+      const img = btn.querySelector('img')!;
+      expect(img.src).toContain('limburg-support.png');
+      expect(img.src).not.toContain('brabant-support.png');
     });
 
     it('train-hero-0 shows limburg-mijnbaas portrait (not generic gem-crown)', () => {

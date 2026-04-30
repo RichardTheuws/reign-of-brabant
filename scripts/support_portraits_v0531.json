@@ -1,0 +1,38 @@
+{
+  "assets": {
+    "limburg-support": {
+      "file": "public/assets/portraits/limburg-support.png",
+      "prompt": "painted RPG card art portrait of a Limburg Sjpion mountain-scout healer-spy, reserved late-20s androgynous figure of mining-folkloric heritage, wearing a wide hooded dark-brown leather cape pulled forward to cast a deep shadow across half the face, only one eye visible below the hood with a sharp analytical gaze, fine ash-streaks of coal-dust on the visible cheekbone, a small brass-rimmed miner's oil-lamp clipped to the cape's collar emitting a soft warm copper-amber glow, holding a small tightly-rolled white linen medical bandage in one gloved hand as a healer detail, the other hand resting on a leather satchel at the hip with small mergel-stone arrow-tips visible, mysterious reserved analytical expression, austrian-mining-folkloric feel (NOT cheerful, NOT carnival, NOT Belgian frituur), oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with brown-black gradient and warm copper-amber lantern glow (earthen Limburg mergel-yellow + coal-black + iron-grey palette), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the partial face shadow under the hood and the small mining-lamp glow on the cheekbone, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, cheerful smile, carnival costume, jester elements, frituur, waffle, full face visible, no hood, modern hardhat, fluorescent vest, headphones, Brabantian orange beanie",
+      "url": "https://v3b.fal.media/files/b/0a985c65/UIvLAw8YkpqT0RNyW-3cv.jpg",
+      "bytes": 300191,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev"
+    },
+    "randstad-support": {
+      "file": "public/assets/portraits/randstad-support.png",
+      "prompt": "painted RPG card art portrait of a Randstad HR-Medewerker corporate human-resources coach, approachable late-30s androgynous professional with neatly tied-back medium-brown hair and gentle empathetic eyes, wearing a well-fitted slate-blue corporate suit jacket over a cream blouse with a small slim badge clipped to the lapel, holding a thin matte-black tablet against the chest with one hand and a slim silver stylus pen tucked behind one ear, calm sympathetic coaching expression with a small reassuring smile and a slight understanding tilt of the head, soft warm rim-light catching the side of the face suggesting gentle authority, refined corporate-healer presence (NOT a barista, NOT a manager dominant pose, NOT a nervous intern), oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with deep blue-black gradient and warm yellow desk-lamp accent lighting (Randstad palette), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the slim tablet edge and the warm rim-light on the cheekbones, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, barista, espresso machine, coffee shop, latte cup, latte art, wave hairstyle, dominant power pose, executive arrogance, anxious posture, oversized suit",
+      "url": "https://v3b.fal.media/files/b/0a985c65/9US9oE1nZEjzoqwVbE21-.jpg",
+      "bytes": 263695,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev"
+    },
+    "belgen-support": {
+      "file": "public/assets/portraits/belgen-support.png",
+      "prompt": "painted RPG card art portrait of a Belgian Wafelzuster matriarchal waffle-sister healer, warm matriarchal mid-40s woman with kind round rosy cheeks and a calm motherly expression, wearing a soft cream sister's headcap framing the face (mild sister, NOT a strict nun habit), a clean white linen apron over a warm chocolate-brown and deep-red bodice with small golden-yellow trim at the cuffs, cradling a small woven wicker basket against the hip filled with fresh golden Belgian waffles dusted with powdered sugar, a tiny brass oil-lamp with a soft warm flame set on a small ledge at her side casting warm chocolate-brown rim-light, gentle warm motherly healer presence (NOT a strict nun, NOT a young girl, NOT a caricature), oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with deep gold-black gradient and warm chocolate-brown accent lighting (Belgian palette: deep black, golden yellow, accent red, Trappist abbey green), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the golden waffles in the woven basket and the small oil-lamp flame, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, strict nun habit, full black habit, young girl, child, teenager, McDonald's, modern fast-food uniform, sexualized, thin glamour pose, full-body distant shot",
+      "url": "https://v3b.fal.media/files/b/0a985c65/reuG8PF0H_GGf5YQ7DC-N.jpg",
+      "bytes": 294113,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev"
+    }
+  },
+  "generated": "2026-04-30",
+  "style_anchor": [
+    "public/assets/portraits/brabant-support.png",
+    "public/assets/portraits/randstad-infantry.png"
+  ],
+  "model": "fal-ai/flux/dev",
+  "pipeline": "Flux Dev square_hd 1024x1024 -> PIL LANCZOS 512x512 -> PNG (NO BiRefNet, vignette+frame is design)"
+}

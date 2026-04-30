@@ -71,16 +71,19 @@ const UNIT_PORTRAITS: Record<number, Record<number, string>> = {
     [UnitTypeId.Worker]: 'randstad-worker',
     [UnitTypeId.Infantry]: 'randstad-infantry',
     [UnitTypeId.Ranged]: 'randstad-ranged',
+    [UnitTypeId.Support]: 'randstad-support',
   },
   [FactionId.Limburgers]: {
     [UnitTypeId.Worker]: 'limburg-worker',
     [UnitTypeId.Infantry]: 'limburg-infantry',
     [UnitTypeId.Ranged]: 'limburg-ranged',
+    [UnitTypeId.Support]: 'limburg-support',
   },
   [FactionId.Belgen]: {
     [UnitTypeId.Worker]: 'belgen-worker',
     [UnitTypeId.Infantry]: 'belgen-infantry',
     [UnitTypeId.Ranged]: 'belgen-ranged',
+    [UnitTypeId.Support]: 'belgen-support',
   },
 };
 

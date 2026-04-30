@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.54.0] - 2026-04-30 — Support-portrait coverage voor alle 4 facties
+
+### Added — 3 nieuwe Support unit-portraits
+v0.53.1 wired faction-painted portraits in voor de building-card train-buttons. Edge case: alleen Brabant had een Support-portrait (`brabant-support.png` voor Boerinneke). Randstad/Limburg/Belgen Support-units (HR-Medewerker / Sjpion / Wafelzuster) vielen daardoor terug op het generieke `UNIT_S` command-icon. Deze bundle vult de gap.
+
+| File | Karakter | Spec | Size |
+|---|---|---|---|
+| `randstad-support.png` | HR-Medewerker | Late-30s androgynous corporate coach, slate-blue suit, klembord/tablet, sympathetic coaching smile, lapel badge. Triple guard: NOT barista, NOT manager, NOT intern. | 257 KB |
+| `limburg-support.png` | Sjpion | Late-20s androgynous mining-scout, hooded brown leather cape met deep face-shadow, brass mining oil-lamp, leather satchel met mergel-stone arrow-tips. Austrian-mining-folkloric. | 293 KB |
+| `belgen-support.png` | Wafelzuster | Mid-40s matriarchal waffle-sister healer, cream sister-headcap (NIET strict nun), white linen apron, woven basket met golden waffles, brass oil-lamp. | 287 KB |
+
+Pipeline: 3 × Flux Dev `square_hd` → PIL LANCZOS 512×512 → PNG (parallel, 30s wallclock). Painted gold-frame en vignette IN het beeld matching `brabant-support.png` anchor (geen BiRefNet). Cost: ~$0.09. Geen backups (paths bestonden niet).
+
+### Updated — `portraitMap.ts` Support-mapping uitgebreid
+`UNIT_PORTRAITS[FactionId.{Randstad,Limburgers,Belgen}]` heeft nu een `[UnitTypeId.Support]` entry met de juiste filename slug. Brabant ongewijzigd (had `brabant-support` al).
+
+### Tests (+3, geen regressions)
+`tests/portrait-asset-coverage.test.ts` `factionUnitTypes` uitgebreid: alle 4 facties testen nu Worker + Infantry + Ranged + Support (was 13 unit-tests, wordt 16). De 3 nieuwe Support-mappings krijgen automatisch een coverage-test (`getUnitPortraitUrl` returns URL én PNG bestaat).
+
+`tests/HUD-bcard-action-portraits.test.ts` "Limburg Schuttershal" scenario: de oude "no Support fallback" test is vervangen door een positieve assertion dat `train-support` nu de `limburg-support.png` portrait krijgt (Sjpion in Schuttershal).
+
+Suite: 1736 → 1739.
+
+### Why MINOR (0.54.0 ipv 0.53.2)
+Coverage-uitbreiding via nieuwe assets + portraitMap.ts code-wijziging = bundle conform `versioning.md`. Niet pure bug-fix want we voegen nieuwe asset-mappings toe en breiden het API-contract van `getUnitPortraitUrl` uit (3 nieuwe valid factie+unitType combinaties die voorheen `null` returnden).
+
+### Reproducibility
+- Script: `scripts/regen_support_portraits_v0531.py`
+- Manifest: `scripts/support_portraits_v0531.json`
+- Memory: `.claude/agents/memory/asset-generator.md` (sectie "v0.53.1 Support-portrait trio")
+
+---
+
 ## [0.53.1] - 2026-04-30 — Building-card train-buttons gebruiken factie-painted portraits
 
 ### Fixed — train-unit + train-hero buttons toonden generieke command-icons
