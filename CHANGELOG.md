@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.52.3] - 2026-04-30 — HUD build-button BEM CSS fix (cost + label visible)
+
+### Fixed — `.cmd-btn__cost`, `.cmd-btn__label`, `.btn-icon`, `.hotkey` now styled
+`createCommandButton()` in `HUD.ts` voegt al sinds langer `<span class="cmd-btn__cost">300g</span>` toe aan elke build-button met positieve cost. Maar `hud.css` had alléén CSS-rules voor de oude convention (`.cmd-label`, `.cmd-icon`, `.cmd-hotkey`) — de BEM-klassen die de JS produceert (`cmd-btn__label`, `cmd-btn__cost`, `btn-icon`, `hotkey`) waren ongestyled. Resultaat: cost-text kreeg browser-default rendering (~16px) en overflowde de 48px button — visueel onleesbaar of geclipt. Bug-rapport van Richard 2026-04-30 ("bij de specials staat de 'cost' ook niet zichtbaar in beeld in de HUD").
+
+CSS toegevoegd in `src/ui/hud.css` na `.cmd-btn--build .cmd-icon`:
+- **`.cmd-btn .btn-icon`** — flex-shrink:0, 26×26px, centered. Image `object-fit: contain` met 3px radius zodat painted-vignette portraits clean fitten.
+- **`.cmd-btn__label`** — 8px uppercase, dim-tekst, ellipsis-overflow.
+- **`.cmd-btn__cost`** — 9px mono gold (`var(--color-gold-icon)`), dezelfde stijl als `.cmd-btn--research .research-cost`. Zichtbaar onder de label.
+- **`.cmd-btn .hotkey`** — absolute top-right, 9px gold, pointer-events:none zodat clicks doorvallen.
+
+Dit raakt ALLE build-buttons (Barracks, Blacksmith, LumberCamp, FactionSpecial1, FactionSpecial2, Housing, Tower, etc.) — de specials waren het meest opvallend door hun hoogste cost (300g/400g) maar het probleem was generiek.
+
+### Tests (+10, geen regressions)
+`tests/HUD-build-cost-display.test.ts` (10 tests):
+- Per factie (4 facties × 2 specials = 8 tests): build-faction1 button bevat `.cmd-btn__cost` met "300g", build-faction2 met "400g".
+- Per factie (4 tests): build-barracks button bevat een cost-span die matcht `^\d+g(\+\d+h)?$`.
+- 1 test: build-barracks button gebruikt `<faction>-barracks.png` als img src (verifieert factie-painted portrait wiring per factie via `getBuildingPortraitUrl`).
+- 1 test: factie-switch (limburg → belgen) rebuildt barracks-button met de juiste portrait per factie.
+
+Test-suite: 1647 → 1657. Helper `hud.init({...mocks})` was nodig naast `new HUD()` omdat DOM-refs in `init()` worden geset, niet in de constructor.
+
+### Why patch (0.52.3 ipv 0.53.0)
+Pure bug-fix conform `versioning.md` — geen nieuwe features, alleen ontbrekende CSS aanvullen voor reeds-bestaande JS-pad.
+
+---
+
 ## [0.52.1] - 2026-04-30 — Limburgs female pool (Nick) + gender-aware UnitVoices
 
 ### Added — Gender-flag op `UnitArchetype`
