@@ -1,0 +1,26 @@
+{
+  "concept": {
+    "prompt": "single full-body T-pose character concept art, modern Dutch corporate Randstad Manager, mid-30s authoritative man in a tailored slate-blue suit jacket with crisp white shirt and slim navy tie, polished black Oxford shoes, holding a thin leather-bound presentation folder under one arm and pointing assertively with the other hand, confident boardroom posture, painted-realistic concept-art style with clean cinematic lighting, soft directional desk-lamp warm-yellow rim light, centered on plain neutral grey background, low-poly stylized fantasy RTS art style, painted clean linework, shoulders squared, matching style of Randstad Stagiair and Consultant unit references, no text, no logo, no carnival costume, no cartoon proportions, Randstad palette (slate-blue suit, white shirt, warm yellow accents), single character only, no extra figures",
+    "neg": "cartoon, exaggerated proportions, big head, chibi, low-quality, blurry, photorealistic photograph, multiple characters, text, watermark, brand logos, ugly, cluttered background",
+    "url": "https://v3b.fal.media/files/b/0a985658/22M4JXBsnKpOsShuF6VXp.jpg",
+    "file": "public/assets/concepts/units/randstad-manager-v2.png",
+    "bytes": 294000
+  },
+  "portrait": {
+    "prompt": "painted RPG card art portrait of a Randstad Manager, mid-30s authoritative corporate man in a tailored slate-blue suit and crisp white shirt with slim navy tie, holding a leather-bound presentation folder, confident boardroom expression with a slight knowing smirk, oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with deep blue-black gradient and warm yellow desk-lamp accent lighting (Randstad palette), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the lapels and tie pin, museum quality oil painting meets corporate concept art, no readable text, no real-world brand logos, no carnival, no cartoon proportions",
+    "neg": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, carnival costume",
+    "url": "https://v3b.fal.media/files/b/0a985659/QR7azYJuSuvi48lu2ziEL.jpg",
+    "file": "public/assets/portraits/randstad-infantry.png",
+    "bytes": 278755
+  },
+  "mesh": {
+    "prompt": "Modern Dutch corporate Randstad Manager character, mid-30s authoritative man in tailored slate-blue suit, white shirt, slim navy tie, polished black Oxford shoes, presentation folder, clean PBR materials, painted-realistic style matching other Randstad units (Stagiair, Consultant), full body T-pose, RTS unit scale, NOT cartoon, NOT chibi",
+    "from_concept": "public/assets/concepts/units/randstad-manager-v2.png",
+    "glb_url": "https://v3b.fal.media/files/b/0a985666/LIOEyHdjVdEg8qy7ZhC9__model.glb",
+    "primary_file": "public/assets/models/v02/randstad/manager.glb",
+    "rendered_file": "public/assets/models/v02/randstad/infantry-v2.glb",
+    "bytes": 6666944,
+    "elapsed_s": 139,
+    "polycount_target": 14000
+  }
+}

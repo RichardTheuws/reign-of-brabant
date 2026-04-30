@@ -1,5 +1,79 @@
 # Changelog
 
+## [0.52.1] - 2026-04-30 — Limburgs female pool (Nick) + gender-aware UnitVoices
+
+### Added — Gender-flag op `UnitArchetype`
+`gender: 'male' | 'female' | 'mixed'` op alle 30 unit-archetypes in `src/data/factionData.ts`. Brabant: Boer/Sluiper/Tractorrijder=male, Boerinneke=female, Carnavalvierder/Praalwagen/Frituurmeester/Muzikant=mixed. Randstad: Manager=male (Serge), de-CEO/Stagiair/etc=mixed. Limburg: Mijnwerker/Schutterij/Mergelridder/Kolenbrander=male, Sjpion/Vlaaienwerper/Mijnrat/Heuvelwacht=mixed. Belgen: Wafelzuster=female, Bierbouwer/Frituurridder/Manneken-Pis-Kanon=male, Frietkraamhouder/Chocolatier/Dubbele-Spion=mixed. Field is `readonly gender?` — defaults to 'mixed' wanneer niet gezet (additief, niet-breaking).
+
+### Added — Gender-aware generic-pool fallback in `UnitVoices.ts`
+Refactor `GENERIC_VOICE_LINES` → `MALE_GENERIC_VOICE_LINES` + `FEMALE_GENERIC_VOICE_LINES`. Nieuwe `getGenericPool(factionId, action, gender)` resolver:
+- `'male'` → male pool (Reinoud/Nick voor Limburg, Hans/Walter voor Belgen, Richard voor Brabant, Serge voor Randstad).
+- `'female'` → female pool. Limburg = Nick origineel female-folder, Belgen = Sharon Vlaams sub-pool. Brabant + Randstad pools zijn leeg → **fallback regel**: `console.warn('[UnitVoices] Female pool empty for faction X action Y — falling back to male pool.')` + return male pool. Warn is de-dup'd per `(factionId, action)` zodat console niet vol-spamt.
+- `'mixed'` → union van beide pools; lege pool wordt overgeslagen zodat random-pick niet richting de niet-bestaande pool biased.
+
+`playUnitVoice(factionId, action, unitTypeId?, gender = 'mixed')` accepteert nu een `gender`-parameter. Alle 6 call-sites in `src/core/Game.ts` (select / attack-move / move / attack / gather / ready / death) plumb de unit-gender via de nieuwe helper `getUnitVoiceGender(factionId, unitTypeId)` uit `factionData.ts`. Hero death/revive blijven 'mixed' (geen unitTypeId beschikbaar in event-payload).
+
+### Added — Limburgs female pool via Nick origineel (22 files)
+`scripts/generate-limburgers-female-voices.sh` (nieuw) — genereert 22 generic Limburgs female files via ElevenLabs TTS met Nick `PrYUlaJFEdOSVy6jaEaG` ("transgender Limburger" framing). Output: `public/assets/audio/voices/limburgers/female/{select|move|attack|gather|death|ability|idle|ready}_N.mp3`. Voice settings: stability 0.30, similarity 0.85, style 0.65 (zachter timbre dan Reinoud-male). Tone: vrouwelijk-Limburgs ("Glück auf, miene leef.", "Hajje, ich kom.", "Joa veurspring!", "Bij mien moeder de berg!", "Och nei... moeke...", "Get ich noemt sjpisser?"). Kosten: $0 (ElevenLabs unlimited subscription).
+
+### Tests (+16, geen regressions)
+`tests/UnitVoices-gender.test.ts` (16 tests, 6 describe-blokken):
+1. **(a) male → male pool**: Limburgers/Belgen male geeft geen `/female/` of `/sharon/` paths.
+2. **(b) female → female pool**: alle paths onder `/limburgers/female/` resp. `/belgen/sharon/`.
+3. **(c) mixed → union**: Limburgs mixed bevat zowel male als female paths; Brabant mixed = male pool (geen female pool).
+4. **(d) empty female pool → warn + fallback**: Brabant/Randstad female resolved naar male pool met `console.warn('Female pool empty')`, de-dup per `(factionId, action)`.
+5. **(e) `getUnitVoiceGender`**: Boer=male, Boerinneke=female, Wafelzuster=female, Mijnwerker=male, Manager=male, unknown→mixed (graceful, geen throw).
+6. **(f) end-to-end via `playUnitVoice`**: female + Limburgers speelt `/limburgers/female/` file; male + Belgen speelt nooit `/sharon/` file.
+
+### Tests-totaal
+1618 → 1634 (+16, alle 16 nieuw, alle 1634 groen). Geen regressions.
+
+---
+
+## [0.52.2] - 2026-04-30 — Manager re-vamp (stats + meleeBackup + voice + mesh + portrait)
+
+### Why
+Live-test 2026-04-30 + GA-agent rapport: de Randstad Manager was een **categorie-fout**. Geclassificeerd als Infantry, maar gameplay = ranged-harasser (range 7). Voice `select_1.mp3` was 30-50% korter dan andere Randstad units (8.6KB anomalie). Mesh voelde grover/cartoony naast painted-realistic Stagiair/Consultant. Bundle pakt alle vier de assen tegelijk aan. Versie-nummer: 0.52.2 omdat 0.52.1 (gender-aware UnitVoices) parallel werd ingevoerd.
+
+### Stats — hybrid harasser (akkoord van Richard)
+- `hp` 70 → **85** (kan een melee-engagement overleven)
+- `range` 7 → **5** (mid-range, niet sniper-ver)
+- `attack` 9 → **7** (lichter dan oude "strong harasser", compenseert hp + meleeBackup)
+- Nieuwe **`meleeBackup: true`** flag op Manager-archetype (factionData.ts + RANDSTAD_UNIT_ARCHETYPES). Andere units ongemoeid (Consultant blijft pure ranged debuffer met range 9).
+
+### New — `meleeBackup` mechanic (CombatSystem)
+- Nieuwe ECS-component `MeleeBackup` met cached ranged + melee profielen (`rangedRange/Damage`, `meleeRange/Damage`, `mode`).
+- Nieuwe constants `MELEE_BACKUP_THRESHOLD = 2` tiles + `MELEE_BACKUP_HYSTERESIS = 0.5` tiles in `types/index.ts`.
+- `CombatSystem.processAttacking` roept `updateMeleeBackupMode(eid, distSq)`: bij target binnen 2 tiles → swap naar melee profile (range = `MINIMUM_MELEE_RANGE`); bij target buiten 2.5 tiles → swap terug naar ranged. Hysteresis voorkomt flicker aan de rand.
+- Damage type, projectile-emit, armor-modifier, gezelligheid-bonus blijven zoals ze zijn: ze lezen `Attack.range`/`Attack.damage` die we mutaten — geen tweede pipeline.
+- Factory-helper `setupMeleeBackupIfNeeded` in `factories.ts` wordt aangeroepen vanuit zowel `initUnit` als `initUnitFromArchetype`.
+
+### Voice — re-cast (Daniel, ElevenLabs `onwK4e9ZLuTAKqWW03F9`)
+6 generic events (select 1-3 + move 1-3) herschreven met meer manager-energy (corporate jargon: deliverables, KPI's, alignment, roadmap, off-site, stakeholders). Gegenereerd via `scripts/regen_manager_voice.sh`. Stab 0.45 / Sim 0.78 / Style 0.55 voor authoritatieve boardroom-cadence. Oude files bewaard als `*.bak.mp3`. select_1.mp3 nu 27KB (was 8.5KB anomalie). Daniel is Manager-only — Antoni / Serge blijven default Randstad voice voor andere units.
+
+### Mesh + Portrait
+- `manager.glb` (nieuw, 14000 polycount, PBR) + `infantry-v2.glb` (mirror — UnitRenderer laadt deze voor Randstad Infantry) via Meshy v6 image-to-3d met painted-realistic Flux-Dev concept als referentie. Oude mesh als `infantry-v2.bak.glb`.
+- `randstad-infantry.png` regenereerd via Flux Dev painted-vignette template (zelfde stijl als andere Randstad portretten). Backup als `randstad-infantry.bak.png`.
+- Pipeline-script: `scripts/regen_manager_mesh_portrait.py` (concept | mesh | portrait | all). Manifest in `scripts/manager_revamp.json`.
+
+### Tests
+- Nieuw: `tests/manager-revamp.test.ts` — 13 tests: stats lock-in (hp=85, range=5, attack=7), meleeBackup flag, MeleeBackup-component wiring, CombatSystem mode-switch (in/out, hysteresis), regression Consultant + Carnavalvierder krijgen GEEN MeleeBackup, constants sanity.
+- Test count delta op deze bundle: +13. Suite groen.
+
+### Files
+- `src/types/index.ts` — `meleeBackup` op `UnitArchetype`, `MELEE_BACKUP_THRESHOLD/HYSTERESIS` constants
+- `src/data/factionData.ts` — Manager stats + flag
+- `src/entities/archetypes.ts` — RANDSTAD_UNIT_ARCHETYPES Manager stats + flag
+- `src/ecs/components.ts` — `MeleeBackup` component
+- `src/entities/factories.ts` — `setupMeleeBackupIfNeeded` helper, gewired in beide init-paths
+- `src/systems/CombatSystem.ts` — `updateMeleeBackupMode` toggle in processAttacking
+- `tests/manager-revamp.test.ts` — nieuw
+
+### Niet in deze bundle
+Deploy. Richard test eerst lokaal.
+
+---
+
 ## [0.51.3] - 2026-04-30 — Randstad Barracks mesh herontworpen + production rebuild
 
 ### Replaced — `randstad-barracks.glb` (greenroof presentation-hall)

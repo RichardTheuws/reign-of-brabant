@@ -407,6 +407,23 @@ export const SELF_DEFENSE_RANGE = 6;
 /** Minimum effective attack range for melee units. */
 export const MINIMUM_MELEE_RANGE = 1.5;
 
+/**
+ * Melee-backup threshold (v0.52.0 — Manager re-vamp).
+ *
+ * Units with `meleeBackup: true` switch from ranged to melee mode when a
+ * target enters within this radius (in tiles). The unit's `Attack.range`
+ * is rewritten to MINIMUM_MELEE_RANGE while in melee mode and restored
+ * to the archetype range when the target leaves
+ * (MELEE_BACKUP_THRESHOLD + MELEE_BACKUP_HYSTERESIS).
+ *
+ * 2 tiles = within visible "I can swing my fist" reach for the Manager,
+ * matching the harasser-fantasy: shoot at range, punch in close.
+ */
+export const MELEE_BACKUP_THRESHOLD = 2;
+
+/** Hysteresis (extra tiles) before swapping back to ranged after melee. */
+export const MELEE_BACKUP_HYSTERESIS = 0.5;
+
 /** Death animation duration in seconds before entity removal. */
 export const DEATH_TIMER = 2.0;
 
@@ -602,8 +619,27 @@ export interface UnitArchetype {
   readonly splashRadius?: number;
   /** Heal rate per second (for Support units). 0 or omitted = no healing. */
   readonly healRate?: number;
+  /**
+   * Melee-backup flag (v0.52.0 — Manager re-vamp).
+   *
+   * When true, this unit is a hybrid harasser: it attacks at its archetype
+   * `range` (ranged mode) by default, but switches to melee (range
+   * MINIMUM_MELEE_RANGE, full `attack` damage) once a target is within
+   * MELEE_BACKUP_THRESHOLD tiles. Switching back to ranged happens when the
+   * target moves out of melee threshold + a small hysteresis.
+   *
+   * Currently only the Randstad Manager uses this flag — it's what gives the
+   * Manager its unique vibe vs the Consultant (pure ranged debuffer).
+   */
+  readonly meleeBackup?: boolean;
   /** Which faction this archetype belongs to, if faction-specific. Omit for universal. */
   readonly factionId?: FactionId;
+  /**
+   * Voice-pool gender for this unit. Used by UnitVoices to pick the matching
+   * actor pool (male/female). 'mixed' = randomly pick from either pool.
+   * Defaults to 'mixed' when omitted (additive — no breaking change).
+   */
+  readonly gender?: 'male' | 'female' | 'mixed';
 }
 
 /** Static stats for a building type. */

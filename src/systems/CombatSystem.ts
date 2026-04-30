@@ -24,6 +24,7 @@ import {
   GezeligheidBonus,
   Stunned,
   Invincible,
+  MeleeBackup,
 } from '../ecs/components';
 import { IsUnit, IsBuilding, IsWorker, IsResource, IsDead, NeedsPathfinding } from '../ecs/tags';
 import {
@@ -36,6 +37,8 @@ import {
   SELF_DEFENSE_RANGE,
   NO_ENTITY,
   MINIMUM_MELEE_RANGE,
+  MELEE_BACKUP_THRESHOLD,
+  MELEE_BACKUP_HYSTERESIS,
   UPKEEP_DEBT_EFFECTIVENESS,
   AI_SCALING_TIER1_TIME,
   AI_SCALING_TIER2_TIME,
@@ -104,6 +107,44 @@ const DAMAGE_MODIFIERS: readonly (readonly number[])[] = [
 
 function getDamageModifier(attackType: number, armorType: number): number {
   return DAMAGE_MODIFIERS[attackType]?.[armorType] ?? 1.0;
+}
+
+// ---------------------------------------------------------------------------
+// MeleeBackup mode toggle (v0.52.0 — Manager re-vamp)
+//
+// Switches Attack.range / Attack.damage between cached ranged and melee
+// profiles based on the squared distance to the current target.
+//
+//  - Enter melee mode when distance <= MELEE_BACKUP_THRESHOLD.
+//  - Exit  melee mode when distance >= MELEE_BACKUP_THRESHOLD + MELEE_BACKUP_HYSTERESIS.
+//
+// The hysteresis prevents flicker when the target is dancing on the edge.
+// All other combat-pipeline reads (range check, damage modifier, projectile
+// emission) are unchanged: they operate on Attack.range / Attack.damage,
+// which we mutate here in place.
+// ---------------------------------------------------------------------------
+const MELEE_BACKUP_ENTER_SQ = MELEE_BACKUP_THRESHOLD * MELEE_BACKUP_THRESHOLD;
+const MELEE_BACKUP_EXIT_SQ =
+  (MELEE_BACKUP_THRESHOLD + MELEE_BACKUP_HYSTERESIS) *
+  (MELEE_BACKUP_THRESHOLD + MELEE_BACKUP_HYSTERESIS);
+
+function updateMeleeBackupMode(eid: number, distSq: number): void {
+  const currentMode = MeleeBackup.mode[eid];
+  if (currentMode === 0) {
+    // Currently ranged → switch to melee when target enters threshold.
+    if (distSq <= MELEE_BACKUP_ENTER_SQ) {
+      MeleeBackup.mode[eid] = 1;
+      Attack.range[eid] = MeleeBackup.meleeRange[eid];
+      Attack.damage[eid] = MeleeBackup.meleeDamage[eid];
+    }
+  } else {
+    // Currently melee → switch back to ranged when target leaves threshold.
+    if (distSq >= MELEE_BACKUP_EXIT_SQ) {
+      MeleeBackup.mode[eid] = 0;
+      Attack.range[eid] = MeleeBackup.rangedRange[eid];
+      Attack.damage[eid] = MeleeBackup.rangedDamage[eid];
+    }
+  }
 }
 
 // Scratch values
@@ -175,6 +216,14 @@ function processAttacking(world: GameWorld, eid: number, dt: number): void {
   _dx = Position.x[targetEid] - Position.x[eid];
   _dz = Position.z[targetEid] - Position.z[eid];
   _distSq = _dx * _dx + _dz * _dz;
+
+  // MeleeBackup toggle (v0.52.0 — Manager re-vamp). Hybrid units swap
+  // their Attack.range/damage between cached ranged and melee profiles
+  // based on target proximity. Hysteresis prevents flicker at the edge.
+  if (hasComponent(world, eid, MeleeBackup)) {
+    updateMeleeBackupMode(eid, _distSq);
+  }
+
   const range = Attack.range[eid];
   const rangeSq = range * range;
 

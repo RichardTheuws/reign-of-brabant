@@ -28,6 +28,7 @@ import {
   NO_ENTITY,
   NO_PRODUCTION,
   CARRY_CAPACITY,
+  MINIMUM_MELEE_RANGE,
   type UnitArchetype,
   type BuildingArchetype,
 } from '../types/index';
@@ -53,6 +54,7 @@ import {
   Velocity,
   Healer,
   UnitAbility,
+  MeleeBackup,
 } from '../ecs/components';
 
 import { getUnitAbilities } from '../data/unitAbilityMap';
@@ -141,6 +143,23 @@ function resolveBuildingArchetype(factionId: FactionId, buildingTypeId: Building
       `No building archetype found for factionId=${factionId}, buildingTypeId=${buildingTypeId}`,
     );
   }
+}
+
+// ---------------------------------------------------------------------------
+// MeleeBackup helper (v0.52.0 — Manager re-vamp)
+//
+// Adds MeleeBackup component to units flagged with `meleeBackup: true` in
+// their archetype, caching both the ranged and melee profiles so
+// CombatSystem can swap them at runtime without recomputing.
+// ---------------------------------------------------------------------------
+function setupMeleeBackupIfNeeded(world: World, eid: number, arch: UnitArchetype): void {
+  if (!arch.meleeBackup) return;
+  addComponent(world, eid, MeleeBackup);
+  MeleeBackup.mode[eid] = 0; // start in ranged mode
+  MeleeBackup.rangedRange[eid] = arch.range;
+  MeleeBackup.rangedDamage[eid] = arch.attack;
+  MeleeBackup.meleeRange[eid] = MINIMUM_MELEE_RANGE;
+  MeleeBackup.meleeDamage[eid] = arch.attack;
 }
 
 // ---------------------------------------------------------------------------
@@ -243,6 +262,9 @@ function initUnit(
     Healer.healTimer[eid] = 0;
   }
 
+  // MeleeBackup (Manager hybrid harasser; v0.52.0)
+  setupMeleeBackupIfNeeded(world, eid, arch);
+
   return eid;
 }
 
@@ -339,6 +361,9 @@ function initUnitFromArchetype(
     Healer.healRange[eid] = arch.range > 0 ? arch.range : 6;
     Healer.healTimer[eid] = 0;
   }
+
+  // MeleeBackup (Manager hybrid harasser; v0.52.0)
+  setupMeleeBackupIfNeeded(world, eid, arch);
 
   // Unit ability assignment (based on faction + unit name)
   const abilityAssignment = getUnitAbilities(factionId, arch.name);

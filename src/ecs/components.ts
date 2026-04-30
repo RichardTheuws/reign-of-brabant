@@ -81,6 +81,30 @@ export const Armor = {
 };
 
 // ---------------------------------------------------------------------------
+// MeleeBackup (v0.52.0 — Manager re-vamp)
+//
+// Hybrid melee/ranged toggle. Units with this component swap their
+// `Attack.range` + `Attack.damage` between a stored ranged profile (default)
+// and a stored melee profile when an enemy enters/leaves the
+// MELEE_BACKUP_THRESHOLD radius. CombatSystem reads the current `mode` to
+// decide which stats to use, then mutates Attack.range / Attack.damage so
+// the rest of the combat pipeline (range check, damage type, projectile
+// emission) stays untouched.
+// ---------------------------------------------------------------------------
+export const MeleeBackup = {
+  /** 0 = ranged mode (default), 1 = melee mode (target within threshold). */
+  mode: u8(),
+  /** Cached ranged-profile range (= archetype.range). */
+  rangedRange: f32(),
+  /** Cached ranged-profile damage (= archetype.attack). */
+  rangedDamage: f32(),
+  /** Cached melee-profile range (= MINIMUM_MELEE_RANGE). */
+  meleeRange: f32(),
+  /** Cached melee-profile damage (= archetype.attack, full strength). */
+  meleeDamage: f32(),
+};
+
+// ---------------------------------------------------------------------------
 // Faction -- player ownership
 // ---------------------------------------------------------------------------
 export const Faction = {

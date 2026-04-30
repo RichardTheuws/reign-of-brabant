@@ -130,24 +130,27 @@ export const RANDSTAD_UNIT_ARCHETYPES: readonly UnitArchetype[] = [
     carryCapacity: 8,
   },
 
-  // UnitTypeId.Infantry = 1 -- Manager (ranged debuff specialist)
+  // UnitTypeId.Infantry = 1 -- Manager (hybrid harasser, v0.52.0 re-vamp).
+  // Mid-range shooter (range 5) that switches to melee when targets close in.
+  // See `meleeBackup` flag and CombatSystem.ts for the toggle mechanic.
   {
     typeId: UnitTypeId.Infantry,
     name: 'Infantry',
     brabantName: 'Manager',
-    hp: 75,
-    attack: 10,
+    hp: 85,
+    attack: 7,
     attackSpeed: 1.5,
     armor: 1,
     armorType: ArmorType.Medium,
     speed: 4.5,
-    range: 7,
+    range: 5,
     buildTime: 22,
     costGold: 95,
     costSecondary: 35,
     population: 1,
     sightRange: 9,
     carryCapacity: 0,
+    meleeBackup: true,
   },
 
   // UnitTypeId.Ranged = 2 -- Consultant (debuff specialist, modest direct damage)

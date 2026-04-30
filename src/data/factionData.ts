@@ -170,6 +170,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Worker,
       name: 'Boer',
       brabantName: 'Boer',
+      gender: 'male',
       hp: 60,
       attack: 5,
       attackSpeed: 1.5,
@@ -189,6 +190,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Infantry,
       name: 'Carnavalvierder',
       brabantName: 'Carnavalvierder',
+      gender: 'mixed',
       hp: 80,
       attack: 10,
       attackSpeed: 1.2,
@@ -208,6 +210,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Ranged,
       name: 'Sluiper',
       brabantName: 'Sluiper',
+      gender: 'male',
       hp: 55,
       attack: 12,
       attackSpeed: 1.8,
@@ -227,6 +230,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Support,
       name: 'Boerinneke',
       brabantName: 'Boerinneke',
+      gender: 'female',
       hp: 50,
       attack: 8,
       attackSpeed: 1.5,
@@ -247,6 +251,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Ranged,
       name: 'Muzikant',
       brabantName: 'Muzikant',
+      gender: 'mixed',
       hp: 45,
       attack: 5,
       attackSpeed: 2.0,
@@ -266,6 +271,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Heavy,
       name: 'Tractorrijder',
       brabantName: 'Tractorrijder',
+      gender: 'male',
       hp: 200,
       attack: 22,
       attackSpeed: 2.0,
@@ -285,6 +291,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Siege,
       name: 'Frituurmeester',
       brabantName: 'Frituurmeester',
+      gender: 'mixed',
       hp: 100,
       attack: 15,
       attackSpeed: 3.0,
@@ -307,6 +314,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Siege,
       name: 'Praalwagen',
       brabantName: 'Praalwagen',
+      gender: 'mixed',
       hp: 300,
       attack: 15,
       attackSpeed: 4.0,
@@ -335,6 +343,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Worker,
       name: 'Stagiair',
       brabantName: 'Stagiair',
+      gender: 'mixed',
       hp: 45,
       attack: 3,
       attackSpeed: 1.5,
@@ -349,30 +358,37 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       sightRange: 8,
       carryCapacity: 8,
     },
-    // Manager (Ranged / Debuff) -- strong ranged harasser, expensive
+    // Manager (Hybrid harasser, v0.52.0 re-vamp) — Infantry-slot unit that
+    // shoots at mid-range (5) and switches to melee when targets close in
+    // (within MELEE_BACKUP_THRESHOLD tiles). meleeBackup distinguishes the
+    // Manager from the Consultant (pure ranged debuffer) and gives him a
+    // unique "step into the meeting and slap with KPIs" vibe.
     {
       typeId: UnitTypeId.Infantry,
       name: 'Manager',
       brabantName: 'Manager',
-      hp: 70,
-      attack: 9,
+      gender: 'male',
+      hp: 85,
+      attack: 7,
       attackSpeed: 1.5,
       armor: 1,
       armorType: ArmorType.Medium,
       speed: 4.5,
-      range: 7,
+      range: 5,
       buildTime: 22,
       costGold: 90,
       costSecondary: 30,
       population: 1,
       sightRange: 9,
       carryCapacity: 0,
+      meleeBackup: true,
     },
     // Consultant (Debuff specialist) -- 0 direct damage is intentional
     {
       typeId: UnitTypeId.Ranged,
       name: 'Consultant',
       brabantName: 'Consultant',
+      gender: 'mixed',
       hp: 55,
       attack: 0, // does NO direct damage per PRD
       attackSpeed: 1.8,
@@ -392,6 +408,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Ranged,
       name: 'Hipster',
       brabantName: 'Hipster',
+      gender: 'mixed',
       hp: 40,
       attack: 6,
       attackSpeed: 1.5,
@@ -411,6 +428,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Support,
       name: 'HR-Medewerker',
       brabantName: 'HR-Medewerker',
+      gender: 'mixed',
       hp: 55,
       attack: 5,
       attackSpeed: 1.5,
@@ -431,6 +449,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Heavy,
       name: 'Corporate Advocaat',
       brabantName: 'Corporate Advocaat',
+      gender: 'mixed',
       hp: 180,
       attack: 18,
       attackSpeed: 2.0,
@@ -450,6 +469,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Ranged,
       name: 'Influencer',
       brabantName: 'Influencer',
+      gender: 'mixed',
       hp: 45,
       attack: 8,
       attackSpeed: 1.5,
@@ -469,6 +489,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Siege,
       name: 'Vastgoedmakelaar',
       brabantName: 'Vastgoedmakelaar',
+      gender: 'mixed',
       hp: 90,
       attack: 10, // 10 vs units, 40 vs buildings (4x siegeBonus)
       attackSpeed: 3.5,
@@ -497,6 +518,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Worker,
       name: 'Mijnwerker',
       brabantName: 'Mijnwerker',
+      gender: 'male',
       hp: 65,
       attack: 6,
       attackSpeed: 1.5,
@@ -516,6 +538,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Infantry,
       name: 'Schutterij',
       brabantName: 'Schutterij',
+      gender: 'male',
       hp: 90,
       attack: 10,
       attackSpeed: 1.4,
@@ -535,6 +558,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Ranged,
       name: 'Vlaaienwerper',
       brabantName: 'Vlaaienwerper',
+      gender: 'mixed',
       hp: 50,
       attack: 12,
       attackSpeed: 2.0,
@@ -554,6 +578,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Heavy,
       name: 'Mergelridder',
       brabantName: 'Mergelridder',
+      gender: 'male',
       hp: 250,
       attack: 22,
       attackSpeed: 2.2,
@@ -573,6 +598,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Siege,
       name: 'Kolenbrander',
       brabantName: 'Kolenbrander',
+      gender: 'male',
       hp: 110,
       attack: 12, // 12 vs units, 48 vs buildings (4x siegeBonus)
       attackSpeed: 3.0,
@@ -594,6 +620,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Support,
       name: 'Sjpion',
       brabantName: 'Sjpion',
+      gender: 'mixed',
       hp: 60,
       attack: 6,
       attackSpeed: 1.5,
@@ -614,6 +641,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Ranged,
       name: 'Mijnrat',
       brabantName: 'Mijnrat',
+      gender: 'mixed',
       hp: 30,
       attack: 4,
       attackSpeed: 1.2,
@@ -633,6 +661,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Ranged,
       name: 'Heuvelwacht',
       brabantName: 'Heuvelwacht',
+      gender: 'mixed',
       hp: 35,
       attack: 5,
       attackSpeed: 1.5,
@@ -659,6 +688,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Worker,
       name: 'Frietkraamhouder',
       brabantName: 'Frietkraamhouder',
+      gender: 'mixed',
       hp: 55,
       attack: 4,
       attackSpeed: 1.5,
@@ -678,6 +708,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Infantry,
       name: 'Bierbouwer',
       brabantName: 'Bierbouwer',
+      gender: 'male',
       hp: 85,
       attack: 9,
       attackSpeed: 1.2,
@@ -697,6 +728,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Ranged,
       name: 'Chocolatier',
       brabantName: 'Chocolatier',
+      gender: 'mixed',
       hp: 60,
       attack: 11,
       attackSpeed: 1.6,
@@ -716,6 +748,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Heavy,
       name: 'Frituurridder',
       brabantName: 'Frituurridder',
+      gender: 'male',
       hp: 180,
       attack: 18,
       attackSpeed: 1.8,
@@ -736,6 +769,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Siege,
       name: 'Manneken Pis-kanon',
       brabantName: 'Manneken Pis-kanon',
+      gender: 'male',
       hp: 80,
       attack: 12,
       attackSpeed: 3.0,
@@ -757,6 +791,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Support,
       name: 'Wafelzuster',
       brabantName: 'Wafelzuster',
+      gender: 'female',
       hp: 45,
       attack: 5,
       attackSpeed: 1.5,
@@ -777,6 +812,7 @@ export const FACTION_UNITS: Record<number, readonly UnitArchetype[]> = {
       typeId: UnitTypeId.Ranged,
       name: 'Dubbele Spion',
       brabantName: 'Dubbele Spion',
+      gender: 'mixed',
       hp: 40,
       attack: 6,
       attackSpeed: 1.3,
@@ -1713,6 +1749,27 @@ export function getDisplayUnitName(
   unitTypeId: UnitTypeId,
 ): string {
   return getFactionUnitArchetype(factionId, unitTypeId).name;
+}
+
+/**
+ * Resolve the voice-pool gender for a unit. Used by UnitVoices to pick the
+ * correct generic-pool fallback (male/female pool) so female-defined units
+ * (Boerinneke, Wafelzuster, …) pull from the female actor pool instead of
+ * the historical male-only fallback.
+ *
+ * Returns 'mixed' when unit has no explicit gender set or lookup fails —
+ * mixed lets the random-pick draw from both pools (or the only non-empty one).
+ */
+export function getUnitVoiceGender(
+  factionId: number,
+  unitTypeId: UnitTypeId,
+): 'male' | 'female' | 'mixed' {
+  try {
+    const arch = getFactionUnitArchetype(factionId, unitTypeId);
+    return arch.gender ?? 'mixed';
+  } catch {
+    return 'mixed';
+  }
 }
 
 /**
