@@ -17,7 +17,7 @@ en niet in scope is van de huidige bundel landt hier, gesorteerd op prioriteit.
   - 2 Game.ts callsites (mission triggerVictory + skirmish triggerGameOver) → playerFactionId.
   - 6 lock-tests in `tests/themeSongVictory.test.ts`. Suite 1596 → 1602.
 
-### 🟠 P2 — Audio-normalisatie pipeline voor 525 voice files
+### ✅ RESOLVED v0.50.0 — Audio-normalisatie pipeline voor 525 voice files
 - **Gevonden**: 2026-04-29 (Richard: "audio moet heel goed normaliseren zodat alle zinnen even duidelijk uitgesproken worden")
 - **Issue**: voice-clips uit ElevenLabs op verschillende dagen/met verschillende stem-IDs hebben ongelijke loudness en EQ-balance. In-game voelt sommige stem te zacht, andere te scherp.
 - **Voorstel**:
@@ -38,7 +38,7 @@ en niet in scope is van de huidige bundel landt hier, gesorteerd op prioriteit.
   - Eventueel context-click pattern: 3x klikken op held → 3e zin is grap (Warcraft 3 idiom)
 - **Bundel-fit**: v0.50.0 of later, na audio-laag rewire (fase C) en normalisatie.
 
-### 🟠 P2 — Generic SFX → factie-specifieke voice rewire (fase C huidige sessie!)
+### ✅ RESOLVED v0.49.1 — Generic SFX → factie-specifieke voice rewire
 - **Gevonden**: 2026-04-29 (Richard: "we hebben nog een aantal hele saaie generic sounds")
 - **Status**: **IN PROGRESS** sessie 2026-04-29 deel 3.
 - **Scope**: `playSound('unit_death' | 'arrow_shoot' | 'arrow_impact' | 'sword_hit' | 'building_complete' | 'building_destroy' | 'gold_deposit' | 'upgrade_complete' | 'select_unit' | 'hero_death' | 'hero_spawn')` callsites in `Game.ts`/`AbilityEffects.ts` → `playUnitVoice(factionId, action, unitTypeId)` waar mogelijk.
@@ -110,7 +110,7 @@ Inzicht uit Brabander recording (v0.51.0): split-by-spoken-numbers.py gebruikte 
 - Optioneel: Brabander female (Emma) + Belgen Sharon ook gender-aware ipv mixed-pool
 - **Bundel-fit**: v0.51.0 of dedicated gender-refactor
 
-### 🔴 P1 — Brabander mannelijke voice opnieuw casten
+### ✅ RESOLVED v0.50.1 — Brabander mannelijke voice opnieuw casten
 - **Gevonden**: 2026-04-29 (Richard A/B luistertest van voices-normalized-sample/)
 - **Issue**: huidige Brabander stem (Joost) klinkt niet enthousiast en heeft geen mooie stemkleur volgens Richard ("ikzelf ook niet"). Gevolg: 138 Brabander voice-files moeten opnieuw worden gegenereerd zodra nieuwe stem is gekozen. Limburgers/Randstad/Belgen voices zijn WEL goedgekeurd.
 - **Scope**:
@@ -124,7 +124,7 @@ Inzicht uit Brabander recording (v0.51.0): split-by-spoken-numbers.py gebruikte 
 - Richard wil ook Brabander vrouwenstem in pipeline (samen met de Brabander herkast hierboven). Voor 8 unit-types waar Brabander vrouwelijke variant past (boerinne specifiek, plus generieke fallbacks).
 - **Bundel-fit**: combineren met Brabander mannelijke recast — dezelfde sessie ElevenLabs-flow.
 
-### 🟢 P3 — Audio-normalize `--all` run uitstellen tot Brabander recast klaar is
+### ✅ RESOLVED v0.50.0 — Audio-normalize `--all` run uitvoeren na Brabander recast
 - Sample-normalisatie heeft Limburgers/Randstad/Belgen goedgekeurd. Brabander wordt opnieuw gegenereerd → normalisatie nu zou dubbel werk zijn.
 - Wachten op Brabander-recast voltooiing, dan `bash scripts/normalize-voices.sh --all`.
 
@@ -163,7 +163,7 @@ Bij oppakken: subject + commit-SHA invullen onder "Resolved".
 - **Onderzoek nodig**: zelf-verdedigingstrigger: damage triggert retaliation alleen als unit `UnitAI.state` == Idle? Anders genegeerd? Hold-position juist gedrag? AI-units detecten threats binnen sight-range automatisch?
 - **Bundel-fit**: gameplay-bug, 1-2 dedicated debug-sessies. v0.43.0 of v0.44.0.
 
-### 🟠 P2 — Battle/damage animaties drastisch verbeteren
+### ✅ RESOLVED v0.46.0 — Battle/damage animaties (DamagePopups + death-anim + attack swing)
 - **Gevonden**: 2026-04-29 (Richard live-test)
 - **Issue**: huidige damage-feedback minimaal: alleen HP-bars, geen visual punch. Voor v1.0 nodig:
   - Hit-flash (rood tint op target-mesh ~0.1s).
@@ -179,7 +179,7 @@ Bij oppakken: subject + commit-SHA invullen onder "Resolved".
 - **Voorstel**: regenerate Randstad barracks concept-art met explicit "auditorium" / "presentation hall" / "amphitheater"-feel ipv generic kantoor. Daarna Meshy v6 → flip path.
 - **Bundel-fit**: kleine asset-batch, 1 concept + 1 GLB. Combineren met andere mesh-regens als die opkomen.
 
-### Complete audit van in-game meldingen voor factie-specificiteit
+### ✅ RESOLVED v0.49.0 — Complete audit van in-game meldingen voor factie-specificiteit
 - **Gevonden**: 2026-04-29 (Richard live-test na v0.41.1)
 - **Issue**: meerdere in-game messages zijn niet factie-aware. Voorbeelden:
   - Lumberjack "ready" / drop-off-callouts spreken algemene tekst, niet factie-flavoured (Brabant houtzager moet Brabants klinken, Randstad stagiair corporate, Limburg vlaaibakker dialect, Belgen frietboer Vlaams).
@@ -200,17 +200,17 @@ Bij oppakken: subject + commit-SHA invullen onder "Resolved".
 
 Items die deze sessie zichtbaar werden bij Bundel 5 + Bug-fix-sweep + Bundel 4A. Niet allemaal blokkers, maar in v1.0 perfectie-kader allemaal aan te pakken.
 
-### Multi-stat splitsing op victory screen
+### ✅ RESOLVED v0.48.0 — Multi-stat splitsing op victory screen
 - **Gevonden**: 2026-04-28 (na Bug #3 fix v0.37.38)
 - **Issue**: stat-row "Verzameld" toont nu `goldGathered + woodGathered` als één getal. Voor speler-inzicht (en eventuele OKR/leaderboard-stats) zou aparte "Goud" + "Hout" beter zijn.
 - **Voorstel**: 7e stat-row toevoegen of 2-kolom layout aanpassen. PlayerState heeft de getters al (`getGoldGathered`/`getWoodGathered`).
 
-### TIER_REQUIREMENT_LABELS factie-aware
+### ✅ RESOLVED v0.48.0 — TIER_REQUIREMENT_LABELS factie-aware
 - **Gevonden**: 2026-04-28 tijdens Bug #2 refactor
 - **Issue**: `factionBuildMenus.ts:44` heeft `TIER_REQUIREMENT_LABELS[3] = 'Geavanceerde Smederij'`. Voor Brabant-spelers leest de tooltip "Vereist Geavanceerde Smederij" terwijl het Wagenbouwer is. Zelfde voor andere facties (Innovatie Lab / Hoogoven / Diamantslijperij).
 - **Voorstel**: `getTierRequirementLabel(factionId, tier)` helper in factionData.ts die de juiste UpgradeBuilding-naam returnt per factie.
 
-### Heal-aura visual feedback
+### ✅ RESOLVED v0.48.0 — Heal-aura visual feedback
 - **Gevonden**: 2026-04-28 (na Bundel 4A v0.37.40)
 - **Issue**: Worstenbroodjeskraam heeft passive heal-aura (+0.5 HP/sec in 8u radius), maar geen visuele indicator. Speler ziet niet welke units worden geheeld.
 - **Voorstel**: groene tint op unit-mesh tijdens heal-tick, of subtle particle-pulse. Idem voor Vlaaiwinkel heal (Bundel 3) — die heeft ook geen visual.
@@ -255,7 +255,7 @@ Per `feedback_v1_perfection_multi_function.md`: voor v1.0 streven we naar **2-3 
 
 ## 🔴 P0 / P1 — game-breakers of wrong-state bugs
 
-### Chocolaterie heeft verkeerde `typeId` — genereert geen Chocolade
+### ✅ RESOLVED — Chocolaterie typeId fix (live, ChocolaterieSystem actief, DiplomacySystem importeert getPralinesDurationMult)
 - **Gevonden**: 2026-04-28 tijdens Belgen-mapping (post-Bundel 1)
 - **Bundel-fit**: Bundel 4A (Brabant Worstenbroodjeskraam adds Brabant TertiaryResource case — natuurlijke plek om Belgen te fixen).
 - **Bug**: `factionData.ts:1296` — Chocolaterie archetype heeft `typeId: BuildingTypeId.LumberCamp` ipv `BuildingTypeId.TertiaryResourceBuilding`. Hij genereert geen Chocolade omdat TertiaryResourceSystem (regel 41) op typeId filtert.
