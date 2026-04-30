@@ -180,6 +180,18 @@ Bij oppakken: subject + commit-SHA invullen onder "Resolved".
 - LIVE in productie via rebuild+rsync
 - Backups bewaard tot Richard in-game verifieert
 
+### 🟠 P2 — Memory-systeem fundamenteel slimmer (Richard 2026-04-30: "daar hebben we steeds problemen mee")
+- **Issue**: memory-audit verdict gaat steeds opnieuw RED na elke productieve sessie. Drempel 30 files te statisch; geen logica voor "deze 5 files dekken samen 1 onderwerp = 1 file".
+- **Symptomen**: feedback_*.md groei, project_*.md per sub-feature, geen auto-merge / decay-strategie
+- **Voorstel-richtingen** (uit te werken in plan-sessie):
+  - Auto-merge similar-topic feedback-files (clustering via filename + content-hash)
+  - Time-decay: feedback ouder dan 6 maanden archiveren tenzij "evergreen" tag
+  - Consolidate-on-write: bij opslaan check of zinvol mergeable in bestaand bestand
+  - Hierarchical structure: project_rob.md als hoofd-index met inline-links naar deelmemories ipv alles plat
+  - Auto-summarize on threshold: bij 25+ files automatisch een condense-sessie voorstellen
+- **Bundel-fit**: aparte memory-architectuur sessie. Niet RoB-game, dus parkeren op meta-toolchain niveau.
+- **Voor nu**: 31 memory files (drempel 30), 1 over → laat staan tot architectuur-review.
+
 ### 🔴 P1 — Manager mesh "grover en cartoony" vs andere units (Richard's live-test 2026-04-30)
 - **Issue**: Manager mesh wijkt **visueel-stijl** af — voelt grover/cartoony terwijl andere Randstad-units painted-realistic zijn
 - **Scope**: regen Manager (`randstad-infantry.glb` of bedoelde unit-mesh) via Meshy v6 met explicit "match style of randstad-stagiair / randstad-consultant" prompt-anchor
