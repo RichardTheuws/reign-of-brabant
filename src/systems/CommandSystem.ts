@@ -53,6 +53,9 @@ interface BuildCommand {
   buildingTypeId: number;
   x: number;
   z: number;
+  /** Owning faction — used to fall back to a global idle worker when no
+   *  worker is currently selected (AoE-style auto-assign). */
+  factionId?: number;
 }
 
 interface TrainCommand {
@@ -291,35 +294,70 @@ function handleGather(world: GameWorld, units: number[], cmd: GatherCommand): vo
 }
 
 export function handleBuild(world: GameWorld, units: number[], cmd: BuildCommand): void {
-  // Find nearest worker among selected units
-  let nearestWorker = -1;
-  let nearestDist = Infinity;
+  // Step 1: prefer the nearest selected worker (mirrors the original behavior
+  // — selected workers stay in control when the player explicitly chose one).
+  const nearestSelected = pickNearestWorker(world, units, cmd.x, cmd.z);
+  if (nearestSelected !== -1) {
+    assignWorkerToBuildSite(world, nearestSelected, cmd.x, cmd.z);
+    return;
+  }
 
-  for (const eid of units) {
+  // Step 2: AoE/Warcraft-style fallback — when no selected worker is a
+  // candidate (e.g. selection cleared, second town hall placed while the
+  // first builder is still busy), pick the nearest worker of the build's
+  // owning faction. Idle workers win over gathering ones at the same
+  // distance so we don't yank a productive harvester unless we have to.
+  const factionId = cmd.factionId;
+  if (factionId === undefined) return; // legacy callers without factionId
+
+  const factionWorkers: number[] = [];
+  const allWorkers = query(world, [IsWorker, Position, Faction]);
+  for (const eid of allWorkers) {
+    if (Faction.id[eid] !== factionId) continue;
+    factionWorkers.push(eid);
+  }
+
+  // Idle (Gatherer.state === 0 i.e. NONE) preferred — they have no productive
+  // task to interrupt. If no idle worker exists, fall back to nearest worker
+  // of any state.
+  const idleWorkers = factionWorkers.filter((eid) => Gatherer.state[eid] === 0);
+  const pool = idleWorkers.length > 0 ? idleWorkers : factionWorkers;
+
+  const nearestFallback = pickNearestWorker(world, pool, cmd.x, cmd.z);
+  if (nearestFallback === -1) return;
+
+  assignWorkerToBuildSite(world, nearestFallback, cmd.x, cmd.z);
+}
+
+function pickNearestWorker(world: GameWorld, candidates: number[], x: number, z: number): number {
+  let nearest = -1;
+  let nearestDist = Infinity;
+  for (const eid of candidates) {
     if (!hasComponent(world, eid, IsWorker)) continue;
-    const dx = cmd.x - Position.x[eid];
-    const dz = cmd.z - Position.z[eid];
+    if (!entityExists(world, eid)) continue;
+    const dx = x - Position.x[eid];
+    const dz = z - Position.z[eid];
     const dist = dx * dx + dz * dz;
     if (dist < nearestDist) {
       nearestDist = dist;
-      nearestWorker = eid;
+      nearest = eid;
     }
   }
+  return nearest;
+}
 
-  if (nearestWorker === -1) return;
+function assignWorkerToBuildSite(world: GameWorld, eid: number, x: number, z: number): void {
+  Movement.targetX[eid] = x;
+  Movement.targetZ[eid] = z;
+  Movement.hasTarget[eid] = 1;
 
-  // Move worker to build site
-  Movement.targetX[nearestWorker] = cmd.x;
-  Movement.targetZ[nearestWorker] = cmd.z;
-  Movement.hasTarget[nearestWorker] = 1;
-
-  UnitAI.state[nearestWorker] = UnitAIState.Moving;
-  addComponent(world, nearestWorker, NeedsPathfinding);
+  UnitAI.state[eid] = UnitAIState.Moving;
+  addComponent(world, eid, NeedsPathfinding);
 
   // Reset gather state so a mid-harvest worker doesn't get yanked back to
   // the resource by GatherSystem before it reaches the build site.
-  Gatherer.state[nearestWorker] = 0; // NONE
-  Gatherer.targetEid[nearestWorker] = NO_ENTITY;
+  Gatherer.state[eid] = 0; // NONE
+  Gatherer.targetEid[eid] = NO_ENTITY;
 }
 
 function handleTrain(world: GameWorld, cmd: TrainCommand): void {

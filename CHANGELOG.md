@@ -1,5 +1,40 @@
 # Changelog
 
+## [0.54.1] - 2026-04-30 — TownHall #2 build-assignment fix (idle-worker fallback)
+
+### Fixed — second TownHall stuck on progress=0 forever
+Richard's bug-rapport 2026-04-30: "het lijkt alsof ik de tweede townhall wel kan plaatsen, maar dat de worker deze niet gaat bouwen". Generaliseerbaar: élk gebouw na de eerste blijft incomplete als de placement gebeurt zonder een worker geselecteerd.
+
+Root cause in `src/systems/CommandSystem.ts:handleBuild`: het zocht uitsluitend in `selectedUnits` naar de dichtstbijzijnde worker, en bij `nearestWorker === -1` returnde het zonder fallback en zonder warning. Eerste TH werkte omdat de spawning-worker meestal nog selected is na de plaatsing. Tweede TH faalde zodra de eerste worker bezig was met iets anders en de speler zijn selectie had losgelaten — `BuildSystem` ziet dan nooit een worker binnen 2.5 units van de site, dus `Building.progress` blijft 0.
+
+### Added — AoE/Warcraft-style fallback to global idle worker
+Twee-staps lookup in `handleBuild`:
+1. **Step 1**: prefer nearest selected worker (mirrors prior behavior — een expliciet geselecteerde worker blijft de control).
+2. **Step 2**: als geen geselecteerde worker een kandidaat is, scan ALLE workers van de building's owning factie. Idle workers (Gatherer.state === NONE) winnen van gathering workers — we yanken geen productieve harvester tenzij we moeten. Binnen de pool: nearest-distance.
+
+`BuildCommand` interface uitgebreid met optional `factionId: number`. Game.ts:2140 callsite stuurt `this.playerFactionId` mee. Legacy callers zonder `factionId` returnen nog steeds zonder throw (backwards-compat).
+
+Twee helpers extracted: `pickNearestWorker(world, candidates, x, z)` en `assignWorkerToBuildSite(world, eid, x, z)`. Laatste zet Movement target + UnitAIState.Moving + voegt NeedsPathfinding toe + reset Gatherer state (Bug 7 patroon — voorkomt dat GatherSystem de worker terugtrekt naar het vorige resource).
+
+### Tests (+7, geen regressions)
+`tests/CommandSystem-build-fallback.test.ts` (7 tests):
+- **Step 1**: selected worker still wins (regression-lock prior behavior).
+- **Step 2a**: no selected worker → nearest IDLE faction worker assigned.
+- **Step 2b**: idle workers preferred over gathering workers (zelfs als gathering dichterbij is).
+- **Step 2c**: only gathering workers available → nearest gathering worker assigned + Gatherer reset to NONE.
+- **Step 2d**: only enemy faction workers exist → nothing happens (faction-filter).
+- **Step 3**: legacy command zonder `factionId` returnt zonder throw of side-effect.
+- **Regression scenario**: tweede TH ver weg geplaatst zonder selectie → idle worker B (dichterbij) wordt assigned, niet busy worker A.
+
+bitECS TypedArray-state isolation: `spawnWorker()` zet expliciet `Movement.hasTarget=0`/`targetX=0`/`targetZ=0` per spawn — anders trekt een previous-test residual een negative-assertion onderuit (typed arrays persisten over `replaceWorld()`).
+
+Suite: 1739 → 1746.
+
+### Why patch (0.54.1 ipv 0.55.0)
+Pure bug-fix conform `versioning.md` — `handleBuild` had altijd al moeten werken voor placement zonder selectie; we fixen alleen de orphan-edge-case zonder het API-contract uit te breiden naar de buitenkant (CommandAction-types ongewijzigd).
+
+---
+
 ## [0.54.0] - 2026-04-30 — Support-portrait coverage voor alle 4 facties
 
 ### Added — 3 nieuwe Support unit-portraits

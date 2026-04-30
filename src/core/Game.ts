@@ -2136,12 +2136,14 @@ export class Game {
       // Spawn building
       const eid = this.spawnBuildingAtRuntime(buildingTypeId, this.playerFactionId, point.x, point.z);
 
-      // Send nearest worker to build site
+      // Send nearest worker to build site. factionId enables the global
+      // idle-worker fallback when no selected unit is a worker.
       queueCommand({
         type: 'build',
         buildingTypeId,
         x: point.x,
         z: point.z,
+        factionId: this.playerFactionId,
       });
 
       this.stats.buildingsBuilt++;
