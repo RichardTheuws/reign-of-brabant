@@ -1,0 +1,28 @@
+{
+  "concepts": [
+    {
+      "idx": 0,
+      "name": "auditorium-glass-amphitheater",
+      "prompt": "isometric 3/4 top-down view game asset, single modern Dutch corporate training auditorium building, low circular amphitheater shape with curved tiered glass-and-steel facade wrapping the perimeter, large skylight oculus in the centre of the flat-circular roof, low-rise (clearly NOT a tower, footprint wider than tall), entrance plaza with glass double-doors, slate grey concrete plinth, copper-blue tinted reflective glass panels, centered on transparent background, low-poly stylized fantasy RTS art, painted clean linework, soft directional lighting, no characters, no text, Randstad palette (slate-blue, white, warm yellow desk-lamp accents), distinct silhouette top-down (round disk shape, NOT a square block, NOT a tower)",
+      "url": "https://v3b.fal.media/files/b/0a9852da/J4D89eT1Pzvs9uOXIUC4B_e2a4efaf36ff4c33a2e4f3bca6c8c32a.jpg",
+      "file": "public/assets/concepts/buildings/randstad-barracks-v2-0-auditorium-glass-amphitheater.png",
+      "bytes": 247311
+    },
+    {
+      "idx": 1,
+      "name": "presentation-hall-greenroof",
+      "prompt": "isometric 3/4 top-down view game asset, single modern Dutch corporate presentation hall building, long rectangular two-storey low-rise structure with a sloping greenery roof covered in grass and small trees (groendak), full-height glass curtain walls along the long side showing rows of theatre seating inside, raised stage visible through glass, slate-grey steel frame, wide entrance canopy, centered on transparent background, low-poly stylized fantasy RTS art, painted clean linework, soft directional lighting, no characters, no text, Randstad palette (slate-blue, white, warm yellow accents, lush green roof), distinct silhouette top-down (long horizontal slab with green roof, NOT a tower)",
+      "url": "https://v3b.fal.media/files/b/0a9852da/odFheOv6L2s2dG4l5pjOF_e44b2e6c7fe54d32b600073ae51b08d6.jpg",
+      "file": "public/assets/concepts/buildings/randstad-barracks-v2-1-presentation-hall-greenroof.png",
+      "bytes": 307371
+    },
+    {
+      "idx": 2,
+      "name": "training-arena-dome",
+      "prompt": "isometric 3/4 top-down view game asset, single modern Dutch corporate training facility, low geodesic glass-dome structure surrounded by a wide ring of slate-grey concrete plinth, glass panels segmented in hexagonal pattern on the dome, small atrium courtyard with a single tree visible through the glass, clean steel structural ribs, centered on transparent background, low-poly stylized fantasy RTS art, painted clean linework, soft directional lighting, no characters, no text, Randstad palette (slate-blue, white, warm yellow accents), distinct silhouette top-down (round dome, NOT a tower, NOT a square block)",
+      "url": "https://v3b.fal.media/files/b/0a9852da/LU7LEo5F7oF7UU1ymEmKD_878b0670e3e84b8b80e202e9b0d7e8a0.jpg",
+      "file": "public/assets/concepts/buildings/randstad-barracks-v2-2-training-arena-dome.png",
+      "bytes": 252222
+    }
+  ]
+}

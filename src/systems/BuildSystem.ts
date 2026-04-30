@@ -186,6 +186,30 @@ const BUILD_RANGE = 2.5;
 const BUILD_SPEED = 1.0;
 
 /**
+ * Format the construction-status string for a building card.
+ *
+ * Mirrors the training-units pattern (`Training X (12s)`) by appending a
+ * `(Xs)` suffix to "Under construction" while progress < maxProgress. The
+ * remaining time uses `Math.ceil` and is computed at 1 worker / no
+ * bureaucracy modifier — same convention as `Production` queue.
+ *
+ * Returns `null` when the building is already complete (caller decides what
+ * the idle/training status should be), so this helper has a single, clear
+ * responsibility.
+ */
+export function formatConstructionStatus(
+  progress: number,
+  maxProgress: number,
+  complete: number,
+): string | null {
+  if (complete === 1) return null;
+  if (!(maxProgress > 0)) return 'Under construction';
+  const remaining = Math.max(0, maxProgress - progress);
+  if (remaining <= 0) return 'Under construction';
+  return `Under construction (${Math.ceil(remaining)}s)`;
+}
+
+/**
  * Create the build system.
  */
 export function createBuildSystem() {

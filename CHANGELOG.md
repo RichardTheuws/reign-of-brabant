@@ -1,5 +1,49 @@
 # Changelog
 
+## [0.51.2] - 2026-04-30 — Limburgers Nick sub-pool + BuildSystem timer text + Manager audit
+
+### Added — Nick als 2e Limburgers voice (20 generic files)
+`public/assets/audio/voices/limburgers/nick/{action}_N.mp3` — 20 Nick-files (`PrYUlaJFEdOSVy6jaEaG`, "Limburgs coaching voice"). Limburgs dialect: "Jao, ich luuster", "Hier, Sjeng", "Hajje!", "Gluck auf!", etc. `subPoolLines` mechanisme in `UnitVoices.ts` mixt Nick met Reinoud in random-select-pool — "transgender Limburger" framing.
+
+### Added — Construction-timer text in Building.status (BACKLOG P2)
+`BuildSystem.ts` rendert nu "Bouwt... (15s)" voor in-progress buildings, vergelijkbaar met training-units. 7 lock-tests in `tests/BuildSystem-status-timer.test.ts`.
+
+### Manager karakter audit (BACKLOG entry, GA-agent rapport)
+Diagnose: Manager is een **categorie-fout** — geclassificeerd als Infantry maar gameplay is Ranged-harasser (`range: 7`), `select_1.mp3` 30-50% korter dan andere Randstad-units (8.6KB vs ~12-21KB). Aanbevolen Optie 2 (medium): re-cast voice + stats-rebalance (hp 70→85, range 7→5, attack 9→7) + `meleeBackup: true` flag voor unieke vibe vs Consultant. **NIET geïmplementeerd in deze bump** — Richard akkoord nodig op stats-rebalance.
+
+### Tests
+1611 → 1618 (+7 BuildSystem timer tests, eerder al +5 TowerSystem in v0.51.1).
+
+---
+
+## [0.51.1] - 2026-04-29 — TowerSystem sniper-bonus vs Ranged units (BACKLOG P2)
+
+### Added
+- `TOWER_RANGED_BONUS = 1.5` constant in `src/systems/TowerSystem.ts`. Watchtowers nu 1.5× damage tegen `UnitTypeId.Ranged` targets (elevated firing platform = natuurlijke counter tegen units die op positionering rekenen i.p.v. armor).
+- `tower-attack` event draagt nu de FINALE damage-waarde (incl. bonus) i.p.v. de constante `TOWER_DAMAGE` — downstream consumers (damage popups, particles, audio) reflecteren de bonus correct.
+
+### Tests
+- Nieuwe regression-class invariant suite `tests/TowerSystem-sniper-bonus.test.ts` (5 tests):
+  1. Tower vs Ranged → 22.5 dmg (1.5×)
+  2. Tower vs Worker/Infantry/Heavy → 15 dmg (1.0× baseline)
+  3. Tower vs Hero/Special/Siege/Support → 15 dmg (1.0× baseline)
+  4. Tower vs entity zonder UnitType component → 15 dmg (graceful fallback)
+  5. Event-payload `damage` matcht actual HP-delta voor zowel Ranged als non-Ranged
+- Full suite: 1611/1611 (was 1606 baseline — +5 nieuwe tests, geen regressions)
+
+### Implementatie
+Conditional in `towerSystem()` na target-selectie:
+```ts
+let damage = TOWER_DAMAGE;
+if (hasComponent(world, closestEid, UnitType) && UnitType.id[closestEid] === UnitTypeId.Ranged) {
+  damage *= TOWER_RANGED_BONUS;
+}
+Health.current[closestEid] -= damage;
+eventBus.emit('tower-attack', { towerEid, targetEid: closestEid, damage });
+```
+
+Additive — geen breaking changes, 1.0× blijft baseline voor 7 van 8 unit-types + entities zonder UnitType.
+
 ## [0.51.0] - 2026-04-30 — Voice-files upload-page LIVE + 7 Brabander slot-fixes
 
 ### Added — `https://reign-of-brabant.nl/voice-files/` LIVE

@@ -14,9 +14,9 @@
  */
 
 import { query, hasComponent } from 'bitecs';
-import { Position, Building, Faction, Health } from '../ecs/components';
+import { Position, Building, Faction, Health, UnitType } from '../ecs/components';
 import { IsBuilding, IsUnit, IsDead } from '../ecs/tags';
-import { BuildingTypeId } from '../types/index';
+import { BuildingTypeId, UnitTypeId } from '../types/index';
 import { eventBus } from '../core/EventBus';
 import type { GameWorld } from '../ecs/world';
 import type { SystemFn } from './SystemPipeline';
@@ -36,6 +36,13 @@ export const TOWER_DAMAGE = 15;
 
 /** Seconds between attacks. */
 export const TOWER_ATTACK_SPEED = 1.5;
+
+/**
+ * Sniper-bonus damage multiplier when target is a Ranged unit.
+ * Towers are elevated firing platforms — natural counter to ranged
+ * units that rely on positioning rather than armor. (BACKLOG P2)
+ */
+export const TOWER_RANGED_BONUS = 1.5;
 
 // ---------------------------------------------------------------------------
 // System factory
@@ -109,17 +116,29 @@ export function createTowerSystem(): SystemFn {
         continue;
       }
 
+      // Compute damage with sniper-bonus vs Ranged units.
+      // Fallback: entities without UnitType component (e.g. buildings)
+      // get the baseline 1.0× damage — no bonus.
+      let damage = TOWER_DAMAGE;
+      if (
+        hasComponent(world, closestEid, UnitType) &&
+        UnitType.id[closestEid] === UnitTypeId.Ranged
+      ) {
+        damage *= TOWER_RANGED_BONUS;
+      }
+
       // Deal damage
-      Health.current[closestEid] -= TOWER_DAMAGE;
+      Health.current[closestEid] -= damage;
 
       // Reset cooldown
       cooldowns.set(towerEid, TOWER_ATTACK_SPEED);
 
-      // Emit event for audio/particles
+      // Emit event for audio/particles -- includes final damage so
+      // visual feedback (popups, particle scaling) reflects bonus.
       eventBus.emit('tower-attack' as never, {
         towerEid,
         targetEid: closestEid,
-        damage: TOWER_DAMAGE,
+        damage,
       } as never);
     }
 

@@ -243,14 +243,40 @@ const GENERIC_VOICE_LINES: Record<number, Record<VoiceAction, string[]>> = {
     ready: genericLines('randstad', 'idle', 2),
   },
   2: {
-    select: genericLines('limburgers', 'select', 3),
-    move: genericLines('limburgers', 'move', 3),
-    attack: genericLines('limburgers', 'attack', 3),
-    gather: genericLines('limburgers', 'gather', 3),
-    death: genericLines('limburgers', 'death', 2),
-    ability: genericLines('limburgers', 'ability', 2),
-    idle: genericLines('limburgers', 'idle', 2),
-    ready: genericLines('limburgers', 'idle', 2),
+    // Limburgers pool: Reinoud (base, mannelijk) + Nick (2e voice, "transgender Limburger" framing).
+    // Random-select rotates organically across actors per call.
+    select: [
+      ...genericLines('limburgers', 'select', 3),
+      ...subPoolLines('limburgers', 'nick', 'select', 3),
+    ],
+    move: [
+      ...genericLines('limburgers', 'move', 3),
+      ...subPoolLines('limburgers', 'nick', 'move', 3),
+    ],
+    attack: [
+      ...genericLines('limburgers', 'attack', 3),
+      ...subPoolLines('limburgers', 'nick', 'attack', 3),
+    ],
+    gather: [
+      ...genericLines('limburgers', 'gather', 3),
+      ...subPoolLines('limburgers', 'nick', 'gather', 3),
+    ],
+    death: [
+      ...genericLines('limburgers', 'death', 2),
+      ...subPoolLines('limburgers', 'nick', 'death', 2),
+    ],
+    ability: [
+      ...genericLines('limburgers', 'ability', 2),
+      ...subPoolLines('limburgers', 'nick', 'ability', 2),
+    ],
+    idle: [
+      ...genericLines('limburgers', 'idle', 2),
+      ...subPoolLines('limburgers', 'nick', 'idle', 2),
+    ],
+    ready: [
+      ...genericLines('limburgers', 'idle', 2),
+      ...subPoolLines('limburgers', 'nick', 'ready', 2),
+    ],
   },
   3: {
     // Belgen pool: Hans/Walter/Petra (base) + Sharon Vlaams (2nd female voice).

@@ -78,7 +78,7 @@ import { audioManager } from '../audio/AudioManager';
 import { playUnitVoice } from '../audio/UnitVoices';
 import { techTreeSystem, UPGRADE_DEFINITIONS, getUpgradeDefinition } from '../systems/TechTreeSystem';
 import { TOWER_RANGE, TOWER_DAMAGE, TOWER_ATTACK_SPEED } from '../systems/TowerSystem';
-import { validateBuildingPlacement } from '../systems/BuildSystem';
+import { validateBuildingPlacement, formatConstructionStatus } from '../systems/BuildSystem';
 import { createMusicSystem, type MusicSystem } from '../systems/MusicSystem';
 import { getUpkeepPerTick, resetUpkeepTimers } from '../systems/UpkeepSystem';
 import { MissionSystem, type MissionCallbacks } from '../campaign/MissionSystem';
@@ -2757,7 +2757,11 @@ export class Game {
     // Build status string
     let status = 'Idle';
     if (Building.complete[eid] !== 1) {
-      status = 'Under construction';
+      status = formatConstructionStatus(
+        Building.progress[eid],
+        Building.maxProgress[eid],
+        Building.complete[eid],
+      ) ?? 'Under construction';
     } else if (queueItems.length > 0) {
       const current = queueItems[0];
       const queueCount = queueItems.length - 1;
@@ -3656,7 +3660,11 @@ export class Game {
             // Update status text
             let status = 'Idle';
             if (Building.complete[firstEid] !== 1) {
-              status = 'Under construction';
+              status = formatConstructionStatus(
+                Building.progress[firstEid],
+                Building.maxProgress[firstEid],
+                Building.complete[firstEid],
+              ) ?? 'Under construction';
             } else if (hasComponent(world, firstEid, Production) && Production.unitType[firstEid] !== NO_PRODUCTION) {
               const progress = Production.progress[firstEid];
               const duration = Production.duration[firstEid];
