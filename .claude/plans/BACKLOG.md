@@ -67,17 +67,39 @@ en niet in scope is van de huidige bundel landt hier, gesorteerd op prioriteit.
 - Backups intact: `voices/brabanders.bak/` + `voices/limburgers.bak/`
 - Daarna `scripts/normalize-voices.sh --all` over 722+ files
 
-### 🔴 P1 — Voice-files upload-page op reign-of-brabant.nl/voice-files/
-- **Frontend**: static page in stijl van `/doneer/`, `/het-verhaal/`. 7 character-cards (Brabant + 6 nieuwe scripts), per card: download .md script-button + upload form (.m4a/.mp3, 50MB cap) + lijst submissions met play-knoppen.
-- **Backend**: nieuwe `rob-voices` Docker microservice op M4 (port 3110, naast `rob-payments` 3100):
-  - `POST /voice-uploads/api/submit` (multipart: file + character + submitter-name + email-optional)
-  - `GET /voice-uploads/api/list?faction=X&gender=Y`
-  - `GET /voice-uploads/files/:faction/:gender/:filename` (audio playback)
-  - JSON-store `submissions.json` (geen DB)
-  - Files in `/Users/Shared/srv/docker/rob-voices/uploads/{faction}-{gender}/{submitter}_{ts}.m4a`
-- **Caddy** (M4): `handle /voice-uploads/api/*` + `/voice-uploads/files/*` → `reverse_proxy rob-voices:3110`
-- **Auth**: open + rate-limit per IP (5/uur)
-- **Bundel-fit**: v0.51.0, ~1-2 uur werk via 4-5 sequentiële agents
+### ✅ RESOLVED v0.51.0 — Voice-files upload-page MVP LIVE
+- Frontend op https://reign-of-brabant.nl/voice-files/ met 7 factie-cards (Brabant + 6 gender-scripts)
+- Backend `rob-voices` Docker microservice op M4 port 3110
+- Caddy `/voice-uploads/*` route, container restart was nodig voor mount-refresh
+- **Status**: MVP werkt voor file-upload-per-factie/gender. Wordt pas inzet bij crowdfunding-launch. Tot dan: feature-paused.
+
+### 🟠 P2 — Voice-files page V2 (PRE-CROWDFUNDING uitbreiding)
+- **Trigger**: voor crowdfunding launch. Richard's vrienden moeten dit makkelijk kunnen gebruiken.
+- **Uitbreidingen tov MVP**:
+  1. **Karakters volledig opsplitsen** — niet 7 cards (factie+gender), maar **32 personage-cards** (8 units × 4 facties; gender-variants als sub-options):
+     - Brabant: boer, carnavalvierder, sluiper, tractorrijder, frituurmeester, boerinne, praalwagen, prins-van-brabant
+     - Randstad: stagiair, manager, consultant, corporate-advocaat, vastgoedmakelaar, hr-medewerker, influencer, de-ceo
+     - Limburg: mijnwerker, schutterij, vlaaienwerper, mergelridder, kolenbrander, sjpion, mijnrat, de-mijnbaas
+     - Belgen: frietkraamhouder, bierbouwer, chocolatier, frituurridder, manneken-pis-kanon, wafelzuster, dubbele-spion, de-frietkoning
+  2. **Karakter-uitleg per kaart**: korte beschrijving van persoonlijkheid + tone-instructie (bv "Stagiair Randstad — onderdanig, beetje slijmerig, LinkedIn-jargon, onzekere zinnetjes met opvolgende 'trouwens'").
+  3. **Voorbeeld in-game audio** — play-button per personage die de huidige in-game stem laat horen (uit `/assets/audio/voices/{faction}/{unit}/select_1.mp3`). Toont "zo klinkt het nu, kan jij het beter?"
+  4. **On-screen lines lezen (geen .md download)** — kaart heeft accordion of modal die de 15 regels toont:
+     - Per regel: **nummer + tekst + audio-preview-button** (current in-game versie als referentie)
+     - Recorder kan zo direct lezen vanaf screen, geen MD-export nodig
+  5. **Browser-recording optie** — naast file-upload: `MediaRecorder` API in browser. "Druk Record → lees alle 15 lines met spaties → druk Stop → upload." Geen Voice Memos / QuickTime nodig.
+  6. **Per-personage upload** ipv per-factie — submissions zijn al gegroepeerd per character → easier audit
+  7. **Anonieme submissions toestaan** — name optional. Privacy-vriendelijker.
+- **Implementatie-stappen**:
+  - JSON-config `voice-files-characters.json` met alle 32 personages + tone + line-list (genereer uit RECORDING-SCRIPT-*.md)
+  - Frontend refactor: card-grid 32 personages, accordion-modal voor lines, MediaRecorder + Audio playback
+  - Backend: minor adjustments — accept new character-IDs in submit-endpoint
+- **Bundel-fit**: PRE-crowdfunding, ~4-6 uur werk. Aparte v0.6x.0 bundel.
+
+### 🟢 P3 — Splitter robustheid: re-take detection
+Inzicht uit Brabander recording (v0.51.0): split-by-spoken-numbers.py gebruikte word.start als boundary, maar bij re-takes ("eenenveertig... vijfenveertig... 45 .. 45") staat de actual word END pas na meerdere number-utterances. 7 slots moesten manual gefixt.
+- **Fix**: detecteer consecutive same-number words (re-takes) en gebruik LAATSTE als boundary
+- **Fix**: detecteer "honderd X" patterns die GEEN expected number matchen → filter als false-takes uit slot-content
+- **Fix**: word.end + 0.20s buffer ipv word.start als take_start basis
 
 ### 🔴 P1 — Limburgs female pool via Nick + gender-aware UnitVoices.ts (volgende bundel)
 - Nick origineel (`PrYUlaJFEdOSVy6jaEaG`) als Limburgs female gepland (zie 2026-04-29 sessie, "transgender Limburger" framing)
