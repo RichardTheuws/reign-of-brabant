@@ -49,6 +49,9 @@ const COMMAND_ICON_IMAGES: Record<string, string> = {
   ATK: '/assets/ui/commands/cmd-atk.png',
   STP: '/assets/ui/commands/cmd-stp.png',
   HLD: '/assets/ui/commands/cmd-hld.png',
+  // Worker gather hotkeys (v0.56.0).
+  GLD: '/assets/ui/commands/cmd-gather-gold.png',
+  WUD: '/assets/ui/commands/cmd-gather-wood.png',
   // FactionSpecial1 passive aura icons (v0.46.0).
   CRN: '/assets/ui/commands/cmd-crn-aura.png',
   BRD: '/assets/ui/commands/cmd-brd-passive.png',
@@ -89,6 +92,7 @@ export type UnitStatus = 'idle' | 'moving' | 'attacking' | 'gathering' | 'buildi
 export type BuildingType = 'townhall' | 'barracks' | 'lumbercamp' | 'blacksmith';
 export type CommandAction =
   | 'move' | 'attack' | 'stop' | 'hold'
+  | 'gather-nearest-gold' | 'gather-nearest-wood'
   | 'train-worker' | 'train-infantry' | 'train-ranged' | 'train-heavy' | 'train-siege' | 'train-support' | 'rally-point'
   | 'build-townhall' | 'build-barracks' | 'build-lumbercamp' | 'build-blacksmith'
   | 'build-mijnschacht' | 'build-chocolaterie'

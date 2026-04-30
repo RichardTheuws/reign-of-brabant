@@ -32,10 +32,17 @@ export interface WorkerBuildCmdExt extends WorkerBuildCmd {
   tier?: 1 | 2 | 3;
 }
 
-/** Always-available worker commands (movement, stop). */
+/** Always-available worker commands (movement, stop, auto-gather).
+ *  Hotkey letters chosen for free-keys in the worker panel:
+ *    A → gather-nearest-gold (mnemonic: Aurum, the chemical Au for gold).
+ *    S → gather-nearest-wood (adjacent to A on the home row, one-handed combo).
+ *  Both auto-target the nearest unblocked resource of that type for the
+ *  player faction — no right-clicking needed. */
 export const BASE_WORKER_CMDS: WorkerBuildCmd[] = [
   { action: 'move', icon: 'MOV', label: '', hotkey: 'W', iconClass: 'btn-icon--move' },
   { action: 'stop', icon: 'STP', label: '', hotkey: 'E', iconClass: 'btn-icon--stop' },
+  { action: 'gather-nearest-gold', icon: 'GLD', label: 'Goud',  hotkey: 'A', iconClass: 'btn-icon--gather' },
+  { action: 'gather-nearest-wood', icon: 'WUD', label: 'Hout',  hotkey: 'S', iconClass: 'btn-icon--gather' },
 ];
 
 /** Generic tier requirement labels — fallback when factionId unavailable. */

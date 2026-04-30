@@ -900,6 +900,12 @@ export class Game {
       case 'stop':
         queueCommand({ type: 'stop' });
         break;
+      case 'gather-nearest-gold':
+        this.queueGatherNearest(ResourceType.Gold);
+        break;
+      case 'gather-nearest-wood':
+        this.queueGatherNearest(ResourceType.Wood);
+        break;
       case 'hold':
         queueCommand({ type: 'hold' });
         break;
@@ -2224,6 +2230,86 @@ export class Game {
       this.auraRingRenderer.hide();
       this.towerRangeRenderer.hide();
     }
+  }
+
+  /**
+   * Auto-gather hotkey (v0.56.0) — finds the nearest unblocked resource of
+   * the requested type relative to the selected workers' centroid, then
+   * dispatches a 'gather' command. The existing handleGather handler picks
+   * up all currently-selected workers and routes them to the resource.
+   *
+   * Anchor priority for "nearest":
+   *   1. Centroid of selected player-faction workers (typical case).
+   *   2. Position of the player's first TownHall (no selection fallback).
+   *   3. Origin (0,0) — last-resort, shouldn't realistically hit.
+   *
+   * If no resource of the requested type exists in the world, shows a HUD
+   * alert ("Geen goud meer in zicht" / "Geen hout meer in zicht") rather
+   * than silently failing.
+   */
+  private queueGatherNearest(resourceType: ResourceType): void {
+    // Step 1: anchor position
+    const selectedWorkers: number[] = [];
+    const allSelected = query(world, [Selected, Position]);
+    for (const eid of allSelected) {
+      if (!hasComponent(world, eid, IsWorker)) continue;
+      if (Selected.by[eid] !== 0) continue; // 0 = player slot
+      if (Faction.id[eid] !== this.playerFactionId) continue;
+      if (hasComponent(world, eid, IsDead)) continue;
+      selectedWorkers.push(eid);
+    }
+
+    let anchorX = 0;
+    let anchorZ = 0;
+    if (selectedWorkers.length > 0) {
+      let sx = 0;
+      let sz = 0;
+      for (const eid of selectedWorkers) {
+        sx += Position.x[eid];
+        sz += Position.z[eid];
+      }
+      anchorX = sx / selectedWorkers.length;
+      anchorZ = sz / selectedWorkers.length;
+    } else {
+      // Fallback: nearest player TownHall.
+      const buildings = query(world, [IsBuilding, Position, Faction, Building]);
+      for (const bEid of buildings) {
+        if (Faction.id[bEid] !== this.playerFactionId) continue;
+        if (Building.typeId[bEid] !== BuildingTypeId.TownHall) continue;
+        if (hasComponent(world, bEid, IsDead)) continue;
+        anchorX = Position.x[bEid];
+        anchorZ = Position.z[bEid];
+        break;
+      }
+    }
+
+    // Step 2: nearest resource of the requested type
+    const resources = query(world, [IsResource, Position, Resource]);
+    let nearestEid = NO_ENTITY;
+    let nearestDistSq = Infinity;
+    for (const rEid of resources) {
+      if (Resource.type[rEid] !== resourceType) continue;
+      if (Resource.amount[rEid] <= 0) continue; // depleted
+      if (hasComponent(world, rEid, IsDead)) continue;
+      const dx = Position.x[rEid] - anchorX;
+      const dz = Position.z[rEid] - anchorZ;
+      const distSq = dx * dx + dz * dz;
+      if (distSq < nearestDistSq) {
+        nearestDistSq = distSq;
+        nearestEid = rEid;
+      }
+    }
+
+    if (nearestEid === NO_ENTITY) {
+      const label = resourceType === ResourceType.Gold ? 'goud' : 'hout';
+      this.hud?.showAlert(`Geen ${label} meer in zicht`, 'warning');
+      return;
+    }
+
+    // Step 3: route via the existing gather pipeline (handleGather will
+    // dispatch to selected workers — same code path as right-click on a
+    // resource).
+    queueCommand({ type: 'gather', targetEid: nearestEid });
   }
 
   /** Spawn a building during gameplay (not from map generation). */

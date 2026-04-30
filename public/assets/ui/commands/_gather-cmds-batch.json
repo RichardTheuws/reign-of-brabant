@@ -1,0 +1,37 @@
+{
+  "batch": "gather-cmd-icons-v056",
+  "generated": "2026-04-30",
+  "model": "fal-ai/flux/dev",
+  "size": "square_hd (1024x1024)",
+  "pipeline": "Flux Dev queue -> PIL re-encode JPG to PNG (no BiRefNet \u2014 vignette + gold frame baked into painting)",
+  "anchor_style": "cmd-mov.png + cmd-atk.png (painted-vignette, ornate gold curved frame, dark moody vignette, single hero-object centered)",
+  "scope": "worker hotkey command icons (A=gold, S=wood)",
+  "assets": [
+    {
+      "file": "cmd-gather-gold.png",
+      "key": "gather-gold",
+      "command": "Gather Gold",
+      "size_kb": 951.5,
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "seed": 1676942618,
+      "source_url": "https://v3b.fal.media/files/b/0a985d66/qONYF1pjzntewkaBbj8kz.jpg",
+      "prompt": "painted RPG card art action icon, a single hero gold ore chunk with bright glowing yellow-gold veins running through dark stone, a heavy iron pickaxe leaning against the ore on the right side, two stacked gleaming gold ingots lying in front of the ore on a small rocky ledge, polished metallic gold sheen with strong yellow-gold reflections, painted oil texture, centered on dark moody vignette background with deep brown-black gradient and warm yellow-gold accent lighting from below, ornate gold curved frame border, dramatic chiaroscuro lighting catching the gold veins and ingots, fantasy game ability icon, oil painting texture, no text, no dollar sign, no coin emblem, museum quality",
+      "negative_prompt": "cartoon coin, dollar sign, $ symbol, euro symbol, currency symbol, emoji, flat icon, modern UI flat design, photorealistic photograph, blurry, watermark, gibberish text, multiple objects cluttered, cartoony, chibi"
+    },
+    {
+      "file": "cmd-gather-wood.png",
+      "key": "gather-wood",
+      "command": "Gather Wood",
+      "size_kb": 1126.6,
+      "model": "fal-ai/flux/dev",
+      "image_size": "square_hd",
+      "seed": 1543689466,
+      "source_url": "https://v3b.fal.media/files/b/0a985d66/b9y-B8fG9SUu95U4yh5xj.jpg",
+      "prompt": "painted RPG card art action icon, a single freshly chopped wooden log with rich saddle-brown bark and warm tan inner wood-grain rings exposed at the cut end, a heavy double-bit woodcutter's axe with dark steel head and oak handle embedded deep into the top of the log, a few curled wood-shavings and small split kindling pieces scattered at the base, painted oil texture, centered on dark moody vignette background with deep brown-black gradient and warm amber lantern accent lighting, ornate gold curved frame border, dramatic chiaroscuro lighting catching the polished axe-blade and the cut wood-grain, fantasy game ability icon, oil painting texture, no text, no living tree, no green leaves, no foliage, museum quality",
+      "negative_prompt": "living tree, green leaves, foliage, forest scene, cartoony tree emoji, saw, chainsaw, modern tool, flat icon, modern UI flat design, photorealistic photograph, blurry, watermark, gibberish text, multiple objects cluttered, cartoony, chibi"
+    }
+  ],
+  "errors": [],
+  "cost_estimate_usd": 0.06
+}

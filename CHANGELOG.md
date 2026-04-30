@@ -1,5 +1,57 @@
 # Changelog
 
+## [0.56.0] - 2026-04-30 — Auto-gather hotkeys voor workers (A/S)
+
+### Added — twee easy gather-hotkeys + HUD buttons in worker panel
+Richard's request 2026-04-30: "twee easy hotkeys aan de workers toevoegen inclusief hud buttons met design; wood en gold gather, die automatisch nearest wood of nearest gold gaan harvesten, dat is makkelijker dan rechtsklikken".
+
+| Hotkey | Action | Mnemonic | Icon |
+|---|---|---|---|
+| **A** | `gather-nearest-gold` | Aurum (Au, chemical symbol for gold) | `GLD` → `cmd-gather-gold.png` |
+| **S** | `gather-nearest-wood` | adjacent to A — one-handed combo | `WUD` → `cmd-gather-wood.png` |
+
+Beide knoppen verschijnen in cmd-worker panel naast de bestaande Move (W) en Stop (E) buttons. Ze zijn cross-faction beschikbaar via `BASE_WORKER_CMDS` (geen factie-specifieke labels nodig — gather is universeel).
+
+### Behavior — `Game.queueGatherNearest(resourceType)`
+Drie-staps lookup voor de juiste resource-target:
+
+1. **Anchor positie**: centroid van geselecteerde player-faction workers (typische case). Geen selectie? → positie van speler's eerste TownHall. Geen TownHall? → (0,0) origin (last-resort, zou niet realistisch hit'en).
+2. **Nearest resource**: bitECS `query([IsResource, Position, Resource])` filter op `Resource.type === requested` en `Resource.amount > 0` (depleted nodes overgeslagen). Nearest by Euclidean dist² vanaf anchor.
+3. **Dispatch**: `queueCommand({ type: 'gather', targetEid: nearestEid })` — zelfde pipeline als rechts-klik op een resource. Bestaande `handleGather` dispatcht naar alle geselecteerde workers + reset Gatherer state correct.
+
+Empty world (geen matching resource): HUD alert "Geen goud meer in zicht" / "Geen hout meer in zicht" ipv silent fail.
+
+### Asset — 2 nieuwe painted-vignette command-icons
+Via Flux Dev (ThreadPoolExecutor 2 workers, ~30s wallclock):
+- `public/assets/ui/commands/cmd-gather-gold.png` — 951 KB. Gold ore chunk + glowing yellow-gold veins + iron pickaxe + 2 stacked ingots, ornate gold filigree frame. Anti-glyph guard kept emoji/coin-cliches out.
+- `public/assets/ui/commands/cmd-gather-wood.png` — 1127 KB. Saddle-brown log + double-bit axe + kindling. No living tree, no leaves.
+
+Style anchors: `cmd-mov.png` + `cmd-atk.png`. Cost: ~$0.06.
+
+### CommandAction type uitgebreid
+`'gather-nearest-gold' | 'gather-nearest-wood'` toegevoegd aan `CommandAction` union in `HUD.ts`. `COMMAND_ICON_IMAGES` map uitgebreid met `GLD` + `WUD` entries.
+
+`btn-icon--gather` className toegevoegd aan beide commands — biedt CSS hook voor toekomstige tinting (groen voor wood, geel voor gold) zonder de painted icons aan te raken.
+
+### Tests (+9, geen regressions)
+`tests/Game-gather-hotkeys.test.ts` (9 tests):
+- **BASE_WORKER_CMDS registration** (4 tests): gold heeft hotkey A + icon GLD + label 'Goud'; wood heeft hotkey S + icon WUD + label 'Hout'; geen hotkey-collisions binnen base; beide gebruiken `btn-icon--gather` className.
+- **Nearest-resource picker** (5 tests): nearest gold gepickt over far gold; wood-pick negeert gold; depleted (amount=0) skip; NO_ENTITY return als geen matching resource; Euclidean (diagonal beats axis-aligned bij gelijk coord-sum).
+
+bitECS query() in test gebruikt om TypedArray-persistence-issues over `replaceWorld()` calls te omzeilen (zelfde patroon als v0.54.1 build-fallback test).
+
+Suite: 1758 → 1767.
+
+### Why MINOR (0.56.0 ipv 0.55.1)
+Nieuwe gameplay-action + nieuwe HUD-buttons + nieuwe assets + nieuwe API surface (`Game.queueGatherNearest`). Conform `versioning.md` features = MINOR.
+
+### Reproducibility
+- Script: `scripts/regen_gather_cmd_icons_v056.py`
+- Manifest: `public/assets/ui/commands/_gather-cmds-batch.json`
+- Memory: `.claude/agents/memory/asset-generator.md` (sectie "RoB v0.56.0 gather-cmd HUD icons")
+
+---
+
 ## [0.55.0] - 2026-04-30 — Skirmish difficulty rebalance (asymmetric easy/hard)
 
 ### Why
