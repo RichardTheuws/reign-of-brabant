@@ -15,7 +15,7 @@ import { IsUnit, IsBuilding, IsResource, IsWorker, IsDead, IsHero } from '../ecs
 import { FactionId, UnitTypeId, BuildingTypeId, HeroTypeId, UpgradeId, ResourceType, MAP_SIZE, MAP_SIZES, RESOURCE_PRESETS, UnitAIState, NO_PRODUCTION, NO_ENTITY, HERO_POPULATION_COST, DEATH_TIMER, type UnitArchetype, type MapSizeOption, type ResourcePreset } from '../types/index';
 import { UNIT_ARCHETYPES, RANDSTAD_UNIT_ARCHETYPES, LIMBURGERS_UNIT_ARCHETYPES, BELGEN_UNIT_ARCHETYPES, BUILDING_ARCHETYPES } from '../entities/archetypes';
 import { HERO_ARCHETYPES, getHeroTypesForFaction, getHeroArchetype } from '../entities/heroArchetypes';
-import { getFactionUnitArchetype, getDisplayBuildingName, getDisplayUnitName, getDisplayUpgradeName } from '../data/factionData';
+import { getFactionUnitArchetype, getDisplayBuildingName, getDisplayUnitName, getDisplayUpgradeName, getUnitVoiceGender } from '../data/factionData';
 import { getFactionMessage } from '../data/factionMessages';
 import { getPortraitUrl } from '../data/portraitMap';
 import { createHero, isHeroActive } from '../entities/heroFactory';
@@ -1440,7 +1440,8 @@ export class Game {
       const voiceEid = selected[0];
       const voiceFaction = hasComponent(world, voiceEid, IsUnit) ? Faction.id[voiceEid] : this.playerFactionId;
       const voiceUnitType = hasComponent(world, voiceEid, IsUnit) ? UnitType.id[voiceEid] : undefined;
-      playUnitVoice(voiceFaction, 'attack', voiceUnitType);
+      const voiceGender = voiceUnitType !== undefined ? getUnitVoiceGender(voiceFaction, voiceUnitType) : 'mixed';
+      playUnitVoice(voiceFaction, 'attack', voiceUnitType, voiceGender);
     }
 
     this.exitAttackMoveMode();
@@ -1939,7 +1940,7 @@ export class Game {
       }
       // Audio: play faction-specific voice line when unit spawns (player only)
       if (event.factionId === this.playerFactionId) {
-        playUnitVoice(event.factionId, 'ready', event.unitTypeId);
+        playUnitVoice(event.factionId, 'ready', event.unitTypeId, getUnitVoiceGender(event.factionId, event.unitTypeId));
       }
     });
 
@@ -1954,7 +1955,7 @@ export class Game {
       const pos = this.entityMeshMap.get(eid)?.position;
       if (pos) {
         audioManager.playSound('unit_death', { x: pos.x, z: pos.z });
-        playUnitVoice(event.factionId, 'death', event.unitTypeId);
+        playUnitVoice(event.factionId, 'death', event.unitTypeId, getUnitVoiceGender(event.factionId, event.unitTypeId));
         const factionColor = FACTION_DEATH_COLORS[event.factionId] ?? 0x4a4a5a;
         this.particles.spawnDeathEffect(pos.x, pos.y, pos.z, factionColor);
       }
@@ -2337,7 +2338,9 @@ export class Game {
       audioManager.playSound('select_unit');
       const firstEid = entityIds[0];
       if (hasComponent(world, firstEid, IsUnit)) {
-        playUnitVoice(Faction.id[firstEid], 'select', UnitType.id[firstEid]);
+        const fid = Faction.id[firstEid];
+        const utid = UnitType.id[firstEid];
+        playUnitVoice(fid, 'select', utid, getUnitVoiceGender(fid, utid));
       }
     }
 
@@ -2562,22 +2565,23 @@ export class Game {
       const voiceEid = selected[0];
       const voiceFaction = hasComponent(world, voiceEid, IsUnit) ? Faction.id[voiceEid] : this.playerFactionId;
       const voiceUnitType = hasComponent(world, voiceEid, IsUnit) ? UnitType.id[voiceEid] : undefined;
+      const voiceGender = voiceUnitType !== undefined ? getUnitVoiceGender(voiceFaction, voiceUnitType) : 'mixed';
 
       if (targetEid !== null && Faction.id[targetEid] !== this.playerFactionId &&
           (hasComponent(world, targetEid, IsUnit) || hasComponent(world, targetEid, IsBuilding))) {
         // Attack enemy unit or building
         queueCommand({ type: 'attack', targetEid });
-        playUnitVoice(voiceFaction, 'attack', voiceUnitType);
+        playUnitVoice(voiceFaction, 'attack', voiceUnitType, voiceGender);
       } else if (targetEid !== null && hasComponent(world, targetEid, IsResource)) {
         // Gather from resource
         queueCommand({ type: 'gather', targetEid });
-        playUnitVoice(voiceFaction, 'gather', voiceUnitType);
+        playUnitVoice(voiceFaction, 'gather', voiceUnitType, voiceGender);
       } else {
         // Move to position
         queueCommand({ type: 'move', targetX: point.x, targetZ: point.z });
         // Show green move indicator
         this.unitRenderer.showMoveIndicator(point.x, point.y, point.z);
-        playUnitVoice(voiceFaction, 'move', voiceUnitType);
+        playUnitVoice(voiceFaction, 'move', voiceUnitType, voiceGender);
       }
     }
   }
