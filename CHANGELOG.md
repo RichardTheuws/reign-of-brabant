@@ -1,12 +1,25 @@
 # Changelog
 
+## [0.51.3] - 2026-04-30 — Randstad Barracks mesh herontworpen + production rebuild
+
+### Replaced — `randstad-barracks.glb` (greenroof presentation-hall)
+Meshy v6 ronde: 3 concept-variants (amphitheater/greenroof-hall/dome), gekozen presentation-hall-greenroof voor TOP-DOWN distinctness vs tower-townhall (groendak + glass curtain walls + theatre seating zichtbaar). 9.4MB GLB, 18000 polycount, PBR. Backup als `barracks.bak.glb`.
+
+### Production rebuild
+`npm run build` + rsync dist/ → web root. Alle Voice & Message Pass code (v0.49.0+) + Nick sub-pool + TowerSystem + BuildSystem timer + Randstad Barracks mesh nu live in bundle. **Richard moet hard-refresh** (Cmd+Shift+R) — eerdere bundle was van vóór v0.49.0.
+
+### BACKLOG P1
+Manager mesh "grover/cartoony" vs andere Randstad units. v0.52.0 Manager re-vamp bundle (mesh + voice + stats + portrait).
+
+---
+
 ## [0.51.2] - 2026-04-30 — Limburgers Nick sub-pool + BuildSystem timer text + Manager audit
 
 ### Added — Nick als 2e Limburgers voice (20 generic files)
 `public/assets/audio/voices/limburgers/nick/{action}_N.mp3` — 20 Nick-files (`PrYUlaJFEdOSVy6jaEaG`, "Limburgs coaching voice"). Limburgs dialect: "Jao, ich luuster", "Hier, Sjeng", "Hajje!", "Gluck auf!", etc. `subPoolLines` mechanisme in `UnitVoices.ts` mixt Nick met Reinoud in random-select-pool — "transgender Limburger" framing.
 
 ### Added — Construction-timer text in Building.status (BACKLOG P2)
-`BuildSystem.ts` rendert nu "Bouwt... (15s)" voor in-progress buildings, vergelijkbaar met training-units. 7 lock-tests in `tests/BuildSystem-status-timer.test.ts`.
+Pure helper `formatConstructionStatus(progress, maxProgress, complete)` geëxporteerd uit `src/systems/BuildSystem.ts`. Building-card status toont nu `Under construction (15s)` i.p.v. plain `Under construction` zolang `Building.complete=0` — dezelfde `(Xs)` / `Math.ceil` conventie als trainings-units (`Training X (12s)`). Helper retourneert `null` bij `complete=1` zodat de caller (Game.ts) Idle/Training/etc. kan kiezen. Beide call-sites in `src/core/Game.ts` (`buildBuildingCardData` + per-frame status-refresh) gebruiken nu de helper. 7 lock-tests in `tests/BuildSystem-status-timer.test.ts` (constructing → suffix, complete → null, defensive `maxProgress<=0`, `Math.ceil` rounding, edge `progress==maxProgress`).
 
 ### Manager karakter audit (BACKLOG entry, GA-agent rapport)
 Diagnose: Manager is een **categorie-fout** — geclassificeerd als Infantry maar gameplay is Ranged-harasser (`range: 7`), `select_1.mp3` 30-50% korter dan andere Randstad-units (8.6KB vs ~12-21KB). Aanbevolen Optie 2 (medium): re-cast voice + stats-rebalance (hp 70→85, range 7→5, attack 9→7) + `meleeBackup: true` flag voor unieke vibe vs Consultant. **NIET geïmplementeerd in deze bump** — Richard akkoord nodig op stats-rebalance.

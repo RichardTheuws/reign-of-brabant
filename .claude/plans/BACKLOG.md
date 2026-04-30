@@ -173,7 +173,18 @@ Bij oppakken: subject + commit-SHA invullen onder "Resolved".
   - Splash-FX voor siege/AoE.
 - **Bundel-fit**: visual-polish bundle, eigen MINOR (v0.44.0 of v0.45.0). Vereist Asset Generator agent voor sprite-sheets / particle textures.
 
-### 🟠 P2 — Randstad Barracks mesh visueel te similar aan Town Hall
+### ✅ RESOLVED v0.51.3 — Randstad Barracks mesh herontworpen
+- Concept-variants: amphitheater / presentation-hall-greenroof / training-arena-dome
+- Gekozen: **presentation-hall-greenroof** (rechthoek + groendak + theatre-seating glass-curtain) — top-down distinctness vs. tower-townhall
+- Meshy v6 image-to-3d, 18000 polycount, PBR, 9.4MB GLB
+- LIVE in productie via rebuild+rsync
+- Backups bewaard tot Richard in-game verifieert
+
+### 🔴 P1 — Manager mesh "grover en cartoony" vs andere units (Richard's live-test 2026-04-30)
+- **Issue**: Manager mesh wijkt **visueel-stijl** af — voelt grover/cartoony terwijl andere Randstad-units painted-realistic zijn
+- **Scope**: regen Manager (`randstad-infantry.glb` of bedoelde unit-mesh) via Meshy v6 met explicit "match style of randstad-stagiair / randstad-consultant" prompt-anchor
+- **Combineer met Manager voice/stats audit**: re-record `select_1.mp3` (8.6KB anomalie) + categorie-mismatch oplossen (Infantry-slot + Ranged gameplay)
+- **Bundel**: v0.52.0 mogelijk — Manager re-vamp = mesh + voice + stats + portrait alignment
 - **Gevonden**: 2026-04-29 (Richard "barracks is hetzelfde gebouw als town hall")
 - **Issue**: file MD5 verschilt (barracks.glb 2.9MB vs townhall.glb 3.1MB), dus het zijn echt verschillende meshes. Maar Meshy v6 genereerde beide als kantoor-stijl — visueel onvoldoende onderscheidend in-game vanuit top-down view.
 - **Voorstel**: regenerate Randstad barracks concept-art met explicit "auditorium" / "presentation hall" / "amphitheater"-feel ipv generic kantoor. Daarna Meshy v6 → flip path.

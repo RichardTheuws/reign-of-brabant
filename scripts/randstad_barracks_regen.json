@@ -24,5 +24,21 @@
       "file": "public/assets/concepts/buildings/randstad-barracks-v2-2-training-arena-dome.png",
       "bytes": 252222
     }
-  ]
+  ],
+  "mesh": {
+    "from_concept_idx": 1,
+    "concept_file": "public/assets/concepts/buildings/randstad-barracks-v2-1-presentation-hall-greenroof.png",
+    "prompt": "Modern Dutch corporate training auditorium / presentation hall, low-rise glass-and-steel architecture with distinctive non-tower silhouette, Randstad slate-blue and warm yellow accents, clean PBR materials, RTS game building scale",
+    "glb_url": "https://v3b.fal.media/files/b/0a985302/i5cC7W5nXBQX6gN0NAH40_model.glb",
+    "out_file": "public/assets/models/v02/randstad/barracks.glb",
+    "bytes": 9662284,
+    "elapsed_s": 393,
+    "polycount_target": 18000
+  },
+  "portrait": {
+    "prompt": "painted RPG card art, modern Dutch corporate training auditorium / presentation hall (Randstad faction), low-rise glass-and-steel amphitheater with curved tiered glass facade and a green-roof oculus skylight at the top, slate-blue and white panels with warm yellow desk-lamp window-glow accents, low circular silhouette clearly NOT a high-rise tower, evening blue-hour atmosphere, centered on dark moody vignette background with deep blue-black gradient, ornate gold curved frame border at top edge, dramatic chiaroscuro lighting, warm yellow desk-lamp accents and neon sticky-note color highlights, oil painting texture meets corporate concept art, fantasy game card icon, no readable text, no real-world brand logos, museum quality",
+    "url": "https://v3b.fal.media/files/b/0a985304/LZN7-h6muPjMj6Z11K-J-.jpg",
+    "out_file": "public/assets/portraits/buildings/randstad-barracks.png",
+    "bytes": 388495
+  }
 }
