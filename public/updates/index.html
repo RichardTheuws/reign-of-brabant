@@ -476,6 +476,122 @@
     <div class="content">
         <div class="timeline">
 
+            <!-- ── v0.55.0-v0.56.0 (Easy difficulty rebalance + auto-gather hotkeys) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.55.0 &ndash; v0.56.0</span>
+                        <span class="update__date">30 april 2026</span>
+                        <h2 class="update__title">Easy is &eacute;cht easy &mdash; en workers verzamelen op &eacute;&eacute;n druk op de knop</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--gameplay">Gameplay</span>
+                            <span class="tag tag--feat">Feature</span>
+                            <span class="tag tag--ui">UI</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">&ldquo;Skirmish op makkelijk is echt nog veel te moeilijk&rdquo; &mdash; klopte. Tot nu toe stelde easy alleen de aanvalstiming van de AI uit, maar zijn economie liep gewoon door op vol tempo. Resultaat: tegen de tijd dat de AI eindelijk aanviel, had hij een gr&oacute;ter leger dan de speler. Rechtgezet met een asymmetrische aanpak. En workers krijgen twee easy hotkeys voor goud en hout zodat je niet meer hoeft te rechtsklikken op elke mijn.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">EASY VOELT NU OOK ECHT EASY</h3>
+                        <ul class="update__highlights">
+                            <li><strong>AI-economie wordt zwakker, speler-economie wordt sterker</strong> &mdash; Op easy verzamelt de AI 35% trager, traint hij 33% langzamer, en start de speler met 50% extra goud &eacute;n een 15% snellere gather rate. Ratio speler/AI op easy: bijna 1.8&times;.</li>
+                            <li><strong>Hard wordt scherper zonder de speler te nerfen</strong> &mdash; Op hard krijgt de AI 15% snellere gather en 9% snellere productie, zonder dat de speler iets inlevert. Geen frustratie, gewoon meer tempo.</li>
+                            <li><strong>Normal blijft 1.0 over de hele lijn</strong> &mdash; De ijklat blijft staan; de oude AI-aggressie-tweaks (later aanvallen op easy, eerder op hard) blijven gewoon bestaan b&oacute;venop deze nieuwe economische as.</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">TWEE NIEUWE HOTKEYS VOOR WORKERS</h3>
+                        <ul class="update__highlights">
+                            <li><strong>A &mdash; Verzamel goud (auto-target dichtstbijzijnde mijn)</strong> &mdash; Selecteer een of meerdere workers, druk op A. Ze lopen automatisch naar de dichtstbijzijnde niet-uitgeputte goudmijn en beginnen te delven.</li>
+                            <li><strong>S &mdash; Verzamel hout (auto-target dichtstbijzijnde boom)</strong> &mdash; Zelfde principe voor hout. Geen rechtsklikken meer op elke individuele resource &mdash; perfect voor het opnieuw aan het werk zetten van een groep workers na een aanval.</li>
+                            <li><strong>HUD-knoppen in painted-vignette stijl</strong> &mdash; Naast de Move- en Stop-knoppen verschijnen nu twee nieuwe knoppen in het worker-paneel: een goudader met pikhouweel, en een gekloofde stam met bijl. Beide in dezelfde geschilderde stijl als de andere worker-acties.</li>
+                            <li><strong>Slim: idle workers worden eerder gekozen</strong> &mdash; Auto-gather kiest de dichtstbijzijnde resource gemeten vanaf het zwaartepunt van je geselecteerde workers. Geen mijn meer in zicht? Dan zegt het spel het netjes met een melding in plaats van stilletjes te falen.</li>
+                        </ul>
+
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--space-md);">Tweak-knoppen voor moeilijkheid blijven open: als easy nu te makkelijk voelt, kan de AI-gather verder zakken of de speler-bonus naar beneden &mdash; alles zit in &eacute;&eacute;n tabel.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.54.0-v0.54.1 (Support portraits + TownHall #2 build-fix) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.54.0 &ndash; v0.54.1</span>
+                        <span class="update__date">30 april 2026</span>
+                        <h2 class="update__title">Sjpion en HR-Medewerker krijgen een gezicht &mdash; en je tweede Hoofdkantoor wordt eindelijk gebouwd</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--visual">Visual</span>
+                            <span class="tag tag--fix">Fix</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Twee gerichte fixes uit de speeltest: de support-units van Limburg, Randstad en Belgen hadden nog geen eigen portret in de HUD &mdash; alleen Brabant had de Boerinneke. En een nare bug waarbij een tweede Hoofdkantoor wel geplaatst werd, maar door geen enkele worker werd gebouwd zolang er geen worker was geselecteerd op het moment van plaatsing.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">DRIE NIEUWE SUPPORT-PORTRETTEN</h3>
+                        <ul class="update__highlights">
+                            <li><strong>HR-Medewerker (Randstad)</strong> &mdash; Corporate coach in slate-blue pak met klembord en empathische blik &mdash; geen barista, geen manager, geen stagiair, gewoon iemand die graag z&rsquo;n &ldquo;goed gesprek&rdquo; aanbiedt.</li>
+                            <li><strong>Sjpion (Limburg)</strong> &mdash; Mijnscout met diepe kap en koperen mijnlamp, leren tas met mergel-pijl. Reserved en analytisch, niet vrolijk &mdash; gespeculeerd over alle stakingen heen.</li>
+                            <li><strong>Wafelzuster (Belgen)</strong> &mdash; Matriarchale heelster met zustershoofdkapje (g&eacute;&eacute;n nun-habijt), wit linnen schort en mand vol gouden wafels.</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">TOWNHALL #2 BOUW-FIX</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Tweede Hoofdkantoor wordt nu wel gebouwd</strong> &mdash; Je kon een tweede TH plaatsen, hij werd zichtbaar, maar de progress bleef voor altijd op 0. Oorzaak: de bouwer-toewijzing keek alleen naar je &iacute;ngeselecteerde workers. Geen worker geselecteerd op moment van plaatsing? Geen worker bouwt het.</li>
+                            <li><strong>Nieuwe AoE-stijl fallback</strong> &mdash; Als geen geselecteerde worker beschikbaar is, kiest het spel nu automatisch de dichtstbijzijnde idle-worker van je factie. Idle workers worden bewust voorgetrokken zodat we geen productieve goud-delver weghalen tenzij dat moet.</li>
+                            <li><strong>Werkt voor alle gebouwen</strong> &mdash; Niet alleen TownHall: elk gebouw geplaatst zonder worker-selectie krijgt nu automatisch een builder. Vooral handig in lategame als je workers verspreid op verschillende mijnen werken.</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ── v0.52.0-v0.53.1 (Manager re-vamp + 43 painted-vignette portraits + bcard fix + gender voices) ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.52.0 &ndash; v0.53.1</span>
+                        <span class="update__date">30 april 2026</span>
+                        <h2 class="update__title">Manager re-vamp, 43 nieuwe geschilderde portretten, en gender-aware stemmen</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--visual">Visual</span>
+                            <span class="tag tag--audio">Audio</span>
+                            <span class="tag tag--gameplay">Gameplay</span>
+                            <span class="tag tag--feat">Feature</span>
+                            <span class="tag tag--fix">Fix</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">De grootste visuele update tot nu toe: 43 portretten van karakters en gebouwen volledig opnieuw geschilderd in de painted-vignette stijl, de Randstad Manager kreeg een complete re-vamp met nieuwe stem en mesh, een raar trainingsknop-bug die voor elke held dezelfde gem-crown liet zien is opgelost, en stemmen zijn nu gender-aware met een vrouwelijke Limburgse stem-pool via Nick.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">DE MANAGER RE-VAMP (v0.52.0)</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Hybride harasser met melee-backup</strong> &mdash; De Randstad Manager was een categorie-fout: geclassificeerd als infanterie maar feitelijk een ranged-harasser. Stats opnieuw afgesteld (HP 70&rarr;85, range 7&rarr;5, attack 9&rarr;7) en een nieuwe melee-backup mechaniek: zit een vijand binnen 2 tiles dan schakelt de Manager naadloos om naar melee. Loopt &lsquo;m weg, dan terug naar ranged. Hysteresis voorkomt knipperen aan de rand.</li>
+                            <li><strong>Nieuwe stem &mdash; Daniel met corporate-jargon</strong> &mdash; De oude Manager-clips waren 30-50% korter dan andere Randstad-units. Nu autoritaire Daniel met &ldquo;KPI&rdquo;, &ldquo;alignment&rdquo;, &ldquo;deliverables&rdquo;, &ldquo;stakeholders&rdquo;, &ldquo;roadmap&rdquo;, &ldquo;off-site&rdquo;.</li>
+                            <li><strong>Painted-realistic mesh + portret</strong> &mdash; Nieuwe 3D-mesh via Meshy v6 die niet langer &ldquo;groffer&rdquo; oogt dan de andere Randstad-units, plus een passend painted-vignette portret in slate-blue.</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">43 PORTRETTEN OPNIEUW GESCHILDERD (v0.53.0)</h3>
+                        <ul class="update__highlights">
+                            <li><strong>24 gebouw-portretten voor Brabant en Randstad</strong> &mdash; Alle twaalf gebouwen per factie kregen een nieuw geschilderd portret in de painted-vignette stijl met gouden filigree-kader, matchend met de Limburg- en Belgen-portretten. Brabant warm-oranje folkloric (rode bakstenen, vlaggetjes, hooi), Randstad slate-blue corporate (glas, beton, geometrische gevels).</li>
+                            <li><strong>19 unit- en held-portretten</strong> &mdash; Worker, Infantry, Ranged en alle 8 helden van alle 4 facties opnieuw geschilderd om dezelfde stijl te delen als de Manager. Stagia&iuml;r met klembord (g&eacute;&eacute;n latte-art), Frietkoning met frieten-scepter, Trappist Abdijbrouwer met biertje.</li>
+                            <li><strong>71 lock-tests om kwaliteit te bewaken</strong> &mdash; Elke factie&times;gebouw- en factie&times;unit-mapping moet een PNG op disk hebben &eacute;n boven een minimum-grootte zitten. Voorkomt dat we per ongeluk een tiny placeholder terugzetten.</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">TRAININGSKNOP-FIX (v0.53.1)</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Train-knoppen tonen nu factie-specifieke portretten</strong> &mdash; In de Schuttershal stond een generieke zwaardicoon op de Schutterij-knop, een boog op Vlaaienwerper, een elixerflesje op Sjpion. En De Mijnbaas en De Maasridder lieten allebei dezelfde gem-crown zien. Allemaal opgelost: de trainings-knoppen gebruiken nu het zojuist geschilderde factie-portret van de unit of held in kwestie.</li>
+                            <li><strong>Builds-knop fix iets eerder die dag</strong> &mdash; De cost-tekst (&ldquo;300g&rdquo; / &ldquo;400g&rdquo; voor specials) verdween onder de knop door een ontbrekende CSS-regel. Nu netjes leesbaar in de gouden mono-font onder de label.</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">GENDER-AWARE STEMMEN (v0.52.1)</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Vrouwelijke Limburgse pool via Nick &mdash; 22 nieuwe lines</strong> &mdash; Nick origineel komt nu terug als vrouwelijke Limburgse stem (&ldquo;transgender Limburger&rdquo; framing): &ldquo;Gl&uuml;ck auf, miene leef&rdquo;, &ldquo;Hajje, ich kom&rdquo;, &ldquo;Joa veurspring!&rdquo;.</li>
+                            <li><strong>Sharon Vlaams als vrouwelijke Belgische pool</strong> &mdash; De Wafelzuster en andere vrouwelijke Belgische units krijgen nu uitsluitend Sharon-Vlaams clips, niet meer gemixt met Hans Claesen of Walter.</li>
+                            <li><strong>Gender-flag op alle 30 unit-types</strong> &mdash; Boer is mannelijk, Boerinneke is vrouwelijk, Manager mannelijk (Serge), Wafelzuster vrouwelijk. Mixed-gender units (Sjpion, Carnavalvierder) trekken random uit beide pools. Ontbreekt een vrouwelijke pool? Dan netjes terugvallen op de mannelijke met een dev-console waarschuwing.</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
             <!-- ── v0.51.3 (Randstad Barracks herontworpen + Voice & Message Pass live) ── -->
             <article class="update">
                 <div class="update__card">
