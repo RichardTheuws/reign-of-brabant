@@ -1,5 +1,53 @@
 # Changelog
 
+## [0.55.0] - 2026-04-30 — Skirmish difficulty rebalance (asymmetric easy/hard)
+
+### Why
+Richard's bug-rapport 2026-04-30: "Skirmish op 'makkelijk' is echt nog veel te moeilijk". Root cause in `AIController.ts:282-298`: easy paste alléén AI-aggressie aan (attackThreshold ×1.5, forceAttackTime ×1.6, maxWorkers −1). De AI economy was untouched — bouwde op normaal tempo zijn leger op en viel alleen later aan, dus bij attack-time had de AI een grótere leger. Easy voelde als normal-met-vertraging.
+
+### Added — `src/data/difficultyConfig.ts` met asymmetrische multiplier-tabel
+
+| Factor | Easy | Normal | Hard |
+|---|---|---|---|
+| **AI** gather rate | ×0.65 | 1.0 | ×1.15 |
+| **AI** production duration | ×1.33 (slower) | 1.0 | ×0.91 (faster) |
+| **AI** starting gold | 1.0 | 1.0 | 1.0 |
+| **Player** gather rate | ×1.15 | 1.0 | 1.0 |
+| **Player** production duration | 1.0 | 1.0 | 1.0 |
+| **Player** starting gold | ×1.50 | 1.0 | 1.0 |
+
+Drie helpers: `getDifficultyGatherMult(factionId)`, `getDifficultyProductionMult(factionId)`, `getDifficultyStartingGoldMult(factionId)`. Elk leest `gameConfig.playerFactionId` + `gameConfig.difficulty` en kiest player- of AI-side van de tabel.
+
+Asymmetrie expliciet: easy = AI weaker AND player stronger (twee assen tegelijk). Hard = AI stronger zonder player nerf (zou geen frustration teweegbrengen, alleen tempo). Normal = pure 1.0 (status-quo).
+
+### Hooked in op 4 plekken
+1. **GatherSystem.ts:130** — `effectiveRate *= getDifficultyGatherMult(Faction.id[eid])` na de bestaande Randstad/Limburg multipliers.
+2. **CommandSystem.ts:389** (training start) — `Production.duration *= getDifficultyProductionMult(factionId)`.
+3. **ProductionSystem.ts:395-398** (queue advance) — idem.
+4. **Game.ts:1187-1190 + 2275 + 806** — alle Production.duration set-points + skirmish starting-gold seed gebruiken nu de difficulty multipliers.
+
+`GameConfig` uitgebreid met `difficulty: Difficulty` getter/setter. `Game.startSkirmish` zet nu zowel `gameConfig.setPlayerFaction()` als `gameConfig.setDifficulty()` voor de AISystem.setFaction call.
+
+`AIController.ts` aggressie-tweaks ongewijzigd — die stay there (strategisch, niet economisch).
+
+### Tests (+12, geen regressions)
+`tests/difficultyConfig.test.ts` (12 tests):
+- **Normal**: alle 3 multipliers = 1.0 voor zowel player als AI (4 tests).
+- **Easy**: AI gather 0.65, production 1.33, player gather 1.15, player gold 1.5 (3 tests).
+- **Hard**: AI gather 1.15, production 0.91, player onveranderd (3 tests).
+- **Player faction switch**: na `setPlayerFaction(Limburgers)` krijgt Limburg de player-mods en Brabanders de AI-mods (1 test, locks dat de hardcoded-naar-Brabanders bug niet terugkomt).
+- **Asymmetry sanity**: easy player/AI gather ratio > 1.7×; hard player/AI ratio < 1.0× (2 tests).
+
+Suite: 1746 → 1758.
+
+### Why MINOR (0.55.0 ipv 0.54.2)
+Mechanic-bundle: nieuwe `difficultyConfig.ts` module + `Difficulty` type-export + `gameConfig.setDifficulty()` API + 4 hot-path code-wijzigingen. Voelbare gameplay-shift, niet pure bug-fix.
+
+### Felt-impact verwachting (heuristisch, niet getest in playthrough)
+Op easy met deze cijfers: AI economy ~50% trager (0.65 gather × 1.33 production = ~0.49 effective), player economy ~70% sneller (1.15 gather × 1.5 starting gold). Player zou een minute-1 economic lead moeten kunnen opbouwen die tegen attack-time (vertraagd door bestaande AIController tweaks) een speelbaar verschil oplevert. Tweak-knoppen blijven open: als nog te zwaar, kunnen we easy AI gather verder zakken naar 0.55 of player gold naar +75%.
+
+---
+
 ## [0.54.1] - 2026-04-30 — TownHall #2 build-assignment fix (idle-worker fallback)
 
 ### Fixed — second TownHall stuck on progress=0 forever

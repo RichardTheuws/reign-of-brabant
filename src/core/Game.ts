@@ -16,6 +16,7 @@ import { FactionId, UnitTypeId, BuildingTypeId, HeroTypeId, UpgradeId, ResourceT
 import { UNIT_ARCHETYPES, RANDSTAD_UNIT_ARCHETYPES, LIMBURGERS_UNIT_ARCHETYPES, BELGEN_UNIT_ARCHETYPES, BUILDING_ARCHETYPES } from '../entities/archetypes';
 import { HERO_ARCHETYPES, getHeroTypesForFaction, getHeroArchetype } from '../entities/heroArchetypes';
 import { getFactionUnitArchetype, getDisplayBuildingName, getDisplayUnitName, getDisplayUpgradeName, getUnitVoiceGender } from '../data/factionData';
+import { getDifficultyProductionMult, getDifficultyStartingGoldMult } from '../data/difficultyConfig';
 import { getFactionMessage } from '../data/factionMessages';
 import { getPortraitUrl } from '../data/portraitMap';
 import { createHero, isHeroActive } from '../entities/heroFactory';
@@ -356,7 +357,10 @@ export class Game {
     }
 
     // Set shared game config so all systems know the player's faction
+    // and the active difficulty (read by GatherSystem, ProductionSystem,
+    // and starting-gold seeding via difficultyConfig.ts).
     gameConfig.setPlayerFaction(this.playerFactionId);
+    gameConfig.setDifficulty(this.difficulty as 'easy' | 'normal' | 'hard');
     AISystem.setFaction(this.getAIFactionId(), this.difficulty);
 
     // 2. Load GLB models (all active factions for performance)
@@ -797,9 +801,13 @@ export class Game {
       }
     }
 
-    // Starting resources for all active factions (uses skirmish config)
+    // Starting resources for all active factions (uses skirmish config).
+    // Difficulty asymmetry: easy gives the player +50% starting gold; AI
+    // factions are unaffected. This is independent from the resource preset
+    // dropdown so an "easy + low resources" run is still measurably easier.
     for (const spawn of this.map.spawns) {
-      this.playerState.addGold(spawn.factionId, this.skirmishStartingResources);
+      const startGold = this.skirmishStartingResources * getDifficultyStartingGoldMult(spawn.factionId);
+      this.playerState.addGold(spawn.factionId, Math.round(startGold));
     }
   }
 
@@ -1182,11 +1190,12 @@ export class Game {
       if (nextType !== NO_PRODUCTION) {
         Production.unitType[buildingId] = nextType;
         Production.progress[buildingId] = 0;
+        const diffMult = getDifficultyProductionMult(fid);
         try {
           const arch = getFactionUnitArchetype(fid, nextType);
-          Production.duration[buildingId] = arch.buildTime;
+          Production.duration[buildingId] = arch.buildTime * diffMult;
         } catch {
-          Production.duration[buildingId] = 15;
+          Production.duration[buildingId] = 15 * diffMult;
         }
         for (let i = 0; i < slots.length - 1; i++) {
           slots[i][buildingId] = slots[i + 1][buildingId];
@@ -2272,7 +2281,8 @@ export class Game {
     if (Production.unitType[buildingEid] === NO_PRODUCTION) {
       Production.unitType[buildingEid] = unitType;
       Production.progress[buildingEid] = 0;
-      Production.duration[buildingEid] = buildTimes[unitType] || 15;
+      const fid = Faction.id[buildingEid];
+      Production.duration[buildingEid] = (buildTimes[unitType] || 15) * getDifficultyProductionMult(fid);
       return true;
     }
 

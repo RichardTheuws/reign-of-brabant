@@ -7,8 +7,11 @@
 
 import { FactionId } from '../types/index';
 
+export type Difficulty = 'easy' | 'normal' | 'hard';
+
 class GameConfigManager {
   private _playerFactionId: FactionId = FactionId.Brabanders;
+  private _difficulty: Difficulty = 'normal';
 
   get playerFactionId(): FactionId {
     return this._playerFactionId;
@@ -20,6 +23,14 @@ class GameConfigManager {
 
   isPlayerFaction(factionId: number): boolean {
     return factionId === this._playerFactionId;
+  }
+
+  get difficulty(): Difficulty {
+    return this._difficulty;
+  }
+
+  setDifficulty(difficulty: Difficulty): void {
+    this._difficulty = difficulty;
   }
 }
 

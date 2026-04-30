@@ -27,6 +27,7 @@ import { playerState } from '../core/PlayerState';
 import { UnitAIState, NO_ENTITY, NO_PRODUCTION } from '../types/index';
 import { gameConfig } from '../core/GameConfig';
 import { getFactionUnitArchetype } from '../data/factionData';
+import { getDifficultyProductionMult } from '../data/difficultyConfig';
 import type { GameWorld } from '../ecs/world';
 
 // ---------------------------------------------------------------------------
@@ -386,7 +387,7 @@ function handleTrain(world: GameWorld, cmd: TrainCommand): void {
   if (Production.unitType[bEid] === NO_PRODUCTION) {
     Production.unitType[bEid] = cmd.unitTypeId;
     Production.progress[bEid] = 0;
-    Production.duration[bEid] = getUnitBuildTimeForFaction(factionId, cmd.unitTypeId);
+    Production.duration[bEid] = getUnitBuildTimeForFaction(factionId, cmd.unitTypeId) * getDifficultyProductionMult(factionId);
     return;
   }
 

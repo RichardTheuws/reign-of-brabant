@@ -47,6 +47,7 @@ import { getSprintModeProductionMod } from './HavermoutmelkSystem';
 import { ceoProductionBuff } from './HeroSystem';
 import { techTreeSystem } from './TechTreeSystem';
 import { getFactionUnitArchetype } from '../data/factionData';
+import { getDifficultyProductionMult } from '../data/difficultyConfig';
 import { createUnit } from '../entities/factories';
 import { gameConfig } from '../core/GameConfig';
 import { getAIHPScaling } from './CombatSystem';
@@ -389,12 +390,14 @@ function shiftQueue(bEid: number, factionId: number): void {
     Production.unitType[bEid] = nextType;
     Production.progress[bEid] = 0;
 
-    // Determine build time for next unit from faction data
+    // Determine build time for next unit from faction data, scaled by
+    // difficulty (easy AI trains slower, hard AI trains faster).
+    const diffMult = getDifficultyProductionMult(factionId);
     try {
       const arch = getFactionUnitArchetype(factionId, nextType);
-      Production.duration[bEid] = arch.buildTime;
+      Production.duration[bEid] = arch.buildTime * diffMult;
     } catch {
-      Production.duration[bEid] = 15;
+      Production.duration[bEid] = 15 * diffMult;
     }
 
     // Shift queue slots down

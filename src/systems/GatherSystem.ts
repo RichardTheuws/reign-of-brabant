@@ -32,6 +32,7 @@ import {
 } from '../types/index';
 import { getRandstadGatherMult } from './HavermoutmelkSystem';
 import { getLimburgGatherMult } from './MijnschachtSystem';
+import { getDifficultyGatherMult } from '../data/difficultyConfig';
 import type { GameWorld } from '../ecs/world';
 
 // Gather states (matches Gatherer.state u8 values)
@@ -127,6 +128,9 @@ function processGathering(world: GameWorld, eid: number, dt: number): void {
   effectiveRate *= getRandstadGatherMult(Faction.id[eid]);
   // Limburg-only: Ploegendienst click-buff (Mijnschacht).
   effectiveRate *= getLimburgGatherMult(Faction.id[eid]);
+  // Difficulty asymmetry: easy gives the player 1.15× and the AI 0.65×;
+  // hard gives the AI 1.15× and leaves the player at 1.0×.
+  effectiveRate *= getDifficultyGatherMult(Faction.id[eid]);
   const harvestAmount = effectiveRate * dt;
   const baseCapacity = Gatherer.carryCapacity[eid] || CARRY_CAPACITY;
   const capacity = baseCapacity + (Gatherer.carryBonus[eid] || 0);
