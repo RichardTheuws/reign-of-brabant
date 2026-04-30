@@ -1,5 +1,52 @@
 # Changelog
 
+## [0.51.0] - 2026-04-30 — Voice-files upload-page LIVE + 7 Brabander slot-fixes
+
+### Added — `https://reign-of-brabant.nl/voice-files/` LIVE
+Frontend `public/voice-files/index.html` (vanilla JS + CSS, mobile-first), 7 character-cards (Brabant + 6 nieuwe scripts), per card download-script-button + upload-form (.m4a/.mp3/.wav/.ogg, 50MB cap) + submissions-lijst met play-controls. Style match met `/doneer/` (Cinzel + Inter, gold-on-dark).
+
+### Added — `rob-voices` Docker microservice op M4 (port 3110)
+Bun TypeScript native (geen Express), endpoints:
+- `POST /voice-uploads/api/submit` (multipart, validatie character/extension/size/email, sanitised submitterName, rate-limit 5/uur/IP, atomic JSON-store)
+- `GET /voice-uploads/api/list?character=X` (geen email exposed, optionele filter)
+- `GET /voice-uploads/files/:character/:filename` (audio streaming, path-traversal guard)
+- `GET /voice-uploads/api/health`
+
+CORS: allow-origin `https://reign-of-brabant.nl` + `http://localhost:5173`.
+Storage M4: `/Users/Shared/srv/docker/rob-voices/uploads/`. Caddy route via `handle /voice-uploads/* → reverse_proxy rob-voices:3110` in @rob block. Container restart was nodig om de mount-refresh te krijgen (Docker bind-mount inode-issue op macOS).
+
+### Vite proxy — local dev integratie
+`vite.config.ts` server.proxy: `/voice-uploads → http://localhost:3110`. Lokale dev-flow werkt nu end-to-end met Bun-server `bun run services/rob-voices/src/server.ts`.
+
+### Fixed — 7 Brabander slot-issues uit Richard's listening-pass
+| Slot | File | Issue | Fix |
+|---|---|---|---|
+| 45 | sluiper/idle_2 | Begint met spoken "45" (2x take) | Start 220.40 (na 2e 45-take) |
+| 47 | tractorrijder/select_2 | Begint met "..veertig" leakage | Start 235.50 |
+| 48 | tractorrijder/select_3 | Eindigt met "49"-leak | End 244.80 |
+| 73 | frituurmeester/ability_2 | Cut mid-"zalfaanval" door Scribe-merged "wal.Vierenzeventig" | Extend tot 367.10 |
+| 131 | death_2 | "verloren" + foute "122"-misspraak | 639.40-641.40 |
+| 132 | gather_1 | Start nog binnen 2e "honderdtweeendertig" word | Start 645.30 (na word-end) |
+| 133 | gather_2 | Start nog binnen "drieendertig" word | Start 650.10 (na word-end) |
+
+Inzicht: oorspronkelijke split-by-spoken-numbers.py gebruikte word.start als boundary, maar bij re-takes met snelle herhaling staat de actual word END pas later. Fix-overrides hardcoded met word.end + 0.20s buffer.
+
+### Deploy — productie LIVE
+- M4: `rob-voices` container running, `docker compose up -d` (image built local op M4)
+- Caddy: `Caddyfile.backup-pre-voiceuploads` + `handle /voice-uploads/*` injected, container restart om mount-refresh
+- Web: `npm run build` + rsync dist/ → `/Users/Shared/srv/www/reign-of-brabant/`
+- Brabander voice-fixes rsync direct naar live web-root
+
+### Smoke-tests groen
+- `https://reign-of-brabant.nl/voice-files/` 200
+- `https://reign-of-brabant.nl/voice-files/RECORDING-SCRIPT-BRABANDER.md` 200
+- `https://reign-of-brabant.nl/voice-uploads/api/health` → `{"ok":true,"submissions":0}`
+
+### Tests
+1606/1606 tests groen (geen frontend-tests, microservice handmatig gevalideerd via curl).
+
+---
+
 ## [0.50.2] - 2026-04-30 — Recording-scripts complete (7 facties × 138 slots) + audit-pages generator
 
 ### Fixed — Brabander split-bug rond slot 131-133

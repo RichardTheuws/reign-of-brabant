@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Voice-Files — Reign of Brabant</title>
+  <meta name="description" content="Help mee de voice-acting van Reign of Brabant levensecht te maken. Lees het script voor je factie, neem een audio-bestand op en upload hieronder." />
+  <meta property="og:title" content="Voice-Files — Reign of Brabant" />
+  <meta property="og:description" content="Help mee de voice-acting van Reign of Brabant levensecht te maken. Lees het script, neem op, upload." />
+  <meta property="og:image" content="https://reign-of-brabant.nl/assets/og/og-steun.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="nl_NL" />
+  <meta property="og:site_name" content="Reign of Brabant" />
+  <meta property="og:url" content="https://reign-of-brabant.nl/voice-files/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Voice-Files — Reign of Brabant" />
+  <meta name="twitter:description" content="Help mee de voice-acting van Reign of Brabant levensecht te maken." />
+  <meta name="twitter:image" content="https://reign-of-brabant.nl/assets/og/og-steun.jpg" />
+  <link rel="canonical" href="https://reign-of-brabant.nl/voice-files/" />
+  <link rel="alternate" hreflang="nl" href="https://reign-of-brabant.nl/voice-files/" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="Richard Theuws" />
+  <meta name="theme-color" content="#0a0806" />
+  <link rel="icon" href="/assets/ui/logo.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --bg:#0a0806;
+      --bg-2:#13100c;
+      --panel:rgba(20,15,10,0.92);
+      --panel-2:rgba(28,22,16,0.85);
+      --border:rgba(212,168,83,0.35);
+      --border-soft:rgba(212,168,83,0.18);
+      --gold:#d4a853;
+      --gold2:#f3c969;
+      --text:#e8e6e3;
+      --dim:#a0a0a0;
+      --muted:#707088;
+      --success:#7ec48a;
+      --error:#e07a7a;
+      --fontH:'Cinzel',serif;
+      --fontB:'Inter','Segoe UI',system-ui,sans-serif;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:var(--fontB);}
+    body{
+      background:
+        radial-gradient(ellipse at top, rgba(212,168,83,0.08), transparent 55%),
+        radial-gradient(ellipse at bottom, rgba(80,40,20,0.10), transparent 60%),
+        var(--bg);
+    }
+    a{color:var(--gold2);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .wrap{max-width:1240px;margin:0 auto;padding:28px 20px 80px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand img{width:48px;height:48px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(212,168,83,0.18))}
+    .brand-title{font-family:var(--fontH);font-weight:900;letter-spacing:0.06em;font-size:1.05rem;color:var(--text)}
+    .brand-sub{color:var(--dim);font-size:0.88rem}
+    .nav{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:10px 14px;border-radius:8px;border:1px solid var(--border);
+      background:rgba(212,168,83,0.10);color:var(--text);cursor:pointer;
+      font-family:var(--fontH);font-weight:700;letter-spacing:0.03em;font-size:0.92rem;
+      text-decoration:none;transition:border-color .15s,background .15s,transform .05s;
+    }
+    .btn:hover{border-color:var(--gold);background:rgba(212,168,83,0.18);text-decoration:none}
+    .btn:active{transform:translateY(1px)}
+    .btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+    .btn[disabled]{opacity:0.45;cursor:not-allowed}
+    .btn-primary{background:linear-gradient(180deg,rgba(243,201,105,0.22),rgba(212,168,83,0.18));border-color:var(--gold)}
+    .btn-primary:hover{background:linear-gradient(180deg,rgba(243,201,105,0.32),rgba(212,168,83,0.26))}
+    .btn-ghost{background:transparent}
+
+    /* Hero */
+    .hero{
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:30px 28px;
+      background:
+        linear-gradient(180deg, rgba(212,168,83,0.06), rgba(0,0,0,0)) , var(--panel);
+      box-shadow:0 14px 40px rgba(0,0,0,0.55);
+      margin-bottom:28px;
+      position:relative;overflow:hidden;
+    }
+    .hero::before{
+      content:"";position:absolute;inset:8px;border:1px solid var(--border-soft);border-radius:12px;pointer-events:none;
+    }
+    .hero h1{
+      font-family:var(--fontH);margin:0 0 10px;color:var(--gold);
+      font-weight:900;letter-spacing:0.04em;font-size:clamp(1.6rem,3.2vw,2.4rem);
+    }
+    .hero p{margin:0 0 8px;line-height:1.6;color:var(--text);max-width:78ch}
+    .hero .small{color:var(--dim);font-size:0.92rem}
+    .hero-steps{
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:18px;
+    }
+    .step{
+      background:rgba(0,0,0,0.25);border:1px solid var(--border-soft);border-radius:10px;padding:10px 12px;
+    }
+    .step-n{font-family:var(--fontH);color:var(--gold2);font-weight:700;font-size:0.78rem;letter-spacing:0.16em}
+    .step-t{color:var(--text);font-size:0.92rem;margin-top:2px;line-height:1.4}
+
+    /* Grid */
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+      gap:18px;
+    }
+    .card{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:18px;
+      box-shadow:0 12px 30px rgba(0,0,0,0.45);
+      display:flex;flex-direction:column;gap:14px;
+      position:relative;
+    }
+    .card-head{display:flex;align-items:center;gap:14px}
+    .portrait{
+      width:64px;height:64px;border-radius:10px;
+      background:#1a1410 center/cover no-repeat;
+      border:1px solid var(--border);
+      flex:0 0 auto;
+      box-shadow:inset 0 0 0 1px rgba(0,0,0,0.4), 0 0 14px rgba(212,168,83,0.10);
+    }
+    .card-title{
+      font-family:var(--fontH);color:var(--gold);font-weight:900;
+      letter-spacing:0.04em;font-size:1.1rem;margin:0;
+    }
+    .card-vibe{color:var(--dim);font-size:0.86rem;line-height:1.45;margin-top:4px}
+    .card-actions{display:flex;flex-wrap:wrap;gap:8px}
+
+    .form{display:flex;flex-direction:column;gap:10px}
+    label{display:flex;flex-direction:column;gap:6px;font-size:0.86rem;color:var(--dim)}
+    input[type=text],input[type=email],input[type=file]{
+      font-family:var(--fontB);font-size:0.95rem;color:var(--text);
+      background:rgba(0,0,0,0.35);border:1px solid var(--border-soft);border-radius:8px;
+      padding:9px 10px;
+    }
+    input[type=text]:focus,input[type=email]:focus,input[type=file]:focus{
+      outline:none;border-color:var(--gold);box-shadow:0 0 0 2px rgba(212,168,83,0.18)
+    }
+    input[type=file]::file-selector-button{
+      font-family:var(--fontH);font-weight:700;letter-spacing:0.03em;
+      background:rgba(212,168,83,0.14);color:var(--text);border:1px solid var(--border);
+      border-radius:6px;padding:6px 10px;margin-right:10px;cursor:pointer;
+    }
+    .hint{color:var(--muted);font-size:0.78rem}
+    .warn{color:var(--error);font-size:0.82rem;display:none}
+    .warn.show{display:block}
+
+    .feedback{font-size:0.9rem;line-height:1.45;display:none;border-radius:8px;padding:8px 10px;border:1px solid transparent}
+    .feedback.show{display:block}
+    .feedback.ok{display:block;color:var(--success);background:rgba(126,196,138,0.08);border-color:rgba(126,196,138,0.35)}
+    .feedback.err{display:block;color:var(--error);background:rgba(224,122,122,0.08);border-color:rgba(224,122,122,0.35)}
+
+    .submissions{
+      border-top:1px solid var(--border-soft);
+      padding-top:12px;
+    }
+    .submissions h3{
+      font-family:var(--fontH);font-weight:700;letter-spacing:0.06em;
+      font-size:0.82rem;color:var(--gold2);margin:0 0 8px;text-transform:uppercase;
+    }
+    .sub-list{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto}
+    .sub-item{
+      display:grid;grid-template-columns:1fr;gap:6px;
+      padding:8px 10px;background:rgba(0,0,0,0.25);
+      border:1px solid var(--border-soft);border-radius:8px;
+    }
+    .sub-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:0.85rem}
+    .sub-name{color:var(--text);font-weight:600}
+    .sub-date{color:var(--muted);font-size:0.78rem;font-family:ui-monospace,monospace}
+    .sub-empty{color:var(--muted);font-size:0.85rem;font-style:italic;padding:6px 2px}
+    audio{width:100%;height:32px}
+
+    .footer{margin-top:28px;color:var(--dim);font-size:0.88rem;text-align:center;line-height:1.6}
+
+    @media (max-width: 520px){
+      .wrap{padding:18px 12px 60px}
+      .hero{padding:22px 18px}
+      .card{padding:16px}
+      .nav{justify-content:flex-start;width:100%}
+    }
+  </style>
+  <!-- Umami Analytics -->
+  <script defer src="https://analytics.reign-of-brabant.nl/script.js" data-website-id="8c91d569-5945-45d6-b407-ffe6749b9cbc"></script>
+</head>
+<body>
+  <div class="wrap">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Reign of Brabant home">
+        <img src="/assets/ui/logo.png" alt="" />
+        <div>
+          <div class="brand-title">Reign of Brabant</div>
+          <div class="brand-sub">Voice-Files Project</div>
+        </div>
+      </a>
+      <nav class="nav" aria-label="Site">
+        <a class="btn btn-ghost" href="/play">Spelen</a>
+        <a class="btn btn-ghost" href="/het-verhaal/">Het Verhaal</a>
+        <a class="btn btn-ghost" href="/doneer/">Doneer</a>
+      </nav>
+    </header>
+
+    <section class="hero" aria-labelledby="hero-title">
+      <h1 id="hero-title">Voice-Files Project</h1>
+      <p>
+        Help mee de voice-acting van <strong>Reign of Brabant</strong> levensecht te maken.
+        Lees het script voor je factie, neem <strong>één audio-bestand</strong> op, en upload het hieronder.
+        Wij knippen het op en mixen het in de game — met credits.
+      </p>
+      <p class="small">
+        Geen gedoe met regels-per-bestand: je leest gewoon het hele script in één take. Pauze tussen zinnen mag.
+        Stilte aan begin en eind helpt onze knipsoftware. Telefoon-microfoon werkt, een headset/USB-mic is beter.
+      </p>
+      <div class="hero-steps" aria-hidden="true">
+        <div class="step"><div class="step-n">STAP 1</div><div class="step-t">Kies je factie hieronder</div></div>
+        <div class="step"><div class="step-n">STAP 2</div><div class="step-t">Download het script (.md)</div></div>
+        <div class="step"><div class="step-n">STAP 3</div><div class="step-t">Neem één bestand op</div></div>
+        <div class="step"><div class="step-n">STAP 4</div><div class="step-t">Upload — wij doen de rest</div></div>
+      </div>
+    </section>
+
+    <main id="cards" class="grid" aria-label="Karakter cards">
+      <!-- Cards worden door JS gerenderd -->
+    </main>
+
+    <p class="footer">
+      Vragen of liever rechtstreeks insturen?
+      <a href="mailto:richard@theuws.com?subject=Reign%20of%20Brabant%20%E2%80%94%20Voice-Files">richard@theuws.com</a>
+      &middot; Bestanden &leq; 50&nbsp;MB &middot; .m4a / .mp3 / .wav / .ogg
+    </p>
+  </div>
+
+  <script>
+    // ---- Configuration ----
+    const CHARACTERS = [
+      { id:'brabant',         gender:'',       script:'RECORDING-SCRIPT-BRABANDER.md',         label:'Brabant',     portrait:'/assets/portraits/brabant-worker.png',
+        vibe:'Zuid-Oost Brabants, warm en authentiek (un/ne, vat ipv pak, geen -ansen).' },
+      { id:'limburg-male',    gender:'male',   script:'RECORDING-SCRIPT-LIMBURGERS-MALE.md',   label:'Limburg ♂', portrait:'/assets/portraits/limburg-mijnbaas.png',
+        vibe:'Limburgs dialect, ich/dich/sjoen, zacht-melodisch, mannelijk warm.' },
+      { id:'limburg-female',  gender:'female', script:'RECORDING-SCRIPT-LIMBURGERS-FEMALE.md', label:'Limburg ♀', portrait:'/assets/portraits/limburg-worker.png',
+        vibe:'Limburgs vrouwelijk, moeke-warmte met scherpte.' },
+      { id:'randstad-male',   gender:'male',   script:'RECORDING-SCRIPT-RANDSTAD-MALE.md',     label:'Randstad ♂', portrait:'/assets/portraits/randstad-ceo.png',
+        vibe:'Corporate ABN, jargon, anglicismen, GEEN koffie.' },
+      { id:'randstad-female', gender:'female', script:'RECORDING-SCRIPT-RANDSTAD-FEMALE.md',   label:'Randstad ♀', portrait:'/assets/portraits/randstad-politicus.png',
+        vibe:'Corporate vrouwelijk, KPI-precisie, deadline-energie.' },
+      { id:'belgen-male',     gender:'male',   script:'RECORDING-SCRIPT-BELGEN-MALE.md',       label:'België ♂', portrait:'/assets/portraits/belgen-frietkoning.png',
+        vibe:'Vlaams, theatraal-warm, droog absurd, ge/gij/amai/voila.' },
+      { id:'belgen-female',   gender:'female', script:'RECORDING-SCRIPT-BELGEN-FEMALE.md',     label:'België ♀', portrait:'/assets/portraits/belgen-abdijbrouwer.png',
+        vibe:'Vlaams vrouwelijk, allez-schat, abdij-warmte.' },
+    ];
+
+    const ALLOWED_EXT = ['m4a','mp3','wav','ogg'];
+    const MAX_BYTES = 50 * 1024 * 1024;
+    const API_BASE = '/voice-uploads/api';
+
+    // ---- Utils ----
+    function el(tag, props = {}, children = []){
+      const n = document.createElement(tag);
+      for (const k in props){
+        if (k === 'class') n.className = props[k];
+        else if (k === 'html') n.innerHTML = props[k];
+        else if (k.startsWith('on') && typeof props[k] === 'function') n.addEventListener(k.slice(2), props[k]);
+        else if (k === 'dataset') for (const d in props.dataset) n.dataset[d] = props.dataset[d];
+        else if (props[k] !== undefined && props[k] !== null) n.setAttribute(k, props[k]);
+      }
+      (Array.isArray(children) ? children : [children]).forEach(c => {
+        if (c == null) return;
+        n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+      });
+      return n;
+    }
+    function fmtBytes(b){
+      if (b < 1024) return b + ' B';
+      if (b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
+      return (b/1024/1024).toFixed(1) + ' MB';
+    }
+    function fmtDate(iso){
+      try {
+        const d = new Date(iso);
+        if (isNaN(d.getTime())) return iso || '';
+        return d.toLocaleDateString('nl-NL', { day:'2-digit', month:'short', year:'numeric' })
+             + ' ' + d.toLocaleTimeString('nl-NL', { hour:'2-digit', minute:'2-digit' });
+      } catch { return iso || ''; }
+    }
+    function escapeHtml(s){
+      return String(s == null ? '' : s)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+    function extOf(name){
+      const i = (name || '').lastIndexOf('.');
+      return i >= 0 ? name.slice(i+1).toLowerCase() : '';
+    }
+
+    // ---- Card rendering ----
+    function renderCard(c){
+      const card = el('article', { class:'card', id:'card-' + c.id, 'aria-labelledby':'h-' + c.id });
+
+      // Head
+      const portrait = el('div', { class:'portrait', role:'img', 'aria-label':c.label });
+      portrait.style.backgroundImage = `url('${c.portrait}')`;
+      const head = el('div', { class:'card-head' }, [
+        portrait,
+        el('div', {}, [
+          el('h2', { class:'card-title', id:'h-' + c.id }, c.label),
+          el('div', { class:'card-vibe' }, c.vibe),
+        ]),
+      ]);
+
+      // Actions (download script)
+      const dl = el('a', { class:'btn btn-ghost', href:'/voice-files/' + c.script, download:'' }, ['Download script']);
+      const actions = el('div', { class:'card-actions' }, [dl]);
+
+      // Form
+      const nameInp = el('input', { type:'text', name:'name', required:'required', placeholder:'Bijv. Jan uit Eindhoven', minlength:'2', maxlength:'80', autocomplete:'name' });
+      const emailInp = el('input', { type:'email', name:'email', placeholder:'(optioneel — voor credits/contact)', maxlength:'120', autocomplete:'email' });
+      const fileInp  = el('input', { type:'file', name:'file', required:'required', accept:'.m4a,.mp3,.wav,.ogg,audio/*' });
+      const sizeWarn = el('div', { class:'warn', role:'alert' }, '');
+      const submitBtn = el('button', { type:'submit', class:'btn btn-primary' }, ['Upload mijn opname']);
+      const feedback  = el('div', { class:'feedback', role:'status', 'aria-live':'polite' }, '');
+
+      const form = el('form', { class:'form', enctype:'multipart/form-data', novalidate:'novalidate' }, [
+        el('label', {}, [ 'Naam', nameInp ]),
+        el('label', {}, [ 'E-mail', emailInp ]),
+        el('label', {}, [
+          'Audio-bestand',
+          fileInp,
+          el('div', { class:'hint' }, '.m4a / .mp3 / .wav / .ogg — max 50 MB'),
+          sizeWarn,
+        ]),
+        el('div', {}, [submitBtn]),
+        feedback,
+      ]);
+
+      // Client-side validation on file change
+      fileInp.addEventListener('change', () => {
+        sizeWarn.classList.remove('show');
+        sizeWarn.textContent = '';
+        const f = fileInp.files && fileInp.files[0];
+        if (!f) return;
+        const ext = extOf(f.name);
+        if (!ALLOWED_EXT.includes(ext)){
+          sizeWarn.textContent = `Type .${ext || '?'} wordt niet ondersteund. Gebruik ${ALLOWED_EXT.map(e=>'.'+e).join(' / ')}.`;
+          sizeWarn.classList.add('show');
+        } else if (f.size > MAX_BYTES){
+          sizeWarn.textContent = `Bestand is ${fmtBytes(f.size)} — dat is groter dan 50 MB. Comprimeer of knip korter.`;
+          sizeWarn.classList.add('show');
+        }
+      });
+
+      // Submit handler
+      form.addEventListener('submit', async (ev) => {
+        ev.preventDefault();
+        feedback.className = 'feedback';
+        feedback.textContent = '';
+
+        const name = nameInp.value.trim();
+        const email = emailInp.value.trim();
+        const f = fileInp.files && fileInp.files[0];
+
+        if (name.length < 2){
+          feedback.textContent = 'Vul je naam in (minimaal 2 tekens).';
+          feedback.classList.add('show','err'); return;
+        }
+        if (!f){
+          feedback.textContent = 'Kies een audio-bestand om te uploaden.';
+          feedback.classList.add('show','err'); return;
+        }
+        const ext = extOf(f.name);
+        if (!ALLOWED_EXT.includes(ext)){
+          feedback.textContent = 'Type bestand niet ondersteund. Gebruik .m4a / .mp3 / .wav / .ogg.';
+          feedback.classList.add('show','err'); return;
+        }
+        if (f.size > MAX_BYTES){
+          feedback.textContent = `Bestand is ${fmtBytes(f.size)} — te groot (max 50 MB).`;
+          feedback.classList.add('show','err'); return;
+        }
+
+        const fd = new FormData();
+        fd.append('name', name);
+        if (email) fd.append('email', email);
+        fd.append('faction', c.id.split('-')[0]);
+        if (c.gender) fd.append('gender', c.gender);
+        fd.append('character', c.id);
+        fd.append('file', f, f.name);
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Bezig met uploaden…';
+        try {
+          const res = await fetch(`${API_BASE}/submit`, { method:'POST', body: fd });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          feedback.textContent = 'Bedankt! Je opname staat erin. We luisteren em straks goed terug.';
+          feedback.classList.add('show','ok');
+          form.reset();
+          sizeWarn.classList.remove('show');
+          loadSubmissions(c, listEl, emptyEl);
+        } catch (err){
+          feedback.textContent = 'Upload mislukt. Backend (nog) niet bereikbaar of bestand geweigerd. Mail naar richard@theuws.com werkt altijd.';
+          feedback.classList.add('show','err');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Upload mijn opname';
+        }
+      });
+
+      // Submissions
+      const listEl = el('div', { class:'sub-list' });
+      const emptyEl = el('div', { class:'sub-empty' }, 'Submissions laden…');
+      listEl.appendChild(emptyEl);
+      const submissions = el('div', { class:'submissions' }, [
+        el('h3', {}, 'Bestaande opnames'),
+        listEl,
+      ]);
+
+      card.appendChild(head);
+      card.appendChild(actions);
+      card.appendChild(form);
+      card.appendChild(submissions);
+
+      // Initial load
+      loadSubmissions(c, listEl, emptyEl);
+      return card;
+    }
+
+    async function loadSubmissions(c, listEl, emptyEl){
+      const params = new URLSearchParams({ faction: c.id.split('-')[0] });
+      if (c.gender) params.set('gender', c.gender);
+      params.set('character', c.id);
+      try {
+        const res = await fetch(`${API_BASE}/list?${params.toString()}`);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        const items = Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : []);
+        listEl.innerHTML = '';
+        if (!items.length){
+          listEl.appendChild(el('div', { class:'sub-empty' }, 'Nog geen submissions — wees de eerste.'));
+          return;
+        }
+        items.forEach(item => {
+          const name = item.name || 'Anoniem';
+          const date = item.created_at || item.date || item.uploaded_at || '';
+          const url  = item.url || item.file_url || (item.path ? '/voice-uploads/files/' + item.path.replace(/^\/+/, '') : '');
+          const meta = el('div', { class:'sub-meta' }, [
+            el('span', { class:'sub-name' }, escapeHtml(name)),
+            el('span', { class:'sub-date' }, fmtDate(date)),
+          ]);
+          const audio = url ? el('audio', { controls:'controls', preload:'none', src:url }) : el('div', { class:'hint' }, 'Audio niet beschikbaar');
+          listEl.appendChild(el('div', { class:'sub-item' }, [meta, audio]));
+        });
+      } catch (err){
+        listEl.innerHTML = '';
+        listEl.appendChild(el('div', { class:'sub-empty' }, 'Backend niet bereikbaar — submissions verschijnen zodra de upload-API live staat.'));
+      }
+    }
+
+    // ---- Boot ----
+    document.addEventListener('DOMContentLoaded', () => {
+      const grid = document.getElementById('cards');
+      CHARACTERS.forEach(c => grid.appendChild(renderCard(c)));
+    });
+  </script>
+</body>
+</html>

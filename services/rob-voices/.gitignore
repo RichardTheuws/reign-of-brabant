@@ -1,0 +1,9 @@
+node_modules/
+uploads/
+submissions.json
+submissions.json.tmp
+*.log
+.env
+.env.*
+.DS_Store
+bun.lockb

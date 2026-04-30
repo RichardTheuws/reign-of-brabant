@@ -1,0 +1,26 @@
+services:
+  rob-voices:
+    build: .
+    container_name: rob-voices
+    image: rob-voices:latest
+    restart: unless-stopped
+    ports:
+      - "3110:3110"
+    environment:
+      - PORT=3110
+      - DATA_DIR=/data
+      - NODE_ENV=production
+    volumes:
+      - /Users/Shared/srv/docker/rob-voices/uploads:/data
+    networks:
+      - webnet
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3110/voice-uploads/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+networks:
+  webnet:
+    external: true

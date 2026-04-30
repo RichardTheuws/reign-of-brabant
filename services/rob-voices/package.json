@@ -1,0 +1,17 @@
+{
+  "name": "rob-voices",
+  "version": "0.1.0",
+  "description": "Voice file upload microservice for Reign of Brabant",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --watch src/server.ts",
+    "start": "bun run src/server.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.5.0"
+  }
+}

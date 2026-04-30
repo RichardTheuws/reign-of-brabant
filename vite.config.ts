@@ -46,5 +46,11 @@ export default defineConfig(({ mode }) => ({
       'Cross-Origin-Opener-Policy': 'same-origin',
       'Cross-Origin-Embedder-Policy': 'require-corp',
     },
+    proxy: {
+      '/voice-uploads': {
+        target: 'http://localhost:3110',
+        changeOrigin: false,
+      },
+    },
   },
 }));
