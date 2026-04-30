@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.53.1] - 2026-04-30 — Building-card train-buttons gebruiken factie-painted portraits
+
+### Fixed — train-unit + train-hero buttons toonden generieke command-icons
+Richard's screenshot 2026-04-30 (Limburg Schuttershal): de "Schutterij/Vlaaienwerper/Sjpion" train-buttons toonden generieke `UNIT_I/UNIT_R/UNIT_S` command-icons (zwaard/boog/elixer) i.p.v. de painted-vignette `limburg-infantry/ranged.png` portraits. De "De Mijnbaas" en "De Maasridder" hero-buttons toonden allebéí dezelfde gem-crown (uit `cmd-hero.png`) — geen onderscheid tussen de 2 heroes.
+
+Root cause: `showBuildingCard()` in `HUD.ts` rendert action-buttons via `COMMAND_ICON_IMAGES[act.icon]` (statische command-icon map). Build-buttons in worker panel gebruikten al `getBuildingPortraitUrl(factionId, buildingTypeId)` (sinds v0.47.0), maar dat code-pad was nooit doorgetrokken naar de building-card train-actions. Hero-icons waren bovendien `H1/H2 → cmd-hero.png` voor BEIDE heroes — geen factie- of hero-specifieke lookup.
+
+### Added — `getActionPortraitUrl(act)` helper
+Nieuwe private methode in HUD die voor een `BuildingCardAction` de juiste factie-painted portrait URL teruggeeft:
+- `train-worker / -infantry / -ranged / -heavy / -siege / -support` → `getUnitPortraitUrl(currentFactionId, unitTypeId)`
+- `train-hero-N` → `getHeroTypesForFaction(currentFactionId)[N]` → `getHeroPortraitUrl(heroTypeId)`
+- `rally-point`, `isInfo`, onbekende actions → `null` (caller fallback naar `COMMAND_ICON_IMAGES[act.icon]`)
+
+In `showBuildingCard()` line 941: `paintedUrl ?? fallbackSrc` (zelfde patroon als build-buttons). DOM-level `img.onerror` swap naar `COMMAND_ICON_IMAGES[act.icon]` als painted PNG 404't — voorkomt broken-image als een factie ooit een unit-type heeft zonder portrait (bijv. Limburg Support: geen `limburg-support.png` → de generic UNIT_S icon).
+
+### Imports
+`getUnitPortraitUrl` + `getHeroPortraitUrl` toegevoegd aan portraitMap import. `getHeroTypesForFaction` uit `entities/heroArchetypes` voor hero-idx → HeroTypeId resolutie.
+
+### Tests (+8, geen regressions)
+`tests/HUD-bcard-action-portraits.test.ts` (8 tests):
+- **Limburg Schuttershal screenshot scenario** (4 tests): train-infantry → `limburg-infantry.png`, train-ranged → `limburg-ranged.png`, train-support → niet de verkeerde factie, train-hero-0/1 → `limburg-mijnbaas.png` resp. `limburg-maasmeester.png` (geen duplicate gem-crown meer).
+- **Faction-aware swap** (2 tests): zelfde `train-infantry` action toont andere portrait per factie (brabant→randstad→belgen). Idem voor `train-hero-0` (brabant-prins → randstad-ceo → belgen-frietkoning).
+- **Non-train fallback** (1 test): `rally-point` (`isRally: true`) gebruikt nooit een unit/hero-portrait — blijft generic command-icon.
+- **train-hero-1 distinctness** (1 test): mijnbaas + maasmeester images zijn nu verschillend (regression-lock voor de duplicate-crown bug).
+
+Suite: 1728 → 1736.
+
+### Why patch (0.53.1 ipv 0.54.0)
+Pure bug-fix conform `versioning.md` — geen nieuwe features, alleen het bestaande factie-painted portrait code-pad doortrekken naar de building-card train-actions die er per ongeluk niet aan gehangen waren. Assets bestonden al sinds v0.53.0 / heroes v0.46.0.
+
+---
+
 ## [0.53.0] - 2026-04-30 — Painted-vignette portrait pass (43 portraits regen)
 
 ### Why

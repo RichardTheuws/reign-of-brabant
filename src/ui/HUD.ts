@@ -19,7 +19,8 @@ import { UnitTypeId, BuildingTypeId, UpgradeId, type UnitArchetype } from '../ty
 import { createCommandIcon, replaceIconText } from './CommandIcons';
 import { getUpgradeImagePath } from './UpgradePortraits';
 import { createBuildingPortraitImg } from './BuildingPortraits';
-import { getBuildingPortraitUrl } from '../data/portraitMap';
+import { getBuildingPortraitUrl, getUnitPortraitUrl, getHeroPortraitUrl } from '../data/portraitMap';
+import { getHeroTypesForFaction } from '../entities/heroArchetypes';
 
 // ---------------------------------------------------------------------------
 // Command icon image mapping — fal.ai generated painted icons
@@ -938,12 +939,20 @@ export class HUD {
       const iconSpan = document.createElement('span');
       iconSpan.className = 'bcard-action-icon';
       if (act.iconClass) iconSpan.classList.add(act.iconClass);
-      const imgSrc = COMMAND_ICON_IMAGES[act.icon];
+
+      // Faction-painted unit/hero portrait wins for train-* actions.
+      // Falls back to the generic command-icon PNG, then SVG glyph, then text.
+      const paintedUrl = this.getActionPortraitUrl(act);
+      const fallbackSrc = COMMAND_ICON_IMAGES[act.icon] ?? null;
+      const imgSrc = paintedUrl ?? fallbackSrc;
       if (imgSrc) {
         const img = document.createElement('img');
         img.src = imgSrc;
         img.alt = act.label;
         img.draggable = false;
+        if (paintedUrl && fallbackSrc) {
+          img.onerror = () => { img.onerror = null; img.src = fallbackSrc; };
+        }
         iconSpan.appendChild(img);
       } else {
         const svgIcon = createCommandIcon(act.icon, 20);
@@ -1854,6 +1863,43 @@ export class HUD {
       case 'belgen':   return FactionId.Belgen;
       default:         return FactionId.Brabanders;
     }
+  }
+
+  /**
+   * Faction-painted portrait URL for a building-card action button.
+   * - train-worker / -infantry / -ranged / -heavy / -siege / -support → unit portrait
+   * - train-hero-N → hero portrait via faction's hero-list[N]
+   * - rally / info / abilities / unknown → null (caller falls back to COMMAND_ICON_IMAGES)
+   *
+   * Returns null when no painted PNG is mapped so the caller can use the
+   * generic command-icon glyph. The DOM-level onerror swap also handles
+   * the case where the mapping exists but the file is missing on disk.
+   */
+  private getActionPortraitUrl(act: BuildingCardAction): string | null {
+    if (act.isRally || act.isInfo) return null;
+
+    const factionId = this.getFactionIdFromCurrent();
+
+    if (act.action.startsWith('train-hero-')) {
+      const heroIdx = parseInt(act.action.replace('train-hero-', ''), 10);
+      if (Number.isNaN(heroIdx)) return null;
+      const heroes = getHeroTypesForFaction(factionId);
+      const heroTypeId = heroes[heroIdx];
+      if (heroTypeId === undefined) return null;
+      return getHeroPortraitUrl(heroTypeId);
+    }
+
+    const actionToTypeId: Record<string, UnitTypeId> = {
+      'train-worker':   UnitTypeId.Worker,
+      'train-infantry': UnitTypeId.Infantry,
+      'train-ranged':   UnitTypeId.Ranged,
+      'train-heavy':    UnitTypeId.Heavy,
+      'train-siege':    UnitTypeId.Siege,
+      'train-support':  UnitTypeId.Support,
+    };
+    const unitTypeId = actionToTypeId[act.action];
+    if (unitTypeId === undefined) return null;
+    return getUnitPortraitUrl(factionId, unitTypeId);
   }
 
   // -----------------------------------------------------------------------
