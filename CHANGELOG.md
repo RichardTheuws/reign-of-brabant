@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.50.1] - 2026-04-30 — Brabander voices: Richard zelf ingesproken (138 files)
+
+### Replaced — 138 Brabander voice-files door Richard zelf
+Richard's eigen voice-recording vervangt de ElevenLabs Richard-voice. Reden: ElevenLabs-uitspraak van Brabants dialect bleef onnatuurlijk klinken. Eigen opname is authentieker en biedt vrijheid voor improvisatie.
+
+### Pipeline — `scripts/split-by-spoken-numbers.py`
+Eén-recording-naar-138-files via:
+1. ElevenLabs **Scribe** STT met word-level timestamps (~$0.04 voor 11 min audio)
+2. Vind alle gesproken slot-nummers ("één", "twee"... "honderdachtendertig"); fuzzy matching voor Scribe-quirks (merged words zoals "wal.Vierenzeventig", typos zoals "Einennegentig" vs "Eenennegentig")
+3. Audio tussen nummer[N].end en nummer[N+1].start wordt slot[N]; `silenceremove` filter trimt leiding/staart-stilte
+4. STT response gecached in `*.stt.json` (one-call-only)
+
+### Cleanup — Boerinne portrait + voice
+v0.50.x mid-sessie hotfixes:
+- `brabant-support.png` portrait gegenereerd via Flux Dev (boerinne, 512x512, $0.03)
+- `UNIT_PORTRAITS[Brabanders][Support] = 'brabant-support'` in portraitMap.ts
+- Boerinne 15 voice-files apart geregenereerd via Emma (zal nu vervangen worden door Richard's vrouw/dochter via recording-flow indien gewenst)
+
+### Niet aangeraakt
+- 138 Brabander files staan nu klaar voor normalize-batch — Limburgers/Belgen/Randstad blijven op hun bestaande generated voices.
+- `RECORDING-SCRIPT-LIMBURGER.md` is nog niet gegenereerd. Aanbevolen: laat een Limburger zelf inspreken voor authenticiteit.
+
+### Tooling
+- `scripts/split-by-spoken-numbers.py` herbruikbaar voor andere facties
+- `scripts/split-voice-recording.sh` (silence-only versie) blijft beschikbaar als fallback wanneer geen STT beschikbaar
+- `_recording/` toegevoegd aan `.gitignore`
+
+### Tests
+1606/1606 groen, type-check clean (geen code-wijzigingen, alleen audio + scripts).
+
+---
+
 ## [0.50.0] - 2026-04-29 — Voice-pipeline complete swap + audio-normalisatie batch
 
 ### Regenerated — Brabander voices (Richard, ~138 fresh files)

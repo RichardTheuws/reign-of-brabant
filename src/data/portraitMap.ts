@@ -65,6 +65,7 @@ const UNIT_PORTRAITS: Record<number, Record<number, string>> = {
     [UnitTypeId.Worker]: 'brabant-worker',
     [UnitTypeId.Infantry]: 'brabant-infantry',
     [UnitTypeId.Ranged]: 'brabant-ranged',
+    [UnitTypeId.Support]: 'brabant-support',
   },
   [FactionId.Randstad]: {
     [UnitTypeId.Worker]: 'randstad-worker',

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>Brabant Voice Audit — vind de rare zin</title>
+<style>
+  body { font-family: -apple-system, sans-serif; background: #1a1a1f; color: #e8e8ee; padding: 24px; max-width: 900px; margin: 0 auto; }
+  h1 { color: #f3c969; }
+  h2 { color: #f3c969; border-bottom: 1px solid #3a3a45; padding-bottom: 4px; margin-top: 28px; }
+  .row { display: grid; grid-template-columns: 90px 1fr 240px; gap: 12px; align-items: center; padding: 6px 10px; background: #25252d; margin-bottom: 4px; border-radius: 4px; font-size: 13px; }
+  .file { font-family: ui-monospace, monospace; color: #aac8ff; }
+  .text { color: #e8e8ee; }
+  audio { width: 100%; height: 28px; }
+  .tip { background: #3a2a20; border-left: 4px solid #ff8830; padding: 10px 14px; margin: 12px 0; border-radius: 4px; font-size: 14px; }
+</style>
+</head>
+<body>
+<h1>Brabant Voice Audit</h1>
+<p>Klik elke speler tot je de "rare zin" hoort. Zeg me dan welk bestand het was — bv. _"boer/select_2"_ of _"generic gather_1"_.</p>
+<div class="tip">Easter-egg lines (5% kans in-game) doen NIET mee in deze audit — die zijn jouw eigen tekst. Lijst hieronder is alle 33 standaard Brabander worker + generic lines.</div>
+
+<h2>boer (worker) — 15 lines</h2>
+<div class="row"><span class="file">select_1</span><span class="text">"Goeiendag."</span><audio controls preload="none" src="/assets/audio/voices/brabanders/boer/select_1.mp3"></audio></div>
+<div class="row"><span class="file">select_2</span><span class="text">"Den boer stao klaor."</span><audio controls preload="none" src="/assets/audio/voices/brabanders/boer/select_2.mp3"></audio></div>
+<div class="row"><span class="file">select_3</span><span class="text">"Wa moet er gebeuren?"</span><audio controls preload="none" src="/assets/audio/voices/brabanders/boer/select_3.mp3"></audio></div>
+<div class="row"><span class="file">move_1</span><span class="text">"Ik gao."</span><audio controls preload="none" src="/assets/audio/voices/brabanders/boer/move_1.mp3"></audio></div>
+<div class="row"><span class="file">move_2</span><span class="text">"Komt voor mekaor."</span><audio controls preload="none" src="/assets/audio/voices/brabanders/boer/move_2.mp3"></audio></div>
+<div class="row"><span class="file">move_3</span><span class="text">"Onderweg."</span><audio controls preload="none" src="/assets/audio/voices/brabanders/boer/move_3.mp3"></audio></div>
+<div class="row"><span class="file">attack_1</span><span class="text">"Met de schup!"</span><audio controls preload="none" src="/assets/audio/voices/brabanders/boer/attack_1.mp3"></audio></div>
+<div class="row"><span class="file">attack_2</span><span class="text">"Ge krijgt er ene!"</span><audio controls preload="none" src="/assets/audio/voices/brabanders/boer/attack_2.mp3"></audio></div>
+<div class="row"><span class="file">attack_3</span><span class="text">"Hier hedde'm!"</span><audio controls preload="none" src="/assets/audio/voices/brabanders/boer/attack_3.mp3"></audio></div>
+<div class="row"><span class="file">death_1</span><span class="text">"Den akker..."</span><audio controls preload="none" src="/assets/audio/voices/brabanders/boer/death_1.mp3"></audio></div>
+<div class="row"><span class="file">death_2</span><span class="text">"Och kjeere..."</span><audio controls preload="none" src="/assets/audio/voices/brabanders/boer/death_2.mp3"></audio></div>
+<div class="row"><span class="file">ability_1</span><span class="text">"Schup uit den grond!"</span><audio controls preload="none" src="/assets/audio/voices/brabanders/boer/ability_1.mp3"></audio></div>
+<div class="row"><span class="file">ability_2</span><span class="text">"Veul wèrk gemokt!"</span><audio controls preload="none" src="/assets/audio/voices/brabanders/boer/ability_2.mp3"></audio></div>
+<div class="row"><span class="file">idle_1</span><span class="text">"Effe pauze."</span><audio controls preload="none" src="/assets/audio/voices/brabanders/boer/idle_1.mp3"></audio></div>
+<div class="row"><span class="file">idle_2</span><span class="text">"Den dag is lang."</span><audio controls preload="none" src="/assets/audio/voices/brabanders/boer/idle_2.mp3"></audio></div>
+
+<h2>brabanders/ generic fallback — 18 lines</h2>
+<p style="color:#a0a0aa; font-size:13px;">Speelt af voor units zonder eigen subfolder, of als faction-wide select voor de eerste-aangeklikte unit.</p>
+<div class="row"><span class="file">select_1</span><span class="text">"Jao?"</span><audio controls preload="none" src="/assets/audio/voices/brabanders/select_1.mp3"></audio></div>
+<div class="row"><span class="file">select_2</span><span class="text">"Hier bende."</span><audio controls preload="none" src="/assets/audio/voices/brabanders/select_2.mp3"></audio></div>
+<div class="row"><span class="file">select_3</span><span class="text">"Zegt 't moar."</span><audio controls preload="none" src="/assets/audio/voices/brabanders/select_3.mp3"></audio></div>
+<div class="row"><span class="file">move_1</span><span class="text">"Ik gao."</span><audio controls preload="none" src="/assets/audio/voices/brabanders/move_1.mp3"></audio></div>
+<div class="row"><span class="file">move_2</span><span class="text">"Onderweg."</span><audio controls preload="none" src="/assets/audio/voices/brabanders/move_2.mp3"></audio></div>
+<div class="row"><span class="file">move_3</span><span class="text">"Komt voor mekaor."</span><audio controls preload="none" src="/assets/audio/voices/brabanders/move_3.mp3"></audio></div>
+<div class="row"><span class="file">attack_1</span><span class="text">"Pak 'm vast!"</span><audio controls preload="none" src="/assets/audio/voices/brabanders/attack_1.mp3"></audio></div>
+<div class="row"><span class="file">attack_2</span><span class="text">"Ge krijgt er van!"</span><audio controls preload="none" src="/assets/audio/voices/brabanders/attack_2.mp3"></audio></div>
+<div class="row"><span class="file">attack_3</span><span class="text">"Voor Brabant!"</span><audio controls preload="none" src="/assets/audio/voices/brabanders/attack_3.mp3"></audio></div>
+<div class="row"><span class="file">death_1</span><span class="text">"Och nee..."</span><audio controls preload="none" src="/assets/audio/voices/brabanders/death_1.mp3"></audio></div>
+<div class="row"><span class="file">death_2</span><span class="text">"Verloren..."</span><audio controls preload="none" src="/assets/audio/voices/brabanders/death_2.mp3"></audio></div>
+<div class="row"><span class="file">gather_1</span><span class="text">"Aan 't wèrk."</span><audio controls preload="none" src="/assets/audio/voices/brabanders/gather_1.mp3"></audio></div>
+<div class="row"><span class="file">gather_2</span><span class="text">"Verzamelen alleman."</span><audio controls preload="none" src="/assets/audio/voices/brabanders/gather_2.mp3"></audio></div>
+<div class="row"><span class="file">gather_3</span><span class="text">"Volop bezig."</span><audio controls preload="none" src="/assets/audio/voices/brabanders/gather_3.mp3"></audio></div>
+<div class="row"><span class="file">ability_1</span><span class="text">"Vurraf!"</span><audio controls preload="none" src="/assets/audio/voices/brabanders/ability_1.mp3"></audio></div>
+<div class="row"><span class="file">ability_2</span><span class="text">"Nou!"</span><audio controls preload="none" src="/assets/audio/voices/brabanders/ability_2.mp3"></audio></div>
+<div class="row"><span class="file">idle_1</span><span class="text">"Effe wachten."</span><audio controls preload="none" src="/assets/audio/voices/brabanders/idle_1.mp3"></audio></div>
+<div class="row"><span class="file">idle_2</span><span class="text">"'t Is rustig."</span><audio controls preload="none" src="/assets/audio/voices/brabanders/idle_2.mp3"></audio></div>
+
+</body>
+</html>
