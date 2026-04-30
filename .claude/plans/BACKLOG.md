@@ -67,6 +67,18 @@ en niet in scope is van de huidige bundel landt hier, gesorteerd op prioriteit.
 - Backups intact: `voices/brabanders.bak/` + `voices/limburgers.bak/`
 - Daarna `scripts/normalize-voices.sh --all` over 722+ files
 
+### 🔴 P1 — Voice-files upload-page op reign-of-brabant.nl/voice-files/
+- **Frontend**: static page in stijl van `/doneer/`, `/het-verhaal/`. 7 character-cards (Brabant + 6 nieuwe scripts), per card: download .md script-button + upload form (.m4a/.mp3, 50MB cap) + lijst submissions met play-knoppen.
+- **Backend**: nieuwe `rob-voices` Docker microservice op M4 (port 3110, naast `rob-payments` 3100):
+  - `POST /voice-uploads/api/submit` (multipart: file + character + submitter-name + email-optional)
+  - `GET /voice-uploads/api/list?faction=X&gender=Y`
+  - `GET /voice-uploads/files/:faction/:gender/:filename` (audio playback)
+  - JSON-store `submissions.json` (geen DB)
+  - Files in `/Users/Shared/srv/docker/rob-voices/uploads/{faction}-{gender}/{submitter}_{ts}.m4a`
+- **Caddy** (M4): `handle /voice-uploads/api/*` + `/voice-uploads/files/*` → `reverse_proxy rob-voices:3110`
+- **Auth**: open + rate-limit per IP (5/uur)
+- **Bundel-fit**: v0.51.0, ~1-2 uur werk via 4-5 sequentiële agents
+
 ### 🔴 P1 — Limburgs female pool via Nick + gender-aware UnitVoices.ts (volgende bundel)
 - Nick origineel (`PrYUlaJFEdOSVy6jaEaG`) als Limburgs female gepland (zie 2026-04-29 sessie, "transgender Limburger" framing)
 - Vereist gender-mapping in `UnitVoices.ts`:

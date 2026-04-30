@@ -1,5 +1,40 @@
 # Changelog
 
+## [0.50.2] - 2026-04-30 — Recording-scripts complete (7 facties × 138 slots) + audit-pages generator
+
+### Fixed — Brabander split-bug rond slot 131-133
+Richard sprak per ongeluk "honderd tweeëntwintig" (slot 122) waar slot 132 hoorde, en herhaalde "honderd tweeëndertig" twee keer. Splitter koos de tweede match → slot 131 (death_2) bevatte het foute 122-nummer, slot 132 (gather_1) startte met de eerste 132-take. Manual re-extract met handmatige boundaries: death_2 [639.30, 641.50], gather_1 [644.40, 648.70], gather_2 [649.30, 654.00].
+
+### Added — 6 nieuwe RECORDING-SCRIPT-*.md files (parallel generated via 6 background agents)
+Elk script: 138 genummerde slots in zelfde structuur als RECORDING-SCRIPT-BRABANDER.md, met per-unit karakter-instructies en suggested lines in factie-dialect. Easter-egg appendix per factie.
+
+| Factie | M-script | F-script |
+|---|---|---|
+| Limburgers | RECORDING-SCRIPT-LIMBURGERS-MALE.md | RECORDING-SCRIPT-LIMBURGERS-FEMALE.md |
+| Randstad | RECORDING-SCRIPT-RANDSTAD-MALE.md | RECORDING-SCRIPT-RANDSTAD-FEMALE.md |
+| Belgen | RECORDING-SCRIPT-BELGEN-MALE.md | RECORDING-SCRIPT-BELGEN-FEMALE.md |
+
+Brabander script blijft origineel (gender-neutraal voor nu, recorder-voorkeur).
+
+### Added — `scripts/build-audit-page.py` template-generator
+Parsed RECORDING-SCRIPT-*.md → genereert `public/voices-audit-<faction>[-gender].html` met alle 138 slots in een speelbare grid. Auto-detecteert factie + gender uit filename. Gebruikt voor 7 audit-pages totaal.
+
+### Audit-pages live (via Vite dev-server)
+- `/voices-audit-brabanders.html` (138 slots, Richard's eigen recording)
+- `/voices-audit-limburgers-male.html` + `-female`
+- `/voices-audit-randstad-male.html` + `-female`
+- `/voices-audit-belgen-male.html` + `-female`
+
+Audio-controls falen voor unfilled slots (geen MP3 nog) — verwacht: pas zichtbaar wanneer recordings binnenkomen.
+
+### Tests
+1606/1606 groen, geen code-wijzigingen.
+
+### Phase 4 (BACKLOG voor volgende sessie)
+Voice-files upload-page op `https://reign-of-brabant.nl/voice-files/` + nieuwe `rob-voices` Docker microservice op M4 (port 3110) met endpoints `/voice-uploads/api/{submit,list}` + `/voice-uploads/files/`. Caddy-route. Architectuur-spec staat in deze session-trace, BACKLOG entry komt apart.
+
+---
+
 ## [0.50.1] - 2026-04-30 — Brabander voices: Richard zelf ingesproken (138 files)
 
 ### Replaced — 138 Brabander voice-files door Richard zelf
