@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.58.0] - 2026-05-01 — Open Beta milestone: BETA-badge + updates-page entry
+
+### Added — On-brand BETA badge op homepage hero, in-game main-menu en updates hero
+Skirmish-mode is volledig speelbaar (alle 4 facties, alle units, alle gebouwen, alle upgrades, AI op 3 difficulties, 1775 tests groen, painted-vignette assets dekken alle build/train-buttons). Tijd voor de Open Beta.
+
+`.beta-badge` component (gedeeld CSS-shape, drie locaties):
+- `index.html` hero — boven de cinematic, in `.hero__beta-row`.
+- `play/index.html` main-menu — onder `.menu-subtitle`, in `.menu-beta-row`.
+- `public/updates/index.html` hero — onder `.hero__label`, in `.hero__beta-row`.
+
+Stijl: Cinzel goud (`#e8c065`) op donkerrood gradient (`rgba(70,12,8,…)` → `rgba(40,8,6,…)`), 1px gouden border, dual filigree streepjes naast de pill, pulserende ember-dot vooraan (`@keyframes betaDot` 2s) + glow-pulse op de pill (`@keyframes betaGlow` 3.2s). Tooltip: "Skirmish 100% speelbaar — campagne in test".
+
+### Added — Updates-page entry voor v0.57 + Open Beta announcement
+Top-of-timeline article: "Open Beta — Reign of Brabant is volledig speelbaar". Beschrijft Heavy/Siege portraits, BETA-badge launch, en de 3D Game World citadel hero entity (theuws.com/games/) inclusief 301-redirect-cleanup van de oude `/games/reign-of-brabant/` route.
+
+### Changed — Homepage `<title>`
+"Reign of Brabant — Nie Fokke Mee Brabant" → "Reign of Brabant — Open Beta · Nie Fokke Mee Brabant" (search-snippet + tab-title signaleren beta-status).
+
 ## [0.57.0] - 2026-05-01 — Heavy + Siege portraits per factie (HUD train-buttons)
 
 ### Added — 8 painted-vignette portraits voor train-heavy + train-siege actions

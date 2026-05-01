@@ -290,6 +290,51 @@
       opacity: 0.8;
     }
 
+    /* ---- BETA badge (on-brand: gold-on-deep-red, dual filigree, ember-pulse) ---- */
+    .menu-beta-row {
+      display: flex; justify-content: center;
+      margin: -10px 0 clamp(14px, 2.4vh, 24px);
+    }
+    .beta-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-family: var(--font-heading);
+      font-size: clamp(0.6rem, 1.1vw, 0.72rem);
+      font-weight: 700; letter-spacing: 0.34em; text-transform: uppercase;
+      color: #e8c065;
+      padding: 5px 14px;
+      background: linear-gradient(180deg, rgba(70, 12, 8, 0.85), rgba(40, 8, 6, 0.92));
+      border: 1px solid rgba(212, 168, 83, 0.55);
+      border-radius: 4px; position: relative;
+      text-shadow: 0 0 12px rgba(212, 168, 83, 0.45);
+      box-shadow:
+        inset 0 0 0 1px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 230, 170, 0.08),
+        0 4px 18px rgba(0, 0, 0, 0.6),
+        0 0 24px rgba(212, 168, 83, 0.18);
+      animation: betaGlow 3.2s ease-in-out infinite;
+    }
+    .beta-badge::before, .beta-badge::after {
+      content: ''; position: absolute; top: 50%;
+      width: 12px; height: 1px;
+      background: linear-gradient(90deg, transparent, #d4a853, transparent);
+    }
+    .beta-badge::before { left: -16px; transform: translateY(-50%); }
+    .beta-badge::after  { right: -16px; transform: translateY(-50%); }
+    .beta-badge__dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: radial-gradient(circle, #ffd86b 0%, #d4a853 60%, #7a4a14 100%);
+      box-shadow: 0 0 7px rgba(255, 216, 107, 0.85), 0 0 16px rgba(212, 168, 83, 0.5);
+      animation: betaDot 2s ease-in-out infinite;
+    }
+    @keyframes betaGlow {
+      0%, 100% { box-shadow: inset 0 0 0 1px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,230,170,0.08), 0 4px 18px rgba(0,0,0,0.6), 0 0 24px rgba(212,168,83,0.18); }
+      50%      { box-shadow: inset 0 0 0 1px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,230,170,0.12), 0 4px 22px rgba(0,0,0,0.65), 0 0 36px rgba(212,168,83,0.32); }
+    }
+    @keyframes betaDot {
+      0%, 100% { opacity: 0.85; transform: scale(1); }
+      50%      { opacity: 1;    transform: scale(1.25); }
+    }
+
     /* ---- Menu buttons ---- */
     .menu-buttons {
       display: flex; flex-direction: column;
@@ -2293,6 +2338,13 @@
             </div>
           </div>
           <p class="menu-subtitle">Een Brabants RTS Avontuur</p>
+
+          <div class="menu-beta-row">
+            <span class="beta-badge" title="Skirmish 100% speelbaar — campagne in test">
+              <span class="beta-badge__dot" aria-hidden="true"></span>
+              Open Beta
+            </span>
+          </div>
 
           <nav class="menu-buttons" role="navigation" aria-label="Hoofdmenu">
             <button class="menu-btn" id="btn-campaign">

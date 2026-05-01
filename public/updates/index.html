@@ -159,6 +159,48 @@
         margin: 0 auto;
     }
 
+    /* ---- BETA badge (on-brand, gedeeld met homepage + game-menu) ---- */
+    .hero__beta-row { display: flex; justify-content: center; margin: 0 0 var(--space-md); }
+    .beta-badge {
+        display: inline-flex; align-items: center; gap: 0.45rem;
+        font-family: var(--font-heading);
+        font-size: 0.78rem; font-weight: 700;
+        letter-spacing: 0.34em; text-transform: uppercase;
+        color: var(--gold-light);
+        padding: 0.35rem 0.95rem;
+        background: linear-gradient(180deg, rgba(70, 12, 8, 0.85), rgba(40, 8, 6, 0.92));
+        border: 1px solid rgba(212, 168, 83, 0.55);
+        border-radius: 4px; position: relative;
+        text-shadow: 0 0 12px rgba(212, 168, 83, 0.45);
+        box-shadow:
+            inset 0 0 0 1px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(255, 230, 170, 0.08),
+            0 4px 18px rgba(0, 0, 0, 0.5),
+            0 0 24px rgba(212, 168, 83, 0.18);
+        animation: betaGlow 3.2s ease-in-out infinite;
+    }
+    .beta-badge::before, .beta-badge::after {
+        content: ''; position: absolute; top: 50%;
+        width: 14px; height: 1px;
+        background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+    .beta-badge::before { left: -18px; transform: translateY(-50%); }
+    .beta-badge::after  { right: -18px; transform: translateY(-50%); }
+    .beta-badge__dot {
+        width: 6px; height: 6px; border-radius: 50%;
+        background: radial-gradient(circle, #ffd86b 0%, #d4a853 60%, #7a4a14 100%);
+        box-shadow: 0 0 8px rgba(255, 216, 107, 0.8), 0 0 18px rgba(212, 168, 83, 0.5);
+        animation: betaDot 2s ease-in-out infinite;
+    }
+    @keyframes betaGlow {
+        0%, 100% { box-shadow: inset 0 0 0 1px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,230,170,0.08), 0 4px 18px rgba(0,0,0,0.5), 0 0 24px rgba(212,168,83,0.18); }
+        50%      { box-shadow: inset 0 0 0 1px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,230,170,0.12), 0 4px 22px rgba(0,0,0,0.55), 0 0 36px rgba(212,168,83,0.32); }
+    }
+    @keyframes betaDot {
+        0%, 100% { opacity: 0.85; transform: scale(1); }
+        50%      { opacity: 1;    transform: scale(1.25); }
+    }
+
     /* ============================================================
        CONTENT LAYOUT
        ============================================================ */
@@ -463,6 +505,12 @@
          ======================================================== -->
     <section class="hero">
         <div class="hero__label">Development Log</div>
+        <div class="hero__beta-row">
+            <span class="beta-badge" title="Skirmish 100% speelbaar — campagne in test">
+                <span class="beta-badge__dot" aria-hidden="true"></span>
+                Open Beta
+            </span>
+        </div>
         <h1 class="hero__title">Wat is er nieuw?</h1>
         <p class="hero__sub">
             Elke update, elke verbetering, elk nieuw model. Volg de bouw van de vetste browser-RTS live.
@@ -475,6 +523,46 @@
          ======================================================== -->
     <div class="content">
         <div class="timeline">
+
+            <!-- ── v0.57.0 + Open Beta milestone — Heavy/Siege portraits, citadel hero entity, beta-badge launch ── -->
+            <article class="update">
+                <div class="update__card">
+                    <div class="update__header">
+                        <span class="update__version">v0.57.0 &mdash; Open Beta</span>
+                        <span class="update__date">1 mei 2026</span>
+                        <h2 class="update__title">Open Beta &mdash; Reign of Brabant is volledig speelbaar</h2>
+                    </div>
+                    <div class="update__body">
+                        <div class="update__tags">
+                            <span class="tag tag--feat">Milestone</span>
+                            <span class="tag tag--visual">Visual</span>
+                            <span class="tag tag--ui">UI</span>
+                        </div>
+                        <p style="color: var(--gold-light); font-style: italic; margin-bottom: var(--space-md); font-size: 1.05rem;">Na zes maanden bouwen draait de skirmish-mode nu volledig. Vier facties, alle units, alle gebouwen, alle upgrades, een AI die zich gedraagt op drie moeilijkheidsniveaus, painted-vignette portretten op &eacute;lk paneel, en stemwerk dat de juiste personage-gender raakt. Tijd voor het bordje &mdash; vanaf vandaag staat &lsquo;Open Beta&rsquo; op de homepage, in het hoofdmenu, en op deze pagina. Campagne staat in laatste polish-ronde; skirmish is wat je nu speelt en het werkt.</p>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">HEAVY EN SIEGE EINDELIJK MET EEN GEZICHT</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Acht nieuwe geschilderde portretten</strong> &mdash; T2 Heavy en T3 Siege per factie hadden tot v0.56 een generieke fallback in de HUD. Nu vier Heavy-portretten (Tractorrijder, Corporate Advocaat, Mergelridder, Frituurridder) en vier Siege-portretten (Frituurmeester, Vastgoedmakelaar, Kolenbrander, Manneken-Pis-kanon) in dezelfde geschilderde stijl als de andere train-knoppen.</li>
+                            <li><strong>Zelfde painted-vignette stijl</strong> &mdash; Olieverf-textuur, gouden filigree-randen, factie-paletten, dramatisch licht. Alle portretten op disk &gt;200 KB om placeholder-regressie te voorkomen.</li>
+                            <li><strong>Coverage in tests vastgelegd</strong> &mdash; Voortaan faalt de testsuite als er een nieuw unit-type wordt toegevoegd zonder dat het portret op disk staat. 1767 &rarr; 1775 tests groen.</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">BETA-BADGE OP HOMEPAGE EN IN HET HOOFDMENU</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Op-merk &lsquo;Open Beta&rsquo;-badge</strong> &mdash; Cinzel goud op donkerrood, dubbele gouden filigree-streepjes ernaast, pulserende ember-stip vooraan. Geen generieke npm-style label &mdash; matched de schildering van de portretten en het logo.</li>
+                            <li><strong>Drie locaties</strong> &mdash; Homepage hero (boven de cinematic), in-game hoofdmenu (onder de subtitel), en deze updates-pagina. Hover toont &ldquo;Skirmish 100% speelbaar &mdash; campagne in test&rdquo;.</li>
+                        </ul>
+
+                        <h3 style="font-family: var(--font-heading); color: var(--gold); font-size: 1rem; margin: var(--space-lg) 0 var(--space-sm); letter-spacing: 0.05em;">BUITEN HET SPEL: DE 3D GAME WORLD</h3>
+                        <ul class="update__highlights">
+                            <li><strong>Reign of Brabant heeft eindelijk een eigen 3D-icoon op theuws.com/games/</strong> &mdash; Geen wit blok meer. Brabantse stenen citadel met crenellated muren, ijzeren poort, gouden rampant-leeuw boven de gate, en vier rode banieren op de muren. Generated via Meshy v6 in &eacute;&eacute;n shot.</li>
+                            <li><strong>Status van &lsquo;niet actief&rsquo; naar &lsquo;Nieuw!&rsquo;</strong> &mdash; Het portaal in de 3D-wereld is nu klikbaar en linkt direct naar reign-of-brabant.nl. Oude theuws.com/games/reign-of-brabant/-route is opgeruimd met een 301-redirect.</li>
+                        </ul>
+
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--space-md);">Wat ontbreekt voor v1.0: campagne-polish-ronde, twee outlier portretten op painted-vignette niveau brengen, en een tweede ronde stemzinnen voor &eacute;chte event-variatie. Bug? Idee? Mail richard@theuws.com of vink de feedback-knop in het spel aan.</p>
+                    </div>
+                </div>
+            </article>
 
             <!-- ── v0.55.0-v0.56.0 (Easy difficulty rebalance + auto-gather hotkeys) ── -->
             <article class="update">
