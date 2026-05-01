@@ -1,0 +1,39 @@
+{
+  "generated": "2026-05-01",
+  "wallclock_s": 5.7,
+  "model": "fal-ai/flux/dev",
+  "image_size": "square_hd (1024x1024 retained, no resize)",
+  "num_inference_steps": 28,
+  "guidance_scale": 3.5,
+  "negative_prompt": "blurry, photorealistic photograph, watermark, signature, gibberish text, real-world brand logos, recognizable corporate logos, EU flag, national flag draped flat, anime, cartoon, ugly, deformed, multiple buildings cluttered, stick figures, dominant human figure, people in foreground",
+  "limburg_style_suffix": "centered on dark moody vignette background with deep slate-grey-black gradient and warm pale-yellow chalky candlelight accent, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture, museum quality, no readable text, no modern logos, no people figures dominating composition",
+  "belgen_style_suffix": "centered on dark moody vignette background with deep oxblood-black gradient and warm golden-yellow gaslight chandelier accent, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture meets classical Flemish salon concept art, museum quality, no readable text, no real-world brand logos, no people figures dominating composition",
+  "byte_threshold": 819200,
+  "max_attempts": 3,
+  "iterations_per_file": {
+    "limburg-faction-special-1.png": 1,
+    "belgen-faction-special-1.png": 1
+  },
+  "assets": [
+    {
+      "file": "limburg-faction-special-1.png",
+      "faction": "limburg",
+      "prompt": "painted RPG card art, Limburgian vlaaiwinkel (vlaai bakery shop), warm timber-and-mergel-limestone storefront with low arched doorway and tall arched display window, golden-glazed Limburgse vlaaien (round open-faced fruit pies with lattice tops) arranged on tiered wooden display planks in the vitrine, small Limburgse blauw-en-geel (blue and yellow) festive pennants strung above the awning, small wooden signboard hanging from an iron bracket (no readable text), warm honey-glow from the interior pouring through the window, chalky pale mergel-stone facade contrasted with dark oak window-frames, centered on dark moody vignette background with deep slate-grey-black gradient and warm pale-yellow chalky candlelight accent, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture, museum quality, no readable text, no modern logos, no people figures dominating composition",
+      "seed": 691903521,
+      "url": "https://v3b.fal.media/files/b/0a98686d/2PjIGnYAfVQ4ap_Ecdvtp.jpg",
+      "bytes": 1388085,
+      "attempt": 1,
+      "status": "ok"
+    },
+    {
+      "file": "belgen-faction-special-1.png",
+      "faction": "belgen",
+      "prompt": "painted RPG card art, Belgian diplomatic salon interior (diplomatiek salon), opulent Brusselian art-nouveau reception room with curved dark-walnut wood-paneled walls and brass sinuous floral inlays, ornate crystal-and-brass chandelier hanging mid-frame casting warm amber light, two deep cognac-brown buttoned-leather Chesterfield fauteuil chairs flanking a small inlaid round side-table with a silver carafe, tall vertical zwart-geel-rood (black-yellow-red) Belgian heraldic banner hanging on the back wall, polished dark parquet floor reflecting the chandelier, classical Belgian diplomatic-grandeur atmosphere, centered on dark moody vignette background with deep oxblood-black gradient and warm golden-yellow gaslight chandelier accent, ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting, oil painting texture meets classical Flemish salon concept art, museum quality, no readable text, no real-world brand logos, no people figures dominating composition",
+      "seed": 2115290031,
+      "url": "https://v3b.fal.media/files/b/0a98686d/b612kkoRQ9CnZMeY9uSjP.jpg",
+      "bytes": 1147381,
+      "attempt": 1,
+      "status": "ok"
+    }
+  ]
+}

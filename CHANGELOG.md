@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.59.0] - 2026-05-01 — Quality-lock 800KB + 36-mission structural audit
+
+### Added — 449 mission-audit tests dekken alle 36 campaign-missies
+Tot v0.58 had de campagne-laag 84 lifecycle/objective-tests op representatieve missies. Nu een **structurele audit-suite** (`tests/mission-structure-audit.test.ts`) die alle 36 missies (12 Brabanders + 8 Limburgers + 8 Belgen + 8 Randstad) screent op:
+- Roster-integriteit: count per campagne, sequential `missionIndex`, correcte `campaignId`/`playerFactionId`, globale ID-uniqueness.
+- Required fields: titel/briefing/map-setup/objectives non-empty, starting-resources ≥0, sane star-thresholds (3★ ≤ 2★).
+- Objective-integriteit: valid `ObjectiveType`, unieke IDs binnen mission, numeric targets >0, minstens 1 primary objective, `'<'`-comparator alleen op `train-units` (anti-frustratie).
+- Trigger + wave consistency: unieke trigger IDs, sequential wave-indices 0..N-1, monotonic `spawnTime`, `survive-waves` targetValue ≤ wave-count.
+
+Resultaat: 1775 → 2224 tests groen. CI vangt nu data-config-bugs voordat ze in een playthrough opduiken.
+
+### Changed — Painted-vignette quality-lock 250KB → 800KB voor buildings
+Twee outlier-portretten (`limburg/belgen-faction-special-1`, ~280-360 KB) waren de enige reden dat de quality-lock op 250KB stond. Nu beide regenereerd:
+- `belgen-faction-special-1.png` (Diplomatiek Salon): 279KB → **1120KB**
+- `limburg-faction-special-1.png` (Vlaaiwinkel): 355KB → **1356KB**
+
+Lock vastgezet op 800KB; alle 48 building-portretten halen die threshold. Asset cost $0.06 (Flux Dev, beide first-try).
+
+### Tested — Asset-pipeline les vastgelegd
+Building-portretten blijven **1024×1024 native PNG `optimize=True`** — geen LANCZOS-resize naar 512. Resize zou ~250-400 KB betekenen en de threshold nooit halen. Unit/hero-portretten blijven 512×512 (200-400KB range past op de unit-card layout). Vastgelegd in `.claude/agents/memory/asset-generator.md`.
+
 ## [0.58.0] - 2026-05-01 — Open Beta milestone: BETA-badge + updates-page entry
 
 ### Added — On-brand BETA badge op homepage hero, in-game main-menu en updates hero

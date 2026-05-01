@@ -112,12 +112,11 @@ describe('Portrait asset coverage — every mapped portrait has a PNG on disk', 
   });
 
   describe('Painted-vignette quality lock — minimum size enforced', () => {
-    // Lower bound prevents accidentally re-introducing tiny placeholder assets.
-    // Two pre-painted-vignette portraits remain (limburg/belgen-faction-special-1
-    // ~280-360 KB) — those land above 250 KB so the bound here catches truly
-    // tiny placeholders without false-positiving them. Tighten to 800 KB once
-    // those two are regenerated in a future bundle.
-    const MIN_BUILDING_KB = 250;
+    // Building portraits are 1024×1024 PNG optimize=True; painted-vignette
+    // ones land above 800 KB. Anything below means a placeholder slipped in.
+    // Unit/hero portraits are 512×512 LANCZOS-resized → ~200-400 KB; lower
+    // bound 200 KB catches placeholders without false-positives.
+    const MIN_BUILDING_KB = 800;
     const MIN_UNIT_KB = 200;
 
     const buildingTypes = [
