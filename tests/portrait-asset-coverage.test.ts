@@ -61,11 +61,19 @@ describe('Portrait asset coverage — every mapped portrait has a PNG on disk', 
   });
 
   describe('Units (4 factions × 3-4 unit types)', () => {
+    const allUnitTypes = [
+      UnitTypeId.Worker,
+      UnitTypeId.Infantry,
+      UnitTypeId.Ranged,
+      UnitTypeId.Heavy,
+      UnitTypeId.Siege,
+      UnitTypeId.Support,
+    ];
     const factionUnitTypes: Record<FactionId, UnitTypeId[]> = {
-      [FactionId.Brabanders]: [UnitTypeId.Worker, UnitTypeId.Infantry, UnitTypeId.Ranged, UnitTypeId.Support],
-      [FactionId.Randstad]: [UnitTypeId.Worker, UnitTypeId.Infantry, UnitTypeId.Ranged, UnitTypeId.Support],
-      [FactionId.Limburgers]: [UnitTypeId.Worker, UnitTypeId.Infantry, UnitTypeId.Ranged, UnitTypeId.Support],
-      [FactionId.Belgen]: [UnitTypeId.Worker, UnitTypeId.Infantry, UnitTypeId.Ranged, UnitTypeId.Support],
+      [FactionId.Brabanders]: allUnitTypes,
+      [FactionId.Randstad]: allUnitTypes,
+      [FactionId.Limburgers]: allUnitTypes,
+      [FactionId.Belgen]: allUnitTypes,
     };
 
     for (const factionId of FACTIONS) {
@@ -133,11 +141,15 @@ describe('Portrait asset coverage — every mapped portrait has a PNG on disk', 
 
     it('all unit + hero portraits are ≥ 200 KB (painted-vignette quality)', () => {
       const offenders: string[] = [];
+      const allUnitTypes = [
+        UnitTypeId.Worker, UnitTypeId.Infantry, UnitTypeId.Ranged,
+        UnitTypeId.Heavy, UnitTypeId.Siege, UnitTypeId.Support,
+      ];
       const factionUnitTypes: Record<FactionId, UnitTypeId[]> = {
-        [FactionId.Brabanders]: [UnitTypeId.Worker, UnitTypeId.Infantry, UnitTypeId.Ranged, UnitTypeId.Support],
-        [FactionId.Randstad]: [UnitTypeId.Worker, UnitTypeId.Infantry, UnitTypeId.Ranged],
-        [FactionId.Limburgers]: [UnitTypeId.Worker, UnitTypeId.Infantry, UnitTypeId.Ranged],
-        [FactionId.Belgen]: [UnitTypeId.Worker, UnitTypeId.Infantry, UnitTypeId.Ranged],
+        [FactionId.Brabanders]: allUnitTypes,
+        [FactionId.Randstad]: [UnitTypeId.Worker, UnitTypeId.Infantry, UnitTypeId.Ranged, UnitTypeId.Heavy, UnitTypeId.Siege],
+        [FactionId.Limburgers]: [UnitTypeId.Worker, UnitTypeId.Infantry, UnitTypeId.Ranged, UnitTypeId.Heavy, UnitTypeId.Siege],
+        [FactionId.Belgen]: [UnitTypeId.Worker, UnitTypeId.Infantry, UnitTypeId.Ranged, UnitTypeId.Heavy, UnitTypeId.Siege],
       };
       for (const factionId of FACTIONS) {
         for (const unitTypeId of factionUnitTypes[factionId]) {

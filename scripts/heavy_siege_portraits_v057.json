@@ -1,0 +1,93 @@
+{
+  "assets": {
+    "brabant-heavy": {
+      "file": "public/assets/portraits/brabant-heavy.png",
+      "prompt": "painted RPG card art portrait of a Brabantian Tractorrijder tractor-knight, late-30s broad-shouldered weather-beaten farmer with sun-tanned face and stubbled jaw, wearing a heavy bolted dark-steel tractor-helm modeled after a modern tractor-cab roof with a small orange carnival pennant tied to one rivet, riveted iron pauldrons over a rugged faded orange-and-white check work-shirt with rolled sleeves and leather suspenders, calloused hands gripping the worn wooden steering-handle of an iron-rimmed tractor-wheel slung across his chest as a shield-prop, stoic determined countryside expression with a knowing half-smile, distinctly rural Dutch Brabantian heavy-cavalry (NOT a medieval knight, NOT a carnival prince, NOT modern military), oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with deep green-black gradient and warm orange-red carnival accent lighting (Brabant palette), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the heavy tractor-helm rim and weathered farmer hands, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, polished plate armor, medieval shining knight, sci-fi mecha, modern military tank uniform, carnival prince robes, jester hat, ornate noble crown, smooth young face, beardless youth",
+      "url": "https://v3b.fal.media/files/b/0a9866fa/2JqGIT419oeSe61EDEXNy.jpg",
+      "bytes": 370640,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": null
+    },
+    "limburg-siege": {
+      "file": "public/assets/portraits/limburg-siege.png",
+      "prompt": "painted RPG card art portrait of a Limburg Kolenbrander coal-burner siege-engineer, weathered mid-40s veteran miner with a thoroughly soot-blackened face and silver-streaked unkempt beard caked with coal-dust, wearing a battered ochre canvas mining jacket dusted with coal-black streaks across the shoulders and a heavy leather chest-strap, a brass-rimmed mining helmet with a small lit oil-lamp glowing warm copper-amber on the front, gripping a stout cast-iron coal-cannon barrel by his side with a glowing red-orange ember-mouth and bright cascading sparks and glowing-orange embers tumbling forward from the muzzle, swirling thin grey smoke around his shoulders, fierce intense determined expression with bright bloodshot eyes contrasting the soot, distinctly earthen-Limburg mining-folkloric (NOT a fantasy fire-mage, NOT a wizard, NOT modern industrial worker, NOT cheerful), oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with brown-black gradient and warm copper-amber lantern glow (earthen Limburg mergel-yellow + coal-black + iron-grey palette), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the glowing red-orange coal-cannon mouth and soot-blackened face, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, fantasy fire mage, wizard staff, magic spell, modern hardhat, fluorescent vest, headphones, cheerful smile, clean face, smooth young face, beardless, carnival pennants, Belgian frituur",
+      "url": "https://v3b.fal.media/files/b/0a9866fb/4NxnVDYyxeDc4VKocVmhU.jpg",
+      "bytes": 407140,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": null
+    },
+    "limburg-heavy": {
+      "file": "public/assets/portraits/limburg-heavy.png",
+      "prompt": "painted RPG card art portrait of a Limburg Mergelridder mergel-stone heavy-knight, imposing late-30s broad-shouldered armored knight with a coal-streaked stoic face and a closely trimmed dark beard, wearing a heavy carved pale mergel-limestone breastplate over a dark studded-leather gambeson, a banded mergel-stone helmet with a chalky pale-yellow patina and a thin slit visor pushed up to reveal his face, an iron-strapped large mergel-stone shield resting against his shoulder, a rough hewn iron-tipped spear shaft visible behind, soft hint of dark Maas-river water and rocky bluff barely visible in deep brown-black background haze, grim weathered coal-grimmed expression, distinctly earthen-Limburg mining-folkloric (NOT a Spanish conquistador, NOT a polished plate-armor European knight, NOT a fantasy paladin), oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with brown-black gradient and warm copper-amber lantern glow (earthen Limburg mergel-yellow + coal-black + iron-grey palette), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the pale mergel-stone breastplate and chalk-helmet rim, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, polished shining plate armor, golden trim everywhere, Spanish conquistador morion helmet, fantasy paladin halo, smooth young face, beardless, modern tactical gear, carnival pennants, Brabant orange beanie",
+      "url": "https://v3b.fal.media/files/b/0a9866fb/e7yt1uRoq2kM3uY_D0AJj.jpg",
+      "bytes": 388655,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": null
+    },
+    "belgen-siege": {
+      "file": "public/assets/portraits/belgen-siege.png",
+      "prompt": "painted RPG card art portrait of a Belgian Manneken-Pis-kanon bronze siege-cannon, the absurd centerpiece itself: a polished aged-bronze statue-cannon shaped EXACTLY like the iconic Brussels little-boy Manneken-Pis fountain figure standing on a small ornate stone-carved pedestal mounted on a heavy wooden carriage with two large iron-rimmed brass cart-wheels visible at the base, the bronze figure's mouth and outstretched stream-spout serving as the cannon-muzzle pointing slightly forward with a wisp of curling grey smoke and a single small bronze cannonball mid-launch, deep-green Trappist-patina age-spots and warm bronze highlights catching chocolate-brown rim-light, blurred Brusselian cobblestone Grand-Place plaza atmosphere with a hint of guildhall facade silhouettes barely visible in deep gold-black background haze, absurd-funny but reverent ceremonial mood, distinctly Belgian-Brusselian folkloric (NOT a real human boy, NOT a child portrait, NOT crude or pornographic, NOT a fantasy golem), oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with deep gold-black gradient and warm chocolate-brown accent lighting (Belgian palette: deep black, golden yellow, accent red, Trappist abbey green), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the polished bronze Manneken-Pis statue-cannon and brass wheel-rim, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, real human child, real photograph of a boy, nudity in any human-skin-rendering, photorealistic skin tones on the figure, fantasy stone golem, glowing magical aura, modern tank turret, military camouflage, carnival jester hat, Brabant orange beanie",
+      "url": "https://v3b.fal.media/files/b/0a9866fb/_totWF8TwNtvsRyhtqn6c.jpg",
+      "bytes": 367988,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": null
+    },
+    "belgen-heavy": {
+      "file": "public/assets/portraits/belgen-heavy.png",
+      "prompt": "painted RPG card art portrait of a Belgian Frituurridder frituur-knight heavy-cavalryman, stocky mid-30s blond-bearded knight with a confident broad grin and a fine waxed pale-blond moustache, wearing a glossy creamy-white mayonnaise-glazed steel breastplate with a small embossed golden lion crest at the chest, deep-black pauldrons trimmed with golden-yellow filigree, a tall slim banner-pole rising behind one shoulder topped with a small Belgian frites-cone banner-flag in golden-yellow and chocolate-brown (no readable text), gripping a broad heavy steel kitchen-spatula re-forged into a two-handed long-sword with the blade upright at his side, a small Trappist-green tabard sash diagonally across the chest, jovial confident chivalrous expression, distinctly Belgian frituur-folkloric (NOT a Brabant carnival fighter, NOT a medieval European paladin, NOT a fantasy hero with magical weapon), oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with deep gold-black gradient and warm chocolate-brown accent lighting (Belgian palette: deep black, golden yellow, accent red, Trappist abbey green), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the mayonnaise-glazed steel breastplate and golden frites-banner, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, real Belgian royal family, glowing magical sword, fantasy paladin halo, Brabant carnival pennants, orange beanie, carnival jester elements, smooth beardless youth, plate armor without any food motif, viking horns",
+      "url": "https://v3b.fal.media/files/b/0a9866fb/R9gmmtltxX1RZd6mny0Ld.jpg",
+      "bytes": 314781,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": null
+    },
+    "brabant-siege": {
+      "file": "public/assets/portraits/brabant-siege.png",
+      "prompt": "painted RPG card art portrait of a Brabantian Frituurmeester frituur-master siege-engineer, stocky mid-40s mustachioed frituur-cook with ruddy red cheeks and a sweat-streaked brow, wearing a tall scorched white cook's hat with a small steel visor pulled down over the eyes like a chef's combat-helmet, a heavy greasy leather apron over a rolled-sleeve cream linen shirt with deep oil-stains, gripping a polished hand-cannon-shaped frituur-spout barrel by his side with golden flames and cascading golden frites bursting forward from the muzzle, small wisps of warm orange flame and oil-smoke curling around the barrel, fierce determined cook expression with a wide grin baring teeth, distinctly carnaval-folkloric Brabantian (NOT a medieval cannoneer, NOT modern fast-food worker, NOT McDonald's, NOT a wizard), oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with deep green-black gradient and warm orange-red carnival accent lighting (Brabant palette), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the open frituur-cannon barrel with golden frites flame and the greasy apron, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, wizard hat, magic spell, pixie dust, fantasy mage, modern fast-food uniform, McDonald's logo, plastic apron, smooth young face, beardless youth, polished knight",
+      "url": "https://v3b.fal.media/files/b/0a9866fb/Utg4WhF8bRqcs0Z2TzugO.jpg",
+      "bytes": 394098,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": null
+    },
+    "randstad-siege": {
+      "file": "public/assets/portraits/randstad-siege.png",
+      "prompt": "painted RPG card art portrait of a Randstad Vastgoedmakelaar real-estate-agent siege-engineer, smug late-30s slick property-broker with neatly slicked-back dark hair, thin silver wire-rim glasses, and a narrow calculating smile, wearing an immaculately tailored slim-cut slate-blue designer two-piece suit with a crisp white shirt and a thin yellow silk pocket-square, gripping a tall polished metallic 'TE HUUR' rental-sign post mounted on a spiked wooden stake by his side like a war-banner held vertically (sign blank, no readable lettering), a small ring of brass keys clipped to the belt, sleek glass skyscraper outlines barely visible in deep blue-black background haze, condescending arrogant urban-realtor expression, distinctly corporate-anti-folkloric (NOT a rural builder, NOT a medieval engineer, NOT a barista, NOT carnival), oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with deep blue-black gradient and warm yellow desk-lamp accent lighting (Randstad palette), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the held metallic To-Let signage and silver wire-rim glasses, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, rural construction worker, hard hat, medieval catapult, trebuchet wood, tank turret, barista apron, espresso machine, friendly warm smile, casual t-shirt, jester hat, any readable text on the sign",
+      "url": "https://v3b.fal.media/files/b/0a9866fb/IF-vqsZmIaiPB9UpzBYIA.jpg",
+      "bytes": 280507,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": null
+    },
+    "randstad-heavy": {
+      "file": "public/assets/portraits/randstad-heavy.png",
+      "prompt": "painted RPG card art portrait of a Randstad Corporate Advocaat corporate-litigator heavy-warrior, imposing late-30s sharp-jawed power-attorney with slicked-back dark hair and piercing pale-blue eyes, wearing a flawlessly tailored black charcoal pinstripe three-piece suit with a deep-navy silk tie clipped with a polished silver tie-clip, narrow gold lapel pin, gripping a heavy polished steel-edged black leather briefcase by the handle as a war-shield with one hand and a thick rolled legal scroll-document tucked under the other arm like a baton, stark glass-and-steel skyscraper silhouettes barely visible in the deep blue-black background haze, grim contemptuous courtroom expression with a thin merciless half-smirk, distinctly corporate-anti-folkloric (NOT a barista, NOT a rural farmer, NOT carnival, NOT casual), oil painting texture, shoulder-up framing centered in composition, centered on dark moody vignette background with deep blue-black gradient and warm yellow desk-lamp accent lighting (Randstad palette), ornate gold curved filigree frame border at top edge and corners matching painted RPG card style, dramatic chiaroscuro lighting catching the polished steel briefcase corner and silk tie clip, museum quality oil painting, no readable text, no real-world brand logos, no cartoon proportions",
+      "negative_prompt": "cartoon, chibi, exaggerated proportions, blurry, multiple figures, text, watermark, brand logos, real corporate logo, ugly, cluttered background, full body, distant shot, casual clothes, t-shirt, beard, smiling broadly, friendly expression, rural clothing, farmer overalls, carnival hat, barista apron, espresso machine, jester elements",
+      "url": "https://v3b.fal.media/files/b/0a9866fb/FNlWre4WPd81llqU4danA.jpg",
+      "bytes": 287710,
+      "size": "512x512",
+      "model": "fal-ai/flux/dev",
+      "backup": null
+    }
+  },
+  "generated": "2026-05-01",
+  "style_anchor": [
+    "public/assets/portraits/brabant-infantry.png",
+    "public/assets/portraits/brabant-support.png",
+    "public/assets/portraits/randstad-infantry.png"
+  ],
+  "model": "fal-ai/flux/dev",
+  "pipeline": "Flux Dev square_hd 1024x1024 -> PIL LANCZOS 512x512 -> PNG (NO BiRefNet, vignette+frame is design)",
+  "scope": "Heavy + Siege per faction (8 NEW portraits, v0.57)"
+}

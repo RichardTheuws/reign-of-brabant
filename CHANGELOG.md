@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.57.0] - 2026-05-01 — Heavy + Siege portraits per factie (HUD train-buttons)
+
+### Added — 8 painted-vignette portraits voor train-heavy + train-siege actions
+Tot v0.56 hadden Heavy- en Siege-units per factie geen factie-specifieke portrait in de HUD train-buttons (Barracks Tier 2 + Siege Workshop). De `UNIT_PORTRAITS` mapping in `src/data/portraitMap.ts` had alleen Worker/Infantry/Ranged/Support — `train-heavy` en `train-siege` vielen daardoor terug op de generic placeholder. Nu factie-specifiek voor alle 4 facties:
+
+| Factie | Heavy | Siege |
+|---|---|---|
+| Brabant | Tractorrijder (`brabant-heavy.png`, 362KB) | Frituurmeester (`brabant-siege.png`, 385KB) |
+| Randstad | Corporate Advocaat (`randstad-heavy.png`, 281KB) | Vastgoedmakelaar (`randstad-siege.png`, 274KB) |
+| Limburg | Mergelridder (`limburg-heavy.png`, 380KB) | Kolenbrander (`limburg-siege.png`, 397KB) |
+| Belgen | Frituurridder (`belgen-heavy.png`, 307KB) | Manneken-Pis-kanon (`belgen-siege.png`, 359KB) |
+
+Style consistent met v053 painted-vignette pass: oil-texture, gold filigree corner-frames, faction-palette vignette, dramatic chiaroscuro, shoulder-up framing. Alle 8 first-try via Flux Dev (square_hd → LANCZOS 512x512), totale asset cost $0.24.
+
+### Code — portraitMap.ts uitgebreid + regen-script herbruikbaar
+- `src/data/portraitMap.ts` — `UnitTypeId.Heavy` + `UnitTypeId.Siege` toegevoegd voor alle 4 facties (8 nieuwe mappings).
+- `scripts/regen_heavy_siege_portraits_v057.py` — herbruikbaar regen-script (manifest in `scripts/heavy_siege_portraits_v057.json`).
+
+### Tests — coverage uitgebreid (+8)
+`tests/portrait-asset-coverage.test.ts` checkt nu Heavy + Siege per factie naast bestaande Worker/Infantry/Ranged/Support. Total 1767 → 1775.
+
 ## [0.56.0] - 2026-04-30 — Auto-gather hotkeys voor workers (A/S)
 
 ### Added — twee easy gather-hotkeys + HUD buttons in worker panel
