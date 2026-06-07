@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.60.2] - 2026-06-07 — v03-payload −91% (texture-resize + mesh-simplify)
+
+### Changed — v03 unit-tier van 401MB → 36MB zonder loader-wijziging
+De v03-tier was ~400MB en daarmee het echte laadtijd-lek voor mobiele/crowdfunding-bezoekers. Twee oorzaken, beide gefikst met `gltf-transform` (geen DRACOLoader/KTX2 nodig — werkt met de bestaande loader):
+- **Textures**: elite-units droegen een 2048×2048 PNG normal-map (6,6MB!) + 2K base-color. Resize naar 512×512 (PNG/JPEG behouden) → elite van ~10MB naar ~1,5MB. Op RTS-camera-afstand visueel niet te onderscheiden (gerenderd vergeleken).
+- **Geometrie**: basis-units (worker/infantry/ranged) waren ~894.000 triangles elk — absurde over-tessellatie uit de generatie. `weld` + `simplify` (meshoptimizer, ratio 0.05, error 0.005) → ~58k tris, GLB van ~38MB naar ~1-3,7MB. Skinned mesh + clips behouden, silhouet identiek (gerenderd vergeleken).
+
+Per-faction lazy-load betekent dat een 2-factie-skirmish nu ~10-15MB modellen laadt i.p.v. ~150MB. Validatie: 24/24 GLB clip+skin PASS, GLTFLoader-parse OK (skinned + clips intact), tsc + 2224 tests groen, vite-build OK. **Known-issue uit v0.60.0 (400MB payload) opgelost.**
+
 ## [0.60.1] - 2026-06-07 — Fix: UAT-gate poort-collisie (deploy-blocker)
 
 ### Fixed — regressie-gate false-failde op gedeelde poort 5173
