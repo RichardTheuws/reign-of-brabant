@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.60.1] - 2026-06-07 — Fix: UAT-gate poort-collisie (deploy-blocker)
+
+### Fixed — regressie-gate false-failde op gedeelde poort 5173
+`deploy-rob.sh` draait STEP 0 lokaal; `playwright.config.ts` gebruikte poort 5173 met `reuseExistingServer: !CI`. Draait er een ander game-project (bv. Cosmo) op 5173, dan hergebruikte playwright díé server, testte de verkeerde app (`#main-menu` not found) en blokkeerde de deploy met een valse fail. Nu: dedicated poort **5273** + `reuseExistingServer: false` → de gate start altijd een verse RoB-server, immuun voor poort-contentie tussen parallelle projecten. Geverifieerd: UAT groen terwijl Cosmo 5173 bezet houdt.
+
 ## [0.60.0] - 2026-06-07 — Elite-tier units geanimeerd (heavy/siege/support × 4 facties)
 
 ### Changed — bevroren elite-tier krijgt skeletale animatie
