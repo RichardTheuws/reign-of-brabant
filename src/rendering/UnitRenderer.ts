@@ -126,11 +126,21 @@ const ANIMATED_MODEL_PATHS: Record<string, string> = {
   worker_3: '/assets/models/v03/belgen/worker.glb',
   infantry_3: '/assets/models/v03/belgen/infantry.glb',
   ranged_3: '/assets/models/v03/belgen/ranged.glb',
-  // Heavy (dedicated GLBs — same v02 models used for v03 quality tier)
-  heavy_0: '/assets/models/v02/brabanders/heavy.glb',
-  heavy_1: '/assets/models/v02/randstad/heavy.glb',
-  heavy_2: '/assets/models/v02/limburgers/heavy.glb',
-  heavy_3: '/assets/models/v02/belgen/heavy.glb',
+  // Heavy — v03 = rigged + animated (Idle/Walk/Attack/HeavyAttack/Death).
+  heavy_0: '/assets/models/v03/brabanders/heavy.glb',
+  heavy_1: '/assets/models/v03/randstad/heavy.glb',
+  heavy_2: '/assets/models/v03/limburgers/heavy.glb',
+  heavy_3: '/assets/models/v03/belgen/heavy.glb',
+  // Siege — v03 = rigged + animated (Idle/SiegeIdle/Walk/Attack/SiegeAttack/Death).
+  siege_0: '/assets/models/v03/brabanders/siege.glb',
+  siege_1: '/assets/models/v03/randstad/siege.glb',
+  siege_2: '/assets/models/v03/limburgers/siege.glb',
+  siege_3: '/assets/models/v03/belgen/siege.glb',
+  // Support — v03 = rigged + animated (Idle/Walk/Attack/Heal/Death).
+  support_0: '/assets/models/v03/brabanders/support.glb',
+  support_1: '/assets/models/v03/randstad/support.glb',
+  support_2: '/assets/models/v03/limburgers/support.glb',
+  support_3: '/assets/models/v03/belgen/support.glb',
   // Heroes — unique models per faction (hero0 = primary, hero1 = secondary)
   hero0_0: '/assets/models/heroes/brabant-prins.glb',
   hero1_0: '/assets/models/heroes/brabant-boer.glb',

@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.60.0] - 2026-06-07 — Elite-tier units geanimeerd (heavy/siege/support × 4 facties)
+
+### Changed — bevroren elite-tier krijgt skeletale animatie
+Tot v0.59 bewogen alleen worker/infantry/ranged (v03, gerigd). De elite-tier — **heavy, siege en support voor alle 4 facties (12 units)** — rende via de animated path met een v02-mesh zonder clips: een bevroren bind-pose met enkel een procedurele attack-lean. In elke late-game match stonden de duurste units stijf stil terwijl de basis-units liepen.
+
+Nu zijn alle 12 elite-units door de bestaande Blender-rig+animatie-pipeline (`scripts/blender-rig-and-animate.py` + `blender-anim-{heavy,siege,healer}.py`) gehaald en als v03 GLB's gegenereerd:
+- **heavy** (4): Idle / Walk / Attack / **HeavyAttack** / Death
+- **siege** (4): Idle / **SiegeIdle** / Walk / Attack / **SiegeAttack** / Death
+- **support** (4): Idle / Walk / Attack / **Heal** / Death
+
+`UnitRenderer.ANIMATED_MODEL_PATHS` wijst nu voor heavy_0..3, siege_0..3 en support_0..3 naar de v03-modellen. `resolveAnimation()` ondersteunde HeavyAttack/SiegeAttack/SiegeIdle/Heal al — alleen de clips ontbraken. Geen render-code gewijzigd, puur asset + path-mapping.
+
+Validatie: alle 12 GLB's PASS op skin + verwachte clips, GLTFLoader-parse OK (1 skinned mesh, 17 bones), tsc schoon, **2224 tests groen** (geen regressie), vite-build OK.
+
+### Known issue — v03 payload 400MB (geen Draco/meshopt)
+De 12 nieuwe elite-GLB's voegen ~111MB toe (v03 totaal nu ~400MB). Lazy-loaded per factie, maar onontkomelijk zwaar voor mobiel. Top-follow-up: Draco/meshopt-compressie op de v03-tier (verwachte -60..80%).
+
 ## [0.59.0] - 2026-05-01 — Quality-lock 800KB + 36-mission structural audit
 
 ### Added — 449 mission-audit tests dekken alle 36 campaign-missies
