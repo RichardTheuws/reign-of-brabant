@@ -62,11 +62,15 @@ const rageState: CarnavalsrageState = {
 // ---------------------------------------------------------------------------
 
 /**
- * Attempt to activate Carnavalsrage.
- * Returns true if successfully activated, false if insufficient
+ * Attempt to activate Carnavalsrage for the player's faction.
+ * Returns false for non-Brabander player factions. Returns true if successfully activated, false if insufficient
  * resources or still on cooldown.
  */
-export function activateCarnavalsrage(): boolean {
+export function activateCarnavalsrage(playerFactionId: FactionId): boolean {
+  // Brabander-only ability: other player factions can't trigger it (and must
+  // never buff the enemy Brabanders or spend their Gezelligheid).
+  if (playerFactionId !== FactionId.Brabanders) return false;
+
   // Check cooldown
   if (rageState.cooldownRemaining > 0) return false;
 

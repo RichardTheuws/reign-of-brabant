@@ -6,6 +6,7 @@
  */
 
 import * as THREE from 'three';
+import { onGameSettingsChange } from '../ui/gameSettings';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -219,6 +220,8 @@ export class ParticleSystem {
   private readonly positions: Float32Array;
   private readonly colors: Float32Array;
   private readonly sizes: Float32Array;
+  /** Settings panel "particles" toggle; when false nothing spawns. */
+  private enabled = true;
 
   constructor(scene: THREE.Scene) {
     this.scene = scene;
@@ -276,6 +279,20 @@ export class ParticleSystem {
     this.points = new THREE.Points(this.geometry, material);
     this.points.frustumCulled = false; // particles span the whole map
     this.scene.add(this.points);
+
+    // Settings panel: particles toggle, applied now and on change.
+    onGameSettingsChange((s) => this.setEnabled(s.particles));
+  }
+
+  /** Enable/disable particle effects. Disabling also clears live particles. */
+  setEnabled(enabled: boolean): void {
+    this.enabled = enabled;
+    if (enabled) return;
+    for (let i = 0; i < MAX_PARTICLES; i++) {
+      if (this.meta[i].alive) this.kill(i);
+    }
+    this.posAttr.needsUpdate = true;
+    this.sizeAttr.needsUpdate = true;
   }
 
   // -------------------------------------------------------------------------
@@ -783,6 +800,7 @@ export class ParticleSystem {
 
   /** Find and return the index of a dead particle slot, or -1 if pool full. */
   private allocate(): number {
+    if (!this.enabled) return -1;
     for (let i = 0; i < MAX_PARTICLES; i++) {
       if (!this.meta[i].alive) return i;
     }

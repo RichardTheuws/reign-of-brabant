@@ -105,6 +105,19 @@ describe('RTSCamera — edge scrolling', () => {
     expect(cam.camera.position.x).toBeCloseTo(startX, 2);
     expect(cam.camera.position.z).toBeCloseTo(startZ, 2);
   });
+
+  it('does not scroll at the edge when the edgeScroll setting is off', async () => {
+    const { updateGameSettings } = await import('../src/ui/gameSettings');
+    updateGameSettings({ edgeScroll: false });
+    try {
+      const cam = new RTSCamera(128);
+      const startX = cam.camera.position.x;
+      for (let i = 0; i < 30; i++) cam.update(1 / 60, noKeys(), 1915, 540, 1920, 1080, 0);
+      expect(cam.camera.position.x).toBeCloseTo(startX, 2);
+    } finally {
+      updateGameSettings({ edgeScroll: true });
+    }
+  });
 });
 
 describe('RTSCamera — zoom', () => {

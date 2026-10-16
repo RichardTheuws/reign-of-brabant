@@ -75,6 +75,15 @@ const FACTION_CAMPAIGN_TABS: FactionCampaignTab[] = [
   },
 ];
 
+/**
+ * Inline-SVG star (5-point polygon). Replaces the former star-glyph entity:
+ * project rule is no unicode symbols in game UI, so stars are drawn shapes.
+ * `size` is a CSS length; `extraStyle` is appended to the inline style.
+ */
+export function starSvg(color: string, size: string = '1em', extraStyle: string = ''): string {
+  return `<svg class="campaign-star" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true" style="display:inline-block;vertical-align:-0.125em;${extraStyle}"><polygon points="12,1.5 15.1,8.3 22.5,9.1 17,14.1 18.5,21.5 12,17.8 5.5,21.5 7,14.1 1.5,9.1 8.9,8.3" fill="${color}"/></svg>`;
+}
+
 export class CampaignUI {
   private events: CampaignUIEvents | null = null;
   private campaignManager: CampaignManager;
@@ -151,7 +160,7 @@ export class CampaignUI {
           background: none; border: 1px solid rgba(212,168,83,0.35); color: #e8e6e3;
           padding: 8px 16px; border-radius: 6px; cursor: pointer;
           font-family: 'Inter', sans-serif; font-size: 0.9rem; transition: background 0.15s;
-        ">&larr; Terug</button>
+        ">Terug</button>
         <h2 id="campaign-title" style="
           font-family: 'Cinzel', serif; font-size: clamp(1.3rem,3vw,2rem);
           color: #d4a853; flex: 1; text-align: center; margin: 0;
@@ -176,7 +185,7 @@ export class CampaignUI {
         margin-bottom: 24px; color: #d4a853; font-size: 0.9rem;
       ">
         <span id="campaign-stars-display">0 / 9</span>
-        <span style="color: #d4a853;">&#9733;</span>
+        ${starSvg('#d4a853')}
       </div>
 
       <div id="campaign-mission-list" style="
@@ -434,11 +443,11 @@ export class CampaignUI {
     const starsEl = document.createElement('div');
     starsEl.style.cssText = 'flex-shrink: 0; font-size: 1.3rem; letter-spacing: 2px;';
     if (isLocked) {
-      starsEl.innerHTML = '<span style="color: #333;">&#9733;&#9733;&#9733;</span>';
+      starsEl.innerHTML = starSvg('#333') + starSvg('#333', '1em', 'margin-left:2px') + starSvg('#333', '1em', 'margin-left:2px');
     } else {
       let starsHtml = '';
       for (let i = 0; i < 3; i++) {
-        starsHtml += `<span style="color: ${i < progress.stars ? '#d4a853' : '#333'};">&#9733;</span>`;
+        starsHtml += starSvg(i < progress.stars ? '#d4a853' : '#333', '1em', i > 0 ? 'margin-left:2px' : '');
       }
       starsEl.innerHTML = starsHtml;
     }
@@ -505,13 +514,13 @@ export class CampaignUI {
             background: transparent; color: #a0a0a0;
             font-family: 'Cinzel', serif; font-size: 0.95rem; font-weight: 600;
             cursor: pointer; transition: background 0.15s, color 0.15s;
-          ">&larr; Terug</button>
+          ">Terug</button>
           <button id="briefing-start-btn" style="
             padding: 12px 36px; border: 2px solid #d4a853; border-radius: 8px;
             background: rgba(212,168,83,0.12); color: #d4a853;
             font-family: 'Cinzel', serif; font-size: 1rem; font-weight: 700;
             cursor: pointer; transition: background 0.2s, transform 0.15s;
-          ">Start Missie &rarr;</button>
+          ">Start Missie</button>
         </div>
       </div>
     `;
@@ -620,11 +629,10 @@ export class CampaignUI {
     let starsHtml = '';
     for (let i = 0; i < 3; i++) {
       starsHtml += `<span style="
-        font-size: 3rem; margin: 0 4px;
-        color: ${i < stars ? '#d4a853' : '#333'};
-        text-shadow: ${i < stars ? '0 0 20px rgba(212,168,83,0.5)' : 'none'};
+        display: inline-block; margin: 0 4px;
+        filter: ${i < stars ? 'drop-shadow(0 0 10px rgba(212,168,83,0.5))' : 'none'};
         animation: ${i < stars ? `starPop 0.3s ease-out ${0.3 + i * 0.15}s both` : 'none'};
-      ">&#9733;</span>`;
+      ">${starSvg(i < stars ? '#d4a853' : '#333', '3rem')}</span>`;
     }
 
     el.innerHTML = `

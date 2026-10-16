@@ -6,6 +6,7 @@
  */
 
 import * as THREE from 'three';
+import { onGameSettingsChange } from '../ui/gameSettings';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -206,7 +207,37 @@ export function initAtmosphere(
   createFog(scene);
   const sunLight = createSunLight(scene, renderer);
   createDustParticles(scene);
+
+  // Settings panel: shadows + particles toggles, applied now and on change.
+  onGameSettingsChange((s) => {
+    applyShadowSetting(renderer, sunLight, s.shadows);
+    applyAmbientParticleSetting(particleSystem, s.particles);
+  });
+
   return sunLight;
+}
+
+/**
+ * Enable/disable shadows live. Toggling `castShadow` on the light changes the
+ * renderer's light-state hash, so lit materials recompile without/with shadow
+ * sampling automatically -- no per-material needsUpdate required.
+ */
+export function applyShadowSetting(
+  renderer: THREE.WebGLRenderer,
+  light: THREE.Light,
+  enabled: boolean,
+): void {
+  renderer.shadowMap.enabled = enabled;
+  light.castShadow = enabled;
+  if (enabled) renderer.shadowMap.needsUpdate = true;
+}
+
+/** Show/hide the decorative ambient dust when the particles setting changes. */
+export function applyAmbientParticleSetting(
+  points: THREE.Points | null,
+  enabled: boolean,
+): void {
+  if (points) points.visible = enabled;
 }
 
 /**

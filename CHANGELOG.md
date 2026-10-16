@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.60.5] - 2026-10-16 — Bundel 3: UI/input, campagne-missies, audio-mix, instellingen
+
+### Fixed — UI & input
+- **Tooltips en de build/rally-modebanner verschenen nooit**: ze werden aan het niet-bestaande `#hud` gehangen. Nu hangen ze aan `#game-hud`. Tooltips groeien omhoog en blijven binnen de viewport.
+- **A/S-gatherhotkeys werkten niet**: nieuwe `src/ui/inputRouting.ts`. Een zichtbare, ingeschakelde paneelknop met die letter wint, dus de camera schuift dan niet en A start geen attack-move. Knoppen die alleen met de muis werken ('move'/'attack') claimen geen toets, dus WASD pant de camera zoals voorheen.
+- **Typen in tekstvelden triggerde spelacties**: `isTypingTarget()` bewaakt de game-toetsen, camera, Escape, M-mute, HUD-hotkeys en de G-gridtoets.
+- **Escape annuleerde de modus én pauzeerde**: één Escape doet nu één ding. Het Escape-listener-lek in de tech-tree is gedicht.
+- **Camera bleef schuiven na alt-tab, en bleef edge-scrollen als de muis het venster verliet**: toetsen worden gewist bij blur, en edge-scroll stopt bij mouseleave.
+- **Sleep-selectie bleef hangen bij loslaten boven de HUD**: mouseup/mousemove worden tijdens het slepen op window gevolgd, en blur annuleert de selectie.
+- **V activeerde Carnavalsrage voor een Brabantse vijand**: dat werkt nu alleen als de speler Brabanders speelt.
+
+### Fixed — campagne
+- **Spawns buiten de map** (terrein is altijd ±64): belgen-1, de Belgen-tutorial, was onwinbaar door golven op (80,80). Ook gecorrigeerd: randstad-4, brabant-10/11/12, limburgers-7 en randstad-5. Een nieuwe audit-test controleert alle coördinaten van alle missies.
+- **Golven in belgen-3 onzichtbaar**: `initMission` laadt nu de modellen van élke factie die in de missie voorkomt (`getMissionFactionIds`).
+- **Unicode-sterren en -pijl** in CampaignUI en de missieteksten zijn vervangen door SVG en tekst.
+
+### Fixed — audio
+- Voices volgen nu de volume-instellingen, ook live tijdens het afspelen. Volume en fade gelden per afspeelinstantie, zodat een geluid ver weg een dichtbije kopie niet meer zachter zet. Ambient-loops stoppen bij match-cleanup (inclusief een race-bug in de fade-out). De muziek-ID's CUTSCENE, LOBBY en TUTORIAL geven geen 404 meer.
+
+### Fixed — instellingen
+- De toggles voor shadows, bloom, particles, grid en edge-scroll werden opgeslagen, maar niets las ze. Nu is er één store `src/ui/gameSettings.ts`, die de instelling direct toepast, zonder reload. De G-toets schrijft terug naar de grid-instelling.
+
+### Tests
+- Nieuw: inputRouting, carnavalsrage-faction, audio-volume-routing, graphics-settings-wiring, Terrain-grid-setting, en een edge-scroll-uit-case. De missie-structuuraudit is uitgebreid met bounds- en preload-checks. 2758/2758 groen, UAT 2/2, browser-smoke 27/27.
+
 ## [0.60.4] - 2026-10-16 — Bundel 2: laadtijd 1v1-skirmish ~320MB → 114MB
 
 ### Performance

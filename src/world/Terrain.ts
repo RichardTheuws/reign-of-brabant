@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { createNoise2D } from 'simplex-noise';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { getGameSettings, onGameSettingsChange, updateGameSettings } from '../ui/gameSettings';
+import { isTypingTarget } from '../ui/inputRouting';
 import type { BiomeType, RiverSpawn, BridgeSpawn, RockWallSpawn, RoadSpawn, TunnelSpawn, PathPoint } from '../types/index';
 
 // ---------------------------------------------------------------------------
@@ -233,12 +235,14 @@ export class Terrain {
     // Build visual meshes for terrain features
     this.buildFeatureVisuals();
 
-    // Create grid overlay (hidden by default)
+    // Create grid overlay; visibility follows the 'grid' setting
     this.gridOverlay = this.createGridOverlay();
     this.gridOverlay.visible = false;
+    onGameSettingsChange((settings) => this.setGridVisible(settings.grid));
 
     // Listen for G key to toggle grid
     window.addEventListener('keydown', (e) => {
+      if (isTypingTarget(e.target)) return;
       if (e.code === 'KeyG' && !e.ctrlKey && !e.metaKey && !e.altKey) {
         this.toggleGrid();
       }
@@ -281,11 +285,16 @@ export class Terrain {
     return this.gridOverlay;
   }
 
-  /** Toggle the building placement grid on/off. */
+  /** Toggle the building placement grid on/off (persisted as the 'grid' setting). */
   toggleGrid(): void {
-    this.gridVisible = !this.gridVisible;
+    updateGameSettings({ grid: !getGameSettings().grid });
+  }
+
+  /** Show or hide the building placement grid. */
+  setGridVisible(visible: boolean): void {
+    this.gridVisible = visible;
     if (this.gridOverlay) {
-      this.gridOverlay.visible = this.gridVisible;
+      this.gridOverlay.visible = visible;
     }
   }
 

@@ -15,6 +15,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { onGameSettingsChange } from '../ui/gameSettings';
 
 export class PostProcessing {
   private composer: EffectComposer;
@@ -61,6 +62,9 @@ export class PostProcessing {
     // 4. Final tone-mapping / color-space conversion
     const outputPass = new OutputPass();
     this.composer.addPass(outputPass);
+
+    // Settings panel: bloom toggle, applied now and on change.
+    onGameSettingsChange((s) => this.setBloomEnabled(s.bloom));
   }
 
   // -----------------------------------------------------------------------
@@ -76,6 +80,11 @@ export class PostProcessing {
   resize(width: number, height: number): void {
     this.composer.setSize(width, height);
     this.bloomPass.resolution.set(width, height);
+  }
+
+  /** Enable/disable the bloom pass (EffectComposer skips disabled passes). */
+  setBloomEnabled(enabled: boolean): void {
+    this.bloomPass.enabled = enabled;
   }
 
   /** Set (or clear) the objects that receive a selection outline. */

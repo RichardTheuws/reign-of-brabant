@@ -35,9 +35,12 @@ export const MUSIC_IDS = {
   VICTORY: 'music_victory',
   VICTORY_BRABANDERS: 'music_victory_brabanders',
   DEFEAT: 'music_defeat',
-  CUTSCENE: 'music_cutscene',
-  LOBBY: 'music_lobby',
-  TUTORIAL: 'music_tutorial',
+  // No dedicated tracks recorded yet for these three: they reuse existing
+  // files so requesting them never 404s. Point them at their own
+  // music_<name>.mp3 once those are added under public/assets/audio/music/.
+  CUTSCENE: 'music_main_menu',
+  LOBBY: 'music_main_menu',
+  TUTORIAL: 'music_brabanders',
 } as const;
 
 // ---------------------------------------------------------------------------

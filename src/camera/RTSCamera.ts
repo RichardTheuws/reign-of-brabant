@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { clamp, lerp } from '@utils/math';
+import { getGameSettings } from '../ui/gameSettings';
 
 const PAN_SPEED = 30;
 const ZOOM_SPEED = 2.5;
@@ -55,7 +56,7 @@ export class RTSCamera {
     if (keys.has('KeyA') || keys.has('ArrowLeft')) dx -= 1;
     if (keys.has('KeyD') || keys.has('ArrowRight')) dx += 1;
 
-    if (mouseX >= 0 && mouseY >= 0) {
+    if (getGameSettings().edgeScroll && mouseX >= 0 && mouseY >= 0) {
       if (mouseX < EDGE_SCROLL_THRESHOLD) dx -= EDGE_SCROLL_SPEED / PAN_SPEED;
       if (mouseX > canvasWidth - EDGE_SCROLL_THRESHOLD) dx += EDGE_SCROLL_SPEED / PAN_SPEED;
       if (mouseY < EDGE_SCROLL_THRESHOLD) dz -= EDGE_SCROLL_SPEED / PAN_SPEED;

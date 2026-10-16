@@ -7,6 +7,7 @@
 
 import { audioManager } from '../audio/AudioManager';
 import { MUSIC_IDS } from '../systems/MusicSystem';
+import { getGameSettings, updateGameSettings, type GameSettings } from './gameSettings';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -45,45 +46,7 @@ interface MapTemplateData {
 // Settings persistence
 // ---------------------------------------------------------------------------
 
-const SETTINGS_KEY = 'rob-settings';
-
-interface GameSettings {
-  musicVolume: number;   // 0-100
-  sfxVolume: number;     // 0-100
-  ambientVolume: number; // 0-100
-  shadows: boolean;
-  bloom: boolean;
-  particles: boolean;
-  edgeScroll: boolean;
-  grid: boolean;
-}
-
-const DEFAULT_SETTINGS: GameSettings = {
-  musicVolume: 40,
-  sfxVolume: 70,
-  ambientVolume: 30,
-  shadows: true,
-  bloom: true,
-  particles: true,
-  edgeScroll: true,
-  grid: false,
-};
-
-function loadSettings(): GameSettings {
-  try {
-    const raw = localStorage.getItem(SETTINGS_KEY);
-    if (raw) {
-      return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
-    }
-  } catch { /* ignore corrupt data */ }
-  return { ...DEFAULT_SETTINGS };
-}
-
-function saveSettings(s: GameSettings): void {
-  try {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
-  } catch { /* storage full / private mode */ }
-}
+// Store + persistence live in ./gameSettings (shared with renderer/camera).
 
 // ---------------------------------------------------------------------------
 // Loading tips (10 from the 50 in SUB-PRD-UI-UX.md)
@@ -222,10 +185,8 @@ export class MenuScreens {
   private currentTipIndex = 0;
   private tipIntervalId = 0;
   private loadingProgress = 0;
-  private settings: GameSettings;
 
   constructor() {
-    this.settings = loadSettings();
   }
 
   init(events: MenuScreenEvents): void {
@@ -569,43 +530,35 @@ export class MenuScreens {
 
     // Audio sliders
     this.bindSlider('setting-music', 'setting-music-val', (val) => {
-      this.settings.musicVolume = val;
       audioManager.setCategoryVolume('music', val / 100);
-      this.persistSettings();
+      updateGameSettings({ musicVolume: val });
     });
     this.bindSlider('setting-sfx', 'setting-sfx-val', (val) => {
-      this.settings.sfxVolume = val;
       audioManager.setCategoryVolume('sfx', val / 100);
-      this.persistSettings();
+      updateGameSettings({ sfxVolume: val });
     });
     this.bindSlider('setting-ambient', 'setting-ambient-val', (val) => {
-      this.settings.ambientVolume = val;
       audioManager.setCategoryVolume('ambient', val / 100);
-      this.persistSettings();
+      updateGameSettings({ ambientVolume: val });
     });
 
     // Graphics checkboxes
     this.bindCheckbox('setting-shadows', (checked) => {
-      this.settings.shadows = checked;
-      this.persistSettings();
+      updateGameSettings({ shadows: checked });
     });
     this.bindCheckbox('setting-bloom', (checked) => {
-      this.settings.bloom = checked;
-      this.persistSettings();
+      updateGameSettings({ bloom: checked });
     });
     this.bindCheckbox('setting-particles', (checked) => {
-      this.settings.particles = checked;
-      this.persistSettings();
+      updateGameSettings({ particles: checked });
     });
 
     // Gameplay checkboxes
     this.bindCheckbox('setting-edge-scroll', (checked) => {
-      this.settings.edgeScroll = checked;
-      this.persistSettings();
+      updateGameSettings({ edgeScroll: checked });
     });
     this.bindCheckbox('setting-grid', (checked) => {
-      this.settings.grid = checked;
-      this.persistSettings();
+      updateGameSettings({ grid: checked });
     });
   }
 
@@ -613,7 +566,7 @@ export class MenuScreens {
    * Apply persisted settings to UI controls and audio system on init.
    */
   private applySettings(): void {
-    const s = this.settings;
+    const s = getGameSettings();
 
     // Sliders
     this.setSliderValue('setting-music', 'setting-music-val', s.musicVolume);
@@ -662,15 +615,11 @@ export class MenuScreens {
     if (cb) cb.checked = checked;
   }
 
-  private persistSettings(): void {
-    saveSettings(this.settings);
-  }
-
   /**
    * Expose current settings for other systems to read (graphics, gameplay).
    */
   getSettings(): Readonly<GameSettings> {
-    return this.settings;
+    return getGameSettings();
   }
 
   // -----------------------------------------------------------------------

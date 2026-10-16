@@ -46,6 +46,7 @@ import { spawnBuildingEntity } from '../entities/buildingSpawn';
 import { HUD, type SelectedUnit, type CommandAction, type HeroAbilityData, type BuildingCardData, type BuildingCardAction } from '../ui/HUD';
 import { DamagePopups } from '../ui/DamagePopups';
 import { activateCarnavalsrage, getCarnavalsrageState, getCarnavalsrageConfig, resetAbilitySystem } from '../systems/AbilitySystem';
+import { isTypingTarget, panelClaimsKey } from '../ui/inputRouting';
 import { activateHeroAbility, resetHeroSystem } from '../systems/HeroSystem';
 import { resetBureaucracy, activateBoardroom, isBoardroomReady, boardroomBuff, BOARDROOM_COOLDOWN } from '../systems/BureaucracySystem';
 import {
@@ -84,7 +85,7 @@ import { validateBuildingPlacement, formatConstructionStatus } from '../systems/
 import { createMusicSystem, type MusicSystem } from '../systems/MusicSystem';
 import { getUpkeepPerTick, resetUpkeepTimers } from '../systems/UpkeepSystem';
 import { MissionSystem, type MissionCallbacks } from '../campaign/MissionSystem';
-import { getMissionById, type MissionDefinition, type MissionUnitSpawn } from '../campaign/MissionDefinitions';
+import { getMissionById, getMissionFactionIds, type MissionDefinition, type MissionUnitSpawn } from '../campaign/MissionDefinitions';
 import type { Terrain } from '../world/Terrain';
 import type { RTSCamera } from '../camera/RTSCamera';
 import type { EventBus as EventBusType } from '../core/EventBus';
@@ -455,8 +456,9 @@ export class Game {
       this.terrain.rebuild(this.map.terrainFeatures);
     }
 
-    // Only load models for active factions (player + AI) for performance
-    const activeFactions = new Set<number>([mission.playerFactionId, ...mission.aiFactionIds]);
+    // Only load models for factions that appear in the mission (player, AI,
+    // and any faction used by buildings/waves/scripted spawns) for performance
+    const activeFactions = getMissionFactionIds(mission);
 
     window.dispatchEvent(new CustomEvent('loading-progress', {
       detail: { progress: 0.1, label: 'Modellen laden...' },
@@ -1694,6 +1696,17 @@ export class Game {
     this.boundCanvasListeners.push({ el, event, handler });
   }
 
+  /** Abort an in-progress drag-select without changing the selection. */
+  private cancelDragSelect(): void {
+    this.isDragging = false;
+    if (this.dragBoxDiv) this.dragBoxDiv.style.display = 'none';
+  }
+
+  /** True while build / rally-point / attack-move mode awaits a click (Escape cancels it). */
+  hasActiveInputMode(): boolean {
+    return this.buildMode || this.rallyPointMode || this.attackMoveMode;
+  }
+
   private setupInput(): void {
     if (this.inputSetup) return;
     this.inputSetup = true;
@@ -1733,7 +1746,7 @@ export class Game {
       this.isDragging = true;
     }) as EventListener);
 
-    // Left mouseup: finish drag-box or single-click select
+    // Right mouseup on the canvas: context command / cancel modes
     this.addTrackedListener(canvas, 'mouseup', ((e: MouseEvent) => {
       if (e.button === 2) {
         // Right click: context command
@@ -1753,7 +1766,12 @@ export class Game {
         this.handleRightClick(e.clientX, e.clientY);
         return;
       }
+    }) as EventListener);
 
+    // Left mouseup: finish drag-box or single-click select. Listened on the
+    // window (not the canvas) so a drag released over the HUD or outside the
+    // window still completes instead of leaving the drag box stuck.
+    this.addTrackedListener(window, 'mouseup', ((e: MouseEvent) => {
       if (e.button !== 0 || !this.isDragging) return;
       this.isDragging = false;
 
@@ -1798,12 +1816,15 @@ export class Game {
       this.onSelectionChanged(this.selectedEntities);
     }) as EventListener);
 
-    // Mouse move: build ghost + drag box update
+    // Mouse move over the canvas: build ghost
     this.addTrackedListener(canvas, 'mousemove', ((e: MouseEvent) => {
       if (this.buildMode && this.buildGhostType) {
         this.updateBuildGhost(e.clientX, e.clientY);
       }
-      // Update drag box overlay
+    }) as EventListener);
+
+    // Mouse move anywhere (window): drag box keeps following over the HUD
+    this.addTrackedListener(window, 'mousemove', ((e: MouseEvent) => {
       if (this.isDragging && this.dragBoxDiv) {
         const minX = Math.min(this.dragStartX, e.clientX);
         const minY = Math.min(this.dragStartY, e.clientY);
@@ -1819,8 +1840,16 @@ export class Game {
       }
     }) as EventListener);
 
+    // Alt-tab / window blur mid-drag: cancel the drag (mouseup never arrives).
+    this.addTrackedListener(window, 'blur', (() => {
+      this.cancelDragSelect();
+    }) as EventListener);
+
     // Keyboard shortcuts
     this.addTrackedListener(window, 'keydown', ((e: KeyboardEvent) => {
+      // Typing in a text field (feedback form, settings) never triggers game actions.
+      if (isTypingTarget(e.target)) return;
+
       // Escape: cancel modes
       if (e.code === 'Escape') {
         if (this.attackMoveMode) { this.exitAttackMoveMode(); return; }
@@ -1894,8 +1923,9 @@ export class Game {
         if (e.code === 'KeyY') { this.trainFactionHero(1); return; }
       }
 
-      // A key: enter attack-move mode (only if units are selected)
-      if (e.code === 'KeyA' && !this.buildMode && !this.rallyPointMode) {
+      // A key: enter attack-move mode (only if units are selected). A visible
+      // panel button with hotkey A (e.g. worker gather-gold) wins instead.
+      if (e.code === 'KeyA' && !this.buildMode && !this.rallyPointMode && !panelClaimsKey('KeyA')) {
         if (this.selectedEntities.length > 0 &&
             this.selectedEntities.some(eid =>
               hasComponent(world, eid, IsUnit) && Faction.id[eid] === this.playerFactionId
@@ -1916,7 +1946,9 @@ export class Game {
       }
       // V key for Carnavalsrage ability ("Vuur los!")
       if (e.code === 'KeyV') {
-        const success = activateCarnavalsrage();
+        // Brabander-only ability: other player factions have no V ability.
+        if (this.playerFactionId !== FactionId.Brabanders) return;
+        const success = activateCarnavalsrage(this.playerFactionId);
         if (success) {
           this.hud?.showAlert('CARNAVALSRAGE! Alle units +50% attack, +25% speed, +25% armor!', 'info');
         } else {
@@ -4411,6 +4443,7 @@ export class Game {
 
     // Stop music system
     this.musicSystem.stop(500);
+    audioManager.stopAllAmbient(500);
 
     // Reset game state
     this.selectedEntities = [];

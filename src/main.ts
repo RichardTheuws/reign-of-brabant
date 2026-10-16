@@ -18,6 +18,7 @@ import { updateWater } from './world/Terrain';
 import { PostProcessing } from './rendering/PostProcessing';
 import { ParticleSystem } from './rendering/ParticleSystem';
 import { ProjectileRenderer } from './rendering/ProjectileRenderer';
+import { isTypingTarget, panelClaimsKey, routeEscape } from './ui/inputRouting';
 
 // ---------------------------------------------------------------------------
 // Version (injected by Vite from package.json)
@@ -92,13 +93,35 @@ const keysDown = new Set<string>();
 let mouseX = -1, mouseY = -1, scrollDelta = 0;
 
 window.addEventListener('keydown', (e) => {
-  keysDown.add(e.code);
-  if (e.code === 'Escape' && gameInitialized && stateMachine.currentId === GameStateId.PLAYING) {
-    togglePause();
+  // Typing in a text field never pans the camera or toggles pause.
+  if (isTypingTarget(e.target)) return;
+  if (e.code === 'Escape') {
+    // One action per Escape: an active build/rally/attack-move mode is
+    // cancelled by Game's own keydown handler (registered after this one,
+    // so the mode is still active here). Open overlays (tech tree) stop
+    // propagation themselves before this window listener runs.
+    const action = routeEscape({
+      playing: gameInitialized && stateMachine.currentId === GameStateId.PLAYING,
+      overlayOpen: false,
+      modeActive: game.hasActiveInputMode(),
+    });
+    if (action === 'toggle-pause') togglePause();
+    return;
   }
+  // A visible command-panel / building-card hotkey (e.g. worker A/S gather,
+  // production W/A/S/D) claims the key: it must not also pan the camera.
+  if (panelClaimsKey(e.code)) return;
+  keysDown.add(e.code);
 });
 window.addEventListener('keyup', (e) => keysDown.delete(e.code));
+// Alt-tab / focus loss: keyup never arrives, so drop every held key.
+window.addEventListener('blur', () => keysDown.clear());
 window.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+// Mouse left the window: stop edge-scrolling (RTSCamera skips edge-scroll at -1).
+document.addEventListener('mouseout', (e) => {
+  if (!e.relatedTarget) { mouseX = -1; mouseY = -1; }
+});
+document.documentElement.addEventListener('mouseleave', () => { mouseX = -1; mouseY = -1; });
 // Camera zoom: only capture wheel events over the game canvas itself.
 // A window-level listener used to preventDefault() on every wheel event,
 // which also blocked native scrolling inside menus (skirmish select, HUD

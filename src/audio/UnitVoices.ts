@@ -502,20 +502,50 @@ const failedPaths = new Set<string>();
  * longer accumulate for the whole session. Re-plays hit the browser HTTP
  * cache, so the cost is a re-decode of a ~1-2 s clip.
  */
-function playVoiceLine(src: string, volume: number, duckMs: number): void {
+function playVoiceLine(src: string, baseVolume: number, duckMs: number): void {
+  const release = (): void => {
+    activeLines.delete(sound);
+    sound.unload();
+  };
   const sound: Howl = new Howl({
     src: [src],
-    volume,
+    volume: voiceVolume(baseVolume),
     onplay: () => audioManager.duckMusic(duckMs),
-    onend: () => sound.unload(),
-    onplayerror: () => sound.unload(),
+    onend: release,
+    onplayerror: release,
     onloaderror: () => {
       // Mark path as failed so we don't retry it
       failedPaths.add(src);
-      sound.unload();
+      release();
     },
   });
+  activeLines.set(sound, baseVolume);
+  subscribeToVolumeChanges();
   sound.play();
+}
+
+// ---------------------------------------------------------------------------
+// Volume — voices follow the user's SFX setting (no separate voice slider)
+// ---------------------------------------------------------------------------
+
+/** Lines that are loaded/playing, with their base volume, for live updates. */
+const activeLines = new Map<Howl, number>();
+let volumeSubscribed = false;
+
+// The typeof guards keep this module usable with the partial audioManager
+// mocks in the unit tests (they only stub duckMusic/playSound).
+function voiceVolume(baseVolume: number): number {
+  return typeof audioManager.getVoiceVolume === 'function'
+    ? audioManager.getVoiceVolume(baseVolume)
+    : baseVolume;
+}
+
+function subscribeToVolumeChanges(): void {
+  if (volumeSubscribed || typeof audioManager.onVolumeChange !== 'function') return;
+  volumeSubscribed = true;
+  audioManager.onVolumeChange(() => {
+    for (const [sound, base] of activeLines) sound.volume(voiceVolume(base));
+  });
 }
 
 // ---------------------------------------------------------------------------

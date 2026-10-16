@@ -21,6 +21,7 @@ import { getUpgradeImagePath } from './UpgradePortraits';
 import { createBuildingPortraitImg } from './BuildingPortraits';
 import { getBuildingPortraitUrl, getUnitPortraitUrl, getHeroPortraitUrl } from '../data/portraitMap';
 import { getHeroTypesForFaction } from '../entities/heroArchetypes';
+import { isTypingTarget, findCommandPanelButton } from './inputRouting';
 
 // ---------------------------------------------------------------------------
 // Command icon image mapping — fal.ai generated painted icons
@@ -377,6 +378,8 @@ export class HUD {
 
   // Tech tree modal
   private techTreeOverlay: HTMLElement | null = null;
+  /** Escape listener for the open tech tree; removed whenever it closes. */
+  private techTreeEscHandler: ((e: KeyboardEvent) => void) | null = null;
   private techTreePanel: HTMLElement | null = null;
 
   // Currently displayed building id (for queue cancel)
@@ -1513,18 +1516,21 @@ export class HUD {
     }
 
     overlay.appendChild(panel);
-    document.getElementById('game-hud')?.appendChild(overlay);
+    this.hudLayer().appendChild(overlay);
 
     this.techTreeOverlay = overlay;
     this.techTreePanel = panel;
 
-    // Bind Escape key to close
+    // Bind Escape key to close. Stored so hideTechTree() removes it on any
+    // close path (Escape, backdrop click, re-open, destroy). Propagation is
+    // stopped so the same Escape doesn't also toggle pause (window listener).
     const escHandler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        e.stopPropagation();
         this.hideTechTree();
-        document.removeEventListener('keydown', escHandler);
       }
     };
+    this.techTreeEscHandler = escHandler;
     document.addEventListener('keydown', escHandler);
   }
 
@@ -1532,6 +1538,10 @@ export class HUD {
    * Hide the tech tree modal.
    */
   hideTechTree(): void {
+    if (this.techTreeEscHandler) {
+      document.removeEventListener('keydown', this.techTreeEscHandler);
+      this.techTreeEscHandler = null;
+    }
     if (this.techTreeOverlay) {
       this.techTreeOverlay.remove();
       this.techTreeOverlay = null;
@@ -1708,7 +1718,7 @@ export class HUD {
     const indicator = document.createElement('div');
     indicator.id = 'mode-indicator';
     indicator.innerHTML = `<span class="mode-indicator__text">${this.escapeHtml(text)}</span><span class="mode-indicator__hint">ESC om te annuleren</span>`;
-    document.getElementById('hud')?.appendChild(indicator);
+    this.hudLayer().appendChild(indicator);
   }
 
   hideModeIndicator(): void {
@@ -2222,6 +2232,7 @@ export class HUD {
 
       // Also bind M key for mute toggle
       const keyHandler = (e: Event) => {
+        if (isTypingTarget(e.target)) return;
         if ((e as KeyboardEvent).code === 'KeyM') {
           handler();
         }
@@ -2263,15 +2274,20 @@ export class HUD {
 
   private bindHotkeys(): void {
     // Hotkeys are resolved dynamically based on which command panel is visible.
-    // WASD is reserved for camera — build/train hotkeys use Q, E, R, T, F, G, Z, X.
+    // W/A/S/D pan the camera UNLESS the visible panel has an enabled button with
+    // that hotkey (e.g. worker A=gold / S=wood gather; pointer-only move/attack
+    // on W never claims): then the panel wins and
+    // main.ts / Game.ts skip camera-pan and attack-move (see inputRouting.ts).
     // V is handled by Game.ts for Carnavalsrage.
     // T/Y are hero training hotkeys.
-    const hotkeyCodes = ['KeyQ', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyF', 'KeyG', 'KeyZ', 'KeyX'];
+    const hotkeyCodes = ['KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyZ', 'KeyX'];
 
     const handler = (e: Event) => {
       const ke = e as KeyboardEvent;
-      // Only fire hotkeys when not in a text input
-      if ((e.target as HTMLElement)?.tagName === 'INPUT') return;
+      // Only fire hotkeys when not typing in a text field
+      if (isTypingTarget(e.target)) return;
+      // Leave Ctrl/Cmd/Alt combos (browser shortcuts) alone
+      if (ke.ctrlKey || ke.metaKey || ke.altKey) return;
 
       if (!hotkeyCodes.includes(ke.code)) return;
 
@@ -2299,9 +2315,7 @@ export class HUD {
     // Find the visible button with this hotkey in any visible command panel.
     // NOTE: Building card hotkeys are NOT resolved here -- they are handled
     // directly by Game.ts's keyboard handler to avoid double-firing.
-    const btn = document.querySelector<HTMLButtonElement>(
-      `.command-panel:not([hidden]) .cmd-btn[data-hotkey="${hotkey}"]:not([hidden])`,
-    );
+    const btn = findCommandPanelButton(hotkey);
     if (btn) {
       return (btn.dataset.action as CommandAction) ?? null;
     }
@@ -2326,6 +2340,17 @@ export class HUD {
   // -----------------------------------------------------------------------
   // Helpers
   // -----------------------------------------------------------------------
+
+  /**
+   * Container for runtime HUD overlays (tooltip, mode banner, tech tree).
+   * play/index.html has #game-hud inside #ui-overlay (z-index above the
+   * canvas); there is no #hud element.
+   */
+  private hudLayer(): HTMLElement {
+    return document.getElementById('game-hud')
+      ?? document.getElementById('ui-overlay')
+      ?? document.body;
+  }
 
   private el(id: string): HTMLElement {
     const element = document.getElementById(id);
@@ -2408,7 +2433,7 @@ export class HUD {
     if (this.tooltipEl) return this.tooltipEl;
     const el = document.createElement('div');
     el.className = 'game-tooltip';
-    document.getElementById('hud')?.appendChild(el);
+    this.hudLayer().appendChild(el);
     this.tooltipEl = el;
     return el;
   }
@@ -2438,11 +2463,17 @@ export class HUD {
     if (data.hotkey) html += `<div class="game-tooltip__hotkey">[${this.escapeHtml(data.hotkey)}]</div>`;
     el.innerHTML = html;
 
-    // Position: prefer above-right of cursor, shift if off-screen
+    // Position: prefer above-right of cursor, shift if off-screen. The
+    // command buttons sit at the bottom edge, so the tooltip must grow
+    // upward (measured height) and stay clamped inside the viewport.
+    const w = el.offsetWidth || 260;
+    const h = el.offsetHeight;
     let left = x + 12;
-    let top = y - 12;
-    if (left + 260 > window.innerWidth) left = x - 270;
+    let top = y - 12 - h;
+    if (left + w > window.innerWidth) left = x - w - 12;
     if (top < 0) top = y + 20;
+    left = Math.max(4, Math.min(left, window.innerWidth - w - 4));
+    top = Math.max(4, Math.min(top, window.innerHeight - h - 4));
     el.style.left = left + 'px';
     el.style.top = top + 'px';
     el.classList.add('is-visible');

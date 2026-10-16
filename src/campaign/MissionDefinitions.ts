@@ -10,7 +10,7 @@
  * - Star rating thresholds
  */
 
-import { FactionId, UnitTypeId, BuildingTypeId } from '../types/index';
+import { FactionId, UnitTypeId, BuildingTypeId, MAP_SIZE } from '../types/index';
 import type { GoldMineSpawn, TreeResourceSpawn } from '../types/index';
 
 // ---------------------------------------------------------------------------
@@ -264,7 +264,7 @@ const MISSION_2_EERSTE_SCHERMUTSEL: MissionDefinition = {
     {
       id: 'tip-start',
       condition: { type: 'time', seconds: 5 },
-      actions: [{ type: 'message', text: 'Bouw een Cafe (Brabantse Kazerne) om soldaten te trainen. Selecteer een Boer → klik op het hamer-icoon → klik op een open plek.' }],
+      actions: [{ type: 'message', text: 'Bouw een Cafe (Brabantse Kazerne) om soldaten te trainen. Selecteer een Boer, klik op het hamer-icoon en klik dan op een open plek.' }],
       once: true,
     },
     {
@@ -1577,7 +1577,7 @@ const MISSION_9_RAAD: MissionDefinition = {
 // ---------------------------------------------------------------------------
 
 const M10_SABOTAGE_NORTH_X = 0;
-const M10_SABOTAGE_NORTH_Z = 62;
+const M10_SABOTAGE_NORTH_Z = 54; // was 62: +8 spread put units at z=70 (map edge is 64)
 const M10_SABOTAGE_WEST_X = -50;
 const M10_SABOTAGE_WEST_Z = 37;
 const M10_SABOTAGE_EAST_X = 50;
@@ -1860,7 +1860,7 @@ const MISSION_10_RAAD: MissionDefinition = {
 // ---------------------------------------------------------------------------
 
 const M11_A2_NORTH_X = 0;
-const M11_A2_NORTH_Z = 62;
+const M11_A2_NORTH_Z = 57; // was 62: +4 offset/+2 spread put units at z=68 (map edge is 64)
 const M11_WEST_FLANK_X = -44;
 const M11_WEST_FLANK_Z = 36;
 const M11_EAST_FLANK_X = 44;
@@ -2222,7 +2222,7 @@ const MISSION_11_A2: MissionDefinition = {
       spawnTime: 1440,
       units: [
         ...createWaveUnits(15, UnitTypeId.Infantry, M11_A2_NORTH_X, M11_A2_NORTH_Z, 4),
-        ...createWaveUnits(8, UnitTypeId.Ranged, M11_A2_NORTH_X, M11_A2_NORTH_Z + 4, 2),
+        ...createWaveUnits(8, UnitTypeId.Ranged, M11_A2_NORTH_X, M11_A2_NORTH_Z + 3, 2),
         ...createWaveUnits(4, UnitTypeId.Infantry, M11_WEST_FLANK_X + 15, M11_WEST_FLANK_Z + 4, 1),
         ...createWaveUnits(3, UnitTypeId.Ranged, M11_EAST_FLANK_X - 15, M11_EAST_FLANK_Z + 4, 1),
         ...createWaveUnits(2, UnitTypeId.Infantry, M11_A2_NORTH_X + 11, M11_A2_NORTH_Z, 1),
@@ -2302,8 +2302,9 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: M12_PLAYER_BASE_X, z: M12_PLAYER_BASE_Z, complete: true },
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M12_PLAYER_BASE_X + 5, z: M12_PLAYER_BASE_Z, complete: true },
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M12_PLAYER_BASE_X - 5, z: M12_PLAYER_BASE_Z, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.LumberCamp, x: M12_PLAYER_BASE_X + 5, z: M12_PLAYER_BASE_Z - 5, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Blacksmith, x: M12_PLAYER_BASE_X - 5, z: M12_PLAYER_BASE_Z - 5, complete: true },
+    // Flanking the Barracks (was z = base - 5 = -65, behind the map edge at -64)
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.LumberCamp, x: M12_PLAYER_BASE_X + 10, z: M12_PLAYER_BASE_Z, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Blacksmith, x: M12_PLAYER_BASE_X - 10, z: M12_PLAYER_BASE_Z, complete: true },
     // Ring 1 — Buitenwijken (2 Barracks as Kantoor-torens at city gates)
     { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: -18, z: M12_RING1_Z, complete: true },
     { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 18, z: M12_RING1_Z, complete: true },
@@ -2464,8 +2465,8 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
   ],
 
   goldMines: [
-    { x: M12_PLAYER_BASE_X - 14, z: M12_PLAYER_BASE_Z - 5, amount: 4000 },
-    { x: M12_PLAYER_BASE_X + 14, z: M12_PLAYER_BASE_Z - 5, amount: 4000 },
+    { x: M12_PLAYER_BASE_X - 16, z: M12_PLAYER_BASE_Z, amount: 4000 },
+    { x: M12_PLAYER_BASE_X + 16, z: M12_PLAYER_BASE_Z, amount: 4000 },
     { x: M12_PLAYER_BASE_X, z: M12_PLAYER_BASE_Z + 9, amount: 3000 },
     { x: 28, z: -37, amount: 2500 },   // Near east flank approach
     { x: -28, z: -37, amount: 2500 },  // Near west flank approach
@@ -2647,8 +2648,9 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
         {
           type: 'spawn-units',
           units: [
-            ...createWaveUnits(10, UnitTypeId.Infantry, 0, 60, 4),
-            ...createWaveUnits(5, UnitTypeId.Ranged, 0, 62, 2),
+            // Behind the Corporate Tower (0,55), inside the map edge (was z up to 64)
+            ...createWaveUnits(10, UnitTypeId.Infantry, 0, 59.5, 2.5),
+            ...createWaveUnits(5, UnitTypeId.Ranged, 6, 60, 2),
           ],
         },
       ],
@@ -2721,8 +2723,10 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
 // Belgen Missie 1: "De Eerste Frituur" (Tutorial)
 // ---------------------------------------------------------------------------
 
-const BELGEN_WAVE_SPAWN_X = 80;
-const BELGEN_WAVE_SPAWN_Z = 80;
+// NE of the player base. Was (80,80): outside the 128-unit terrain (edge at 64),
+// so wave units could never be reached and 'all-waves-defeated' never fired.
+const BELGEN_WAVE_SPAWN_X = 40;
+const BELGEN_WAVE_SPAWN_Z = 40;
 
 const MISSION_B1_EERSTE_FRITUUR: MissionDefinition = {
   id: 'belgen-1-de-eerste-frituur',
@@ -4651,8 +4655,9 @@ const RANDSTAD_MISSION_3_VIJANDIGE_OVERNAME: MissionDefinition = {
 // Randstad Missie 4: "Gentrificatie" (Defend and transform)
 // ---------------------------------------------------------------------------
 
-const RAND_GENTRIFY_WAVE_X = 80;
-const RAND_GENTRIFY_WAVE_Z = 80;
+// NE corner. Was (80,80): outside the 128-unit terrain (edge at 64).
+const RAND_GENTRIFY_WAVE_X = 52;
+const RAND_GENTRIFY_WAVE_Z = 52;
 
 const RANDSTAD_MISSION_4_GENTRIFICATIE: MissionDefinition = {
   id: 'randstad-4-gentrificatie',
@@ -4932,8 +4937,8 @@ const RANDSTAD_MISSION_5_BOARDROOM_BESLISSING: MissionDefinition = {
 
   goldMines: [
     // Player area
-    { x: -7, z: -62, amount: 3000 },
-    { x: 7, z: -62, amount: 3000 },
+    { x: -11, z: -60, amount: 3000 },
+    { x: 11, z: -60, amount: 3000 },
     { x: 0, z: -49, amount: 2500 },
     // Center contested
     { x: 0, z: 0, amount: 4000 },
@@ -5245,9 +5250,11 @@ const LIMBURGERS_MISSION_6_TUNNELOORLOG: MissionDefinition = {
 // Limburgers Missie 7: "De Grote Sjtoelgang" (Full defense + counter-attack)
 // ---------------------------------------------------------------------------
 
-const LIMB_SJTOELGANG_SPAWN_N_X = 0;
-const LIMB_SJTOELGANG_SPAWN_N_Z = 60;
-const LIMB_SJTOELGANG_SPAWN_E_X = 55;
+// N spawn sits west of the Randstad TH (0,55) so units don't spawn inside it.
+// Was (0,60): offsets+spread reached z=68, past the map edge at 64.
+const LIMB_SJTOELGANG_SPAWN_N_X = -14;
+const LIMB_SJTOELGANG_SPAWN_N_Z = 54;
+const LIMB_SJTOELGANG_SPAWN_E_X = 54; // was 55: offsets+spread reached x=63
 const LIMB_SJTOELGANG_SPAWN_E_Z = 0;
 
 const LIMBURGERS_MISSION_7_GROTE_SJTOELGANG: MissionDefinition = {
@@ -7141,8 +7148,8 @@ const RANDSTAD_MISSION_8_IPO_DAY: MissionDefinition = {
     { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: 0, z: -55, complete: true },
     { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 8, z: -55, complete: true },
     { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: -8, z: -55, complete: true },
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Blacksmith, x: 0, z: -62, complete: true },
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.SiegeWorkshop, x: -10, z: -62, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Blacksmith, x: 0, z: -60, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.SiegeWorkshop, x: -15, z: -60, complete: true },
     // Brabanders base — southwest
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: -50, z: -20, complete: true },
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: -43, z: -20, complete: true },
@@ -7422,6 +7429,43 @@ const ALL_MISSIONS: readonly MissionDefinition[] = [
   ...BELGEN_MISSIONS,
   ...RANDSTAD_MISSIONS,
 ];
+
+/**
+ * Playable bounds for mission coordinates. Game.initMission() always builds
+ * the default terrain (MAP_SIZE = 128, i.e. -64..+64) — the per-mission
+ * `mapSize` field is not applied. Units need a small edge margin so the
+ * navmesh agent (and ProductionSystem's +-63 clamp) can hold them; buildings
+ * and gold mines need room for their 4x4 footprint plus a walkable strip
+ * behind them so workers/attackers can reach every side.
+ */
+export const MISSION_MAP_HALF_EXTENT = MAP_SIZE / 2;
+export const MISSION_UNIT_MAX_ABS_COORD = MISSION_MAP_HALF_EXTENT - 2;      // 62
+export const MISSION_STRUCTURE_MAX_ABS_COORD = MISSION_MAP_HALF_EXTENT - 4; // 60
+
+/** Every unit spawn in a mission: starting units, wave units and scripted spawn-units actions. */
+export function getAllMissionUnitSpawns(mission: MissionDefinition): MissionUnitSpawn[] {
+  const spawns: MissionUnitSpawn[] = [...mission.units];
+  for (const w of mission.waves) spawns.push(...w.units);
+  for (const t of mission.triggers) {
+    for (const a of t.actions) {
+      if (a.type === 'spawn-units') spawns.push(...a.units);
+    }
+  }
+  return spawns;
+}
+
+/**
+ * All factions whose unit/building models must be preloaded for a mission:
+ * player, AI factions, and any faction that appears in a building, starting
+ * unit, wave or scripted spawn. Without this, e.g. Randstad wave units in a
+ * Belgen-vs-Brabanders mission get no mesh (UnitRenderer.addUnit -> null).
+ */
+export function getMissionFactionIds(mission: MissionDefinition): Set<number> {
+  const ids = new Set<number>([mission.playerFactionId, ...mission.aiFactionIds]);
+  for (const b of mission.buildings) ids.add(b.factionId);
+  for (const u of getAllMissionUnitSpawns(mission)) ids.add(u.factionId);
+  return ids;
+}
 
 /** Get a mission by its id. */
 export function getMissionById(id: string): MissionDefinition | undefined {

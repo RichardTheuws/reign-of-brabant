@@ -106,19 +106,22 @@ const SOUND_DEFINITIONS: SoundDefinition[] = [
   { id: 'heal_tick',         src: sfxPath('heal_tick.mp3'),        category: 'sfx', baseVolume: 0.4 },
 ];
 
+const DEFAULT_CATEGORY_VOLUMES: Readonly<Record<AudioCategory, number>> = {
+  music: 0.4,
+  sfx: 0.7,
+  ui: 0.5,
+  voice: 0.8,
+  ambient: 0.3,
+};
+
 // ---------------------------------------------------------------------------
 // AudioManager singleton
 // ---------------------------------------------------------------------------
 
 class AudioManager {
   private sounds = new Map<string, ActiveSound>();
-  private categoryVolumes: Record<AudioCategory, number> = {
-    music: 0.4,
-    sfx: 0.7,
-    ui: 0.5,
-    voice: 0.8,
-    ambient: 0.3,
-  };
+  private categoryVolumes: Record<AudioCategory, number> = { ...DEFAULT_CATEGORY_VOLUMES };
+  private volumeListeners = new Set<() => void>();
   private masterVolume = 1.0;
   private muted = false;
 
@@ -215,8 +218,39 @@ class AudioManager {
     const override = volumeOverride ?? 1.0;
     const finalVolume = this.masterVolume * catVol * baseVol * spatialMult * override;
 
-    sound.howl.volume(Math.min(1.0, finalVolume));
-    sound.howl.play();
+    // Volume on this playback id only: setting it on the whole Howl would
+    // also turn down (or up) copies of this sound that are already playing.
+    const soundId = sound.howl.play();
+    sound.howl.volume(Math.min(1.0, finalVolume), soundId);
+  }
+
+  // -------------------------------------------------------------------------
+  // Voice volume
+  // -------------------------------------------------------------------------
+
+  /**
+   * Effective volume for a voice line with the given base volume.
+   *
+   * The settings menu has no voice slider, so voices follow the SFX slider
+   * (and the 'voice' category, which has no UI yet). Both are normalised to
+   * their defaults so voice loudness at default settings is unchanged.
+   * Master volume is not multiplied in: setMasterVolume applies it globally
+   * through Howler.volume().
+   */
+  getVoiceVolume(baseVolume: number): number {
+    const v = baseVolume
+      * (this.categoryVolumes.sfx / DEFAULT_CATEGORY_VOLUMES.sfx)
+      * (this.categoryVolumes.voice / DEFAULT_CATEGORY_VOLUMES.voice);
+    return Math.max(0, Math.min(1, v));
+  }
+
+  /**
+   * Subscribe to category-volume changes (e.g. to update voice lines that are
+   * playing while the user drags a slider). Returns an unsubscribe function.
+   */
+  onVolumeChange(listener: () => void): () => void {
+    this.volumeListeners.add(listener);
+    return () => this.volumeListeners.delete(listener);
   }
 
   // -------------------------------------------------------------------------
@@ -299,31 +333,34 @@ class AudioManager {
     }
 
     const targetVol = this.masterVolume * this.categoryVolumes.ambient * sound.baseVolume;
-    sound.howl.volume(0);
     const howlId = sound.howl.play();
-    sound.howl.fade(0, targetVol, 2000);
+    sound.howl.volume(0, howlId);
+    sound.howl.fade(0, targetVol, 2000, howlId);
     this.ambientLoops.set(id, howlId);
   }
 
   /**
    * Stop an ambient loop by its sound ID.
+   *
+   * The loop is dropped from the bookkeeping right away and only its own
+   * playback id is faded/stopped, so startAmbient() during the fade (next
+   * match) starts a fresh loop that the pending stop does not cut off.
    */
   stopAmbient(id: string, fadeMs = 1000): void {
     const sound = this.sounds.get(id);
-    if (!sound) return;
+    const howlId = this.ambientLoops.get(id);
+    if (!sound || howlId === undefined) return;
+    this.ambientLoops.delete(id);
 
-    sound.howl.fade(sound.howl.volume(), 0, fadeMs);
-    setTimeout(() => {
-      sound.howl.stop();
-      this.ambientLoops.delete(id);
-    }, fadeMs);
+    sound.howl.fade(sound.howl.volume(howlId) as number, 0, fadeMs, howlId);
+    setTimeout(() => sound.howl.stop(howlId), fadeMs);
   }
 
   /**
-   * Stop all ambient loops.
+   * Stop all ambient loops. Call on match cleanup.
    */
   stopAllAmbient(fadeMs = 1000): void {
-    for (const id of this.ambientLoops.keys()) {
+    for (const id of [...this.ambientLoops.keys()]) {
       this.stopAmbient(id, fadeMs);
     }
   }
@@ -338,6 +375,7 @@ class AudioManager {
   setCategoryVolume(category: AudioCategory, volume: number): void {
     this.categoryVolumes[category] = Math.max(0, Math.min(1, volume));
     this.updateAllVolumes();
+    for (const listener of this.volumeListeners) listener();
   }
 
   /**
@@ -455,11 +493,11 @@ class AudioManager {
 
   private updateAllVolumes(): void {
     // Update ambient loop volumes
-    for (const [id] of this.ambientLoops) {
+    for (const [id, howlId] of this.ambientLoops) {
       const sound = this.sounds.get(id);
       if (sound) {
         const vol = this.masterVolume * this.categoryVolumes[sound.category] * sound.baseVolume;
-        sound.howl.volume(vol);
+        sound.howl.volume(vol, howlId);
       }
     }
 
