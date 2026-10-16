@@ -458,110 +458,141 @@ export class UnitRenderer {
   // Asset loading
   // -----------------------------------------------------------------------
 
-  /** Pre-load unit GLB models (v02 with v01 fallback) and create InstancedMeshes.
+  /** Pre-load unit models and create InstancedMeshes / animated templates.
+   *  Per key the animated (v03/hero) model is tried first; the static
+   *  v02 -> v01 chain is only downloaded when a key has no animated path or
+   *  the animated load failed. Each URL is fetched at most once per preload.
    *  @param factions  Optional set of faction IDs to load. If omitted, loads all factions.
-   *  @param onProgress  Called after each model finishes loading with (loaded, total) counts.
+   *  @param onProgress  Called once per unit key with (loaded, total) counts.
    */
   async preload(factions?: Set<number>, onProgress?: (loaded: number, total: number) => void): Promise<void> {
-    const entries = Object.entries(UNIT_MODEL_PATHS).filter(([key]) => {
-      if (!factions) return true;
-      const factionId = parseInt(key.split('_')[1], 10);
-      return factions.has(factionId);
-    });
-
-    const animEntries = Object.entries(ANIMATED_MODEL_PATHS).filter(([key]) => {
+    const keys = [...new Set([
+      ...Object.keys(ANIMATED_MODEL_PATHS),
+      ...Object.keys(UNIT_MODEL_PATHS),
+    ])].filter((key) => {
       if (!factions) return true;
       const factionId = parseInt(key.split('_')[1], 10);
       return factions.has(factionId);
     });
 
     let loaded = 0;
-    const total = entries.length + animEntries.length;
+    const total = keys.length;
 
-    const promises = entries.map(([key, path]) =>
-      this.loader.loadAsync(path).catch(() => {
-        const fallback = UNIT_MODEL_FALLBACKS[key];
-        if (fallback) return this.loader.loadAsync(fallback);
-        return null;
-      }).then((gltf: GLTF | null) => {
-        const cacheKey = key as ModelCacheKey;
-        const factionId = parseInt(key.split('_')[1], 10);
+    // One request per URL per preload (heroes share paths, fallbacks are shared).
+    const requests = new Map<string, Promise<GLTF>>();
+    const load = (url: string): Promise<GLTF> => {
+      let req = requests.get(url);
+      if (!req) {
+        req = this.loader.loadAsync(url);
+        req.catch(() => {}); // rejection is handled by each consumer
+        requests.set(url, req);
+      }
+      return req;
+    };
 
-        if (!gltf) {
-          console.warn(`[UnitRenderer] Model load failed for "${key}", using fallback box`);
-          this.createFallbackBucket(cacheKey, factionId);
+    const promises = keys.map(async (key) => {
+      const cacheKey = key as ModelCacheKey;
+      const animPath = ANIMATED_MODEL_PATHS[key];
+      if (animPath) {
+        try {
+          this.registerAnimated(cacheKey, await load(animPath));
           loaded++;
           onProgress?.(loaded, total);
           return;
+        } catch (err) {
+          console.warn(`[UnitRenderer] Failed to load animated model "${key}":`, err);
         }
-
-        const root = gltf.scene;
-        const isV02 = path.includes('/v02/');
-        if (isV02) this.v02Models.add(cacheKey);
-
-        const scaleFactor = isV02 ? 1.5 : 1.8;
-        root.scale.set(scaleFactor, scaleFactor, scaleFactor);
-        root.updateMatrixWorld(true);
-
-        root.traverse((child) => {
-          if ((child as THREE.Mesh).isMesh) {
-            child.castShadow = true;
-            child.receiveShadow = false;
-          }
-        });
-
-        this.modelCache.set(cacheKey, root);
-        this.createBucket(cacheKey, root, isV02);
-
-        // Verify bucket was created, fallback if extractFirstMesh failed
-        if (!this.buckets.has(cacheKey)) {
-          console.warn(`[UnitRenderer] No mesh extracted for "${key}", using fallback box`);
-          this.createFallbackBucket(cacheKey, factionId);
-        }
-
-        loaded++;
-        onProgress?.(loaded, total);
-      }),
-    );
+      }
+      // No animated model (or it failed): static v02 -> v01 chain.
+      await this.loadStatic(cacheKey, load, animPath);
+      loaded++;
+      onProgress?.(loaded, total);
+    });
     await Promise.all(promises);
+  }
 
-    // Load animated models (skeletal animation GLBs)
-    const animPromises = animEntries.map(([key, path]) =>
-      this.loader.loadAsync(path).then((gltf: GLTF) => {
-        const cacheKey = key as ModelCacheKey;
-        const root = gltf.scene;
+  /** Store a loaded animated GLB as the template for `key`. */
+  private registerAnimated(key: ModelCacheKey, gltf: GLTF): void {
+    const root = gltf.scene;
 
-        // Scale animated models to match v02 static model size
-        const scaleFactor = 1.5;
-        root.scale.set(scaleFactor, scaleFactor, scaleFactor);
-        root.updateMatrixWorld(true);
+    // Scale animated models to match v02 static model size
+    const scaleFactor = 1.5;
+    root.scale.set(scaleFactor, scaleFactor, scaleFactor);
+    root.updateMatrixWorld(true);
 
-        root.traverse((child) => {
-          if ((child as THREE.Mesh).isMesh) {
-            child.castShadow = true;
-            child.receiveShadow = false;
-          }
-        });
+    root.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = false;
+      }
+    });
 
-        this.animatedTemplates.set(cacheKey, {
-          scene: root,
-          clips: gltf.animations,
-        });
+    this.animatedTemplates.set(key, {
+      scene: root,
+      clips: gltf.animations,
+    });
 
-        console.log(
-          `[UnitRenderer] Loaded animated model "${key}" with ${gltf.animations.length} clips:`,
-          gltf.animations.map((c) => c.name),
-        );
-
-        loaded++;
-        onProgress?.(loaded, total);
-      }).catch((err) => {
-        console.warn(`[UnitRenderer] Failed to load animated model "${key}":`, err);
-        loaded++;
-        onProgress?.(loaded, total);
-      }),
+    console.log(
+      `[UnitRenderer] Loaded animated model "${key}" with ${gltf.animations.length} clips:`,
+      gltf.animations.map((c) => c.name),
     );
-    await Promise.all(animPromises);
+  }
+
+  /**
+   * Load the static model for `key` (v02 -> v01 fallback chain) into an
+   * InstancedMesh bucket; fallback box when nothing loads. `skipUrl` is a URL
+   * that already failed as the animated model (heroes share their path).
+   */
+  private async loadStatic(
+    key: ModelCacheKey,
+    load: (url: string) => Promise<GLTF>,
+    skipUrl?: string,
+  ): Promise<void> {
+    const factionId = parseInt(key.split('_')[1], 10);
+    const candidates = [UNIT_MODEL_PATHS[key], UNIT_MODEL_FALLBACKS[key]]
+      .filter((url): url is string => !!url && url !== skipUrl);
+
+    let gltf: GLTF | null = null;
+    let path = '';
+    for (const url of candidates) {
+      try {
+        gltf = await load(url);
+        path = url;
+        break;
+      } catch {
+        // try next candidate
+      }
+    }
+
+    if (!gltf) {
+      console.warn(`[UnitRenderer] Model load failed for "${key}", using fallback box`);
+      this.createFallbackBucket(key, factionId);
+      return;
+    }
+
+    const root = gltf.scene;
+    const isV02 = path.includes('/v02/');
+    if (isV02) this.v02Models.add(key);
+
+    const scaleFactor = isV02 ? 1.5 : 1.8;
+    root.scale.set(scaleFactor, scaleFactor, scaleFactor);
+    root.updateMatrixWorld(true);
+
+    root.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = false;
+      }
+    });
+
+    this.modelCache.set(key, root);
+    this.createBucket(key, root, isV02);
+
+    // Verify bucket was created, fallback if extractFirstMesh failed
+    if (!this.buckets.has(key)) {
+      console.warn(`[UnitRenderer] No mesh extracted for "${key}", using fallback box`);
+      this.createFallbackBucket(key, factionId);
+    }
   }
 
   /** Create a simple colored box as fallback when GLB loading fails. */

@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.60.4] - 2026-10-16 — Bundel 2: laadtijd 1v1-skirmish ~320MB → 114MB
+
+### Performance
+- **Geen dubbele unit-downloads meer**: `UnitRenderer.preload()` laadt eerst het geanimeerde v03/hero-model en haalt de statische v02 → v01-keten alleen nog op als er geen animated pad is of die load faalt. Elke URL wordt per preload maximaal één keer opgehaald (heroes stonden in beide lijsten). Scheelt ~256MB over alle facties (~81MB per 1v1). Als bijvangst: als alle modellen falen, valt de preload niet meer om (fallback-box), en de laadbalk telt per unit-key.
+- **56 runtime-GLB's −78% (544MB → 122MB)**: v02-gebouwen, shared props en de 8 heroes zijn verkleind met gltf-transform. Textures gaan naar 1024 voor gebouwen en 512 voor heroes (formaten behouden). De 5 over-getesselleerde gebouwen (0,83-1,38M tris) zijn vereenvoudigd naar ~100-143k tris met een simplify die ook de normalen en UV's meeweegt (anders facetten in de shading). Grootste bestand 52MB → 5,8MB. Gevalideerd: GLTFLoader-parse, gelijke node/mesh/material/clip-aantallen, bbox ≤0,043% afwijking, renders voor/na visueel gelijk. Er is geen decoder nodig: geen Draco, meshopt of KTX2.
+- **Dode assets uit dist**: Vite-plugin `rob-prune-dist` haalt na de build 79 ongebruikte paden (173,6MB) uit de outDir: `v02-upgrade/`, concepts, ongebruikte steun-media en logo-varianten, poc-restanten, `.bak`-bestanden. `public/` zelf blijft intact.
+
+### Fixed
+- **Randstad-voice 404's**: 32 niet-bestaande voice-paden (ability/idle per Randstad-unit) worden nu vooraf herkend via een beschikbaarheidstabel en gaan direct naar de fallback-lijnen, zonder request.
+- **Howler-lek**: niet meer per afgespeelde voicelijn een nieuwe `Howl` die nooit vrijkwam.
+
+### Tests
+- Nieuwe guards: preload-dedupe (7), voice-beschikbaarheid, dist-prune (elk gepruned pad mag nergens gerefereerd worden), GLB-payload-budget (≤6MB, ≤150k tris, geen decoder-extensies). 2357/2357 groen. Gemeten: een 1v1 haalt ~114MB op in 301 requests, met 0 4xx/5xx en 0 console-errors.
+
 ## [0.60.3] - 2026-10-16 — Fix-bundel 1: zombie-kills, AI-blokkades, herstart-cleanup, save-migratie
 
 ### Fixed — gameplay-brekende bugs uit de audit van 2026-10-16

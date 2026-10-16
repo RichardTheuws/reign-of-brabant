@@ -153,26 +153,62 @@ function subPoolLines(
 }
 
 /**
+ * Recorded-file categories (the `<category>_N.mp3` prefix on disk) that a
+ * per-unit folder does NOT have yet. Every per-unit folder is assumed to hold
+ * the full standard set (select/move/attack ×3, death/ability/idle ×2) unless
+ * listed here. Missing categories resolve to an empty per-unit pool, so
+ * playUnitVoice routes them straight to the generic faction pool without
+ * requesting (and 404-ing on) a file that was never recorded.
+ *
+ * 'ready' and 'gather' reuse the 'idle' and 'move' files, so listing 'idle'
+ * here also covers 'ready'.
+ *
+ * Updating: when new recordings land (scripts/sync-voice-recordings.sh or the
+ * scripts/generate-*-voices.sh generators), `git add` them under
+ * public/assets/audio/voices/ and remove the category from this table.
+ * tests/UnitVoices-availability.test.ts fails if any requestable path is not a
+ * git-tracked file, and also if this table lists a category that now exists.
+ */
+type RecordedCategory = 'select' | 'move' | 'attack' | 'death' | 'ability' | 'idle';
+
+export const MISSING_UNIT_VOICE_CATEGORIES: Readonly<Record<string, readonly RecordedCategory[]>> = {
+  // Randstad: only select/move/attack/death recorded so far (Serge e.a.).
+  'randstad/stagiair': ['ability', 'idle'],
+  'randstad/manager': ['ability', 'idle'],
+  'randstad/consultant': ['ability', 'idle'],
+  'randstad/corporate-advocaat': ['ability', 'idle'],
+  'randstad/vastgoedmakelaar': ['ability', 'idle'],
+  'randstad/hr-medewerker': ['ability', 'idle'],
+  'randstad/influencer': ['ability', 'idle'],
+  'randstad/de-ceo': ['ability', 'idle'],
+};
+
+/**
  * Helper: generates a standard voice line set for a unit.
  * - select/move/attack: 3 variants
  * - death: 2 variants
  * - ability: 2 variants
  * - idle: 2 variants
  * - gather: reuses move lines (existing behaviour)
+ * Categories listed in MISSING_UNIT_VOICE_CATEGORIES become empty pools
+ * (→ generic faction fallback, no request).
  */
 function standardUnitVoices(
   faction: string,
   unitName: string,
 ): Record<VoiceAction, string[]> {
+  const missing = new Set(MISSING_UNIT_VOICE_CATEGORIES[`${faction}/${unitName}`] ?? []);
+  const lines = (category: RecordedCategory, count: number): string[] =>
+    missing.has(category) ? [] : unitLines(faction, unitName, category, count);
   return {
-    select: unitLines(faction, unitName, 'select', 3),
-    move: unitLines(faction, unitName, 'move', 3),
-    attack: unitLines(faction, unitName, 'attack', 3),
-    gather: unitLines(faction, unitName, 'move', 3), // reuse move for gather
-    death: unitLines(faction, unitName, 'death', 2),
-    ability: unitLines(faction, unitName, 'ability', 2),
-    idle: unitLines(faction, unitName, 'idle', 2),
-    ready: unitLines(faction, unitName, 'idle', 2), // reuse idle as spawn announcement
+    select: lines('select', 3),
+    move: lines('move', 3),
+    attack: lines('attack', 3),
+    gather: lines('move', 3), // reuse move for gather
+    death: lines('death', 2),
+    ability: lines('ability', 2),
+    idle: lines('idle', 2),
+    ready: lines('idle', 2), // reuse idle as spawn announcement
   };
 }
 
@@ -456,6 +492,33 @@ export const __easterEggRng = { random: () => Math.random() };
 const failedPaths = new Set<string>();
 
 // ---------------------------------------------------------------------------
+// Howl lifecycle — one short-lived Howl per played line
+// ---------------------------------------------------------------------------
+
+/**
+ * Each play gets its own Howl so overlapping lines (after the cooldown) keep
+ * working exactly as before. The Howl is unloaded as soon as it ends, fails
+ * to load, or fails to play, so instances (and howler's decoded buffers) no
+ * longer accumulate for the whole session. Re-plays hit the browser HTTP
+ * cache, so the cost is a re-decode of a ~1-2 s clip.
+ */
+function playVoiceLine(src: string, volume: number, duckMs: number): void {
+  const sound: Howl = new Howl({
+    src: [src],
+    volume,
+    onplay: () => audioManager.duckMusic(duckMs),
+    onend: () => sound.unload(),
+    onplayerror: () => sound.unload(),
+    onloaderror: () => {
+      // Mark path as failed so we don't retry it
+      failedPaths.add(src);
+      sound.unload();
+    },
+  });
+  sound.play();
+}
+
+// ---------------------------------------------------------------------------
 // Cooldown — prevent overlapping voice lines
 // ---------------------------------------------------------------------------
 
@@ -473,6 +536,19 @@ export function __resetFallbackWarnings(): void {
 
 /** Direct access to the gender-aware pool resolver for unit tests. */
 export const __getGenericPool = getGenericPool;
+
+/** Every path the voice system can request (tests: asset coverage). */
+export function __allVoicePaths(): string[] {
+  const all = new Set<string>();
+  const add = (pools: Record<VoiceAction, string[]>) => {
+    for (const lines of Object.values(pools)) for (const p of lines) all.add(p);
+  };
+  for (const units of Object.values(UNIT_VOICE_LINES)) for (const pools of Object.values(units)) add(pools);
+  for (const pools of Object.values(MALE_GENERIC_VOICE_LINES)) add(pools);
+  for (const pools of Object.values(FEMALE_GENERIC_VOICE_LINES)) add(pools);
+  for (const lines of Object.values(EASTER_EGG_LINES)) for (const p of lines) all.add(p);
+  return [...all].sort();
+}
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -504,13 +580,7 @@ export function playUnitVoice(
     const easterPool = EASTER_EGG_LINES[factionId]?.filter(p => !failedPaths.has(p));
     if (easterPool && easterPool.length > 0) {
       const src = easterPool[Math.floor(__easterEggRng.random() * easterPool.length)];
-      const sound = new Howl({
-        src: [src],
-        volume: 0.7,
-        onplay: () => audioManager.duckMusic(2000),
-        onloaderror: () => failedPaths.add(src),
-      });
-      sound.play();
+      playVoiceLine(src, 0.7, 2000);
       lastVoiceTime = now;
       return;
     }
@@ -548,19 +618,7 @@ export function playUnitVoice(
   // Pick a random variant
   const src = lines[Math.floor(Math.random() * lines.length)];
 
-  const sound = new Howl({
-    src: [src],
-    volume: 0.6,
-    onplay: () => {
-      audioManager.duckMusic(1500);
-    },
-    onloaderror: () => {
-      // Mark path as failed so we don't retry it
-      failedPaths.add(src);
-    },
-  });
-
-  sound.play();
+  playVoiceLine(src, 0.6, 1500);
   lastVoiceTime = now;
 }
 
