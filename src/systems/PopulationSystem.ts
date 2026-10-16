@@ -21,6 +21,18 @@ import { playerState } from '../core/PlayerState';
 import type { GameWorld } from '../ecs/world';
 import type { SystemFn } from './SystemPipeline';
 
+/**
+ * Set of entity IDs whose population reduction has already been applied.
+ * Module-level so it can be cleared between matches: the pipeline (and thus
+ * this system) outlives world resets, and bitECS recycles eids.
+ */
+const processed = new Set<number>();
+
+/** Clear the processed set (on new game / mission, after the world reset). */
+export function resetPopulationSystem(): void {
+  processed.clear();
+}
+
 // ---------------------------------------------------------------------------
 // System factory
 // ---------------------------------------------------------------------------
@@ -31,9 +43,6 @@ import type { SystemFn } from './SystemPipeline';
  * the owning faction's population capacity accordingly.
  */
 export function createPopulationSystem(): SystemFn {
-  /** Set of entity IDs whose population reduction has already been applied. */
-  const processed = new Set<number>();
-
   return function populationSystem(world: GameWorld, _dt: number): void {
     const allBuildings = query(world, [Building, Faction, IsBuilding]);
 

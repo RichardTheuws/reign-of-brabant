@@ -401,6 +401,12 @@ stateMachine.register(new TutorialState());
 stateMachine.register(new PlayingState());
 stateMachine.register(new GameOverState());
 
+// Every return to the menu (pause menu, campaign victory/defeat → back) ends
+// the match: the next skirmish must run game.init() again.
+stateMachine.onChange((_from, to) => {
+  if (to === GameStateId.MENU) gameInitialized = false;
+});
+
 // ---------------------------------------------------------------------------
 // Feedback reporter
 // ---------------------------------------------------------------------------

@@ -13,7 +13,7 @@
  * | Targeting    | Closest enemy|
  */
 
-import { query, hasComponent } from 'bitecs';
+import { query, hasComponent, addComponent } from 'bitecs';
 import { Position, Building, Faction, Health, UnitType } from '../ecs/components';
 import { IsBuilding, IsUnit, IsDead } from '../ecs/tags';
 import { BuildingTypeId, UnitTypeId } from '../types/index';
@@ -94,7 +94,7 @@ export function createTowerSystem(): SystemFn {
 
       for (const unitEid of allUnits) {
         // Skip dead units
-        if (hasComponent(world, unitEid, IsDead)) continue;
+        if (hasComponent(world, unitEid, IsDead) || Health.current[unitEid] <= 0) continue;
 
         // Skip friendly units
         if (Faction.id[unitEid] === towerFaction) continue;
@@ -129,6 +129,12 @@ export function createTowerSystem(): SystemFn {
 
       // Deal damage
       Health.current[closestEid] -= damage;
+
+      // Check kill (mirrors CombatSystem) -- DeathSystem handles removal/population
+      if (Health.current[closestEid] <= 0) {
+        Health.current[closestEid] = 0;
+        addComponent(world, closestEid, IsDead);
+      }
 
       // Reset cooldown
       cooldowns.set(towerEid, TOWER_ATTACK_SPEED);

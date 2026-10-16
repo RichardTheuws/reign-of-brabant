@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.60.3] - 2026-10-16 — Fix-bundel 1: zombie-kills, AI-blokkades, herstart-cleanup, save-migratie
+
+### Fixed — gameplay-brekende bugs uit de audit van 2026-10-16
+- **Zombie-kills**: torens (`TowerSystem`), Hold Position (`CombatSystem`) en de Belgische damage-split (`DiplomacySystem`) trokken HP af zonder `IsDead` te zetten. `DeathSystem` verwerkt alleen `[IsDead]`, dus het doelwit bleef aanvallen, werd nooit opgeruimd en hield populatie bezet. Nu gemarkeerd als dood zoals het normale aanvalspad. Torens slaan HP<=0-doelen over.
+- **Dode units handelden door**: combat, movement en gather slaan entities met `IsDead` nu over (death-animatie/cleanup ongewijzigd).
+- **AI stopte met legers trainen**: (1) gebouwen zonder Production-component (o.a. het tertiaire gebouw van Limburgers/Belgen) telden als "bezig met trainen", (2) een beschadigde kazerne telde als "in aanbouw" omdat voltooiing op volle HP werd afgeleid. `AISystem` gebruikt nu `Building.complete` + `hasComponent(Production)`. De AI stuurt workers voor goud ook niet meer naar bomen.
+- **Nieuw skirmish bovenop vorig potje**: `Game.init()` roept nu `cleanup()` aan (zoals `initMission` al deed), en `gameInitialized` wordt bij elke terugkeer naar MENU gereset (ook na missie-winst/verlies). Cleanup reset nu ook heldentracking, de PopulationSystem-eid-set, map-tunnels en gold-mine/boom-props (geen geest-modellen of gestapelde teleports meer).
+- **Oude campagne-saves liepen vast**: `SAVE_VERSION` 1 → 2 met migratie in plaats van weggooien. Voortgang wordt op mission-id gematcht (niet op positie), hernoemde Brabant-missies 8/9 worden gemapt, nieuwe missies/campagnes krijgen een entry en unlocks worden herberekend.
+
+### Tests
+- 9 nieuwe regressietests (elk eerst rood op de oude code): 2258/2258 groen, tsc 0 fouten, UAT 2/2.
+
 ## [0.60.2] - 2026-06-07 — v03-payload −91% (texture-resize + mesh-simplify)
 
 ### Changed — v03 unit-tier van 401MB → 36MB zonder loader-wijziging

@@ -22,7 +22,7 @@
  *      Requires at least 1 enemy in range, otherwise no effect
  */
 
-import { query, hasComponent } from 'bitecs';
+import { query, hasComponent, addComponent } from 'bitecs';
 import {
   Position,
   Building,
@@ -684,8 +684,10 @@ function processDamageSplits(world: GameWorld): void {
 
     for (const enemy of enemiesInRange) {
       Health.current[enemy.eid] -= damagePerEnemy;
-
-      // Note: death check is handled by DeathSystem which runs after us
+      if (Health.current[enemy.eid] <= 0) {
+        Health.current[enemy.eid] = 0;
+        addComponent(world, enemy.eid, IsDead);
+      }
     }
 
     // Heal the Belgische unit for the split amount (damage was redirected)

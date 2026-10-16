@@ -161,6 +161,9 @@ export function createCombatSystem() {
     const units = query(world, [Position, Attack, Health, UnitAI, IsUnit]);
 
     for (const eid of units) {
+      // Skip dead units -- DeathSystem removes them after the death animation
+      if (hasComponent(world, eid, IsDead)) continue;
+
       // Skip stunned units -- they cannot act
       if (hasComponent(world, eid, Stunned) && Stunned.duration[eid] > 0) continue;
 
@@ -523,6 +526,12 @@ function processHoldPosition(
             x: Position.x[currentTarget],
             z: Position.z[currentTarget],
           });
+
+          // Check kill (mirrors processAttacking) -- stay in HoldPosition, rescan next tick
+          if (Health.current[currentTarget] <= 0) {
+            addComponent(world, currentTarget, IsDead);
+            UnitAI.targetEid[eid] = NO_ENTITY;
+          }
         }
         return;
       } else {

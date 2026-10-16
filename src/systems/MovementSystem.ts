@@ -7,7 +7,7 @@
 
 import { query, hasComponent } from 'bitecs';
 import { Position, Movement, Rotation, GezeligheidBonus, Stunned, Faction } from '../ecs/components';
-import { IsUnit, IsWorker } from '../ecs/tags';
+import { IsUnit, IsWorker, IsDead } from '../ecs/tags';
 import { playerState } from '../core/PlayerState';
 import { UPKEEP_DEBT_EFFECTIVENESS, ROAD_SPEED_BONUS } from '../types/index';
 import { getDeadlineCrunchSpeedMult } from './HavermoutmelkSystem';
@@ -37,6 +37,9 @@ export function createMovementSystem(terrain: Terrain) {
     for (const eid of entities) {
       // Skip entities not actively moving
       if (Movement.hasTarget[eid] === 0) continue;
+
+      // Skip dead entities -- they stay in place during the death animation
+      if (hasComponent(world, eid, IsDead)) continue;
 
       // Skip stunned entities
       if (hasComponent(world, eid, Stunned) && Stunned.duration[eid] > 0) continue;

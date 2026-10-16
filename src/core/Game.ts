@@ -19,12 +19,13 @@ import { getFactionUnitArchetype, getDisplayBuildingName, getDisplayUnitName, ge
 import { getDifficultyProductionMult, getDifficultyStartingGoldMult } from '../data/difficultyConfig';
 import { getFactionMessage } from '../data/factionMessages';
 import { getPortraitUrl } from '../data/portraitMap';
-import { createHero, isHeroActive } from '../entities/heroFactory';
+import { createHero, isHeroActive, resetHeroTracking } from '../entities/heroFactory';
 import { createGamePipeline, type SystemPipeline } from '../systems/SystemPipeline';
 import { generateMap, type GeneratedMap, DecoType } from '../world/MapGenerator';
 import { remapMapPlayerFaction } from '../world/factionRemap';
 import { checkBuildingAffordability, chargeBuildingCost } from '../world/buildingCost';
 import { createMapTunnelSystem } from '../systems/MapTunnelSystem';
+import { resetPopulationSystem } from '../systems/PopulationSystem';
 import { queueCommand } from '../systems/CommandSystem';
 import { NavMeshManager } from '../pathfinding/NavMeshManager';
 import { AISystem } from '../ai/AISystem';
@@ -324,6 +325,10 @@ export class Game {
     startingResources: string = 'medium',
     fogOfWar: boolean = true,
   ): Promise<void> {
+    // Clean up previous game/mission state (world, meshes, HUD, listeners) —
+    // skirmish after menu otherwise starts on top of the previous match.
+    this.cleanup();
+
     this.playerFactionId = playerFaction as FactionId;
     this.difficulty = difficulty;
 
@@ -4370,9 +4375,17 @@ export class Game {
     this.entityMeshMap.clear();
     this.knownUnitEntities.clear();
     this.knownBuildingEntities.clear();
+    this.propRenderer.clearResourceProps();
 
     // Reset ECS world (removes all entities and components)
     resetGameWorld();
+
+    // Map tunnels are registered per map in init(); drop the previous map's
+    // system(s) so teleports don't stack across matches.
+    while (this.pipeline.remove('MapTunnelSystem')) { /* remove all */ }
+
+    // Clear eid-keyed state that outlives the world reset (eids get recycled)
+    resetPopulationSystem();
 
     // Reset player state (gold, population, resources)
     this.playerState.reset();
@@ -4386,6 +4399,7 @@ export class Game {
     // Reset faction-specific systems
     resetAbilitySystem();
     resetHeroSystem();
+    resetHeroTracking();
     resetBureaucracy();
     resetHavermoutmelkBuffs();
     resetMijnschachtBuffs();

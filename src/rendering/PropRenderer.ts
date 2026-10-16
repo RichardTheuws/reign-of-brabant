@@ -383,6 +383,25 @@ export class PropRenderer {
   // Cleanup
   // -----------------------------------------------------------------------
 
+  /**
+   * Remove all placed gold mines and tree resource nodes (between matches).
+   * Clones share geometry with their source model, so only the per-clone
+   * materials are disposed; the sources stay loaded for the next match.
+   */
+  clearResourceProps(): void {
+    for (const [, obj] of this.goldMines) {
+      this.group.remove(obj);
+      this.disposeMaterials(obj);
+    }
+    this.goldMines.clear();
+
+    for (const [, obj] of this.treeResourceNodes) {
+      this.group.remove(obj);
+      this.disposeMaterials(obj);
+    }
+    this.treeResourceNodes.clear();
+  }
+
   destroy(): void {
     for (const im of this.treeInstances) {
       this.group.remove(im);
@@ -429,6 +448,16 @@ export class PropRenderer {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
         mesh.geometry?.dispose();
+        const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+        for (const mat of mats) mat.dispose();
+      }
+    });
+  }
+
+  private disposeMaterials(obj: THREE.Object3D): void {
+    obj.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh;
         const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
         for (const mat of mats) mat.dispose();
       }

@@ -18,6 +18,7 @@ import {
   HERO_POPULATION_COST,
   type EntityId,
   MAP_SIZE,
+  ResourceType,
 } from '../types/index';
 import { getFactionUnitArchetype } from '../data/factionData';
 import {
@@ -37,6 +38,8 @@ import { createHero, isHeroActive } from '../entities/heroFactory';
 import { HERO_ARCHETYPES, getHeroTypesForFaction } from '../entities/heroArchetypes';
 import { playerState } from '../core/PlayerState';
 import { world as ecsWorld } from '../ecs/world';
+import { hasComponent } from 'bitecs';
+import { Building, Production, Resource } from '../ecs/components';
 
 // ---------------------------------------------------------------------------
 // ECS component arrays -- set via configure()
@@ -288,23 +291,29 @@ function buildSnapshot(
         baseX = c.positionX[eid];
         baseZ = c.positionZ[eid];
       } else if (buildingType === BuildingTypeId.Barracks) {
-        // Check if barracks is complete (health > 0 and has full health)
-        if (c.healthCurrent[eid] > 0 && c.healthCurrent[eid] >= c.healthMax[eid]) {
+        // Check if barracks is complete (construction flag -- buildings never
+        // heal, so a damaged barracks must still count as complete)
+        if (Building.complete[eid] === 1) {
           barracks.push(eid);
         } else {
           barracksUnderConstruction = true;
         }
       } else if (buildingType === BuildingTypeId.TertiaryResourceBuilding) {
         // Tertiary resource buildings (Mijnschacht / Chocolaterie)
-        if (c.healthCurrent[eid] > 0 && c.healthCurrent[eid] >= c.healthMax[eid]) {
+        if (Building.complete[eid] === 1) {
           tertiaryBuildings.push(eid);
         } else {
           tertiaryUnderConstruction = true;
         }
       }
 
-      // Check if any building is training
-      if (c.productionUnitType[eid] !== 0xff) {
+      // Check if any completed production building is training (buildings
+      // without a Production component read 0 here, not 0xff)
+      if (
+        Building.complete[eid] === 1 &&
+        hasComponent(ecsWorld, eid, Production) &&
+        c.productionUnitType[eid] !== 0xff
+      ) {
         isTraining = true;
       }
     }
@@ -319,8 +328,8 @@ function buildSnapshot(
       }
     }
 
-    // Gold mines (no faction)
-    if (c.isResource[eid] === 1) {
+    // Gold mines (no faction) -- trees are resources too, skip them
+    if (c.isResource[eid] === 1 && Resource.type[eid] === ResourceType.Gold) {
       goldMines.push({
         eid,
         x: c.positionX[eid],

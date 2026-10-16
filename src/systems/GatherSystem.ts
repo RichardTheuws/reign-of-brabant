@@ -49,6 +49,9 @@ export function createGatherSystem() {
     const workers = query(world, [Position, Gatherer, IsWorker]);
 
     for (const eid of workers) {
+      // Skip dead workers -- DeathSystem removes them after the death animation
+      if (hasComponent(world, eid, IsDead)) continue;
+
       const state = Gatherer.state[eid];
       if (state === GATHER_NONE) continue;
 
