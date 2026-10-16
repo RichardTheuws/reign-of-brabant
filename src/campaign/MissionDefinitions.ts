@@ -359,7 +359,7 @@ const MISSION_3_VERDEDIGING: MissionDefinition = {
   ],
 
   goldMines: [
-    { x: -20, z: -30, amount: 2000 },
+    { x: -20, z: -35, amount: 2000 }, // was (-20,-30): overlapped the Barracks at (-22,-30)
     { x: -30, z: -20, amount: 2000 },
     { x: -10, z: -25, amount: 2000 },
     { x: -25, z: -10, amount: 2000 },
@@ -560,10 +560,11 @@ const MISSION_4_BINNENDIEZE: MissionDefinition = {
     { x: -25, z: -20, amount: 300 },
     { x: -20, z: -18, amount: 300 },
     { x: -15, z: -20, amount: 300 },
-    // Bomenrij midden (scheidt zuid van west sector)
-    { x: -30, z: 0, amount: 300 },
-    { x: -25, z: 2, amount: 300 },
-    { x: -20, z: -2, amount: 300 },
+    // Bomenrij midden (scheidt zuid van west sector) -- on the north bank of
+    // the generated river (was z=-2..2, inside the water)
+    { x: -30, z: 4, amount: 300 },
+    { x: -25, z: 5, amount: 300 },
+    { x: -20, z: 3, amount: 300 },
     { x: -15, z: 1, amount: 300 },
     // Bomenrij noord (scheidt west van archief sector)
     { x: 10, z: 30, amount: 300 },
@@ -704,16 +705,16 @@ const MISSION_5_HEUVELLAND: MissionDefinition = {
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -43, z: -2 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -47, z: 2 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -45, z: 2 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -40, z: -2 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -38, z: -2 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -40, z: 4 }, // was z=-2: river bank
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -38, z: 4 }, // was z=-2: in river
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -40, z: 2 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -38, z: 2 },
   ],
 
   goldMines: [
-    { x: -45, z: -10, amount: 2500 },
+    { x: -50, z: -7, amount: 2500 }, // was (-45,-10): in river
     { x: -45, z: 10, amount: 2500 },
-    { x: -30, z: 0, amount: 2000 },
+    { x: -30, z: 6, amount: 2000 }, // was (-30,0): in river
   ],
 
   objectives: [
@@ -870,7 +871,7 @@ const MISSION_6_BOERENOPSTAND: MissionDefinition = {
     // 3 "tractor" outposts (Barracks as proxy for confiscated tractors)
     { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 0, z: -20, complete: true },
     { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: -20, z: 15, complete: true },
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 20, z: 5, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 18, z: 8, complete: true }, // was (20,5): river bank
   ],
 
   units: [
@@ -897,11 +898,11 @@ const MISSION_6_BOERENOPSTAND: MissionDefinition = {
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -18, z: 13 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -20, z: 17 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -20, z: 11 },
-    // Tractor outpost 3 guards (east)
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 18, z: 3 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 22, z: 3 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 20, z: 7 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 20, z: 1 },
+    // Tractor outpost 3 guards (east) -- whole outpost shifted (-2,+3) off the river
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 16, z: 6 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 20, z: 6 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 18, z: 10 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 18, z: 4 },
     // Main garrison defenders
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 43, z: 43 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 47, z: 43 },
@@ -914,7 +915,7 @@ const MISSION_6_BOERENOPSTAND: MissionDefinition = {
   ],
 
   goldMines: [
-    { x: -40, z: -50, amount: 3000 },
+    { x: -40, z: -55, amount: 3000 }, // was (-40,-50): overlapped the Barracks at (-42,-50)
     { x: -50, z: -40, amount: 3000 },
     { x: -25, z: -25, amount: 2000 },
     { x: 0, z: 0, amount: 2000 },
@@ -1257,7 +1258,7 @@ const MISSION_8_BELEG: MissionDefinition = {
   goldMines: [
     { x: -35, z: -25, amount: 3000 },
     { x: -25, z: -38, amount: 2500 },
-    { x: 0, z: -10, amount: 2000 },
+    { x: 0, z: -13, amount: 2000 }, // was (0,-10): river bank
     { x: 35, z: 25, amount: 2000 }, // Near enemy — risky
   ],
 
@@ -1606,12 +1607,13 @@ const MISSION_10_RAAD: MissionDefinition = {
   startingGoldAI: 0,
 
   buildings: [
-    // Player: base south of the cathedral
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: 0, z: -12, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: 6, z: -12, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: -6, z: -12, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.LumberCamp, x: 0, z: -19, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Blacksmith, x: 6, z: -19, complete: true },
+    // Player: base south of the cathedral -- shifted (-6,-3) off the generated
+    // river bank and the rock wall at (5..15,-15..-20); units sit outside footprints
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: -6, z: -15, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: 0, z: -15, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: -12, z: -15, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.LumberCamp, x: -6, z: -22, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Blacksmith, x: 0, z: -22, complete: true },
     // Limburgse bondgenoot basis (oost) — represented by AI-friendly barracks
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: 50, z: 0, complete: true },
     // Belgische bondgenoot basis (west)
@@ -1620,51 +1622,51 @@ const MISSION_10_RAAD: MissionDefinition = {
 
   units: [
     // Player: 8 workers, 6 infantry (Carnavalvierders), 4 ranged (Sluipers), 2 ranged (Boerinnen equivalent)
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -2, z: -11 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -11 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -11 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 2, z: -11 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -2, z: -10 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -10 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -10 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 2, z: -10 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -8, z: -13 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -7, z: -13 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -5, z: -13 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -4, z: -13 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -8, z: -12 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -7, z: -12 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -5, z: -12 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -4, z: -12 },
     // Infantry (Carnavalvierders)
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 5, z: -11 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 6, z: -11 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 7, z: -11 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 5, z: -10 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 6, z: -10 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 7, z: -10 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -1, z: -13 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 0, z: -13 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 1, z: -13 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -1, z: -12 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 0, z: -12 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 1, z: -12 },
     // Ranged (Sluipers)
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -5, z: -11 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -6, z: -11 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -5, z: -10 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -6, z: -10 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -11, z: -13 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -12, z: -13 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -11, z: -12 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -12, z: -12 },
     // Limburgse bondgenoot units (oost)
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 48, z: -1 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 50, z: -1 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 51, z: -1 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 48, z: 1 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 50, z: 1 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 51, z: 1 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 52, z: 0 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 48, z: -3 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 50, z: -3 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 51, z: -3 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 48, z: 3 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 50, z: 3 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 51, z: 3 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 53, z: 0 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 47, z: 0 },
     // Belgische bondgenoot units (west)
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -48, z: -1 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -50, z: -1 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -51, z: -1 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -48, z: 1 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -50, z: 1 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -51, z: 1 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -52, z: 0 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -48, z: -3 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -50, z: -3 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -51, z: -3 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -48, z: 3 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -50, z: 3 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -51, z: 3 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -53, z: 0 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -47, z: 0 },
   ],
 
   goldMines: [
     { x: -12, z: -19, amount: 3000 },
-    { x: 12, z: -19, amount: 3000 },
+    { x: 8, z: -27, amount: 3000 },  // was (12,-19): inside the rock wall
     { x: -37, z: 25, amount: 2000 }, // Contested — past de Dieze
-    { x: 37, z: 25, amount: 2000 },  // Contested — past de Dieze
+    { x: 36, z: 27, amount: 2000 },  // Contested — past de Dieze (was (37,25): river bank)
   ],
 
   treeResources: [
@@ -1865,10 +1867,13 @@ const M11_WEST_FLANK_X = -44;
 const M11_WEST_FLANK_Z = 36;
 const M11_EAST_FLANK_X = 44;
 const M11_EAST_FLANK_Z = 36;
-const M11_FORT_DENBOSCH_X = 0;
+// Forts sit on the classic generateMap(42) terrain every mission uses: Den Bosch
+// was x=0 (east barracks inside the rock wall at (5..15,-15..-20)), Veghel was
+// (29,7) -- in the river. Units stand outside the 4x4 building footprints.
+const M11_FORT_DENBOSCH_X = -6;
 const M11_FORT_DENBOSCH_Z = -22;
-const M11_FORT_VEGHEL_X = 29;
-const M11_FORT_VEGHEL_Z = 7;
+const M11_FORT_VEGHEL_X = 24;
+const M11_FORT_VEGHEL_Z = 12;
 const M11_FORT_BEST_X = -29;
 const M11_FORT_BEST_Z = 7;
 
@@ -1902,10 +1907,10 @@ const MISSION_11_A2: MissionDefinition = {
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Blacksmith, x: M11_FORT_DENBOSCH_X + 4, z: M11_FORT_DENBOSCH_Z - 4, complete: true },
     // Fort Veghel (center-east) — allied outpost
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: M11_FORT_VEGHEL_X, z: M11_FORT_VEGHEL_Z, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M11_FORT_VEGHEL_X + 3, z: M11_FORT_VEGHEL_Z, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M11_FORT_VEGHEL_X + 4, z: M11_FORT_VEGHEL_Z, complete: true },
     // Fort Best (center-west) — allied outpost
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: M11_FORT_BEST_X, z: M11_FORT_BEST_Z, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M11_FORT_BEST_X - 3, z: M11_FORT_BEST_Z, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: M11_FORT_BEST_X - 4, z: M11_FORT_BEST_Z, complete: true },
     // Randstad Veldkwartier (mobile HQ — represented as a northern TownHall)
     { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: M11_A2_NORTH_X, z: 51, complete: true },
     { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: M11_A2_NORTH_X + 4, z: 51, complete: true },
@@ -1914,74 +1919,74 @@ const MISSION_11_A2: MissionDefinition = {
 
   units: [
     // Fort Den Bosch garrison — 10 infantry + 6 ranged + 6 workers
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -21 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 0, z: -21 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 0, z: -22 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -21 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -20 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 0, z: -20 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 3, z: -21 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 4, z: -21 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 4, z: -22 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 5, z: -21 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 3, z: -20 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 4, z: -20 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 4, z: -19 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 5, z: -20 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -3, z: -21 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -4, z: -21 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -3, z: -20 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -4, z: -20 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -4, z: -19 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -4, z: -22 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -5, z: -20 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -5, z: -21 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -7, z: -18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -6, z: -18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -6, z: -19 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -5, z: -18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -7, z: -17 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -6, z: -17 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -3, z: -18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -2, z: -18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -2, z: -19 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -1, z: -18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -3, z: -17 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -2, z: -17 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -2, z: -16 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -1, z: -17 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -9, z: -18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -10, z: -18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -9, z: -17 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -10, z: -17 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -10, z: -16 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -10, z: -19 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -11, z: -17 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -11, z: -18 },
     // Fort Veghel garrison — 12 infantry + 4 ranged
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 28, z: 7 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 29, z: 7 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 30, z: 7 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 31, z: 7 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 28, z: 8 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 29, z: 8 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 30, z: 8 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 31, z: 8 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 28, z: 6 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 31, z: 6 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 28, z: 9 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 30, z: 9 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 29, z: 9 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 31, z: 9 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 28, z: 5 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 31, z: 5 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 23, z: 16 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 24, z: 16 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 25, z: 16 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 26, z: 16 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 23, z: 17 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 24, z: 17 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 25, z: 17 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 26, z: 17 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 23, z: 15 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 26, z: 15 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 23, z: 18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 25, z: 18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 24, z: 18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 26, z: 18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 23, z: 14 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 26, z: 14 },
     // Fort Best garrison — 10 infantry + 4 ranged
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -28, z: 7 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -29, z: 7 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -30, z: 7 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -31, z: 7 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -28, z: 8 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -29, z: 8 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -30, z: 8 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -31, z: 8 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -28, z: 6 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -31, z: 6 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -29, z: 9 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -28, z: 11 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -29, z: 11 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -30, z: 11 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -31, z: 11 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -28, z: 12 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -29, z: 12 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -30, z: 12 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -31, z: 12 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -28, z: 10 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -31, z: 10 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -29, z: 13 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -31, z: 13 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -28, z: 9 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -31, z: 9 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -28, z: 5 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -31, z: 5 },
     // Veldkwartier guards
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -1, z: 50 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 1, z: 50 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -1, z: 52 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 1, z: 52 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -1, z: 48 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 1, z: 48 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -1, z: 54 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 1, z: 54 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -2, z: 51 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 2, z: 51 },
   ],
 
   goldMines: [
-    { x: -7, z: -26, amount: 4000 },
+    { x: -13, z: -26, amount: 4000 }, // follows the fort shift (-6)
     { x: 7, z: -26, amount: 4000 },
-    { x: M11_FORT_VEGHEL_X, z: M11_FORT_VEGHEL_Z - 5, amount: 3000 },
-    { x: M11_FORT_BEST_X, z: M11_FORT_BEST_Z - 5, amount: 3000 },
+    { x: M11_FORT_VEGHEL_X - 5, z: M11_FORT_VEGHEL_Z, amount: 3000 }, // was z-5: river
+    { x: M11_FORT_BEST_X + 5, z: M11_FORT_BEST_Z, amount: 3000 },   // was z-5: river bank
     { x: 0, z: 18, amount: 2500 },  // Contested — in no-man's land
   ],
 
@@ -2307,9 +2312,9 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Blacksmith, x: M12_PLAYER_BASE_X - 10, z: M12_PLAYER_BASE_Z, complete: true },
     // Ring 1 — Buitenwijken (2 Barracks as Kantoor-torens at city gates)
     { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: -18, z: M12_RING1_Z, complete: true },
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 18, z: M12_RING1_Z, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 19, z: M12_RING1_Z - 1, complete: true }, // was (18,-18): against the rock wall
     // Ring 2 — Bedrijventerrein (2 Barracks as Coworking Spaces + Politicus patrol zone)
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: -14, z: M12_RING2_Z, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: -14, z: M12_RING2_Z - 5, complete: true }, // was (-14,14): inside the rock wall
     { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 14, z: M12_RING2_Z, complete: true },
     // Ring 3 — Centrum (TownHall as Corporate Tower, surrounded by Barracks as Kantoor-torens)
     { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: M12_TOWER_X, z: M12_TOWER_Z, complete: true },
@@ -2319,33 +2324,34 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
   ],
 
   units: [
-    // Player starting army: 8 workers + 10 infantry + 6 ranged
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -59 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 0, z: -59 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 0, z: -60 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -59 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -58 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 0, z: -58 },
+    // Player starting army: 8 workers + 10 infantry + 6 ranged -- north of the
+    // base row (z>=-57) so nobody spawns inside the TownHall/Barracks footprints
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -56 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 0, z: -56 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 0, z: -57 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -58 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -56 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: -1, z: -55 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 0, z: -55 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 0, z: -54 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 1, z: -55 },
     // Infantry
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 4, z: -59 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 5, z: -59 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 6, z: -59 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 6, z: -60 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 7, z: -59 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 4, z: -58 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 5, z: -58 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 6, z: -58 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 4, z: -56 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 5, z: -56 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 6, z: -56 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 6, z: -57 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 7, z: -58 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 7, z: -56 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 4, z: -55 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 5, z: -55 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 6, z: -55 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 6, z: -54 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 7, z: -55 },
     // Ranged
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -4, z: -59 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -5, z: -59 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -6, z: -59 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -4, z: -58 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -5, z: -58 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -6, z: -58 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -4, z: -56 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -5, z: -56 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -6, z: -56 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -4, z: -55 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -5, z: -55 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -6, z: -55 },
     // Limburgse bondgenoten (east flank)
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 37, z: -51 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 38, z: -51 },
@@ -2381,7 +2387,7 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -14, z: -21 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -11, z: -21 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -9, z: -19 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 9, z: -19 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 9, z: -23 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 11, z: -21 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 14, z: -21 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -5, z: -17 },
@@ -2391,7 +2397,7 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -16, z: -18 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 16, z: -18 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -7, z: -17 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 7, z: -17 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 6, z: -14 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -21, z: -17 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 21, z: -17 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -23, z: -16 },
@@ -2409,11 +2415,11 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 7, z: 13 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 9, z: 11 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 11, z: 11 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -16, z: 14 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -17, z: 11 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 16, z: 14 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 0, z: 16 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -13, z: 15 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 13, z: 15 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -12, z: 12 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 12, z: 16 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -9, z: 15 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 9, z: 15 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -5, z: 16 },
@@ -2436,13 +2442,13 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 2, z: 45 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 5, z: 44 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 7, z: 44 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -9, z: 46 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 9, z: 46 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -12, z: 46 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 12, z: 46 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -7, z: 48 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 7, z: 48 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 0, z: 48 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -8, z: 47 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 8, z: 47 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -6, z: 49 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 6, z: 49 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -5, z: 47 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 5, z: 47 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -2, z: 50 },
@@ -2450,18 +2456,18 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -5, z: 51 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 5, z: 51 },
     // Siege defenders (Vastgoedmakelaars)
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -10, z: 45 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 10, z: 45 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -11, z: 43 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 11, z: 43 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -10, z: 48 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 10, z: 48 },
 
     // Corporate Tower guards (CEO bodyguards) — 4 elite Infantry
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -1, z: 54 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 1, z: 54 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -1, z: 56 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 1, z: 56 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -2, z: 53 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 2, z: 53 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -2, z: 57 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 2, z: 57 },
     // CEO himself (represented as Ranged — uses ranged attacks from the tower)
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 0, z: 55 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 0, z: 58 },
   ],
 
   goldMines: [
@@ -2561,8 +2567,8 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
         {
           type: 'spawn-units',
           units: [
-            ...createWaveUnits(6, UnitTypeId.Infantry, -14, 16, 2),
-            ...createWaveUnits(6, UnitTypeId.Infantry, 14, 16, 2),
+            ...createWaveUnits(6, UnitTypeId.Infantry, -19, 12, 2), // was (-14,16): rock wall
+            ...createWaveUnits(6, UnitTypeId.Infantry, 14, 18, 2),  // was z=16: inside the Barracks
             ...createWaveUnits(3, UnitTypeId.Ranged, 0, 17, 1),
           ],
         },
@@ -2609,7 +2615,7 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
           type: 'spawn-units',
           units: [
             // Stagiaires shield
-            ...createWaveUnits(4, UnitTypeId.Infantry, 0, 53, 1),
+            ...createWaveUnits(4, UnitTypeId.Infantry, 0, 51.5, 1), // was z=53: inside the tower
           ],
         },
       ],
@@ -2630,7 +2636,7 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
             // Desperate reinforcements
             ...createWaveUnits(6, UnitTypeId.Infantry, -7, 55, 2),
             ...createWaveUnits(6, UnitTypeId.Infantry, 7, 55, 2),
-            ...createWaveUnits(3, UnitTypeId.Ranged, 0, 57, 1),
+            ...createWaveUnits(3, UnitTypeId.Ranged, 0, 58, 1), // was z=57: inside the tower
           ],
         },
       ],
@@ -2665,8 +2671,8 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
         {
           type: 'spawn-units',
           units: [
-            ...createWaveUnits(5, UnitTypeId.Infantry, -28, 0, 2),
-            ...createWaveUnits(2, UnitTypeId.Ranged, -25, 2, 1),
+            ...createWaveUnits(5, UnitTypeId.Infantry, -28, 6, 2), // was z=0: in the river
+            ...createWaveUnits(2, UnitTypeId.Ranged, -25, 7, 1),
           ],
         },
       ],
@@ -2680,8 +2686,8 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
         {
           type: 'spawn-units',
           units: [
-            ...createWaveUnits(5, UnitTypeId.Infantry, 28, 0, 2),
-            ...createWaveUnits(2, UnitTypeId.Ranged, 25, 2, 1),
+            ...createWaveUnits(5, UnitTypeId.Infantry, 30, -2, 2), // was (28,0): in the river
+            ...createWaveUnits(2, UnitTypeId.Ranged, 27, -3, 1),
           ],
         },
       ],
@@ -2956,11 +2962,12 @@ const MISSION_B2_CHOCOLADE_VERDRAG: MissionDefinition = {
   ],
 
   units: [
-    // Player: 4 workers + 2 infantry
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -7, z: -8 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -5, z: -8 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -3, z: -8 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -7, z: -6 },
+    // Player: 4 workers + 2 infantry (workers beside the TownHall; z=-8/-6 was
+    // in the generated river)
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -7, z: -12 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -7, z: -10 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -3, z: -10 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -13, z: -12 },
     { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -2, z: -13 },
     { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: 0, z: -13 },
     // Enemy: starting defenders + raid groups
@@ -3137,10 +3144,11 @@ const MISSION_B3_COMMISSIEVERGADERING: MissionDefinition = {
   startingGoldAI: 800,
 
   buildings: [
-    // Player base — west (Belgian district of Brussels)
-    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.TownHall, x: -45, z: 0, complete: true },
-    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.Barracks, x: -38, z: -5, complete: true },
-    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.TertiaryResourceBuilding, x: -38, z: 5, complete: true },
+    // Player base — west (Belgian district of Brussels); +8 north of the
+    // original spot, which put the Barracks in the generated river
+    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.TownHall, x: -45, z: 8, complete: true },
+    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.Barracks, x: -38, z: 3, complete: true },
+    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.TertiaryResourceBuilding, x: -38, z: 13, complete: true },
     // Enemy base — east (Brabanders encampment)
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: 45, z: 0, complete: true },
     { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: 38, z: -5, complete: true },
@@ -3149,19 +3157,19 @@ const MISSION_B3_COMMISSIEVERGADERING: MissionDefinition = {
 
   units: [
     // Player: 5 workers + 3 infantry + 1 ranged
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -42, z: -2 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -40, z: -2 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -42, z: 2 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -40, z: 2 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -41, z: 0 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -35, z: -3 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -35, z: 0 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -35, z: 3 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -33, z: 0 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -42, z: 6 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -40, z: 6 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -42, z: 10 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -40, z: 10 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -41, z: 8 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -35, z: 5 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -35, z: 8 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -35, z: 11 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -33, z: 8 },
     // Enemy: Brabanders with strong starting force + AI production
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 42, z: -2 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 42, z: 2 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 44, z: 0 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Worker, x: 42, z: 0 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 36, z: -3 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 36, z: 0 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 36, z: 3 },
@@ -3174,13 +3182,13 @@ const MISSION_B3_COMMISSIEVERGADERING: MissionDefinition = {
   goldMines: [
     // Player-side
     { x: -35, z: -15, amount: 2500 },
-    { x: -35, z: 15, amount: 2500 },
+    { x: -35, z: 19, amount: 2500 }, // was z=15: overlapped the shifted Chocolaterie
     // Contested centre (no man's land)
-    { x: 0, z: -10, amount: 3000 },
+    { x: 0, z: -13, amount: 3000 }, // was (0,-10): river bank
     { x: 0, z: 10, amount: 3000 },
     // Enemy-side
     { x: 35, z: -15, amount: 2000 },
-    { x: 35, z: 15, amount: 2000 },
+    { x: 31, z: 17, amount: 2000 }, // was (35,15): in the river
   ],
 
   objectives: [
@@ -3230,9 +3238,10 @@ const MISSION_B3_COMMISSIEVERGADERING: MissionDefinition = {
         {
           type: 'spawn-units',
           units: [
-            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 20, z: -5 },
-            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 20, z: 0 },
-            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 20, z: 5 },
+            // South bank: the original (20,-5..5) line stood in the river
+            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 24, z: -6 },
+            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 24, z: -9 },
+            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 24, z: -12 },
           ],
         },
       ],
@@ -3300,8 +3309,8 @@ const MISSION_B3_COMMISSIEVERGADERING: MissionDefinition = {
       index: 0,
       spawnTime: 300,
       units: [
-        ...createWaveUnits(6, UnitTypeId.Infantry, 25, 0, 4),
-        ...createWaveUnits(3, UnitTypeId.Ranged, 28, 3, 2),
+        ...createWaveUnits(6, UnitTypeId.Infantry, 31, -6, 4), // was (25,0): in the river
+        ...createWaveUnits(3, UnitTypeId.Ranged, 34, -3, 2),
       ],
       message: 'Golf 1 van 2',
     },
@@ -3310,9 +3319,9 @@ const MISSION_B3_COMMISSIEVERGADERING: MissionDefinition = {
       index: 1,
       spawnTime: 480,
       units: [
-        ...createWaveUnits(8, UnitTypeId.Infantry, 25, 0, 5),
-        ...createWaveUnits(5, UnitTypeId.Ranged, 29, 4, 3),
-        ...createWaveUnits(2, UnitTypeId.Heavy, 27, -3, 2),
+        ...createWaveUnits(8, UnitTypeId.Infantry, 31, -6, 5), // was (25,0): in the river
+        ...createWaveUnits(5, UnitTypeId.Ranged, 35, -2, 3),
+        ...createWaveUnits(2, UnitTypeId.Heavy, 33, -9, 2),
       ],
       message: 'Golf 2 van 2 — TEGENAANVAL!',
     },
@@ -3402,7 +3411,7 @@ const LIMBURGERS_MISSION_1_EERSTE_SCHACHT: MissionDefinition = {
   goldMines: [
     { x: 5, z: -35, amount: 1500 },   // Close to start
     { x: -15, z: -25, amount: 1500 },  // Medium distance
-    { x: 10, z: -10, amount: 2000 },   // North — tunnel helps reach this safely
+    { x: 10, z: -12, amount: 2000 },   // North — tunnel helps reach this safely (was z=-10: river bank)
   ],
 
   treeResources: [
@@ -3545,8 +3554,8 @@ const LIMBURGERS_MISSION_2_DUISTERNIS_BENEDEN: MissionDefinition = {
     { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -39, z: -38 },
     { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -43, z: -36 },
     { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -41, z: -36 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -35, z: -38 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -35, z: -36 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -37, z: -38 }, // was x=-35: under the gold mine
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -37, z: -36 },
     // Enemy: static defenders around boorinstallatie
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 38, z: 33 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 42, z: 33 },
@@ -3561,7 +3570,7 @@ const LIMBURGERS_MISSION_2_DUISTERNIS_BENEDEN: MissionDefinition = {
   goldMines: [
     { x: -35, z: -35, amount: 2000 },  // Near player base
     { x: -40, z: -20, amount: 2000 },  // Second node southwest
-    { x: 0, z: -10, amount: 2500 },    // Center, contested
+    { x: 0, z: -13, amount: 2500 },    // Center, contested (was z=-10: river bank)
     { x: 30, z: 25, amount: 2000 },    // Near enemy
   ],
 
@@ -3666,30 +3675,31 @@ const LIMBURGERS_MISSION_3_VLAAIPRODUCTIE: MissionDefinition = {
   startingGoldAI: 0,
 
   buildings: [
+    // Base shifted +7 north: at z=0 it sat in/on the generated river (z~-2 here)
     // Player: Grottentempel + LumberCamp (tunnel node) + Barracks in center-west
-    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.TownHall, x: -40, z: 0, complete: true },
-    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.LumberCamp, x: -32, z: 0, complete: true },
-    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.Barracks, x: -40, z: 8, complete: true },
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.TownHall, x: -40, z: 7, complete: true },
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.LumberCamp, x: -32, z: 7, complete: true },
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.Barracks, x: -40, z: 15, complete: true },
   ],
 
   units: [
     // Player: 6 workers (economy focus) + 2 infantry + 1 ranged
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -38, z: -2 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -36, z: -2 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -34, z: -2 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -38, z: 2 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -36, z: 2 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -34, z: 2 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -30, z: -2 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -30, z: 2 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: -28, z: 0 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -38, z: 5 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -36, z: 5 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -34, z: 5 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -38, z: 9 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -36, z: 9 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: -34, z: 9 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -30, z: 5 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -30, z: 9 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: -28, z: 7 },
   ],
 
   goldMines: [
     { x: -30, z: -10, amount: 2500 },  // Close, southwest
-    { x: -30, z: 10, amount: 2500 },   // Close, northwest
-    { x: -15, z: 0, amount: 3000 },    // Center, exposed
-    { x: 10, z: -15, amount: 2000 },   // Far, near raid spawns
+    { x: -30, z: 14, amount: 2500 },   // Close, northwest (z+4 with the base shift)
+    { x: -15, z: 6, amount: 3000 },    // Center, exposed (was z=0: under water)
+    { x: 8, z: -12, amount: 2000 },    // Far, near raid spawns (was (10,-15): rock wall)
     { x: 10, z: 15, amount: 2000 },    // Far, near raid spawns
   ],
 
@@ -3814,9 +3824,9 @@ const LIMBURGERS_MISSION_3_VLAAIPRODUCTIE: MissionDefinition = {
       spawnTime: 210,
       units: [
         ...createLimbWaveUnits(2, UnitTypeId.Infantry, 35, -20, 2),
-        ...createLimbWaveUnits(2, UnitTypeId.Infantry, 35, 20, 2),
+        ...createLimbWaveUnits(2, UnitTypeId.Infantry, 30, 22, 2), // was (35,20): in the river
         ...createLimbWaveUnits(1, UnitTypeId.Ranged, 37, -18, 1),
-        ...createLimbWaveUnits(1, UnitTypeId.Ranged, 37, 18, 1),
+        ...createLimbWaveUnits(1, UnitTypeId.Ranged, 32, 20, 1),
       ],
       message: 'Raid 2 van 4',
     },
@@ -3884,7 +3894,7 @@ const LIMBURGERS_MISSION_4_VERRASSINGSAANVAL: MissionDefinition = {
     // Enemy: fortified base in northeast — heavy front defense, weak rear
     { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: 40, z: 35, complete: true },
     { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 32, z: 35, complete: true },
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 40, z: 27, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: 40, z: 28, complete: true }, // was z=27: river bank
     { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Blacksmith, x: 35, z: 30, complete: true },
   ],
 
@@ -3914,7 +3924,7 @@ const LIMBURGERS_MISSION_4_VERRASSINGSAANVAL: MissionDefinition = {
   ],
 
   goldMines: [
-    { x: -35, z: -40, amount: 2500 },  // Near player
+    { x: -35, z: -45, amount: 2500 },  // Near player (was z=-40: overlapped the Barracks)
     { x: -40, z: -25, amount: 2500 },  // Southwest
     { x: 0, z: 0, amount: 3000 },      // Center — contested, risky
     { x: 35, z: 40, amount: 2000 },    // Behind enemy (reward for tunneling)
@@ -4002,7 +4012,7 @@ const LIMBURGERS_MISSION_4_VERRASSINGSAANVAL: MissionDefinition = {
 // ---------------------------------------------------------------------------
 
 const LIMB_DEFENSE_SPAWN_NE_X = 45;
-const LIMB_DEFENSE_SPAWN_NE_Z = 35;
+const LIMB_DEFENSE_SPAWN_NE_Z = 38; // was 35: the r=6 ring reached the river bank at (48,30)
 const LIMB_DEFENSE_SPAWN_NW_X = -20;
 const LIMB_DEFENSE_SPAWN_NW_Z = 40;
 
@@ -4061,9 +4071,9 @@ const LIMBURGERS_MISSION_5_MERGELMUREN: MissionDefinition = {
   ],
 
   goldMines: [
-    { x: -10, z: -40, amount: 3000 },  // Near base, left
-    { x: 10, z: -40, amount: 3000 },   // Near base, right
-    { x: 0, z: -50, amount: 2500 },    // Behind base, safe
+    { x: -13, z: -40, amount: 3000 },  // Near base, left (was x=-10: overlapped the Barracks)
+    { x: 13, z: -40, amount: 3000 },   // Near base, right
+    { x: 0, z: -53, amount: 2500 },    // Behind base, safe (was z=-50: overlapped the Blacksmith)
     { x: -25, z: -30, amount: 2000 },  // Left flank, exposed
     { x: 25, z: -30, amount: 2000 },   // Right flank, exposed
   ],
@@ -4565,7 +4575,7 @@ const RANDSTAD_MISSION_3_VIJANDIGE_OVERNAME: MissionDefinition = {
   ],
 
   goldMines: [
-    { x: -50, z: -59, amount: 2000 },
+    { x: -46, z: -59, amount: 2000 }, // was x=-50: overlapped the Barracks
     { x: -59, z: -50, amount: 2000 },
     { x: -25, z: -25, amount: 2500 },
     { x: 0, z: 42, amount: 3000 },
@@ -4701,16 +4711,16 @@ const RANDSTAD_MISSION_4_GENTRIFICATIE: MissionDefinition = {
   ],
 
   goldMines: [
-    { x: -50, z: -15, amount: 2500 },
+    { x: -48, z: -4, amount: 2500 }, // was (-50,-15): in the river
     { x: -60, z: 0, amount: 2000 },
-    { x: -40, z: -5, amount: 2000 },
+    { x: -38, z: 4, amount: 2000 }, // was (-40,-5): in the river
     { x: -30, z: 10, amount: 3000 },
   ],
 
   treeResources: [
     { x: -55, z: 0, amount: 1000 },
-    { x: -45, z: -15, amount: 1000 },
-    { x: -35, z: 0, amount: 800 },
+    { x: -43, z: -18, amount: 1000 }, // was (-45,-15): in the river
+    { x: -35, z: 4, amount: 800 }, // was z=0: in the river
   ],
 
   objectives: [
@@ -4914,24 +4924,24 @@ const RANDSTAD_MISSION_5_BOARDROOM_BESLISSING: MissionDefinition = {
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 7, z: -56 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -7, z: -56 },
     // Brabanders defenders (southeast) — 6 units
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 51, z: -38 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 50, z: -38 }, // x=51 was inside the TownHall
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 54, z: -38 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 52, z: -37 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 51, z: -40 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 50, z: -40 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 54, z: -40 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Heavy, x: 52, z: -42 },
     // Limburgers defenders (northeast) — 6 units
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 51, z: 38 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 50, z: 38 },
     { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 54, z: 38 },
     { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 52, z: 37 },
     { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 52, z: 42 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 51, z: 40 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 50, z: 40 },
     { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 54, z: 40 },
     // Belgen defenders (northwest) — 5 units
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -51, z: 38 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -50, z: 38 },
     { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -54, z: 38 },
     { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -52, z: 37 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -51, z: 40 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -50, z: 40 },
     { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -54, z: 40 },
   ],
 
@@ -4956,8 +4966,8 @@ const RANDSTAD_MISSION_5_BOARDROOM_BESLISSING: MissionDefinition = {
     { x: -13, z: -46, amount: 1000 },
     { x: 13, z: -46, amount: 1000 },
     { x: 0, z: -33, amount: 800 },
-    { x: -26, z: 0, amount: 800 },
-    { x: 26, z: 0, amount: 800 },
+    { x: -26, z: 4, amount: 800 },  // was z=0: in the river
+    { x: 28, z: -3, amount: 800 },  // was (26,0): in the river
   ],
 
   objectives: [
@@ -5027,7 +5037,7 @@ const RANDSTAD_MISSION_5_BOARDROOM_BESLISSING: MissionDefinition = {
             { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 39, z: 26 },
             { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 38, z: 27 },
             { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 37, z: 25 },
-            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 40, z: 25 },
+            { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 38, z: 24 }, // was (40,25): river bank
             { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 39, z: 29 },
           ],
         },
@@ -5133,7 +5143,7 @@ const LIMBURGERS_MISSION_6_TUNNELOORLOG: MissionDefinition = {
     { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: -22, z: -31 },
     // Enemy: commandopost 1 defenders (northeast) — strong front, weak rear
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 22, z: 18 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 24, z: 20 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 21, z: 20 }, // was x=24: inside the DefenseTower
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: 20, z: 22 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: 22, z: 22 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Heavy, x: 23, z: 19 },
@@ -5324,9 +5334,9 @@ const LIMBURGERS_MISSION_7_GROTE_SJTOELGANG: MissionDefinition = {
   ],
 
   goldMines: [
-    { x: -10, z: -45, amount: 3000 },   // Near base, left
-    { x: 10, z: -45, amount: 3000 },    // Near base, right
-    { x: 0, z: -55, amount: 2500 },     // Behind base, safe
+    { x: -13, z: -45, amount: 3000 },   // Near base, left (was x=-10: overlapped the Barracks)
+    { x: 13, z: -45, amount: 3000 },    // Near base, right
+    { x: 0, z: -58, amount: 2500 },     // Behind base, safe (was z=-55: overlapped the Blacksmith)
     { x: -25, z: -35, amount: 2000 },   // Left flank, exposed
     { x: 25, z: -35, amount: 2000 },    // Right flank, exposed
     { x: 0, z: 0, amount: 3000 },       // No man's land
@@ -5622,14 +5632,14 @@ const LIMBURGERS_MISSION_8_KONINGIN_VAN_DE_MIJN: MissionDefinition = {
     { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -15, z: -36 },
     { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: -15, z: -34 },
     { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: -13, z: -34 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: -15, z: -40 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: -15, z: -43 }, // was z=-40: inside the LumberCamp
     // Right flank (facing Randstad)
     { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 13, z: -38 },
     { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 17, z: -38 },
     { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 15, z: -36 },
     { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 15, z: -34 },
     { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 13, z: -34 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 15, z: -40 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 15, z: -43 },
     // Center reserve
     { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 0, z: -37 },
     // Brabanders defenders (west)
@@ -5651,10 +5661,10 @@ const LIMBURGERS_MISSION_8_KONINGIN_VAN_DE_MIJN: MissionDefinition = {
   ],
 
   goldMines: [
-    // Player area
-    { x: -10, z: -50, amount: 3500 },
-    { x: 10, z: -50, amount: 3500 },
-    { x: 0, z: -55, amount: 3000 },
+    // Player area (moved out of the Mijnschacht/SiegeWorkshop/Blacksmith footprints)
+    { x: -13, z: -56, amount: 3500 },
+    { x: 13, z: -56, amount: 3500 },
+    { x: 0, z: -58, amount: 3000 },
     // Contested center
     { x: -20, z: -20, amount: 2500 },
     { x: 20, z: -20, amount: 2500 },
@@ -5702,10 +5712,11 @@ const LIMBURGERS_MISSION_8_KONINGIN_VAN_DE_MIJN: MissionDefinition = {
         {
           type: 'spawn-units',
           units: [
-            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -40, z: -10 },
-            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -38, z: -8 },
-            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -42, z: -8 },
-            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -40, z: -6 },
+            // z-8 from the original spot, which was in the generated river
+            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -40, z: -18 },
+            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -38, z: -16 },
+            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -42, z: -16 },
+            { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -40, z: -14 },
           ],
         },
       ],
@@ -5826,31 +5837,32 @@ const MISSION_B4_WAFELTJESWAR: MissionDefinition = {
   startingGoldAI: 0,
 
   buildings: [
-    // Player: base in west-center with the "waffle factory"
-    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.TownHall, x: -25, z: 0, complete: true },
-    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.Barracks, x: -18, z: -5, complete: true },
-    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.TertiaryResourceBuilding, x: -18, z: 5, complete: true },
+    // Player: base in west-center with the "waffle factory" -- +9 north of the
+    // original z=0 row, which straddled the generated river
+    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.TownHall, x: -25, z: 9, complete: true },
+    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.Barracks, x: -18, z: 4, complete: true },
+    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.TertiaryResourceBuilding, x: -20, z: 13, complete: true }, // clear of the rock wall at (-15,15)
   ],
 
   units: [
     // Player: 5 workers + 4 infantry + 2 ranged
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -22, z: -2 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -20, z: -2 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -22, z: 2 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -20, z: 2 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -21, z: 0 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -15, z: -3 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -15, z: 0 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -15, z: 3 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -13, z: 0 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -13, z: -3 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -13, z: 3 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -22, z: 7 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -20, z: 7 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -22, z: 11 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -20, z: 11 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -21, z: 9 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -15, z: 6 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -15, z: 9 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -15, z: 12 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -13, z: 9 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -13, z: 6 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -13, z: 12 },
   ],
 
   goldMines: [
     { x: -30, z: -10, amount: 2000 },
     { x: -30, z: 10, amount: 2000 },
-    { x: -10, z: 0, amount: 2500 },
+    { x: -10, z: 9, amount: 2500 }, // follows the base shift (z=0 was the river bank)
     { x: -20, z: -20, amount: 1500 },
   ],
 
@@ -6085,7 +6097,7 @@ const MISSION_B5_FRIETTENT: MissionDefinition = {
 
   goldMines: [
     { x: -10, z: -10, amount: 2000 },
-    { x: 10, z: -10, amount: 2000 },
+    { x: 10, z: -12, amount: 2000 }, // was z=-10: river bank
     { x: -10, z: 10, amount: 2000 },
     { x: 10, z: 10, amount: 2000 },
     { x: 0, z: -20, amount: 2500 },
@@ -6094,7 +6106,7 @@ const MISSION_B5_FRIETTENT: MissionDefinition = {
   treeResources: [
     { x: -8, z: 0, amount: 800 },
     { x: 0, z: 8, amount: 800 },
-    { x: 0, z: -8, amount: 800 },
+    { x: 0, z: -12, amount: 800 }, // was z=-8: in the river
     { x: -15, z: -15, amount: 600 },
     { x: 15, z: -15, amount: 600 },
   ],
@@ -6237,38 +6249,39 @@ const MISSION_B6_DIPLOMATIEK_INCIDENT: MissionDefinition = {
   startingGoldAI: 350,
 
   buildings: [
-    // Player base — west
-    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.TownHall, x: -35, z: 0, complete: true },
-    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.Barracks, x: -28, z: -5, complete: true },
-    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.LumberCamp, x: -35, z: 7, complete: true },
+    // Player base — west; +10 north of the original z=0 row, which straddled
+    // the generated river. The Limburg side moved its north buildings south.
+    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.TownHall, x: -35, z: 10, complete: true },
+    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.Barracks, x: -28, z: 5, complete: true },
+    { factionId: FactionId.Belgen, buildingType: BuildingTypeId.LumberCamp, x: -35, z: 17, complete: true },
     // "Allied" Limburgers — east (become enemies later)
     { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.TownHall, x: 35, z: 0, complete: true },
     { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.Barracks, x: 28, z: -5, complete: true },
-    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.Barracks, x: 35, z: 7, complete: true },
-    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.Blacksmith, x: 28, z: 5, complete: true },
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.Barracks, x: 41, z: 5, complete: true },   // was (35,7): river bank
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.Blacksmith, x: 35, z: -7, complete: true }, // was (28,5): in the river
   ],
 
   units: [
     // Player: 5 workers + 3 infantry + 2 ranged
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -32, z: -2 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -30, z: -2 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -32, z: 2 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -30, z: 2 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -31, z: 0 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -25, z: -3 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -25, z: 0 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -25, z: 3 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -23, z: -1 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -23, z: 1 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -32, z: 8 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -30, z: 8 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -32, z: 12 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -30, z: 12 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -31, z: 10 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -25, z: 7 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -25, z: 10 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -25, z: 13 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -23, z: 9 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: -23, z: 11 },
     // Limburgers — "allied" start force (become hostile at wave 3 trigger)
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 25, z: -9 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 25, z: -6 },
     { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 25, z: -3 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 25, z: 0 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 25, z: 3 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 27, z: -5 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 23, z: -1 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 23, z: 1 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 26, z: 0 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 24, z: 3 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 27, z: -11 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 23, z: -7 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 23, z: -5 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 26, z: -6 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 24, z: -3 },
   ],
 
   goldMines: [
@@ -6276,7 +6289,7 @@ const MISSION_B6_DIPLOMATIEK_INCIDENT: MissionDefinition = {
     { x: -30, z: -15, amount: 2000 },
     { x: -30, z: 15, amount: 2000 },
     // Shared center (contested after betrayal)
-    { x: 0, z: -10, amount: 3000 },
+    { x: 0, z: -13, amount: 3000 }, // was (0,-10): river bank
     { x: 0, z: 10, amount: 3000 },
     // Limburger side
     { x: 30, z: -15, amount: 2000 },
@@ -6285,7 +6298,7 @@ const MISSION_B6_DIPLOMATIEK_INCIDENT: MissionDefinition = {
 
   treeResources: [
     { x: -25, z: -10, amount: 800 },
-    { x: -25, z: 10, amount: 800 },
+    { x: -25, z: 18, amount: 800 }, // was z=10: on the shifted infantry
     { x: -10, z: 0, amount: 600 },
     { x: 10, z: 0, amount: 600 },
   ],
@@ -6384,8 +6397,9 @@ const MISSION_B6_DIPLOMATIEK_INCIDENT: MissionDefinition = {
       index: 0,
       spawnTime: 300,
       units: [
-        ...createWaveUnits(6, UnitTypeId.Infantry, 10, 0, 4, FactionId.Limburgers),
-        ...createWaveUnits(3, UnitTypeId.Ranged, 13, 3, 2, FactionId.Limburgers),
+        // Wave centres +9 north of the river channel they used to spawn in
+        ...createWaveUnits(6, UnitTypeId.Infantry, 10, 9, 4, FactionId.Limburgers),
+        ...createWaveUnits(3, UnitTypeId.Ranged, 13, 12, 2, FactionId.Limburgers),
       ],
       message: 'VERRAAD! Golf 1 van 3',
     },
@@ -6394,9 +6408,9 @@ const MISSION_B6_DIPLOMATIEK_INCIDENT: MissionDefinition = {
       index: 1,
       spawnTime: 450,
       units: [
-        ...createWaveUnits(8, UnitTypeId.Infantry, 15, 0, 5, FactionId.Limburgers),
-        ...createWaveUnits(4, UnitTypeId.Ranged, 18, 4, 3, FactionId.Limburgers),
-        ...createWaveUnits(2, UnitTypeId.Heavy, 12, -3, 2, FactionId.Limburgers),
+        ...createWaveUnits(8, UnitTypeId.Infantry, 15, 9, 5, FactionId.Limburgers),
+        ...createWaveUnits(4, UnitTypeId.Ranged, 18, 13, 3, FactionId.Limburgers),
+        ...createWaveUnits(2, UnitTypeId.Heavy, 12, 6, 2, FactionId.Limburgers),
       ],
       message: 'Golf 2 van 3',
     },
@@ -6405,9 +6419,9 @@ const MISSION_B6_DIPLOMATIEK_INCIDENT: MissionDefinition = {
       index: 2,
       spawnTime: 600,
       units: [
-        ...createWaveUnits(10, UnitTypeId.Infantry, 15, 0, 6, FactionId.Limburgers),
-        ...createWaveUnits(5, UnitTypeId.Ranged, 19, 5, 3, FactionId.Limburgers),
-        ...createWaveUnits(3, UnitTypeId.Heavy, 12, -4, 2, FactionId.Limburgers),
+        ...createWaveUnits(10, UnitTypeId.Infantry, 15, 9, 6, FactionId.Limburgers),
+        ...createWaveUnits(5, UnitTypeId.Ranged, 19, 14, 3, FactionId.Limburgers),
+        ...createWaveUnits(3, UnitTypeId.Heavy, 12, 5, 2, FactionId.Limburgers),
       ],
       message: 'LAATSTE GOLF!',
     },
@@ -6644,7 +6658,7 @@ const MISSION_B8_HET_LAATSTE_BIER: MissionDefinition = {
     { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -48, z: -41 },
     { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -46, z: -41 },
     { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -47, z: -39 },
-    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -49, z: -39 },
+    { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -47, z: -41 }, // was (-49,-39): inside the Barracks
     { factionId: FactionId.Belgen, unitType: UnitTypeId.Worker, x: -45, z: -39 },
     // Left flank (facing north/Randstad)
     { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: -40, z: -35 },
@@ -6845,34 +6859,35 @@ const RANDSTAD_MISSION_6_MARKTMANIPULATIE: MissionDefinition = {
   startingGoldAI: 400,
 
   buildings: [
-    // Player: base in west — ready for fast production
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: -35, z: 0, complete: true },
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: -28, z: -5, complete: true },
+    // Player: base in west — ready for fast production; +10 north of the
+    // original z=0 row, which straddled the generated river
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall, x: -35, z: 10, complete: true },
     { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: -28, z: 5, complete: true },
-    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Blacksmith, x: -35, z: 8, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: -28, z: 15, complete: true },
+    { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Blacksmith, x: -35, z: 18, complete: true },
     // Enemy: Limburger base in east — fortified
     { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.TownHall, x: 35, z: 0, complete: true },
     { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.Barracks, x: 28, z: -5, complete: true },
-    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.Blacksmith, x: 28, z: 5, complete: true },
-    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.DefenseTower, x: 22, z: 0, complete: true },
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.Blacksmith, x: 35, z: -7, complete: true },  // was (28,5): in the river
+    { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.DefenseTower, x: 22, z: -7, complete: true }, // was (22,0): in the river
   ],
 
   units: [
     // Player: 6 workers + 2 infantry (fast economy start)
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -33, z: -2 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -31, z: -2 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -33, z: 2 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -31, z: 2 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -32, z: 0 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -30, z: 0 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -26, z: -3 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -26, z: 3 },
-    // Enemy: solid defense force
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 20, z: -2 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 20, z: 2 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 22, z: -4 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 22, z: 4 },
-    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 24, z: 0 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -33, z: 8 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -31, z: 8 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -33, z: 12 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -31, z: 12 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -32, z: 10 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Worker, x: -30, z: 10 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -26, z: 7 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Infantry, x: -26, z: 13 },
+    // Enemy: solid defense force (front line z-9, south bank of the river)
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 20, z: -11 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: 20, z: -7 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 22, z: -13 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: 22, z: -5 },
+    { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 24, z: -9 },
     { factionId: FactionId.Limburgers, unitType: UnitTypeId.Heavy, x: 30, z: 0 },
     { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: 33, z: -2 },
     { factionId: FactionId.Limburgers, unitType: UnitTypeId.Worker, x: 33, z: 2 },
@@ -6881,7 +6896,7 @@ const RANDSTAD_MISSION_6_MARKTMANIPULATIE: MissionDefinition = {
 
   goldMines: [
     { x: -30, z: -15, amount: 1500 },  // Player side — limited!
-    { x: -30, z: 15, amount: 1500 },
+    { x: -30, z: 22, amount: 1500 }, // was z=15: overlapped the shifted Barracks
     { x: 0, z: 0, amount: 2000 },      // Contested center
     { x: 30, z: -15, amount: 2500 },   // Enemy side
     { x: 30, z: 15, amount: 2500 },
@@ -7005,37 +7020,38 @@ const RANDSTAD_MISSION_7_REORGANISATIE: MissionDefinition = {
 
   buildings: [
     // No player buildings — commando mission
-    // Enemy base — Brabantse boerderij in center-east
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: 25, z: 0, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: 18, z: -5, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: 18, z: 5, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Housing, x: 25, z: 8, complete: true },
+    // Enemy base — Brabantse boerderij in center-east, moved (+8,-11) with its
+    // defenders: at (25,0) the farm stood in the generated river
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: 33, z: -11, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: 26, z: -16, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: 26, z: -6, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Housing, x: 33, z: -3, complete: true },
   ],
 
   units: [
     // Player: 4 Heavy + 2 Ranged elite squad
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Heavy, x: -33, z: -2 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Heavy, x: -33, z: 2 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Heavy, x: -35, z: -2 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Heavy, x: -35, z: 2 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -37, z: -1 },
-    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -37, z: 1 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Heavy, x: -33, z: 4 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Heavy, x: -33, z: 8 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Heavy, x: -35, z: 4 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Heavy, x: -35, z: 8 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -37, z: 5 },
+    { factionId: FactionId.Randstad, unitType: UnitTypeId.Ranged, x: -37, z: 7 },
     // Enemy: patrol groups and base defenders
     // Patrol 1 — west
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -10, z: -5 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -8, z: -3 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -10, z: 2 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -8, z: 4 },
     // Patrol 2 — center
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 5, z: 5 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 7, z: 3 },
     { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 5, z: 7 },
     // Base defenders — inner ring
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 16, z: -3 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 16, z: 3 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 20, z: -7 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 20, z: 7 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 23, z: -3 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 23, z: 3 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Heavy, x: 27, z: 0 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 24, z: -14 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 24, z: -8 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 28, z: -18 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: 28, z: -4 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 31, z: -14 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: 31, z: -8 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Heavy, x: 35, z: -11 },
   ],
 
   goldMines: [], // No economy in commando mission
@@ -7150,10 +7166,11 @@ const RANDSTAD_MISSION_8_IPO_DAY: MissionDefinition = {
     { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Barracks, x: -8, z: -55, complete: true },
     { factionId: FactionId.Randstad, buildingType: BuildingTypeId.Blacksmith, x: 0, z: -60, complete: true },
     { factionId: FactionId.Randstad, buildingType: BuildingTypeId.SiegeWorkshop, x: -15, z: -60, complete: true },
-    // Brabanders base — southwest
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: -50, z: -20, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: -43, z: -20, complete: true },
-    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: -50, z: -13, complete: true },
+    // Brabanders base — southwest; moved (-2,-14) with its defenders: at
+    // (-50,-20) it stood in the generated river
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall, x: -52, z: -34, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: -45, z: -34, complete: true },
+    { factionId: FactionId.Brabanders, buildingType: BuildingTypeId.Barracks, x: -52, z: -27, complete: true },
     // Limburgers base — northwest
     { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.TownHall, x: -50, z: 40, complete: true },
     { factionId: FactionId.Limburgers, buildingType: BuildingTypeId.Barracks, x: -43, z: 40, complete: true },
@@ -7185,13 +7202,13 @@ const RANDSTAD_MISSION_8_IPO_DAY: MissionDefinition = {
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Heavy, x: -5, z: -47 },
     { factionId: FactionId.Randstad, unitType: UnitTypeId.Heavy, x: 5, z: -47 },
     // Brabanders defenders (southwest) — 7 units
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -48, z: -18 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -45, z: -18 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -48, z: -22 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -52, z: -18 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -52, z: -22 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Heavy, x: -47, z: -16 },
-    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Heavy, x: -50, z: -24 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -50, z: -32 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -47, z: -32 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Infantry, x: -50, z: -36 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -54, z: -32 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Ranged, x: -54, z: -36 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Heavy, x: -49, z: -30 },
+    { factionId: FactionId.Brabanders, unitType: UnitTypeId.Heavy, x: -52, z: -38 },
     // Limburgers defenders (northwest) — 7 units
     { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -48, z: 38 },
     { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -45, z: 38 },
@@ -7219,7 +7236,7 @@ const RANDSTAD_MISSION_8_IPO_DAY: MissionDefinition = {
     { x: -25, z: -25, amount: 2500 },
     { x: 25, z: -15, amount: 2500 },
     // Near enemies
-    { x: -45, z: -15, amount: 2000 },
+    { x: -47, z: -29, amount: 2000 }, // was (-45,-15): in the river
     { x: -45, z: 35, amount: 2000 },
     { x: 45, z: 35, amount: 2000 },
   ],
@@ -7230,7 +7247,7 @@ const RANDSTAD_MISSION_8_IPO_DAY: MissionDefinition = {
     { x: -15, z: -48, amount: 1000 },
     { x: 15, z: -48, amount: 1000 },
     { x: 0, z: -35, amount: 800 },
-    { x: -30, z: 0, amount: 800 },
+    { x: -30, z: 4, amount: 800 }, // was z=0: in the river
     { x: 30, z: 10, amount: 800 },
   ],
 
@@ -7280,11 +7297,12 @@ const RANDSTAD_MISSION_8_IPO_DAY: MissionDefinition = {
         {
           type: 'spawn-units',
           units: [
-            { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: 35, z: 15 },
-            { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: 33, z: 17 },
-            { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: 37, z: 17 },
-            { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: 35, z: 19 },
-            { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: 33, z: 19 },
+            // (-5,+3) from the original group, which spawned in the river
+            { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: 30, z: 18 },
+            { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: 28, z: 20 },
+            { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: 32, z: 20 },
+            { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: 30, z: 22 },
+            { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: 28, z: 22 },
           ],
         },
       ],
@@ -7325,9 +7343,9 @@ const RANDSTAD_MISSION_8_IPO_DAY: MissionDefinition = {
             { factionId: FactionId.Limburgers, unitType: UnitTypeId.Infantry, x: -23, z: 3 },
             { factionId: FactionId.Limburgers, unitType: UnitTypeId.Ranged, x: -27, z: 3 },
             // Belgen van het noordoosten
-            { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: 25, z: 5 },
-            { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: 23, z: 3 },
-            { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: 27, z: 3 },
+            { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: 20, z: 8 }, // was (25,5): in the river
+            { factionId: FactionId.Belgen, unitType: UnitTypeId.Infantry, x: 18, z: 6 },
+            { factionId: FactionId.Belgen, unitType: UnitTypeId.Ranged, x: 22, z: 6 },
           ],
         },
       ],

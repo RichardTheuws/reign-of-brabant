@@ -16,6 +16,10 @@ import { getInnovatieBoostSpeedMult } from './UpgradeBuildingPassivesSystem';
 import { getCarnavalsoptochtSpeedMult } from './CarnavalsoptochtSystem';
 import type { Terrain } from '../world/Terrain';
 import type { GameWorld } from '../ecs/world';
+import {
+  steerUnit, steerOut, clearUnitPath, processPathRequests, getActiveNavGrid, Steer,
+  BLOCKED_GOAL_STOP_DISTANCE,
+} from '../pathfinding/UnitPathing';
 
 // Reusable scratch values to avoid per-frame allocations
 let _dx = 0;
@@ -25,6 +29,8 @@ let _invDist = 0;
 
 /** Distance threshold to consider "arrived" at target. */
 const ARRIVAL_THRESHOLD = 0.5;
+
+const _reqPos = { x: 0, z: 0 };
 
 /**
  * Create the movement system bound to a terrain instance.
@@ -36,10 +42,10 @@ export function createMovementSystem(terrain: Terrain) {
 
     for (const eid of entities) {
       // Skip entities not actively moving
-      if (Movement.hasTarget[eid] === 0) continue;
+      if (Movement.hasTarget[eid] === 0) { clearUnitPath(eid); continue; }
 
       // Skip dead entities -- they stay in place during the death animation
-      if (hasComponent(world, eid, IsDead)) continue;
+      if (hasComponent(world, eid, IsDead)) { clearUnitPath(eid); continue; }
 
       // Skip stunned entities
       if (hasComponent(world, eid, Stunned) && Stunned.duration[eid] > 0) continue;
@@ -52,7 +58,32 @@ export function createMovementSystem(terrain: Terrain) {
       // Check arrival
       if (_dist < ARRIVAL_THRESHOLD) {
         Movement.hasTarget[eid] = 0;
+        clearUnitPath(eid);
         continue;
+      }
+
+      // Pathfinding: steer at the next waypoint around rivers / rock walls.
+      const steer = steerUnit(eid, Position.x[eid], Position.z[eid], Movement.targetX[eid], Movement.targetZ[eid], dt);
+      if (steer === Steer.Wait) continue;
+      if (steer === Steer.ArrivedApprox) {
+        Movement.hasTarget[eid] = 0;
+        clearUnitPath(eid);
+        continue;
+      }
+      // Free leg: may enter blocked cells. Into a blocked goal (resource in the
+      // river mask) stop just within gather/melee reach instead of wading in.
+      const freeLeg = steer === Steer.TargetFree;
+      if (freeLeg && _dist < BLOCKED_GOAL_STOP_DISTANCE
+        && getActiveNavGrid()?.isBlockedAt(Movement.targetX[eid], Movement.targetZ[eid])) {
+        Movement.hasTarget[eid] = 0;
+        clearUnitPath(eid);
+        continue;
+      }
+      const toWaypoint = steer === Steer.Waypoint;
+      if (toWaypoint) {
+        _dx = steerOut.x - Position.x[eid];
+        _dz = steerOut.z - Position.z[eid];
+        _dist = Math.sqrt(_dx * _dx + _dz * _dz);
       }
 
       // Normalize direction and scale by speed * dt (with Gezelligheid bonus + road bonus + upkeep debt)
@@ -87,14 +118,28 @@ export function createMovementSystem(terrain: Terrain) {
 
       // Clamp step to not overshoot target
       const stepMag = Math.sqrt(stepX * stepX + stepZ * stepZ);
-      if (stepMag >= _dist) {
+      if (toWaypoint && stepMag >= _dist) {
+        // Snap to waypoint (next frame advances to the following one)
+        Position.x[eid] = steerOut.x;
+        Position.z[eid] = steerOut.z;
+      } else if (stepMag >= _dist) {
         // Snap to target
         Position.x[eid] = Movement.targetX[eid];
         Position.z[eid] = Movement.targetZ[eid];
         Movement.hasTarget[eid] = 0;
+        clearUnitPath(eid);
       } else {
-        Position.x[eid] += stepX;
-        Position.z[eid] += stepZ;
+        const grid = getActiveNavGrid();
+        const nx = Position.x[eid] + stepX;
+        const nz = Position.z[eid] + stepZ;
+        if (!freeLeg && grid && grid.isBlockedAt(nx, nz) && !grid.isBlockedAt(Position.x[eid], Position.z[eid])) {
+          // Never step into a river / rock wall: slide along the edge instead.
+          if (!grid.isBlockedAt(nx, Position.z[eid])) Position.x[eid] = nx;
+          else if (!grid.isBlockedAt(Position.x[eid], nz)) Position.z[eid] = nz;
+        } else {
+          Position.x[eid] = nx;
+          Position.z[eid] = nz;
+        }
       }
 
       // Smooth Y to terrain height (lerp to avoid vertical jitter on micro-bumps)
@@ -104,5 +149,13 @@ export function createMovementSystem(terrain: Terrain) {
       // Face movement direction
       Rotation.y[eid] = Math.atan2(_dx, _dz);
     }
+
+    // Solve queued path requests within the per-frame budget.
+    processPathRequests((eid) => {
+      if (Movement.hasTarget[eid] === 0) return null;
+      _reqPos.x = Position.x[eid];
+      _reqPos.z = Position.z[eid];
+      return _reqPos;
+    });
   };
 }

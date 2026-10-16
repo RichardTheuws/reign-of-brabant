@@ -1,8 +1,11 @@
+/**
+ * @vitest-environment jsdom
+ */
 // Structural audit of all 36 campaign missions across 4 factions.
 // Catches misconfigurations (unreachable objectives, duplicate IDs, missing
 // data) that the existing CampaignManager tests don't surface because they
 // only exercise representative missions.
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi, beforeAll } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -22,6 +25,9 @@ import { FactionId, BuildingTypeId, UnitTypeId, MAP_SIZE } from '../src/types/in
 import { getUnitsForFaction } from '../src/data/factionData';
 import { FACTION_WORKER_BUILDS } from '../src/ui/factionBuildMenus';
 import type { Faction } from '../src/ui/HUD';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { Terrain } from '../src/world/Terrain';
+import { generateMap, type GeneratedMap } from '../src/world/MapGenerator';
 
 const ALL_CAMPAIGNS: { name: string; missions: readonly MissionDefinition[]; expectedCount: number; expectedFaction: FactionId }[] = [
   { name: 'brabanders', missions: BRABANDERS_MISSIONS, expectedCount: 12, expectedFaction: FactionId.Brabanders },
@@ -357,4 +363,137 @@ describe('No unicode symbols in campaign UI and mission text', () => {
     expect(symbolOffenders(src)).toEqual([]);
     expect(src.match(/&#\d+;|&#x[0-9a-f]+;|&(larr|rarr|uarr|darr|harr|times|check|bull|hearts|star|starf);/gi) ?? []).toEqual([]);
   });
+});
+
+// ---------------------------------------------------------------------------
+// Terrain placement: every mission runs on generateMap(42) (classic template),
+// which carves a diagonal river (width 5, two bridges) and raises two rock
+// walls. initMission() ignores that for mission data, so spawns/buildings that
+// sit in the river, on its steep bank or inside a rock wall are stuck or
+// unreachable (brabant-11/12). Buildings also must not overlap each other or
+// the starting units (brabant-12 infantry inside the player Barracks).
+// The terrain is built exactly like initMission(): default Terrain ->
+// generateMap(42, getHeightAt) -> rebuild(terrainFeatures).
+// ---------------------------------------------------------------------------
+
+/** Terrain.ts water plane height. */
+const WATER_LEVEL = -1;
+/** BuildSystem footprint convention: centers closer than 4 on both axes overlap. */
+const BUILDING_FOOTPRINT = 4;
+/** A unit spawn strictly inside a building/mine's 4x4 footprint (per axis). */
+const UNIT_IN_FOOTPRINT = BUILDING_FOOTPRINT / 2;
+/** Margin beyond the carved river core (the waterline / steepest bank part). */
+const RIVER_MARGIN = 1;
+/** Margin beyond a rock wall's raised core (the steep transition slope). */
+const ROCK_MARGIN = 1;
+
+function distToPath(px: number, pz: number, path: ReadonlyArray<{ x: number; z: number }>): number {
+  let min = Infinity;
+  for (let i = 0; i < path.length - 1; i++) {
+    const a = path[i], b = path[i + 1];
+    const abx = b.x - a.x, abz = b.z - a.z;
+    const ab2 = abx * abx + abz * abz;
+    const t = ab2 < 1e-4 ? 0 : Math.max(0, Math.min(1, ((px - a.x) * abx + (pz - a.z) * abz) / ab2));
+    const dx = px - (a.x + t * abx), dz = pz - (a.z + t * abz);
+    min = Math.min(min, Math.sqrt(dx * dx + dz * dz));
+  }
+  return min;
+}
+
+describe('Mission placements respect the generated terrain (river, rock walls)', () => {
+  let terrain: Terrain;
+  let map: GeneratedMap;
+
+  beforeAll(() => {
+    HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
+      fillStyle: '',
+      fillRect: vi.fn(),
+      getImageData: vi.fn(() => ({ data: new Uint8ClampedArray(4) })),
+      putImageData: vi.fn(),
+      createImageData: vi.fn((w: number, h: number) => ({ data: new Uint8ClampedArray(w * h * 4) })),
+    })) as never;
+    vi.spyOn(GLTFLoader.prototype, 'load').mockImplementation(() => {}); // bridge visuals only
+    terrain = new Terrain();
+    map = generateMap(42, (x, z) => terrain.getHeightAt(x, z));
+    terrain.rebuild(map.terrainFeatures);
+  });
+
+  /** On a bridge deck (same oriented rectangle Terrain.carveRivers leaves uncarved). */
+  function onBridge(x: number, z: number): boolean {
+    return map.terrainFeatures.bridges.some(b => {
+      const rot = -(b.rotation ?? 0);
+      const dx = x - b.x, dz = z - b.z;
+      const lx = dx * Math.cos(rot) - dz * Math.sin(rot);
+      const lz = dx * Math.sin(rot) + dz * Math.cos(rot);
+      return Math.abs(lx) < (b.length ?? b.width) / 2 && Math.abs(lz) < b.width / 2;
+    });
+  }
+
+  /** Why (x,z) is not standable for an object of the given half-extent, or null. */
+  function terrainProblem(x: number, z: number, halfExtent: number): string | null {
+    const { rivers, rockWalls } = map.terrainFeatures;
+    // A unit may stand on a bridge deck (waves cross there); structures never.
+    if (halfExtent === 0 && onBridge(x, z)) return null;
+    if (terrain.isRiver(x, z)) return 'in river';
+    if (terrain.getHeightAt(x, z) < WATER_LEVEL + 0.05) return 'under water';
+    for (const r of rivers) {
+      const d = distToPath(x, z, r.path);
+      if (d < r.width / 2 + RIVER_MARGIN + halfExtent) return `river bank (d=${d.toFixed(1)})`;
+    }
+    for (const w of rockWalls) {
+      const d = distToPath(x, z, w.path);
+      if (d < w.thickness / 2 + ROCK_MARGIN + halfExtent) return `rock wall (d=${d.toFixed(1)})`;
+    }
+    return null;
+  }
+
+  it('the audited map is the classic river map (guards the fixture)', () => {
+    expect(map.terrainFeatures.rivers.length).toBeGreaterThan(0);
+    expect(map.terrainFeatures.rockWalls.length).toBeGreaterThan(0);
+  });
+
+  for (const c of ALL_CAMPAIGNS) {
+    for (const m of c.missions) {
+      it(`${m.id}: no unit spawn in water, on the river bank or in a rock wall`, () => {
+        const offenders = getAllMissionUnitSpawns(m)
+          .map(u => ({ u, p: terrainProblem(u.x, u.z, 0) }))
+          .filter(o => o.p)
+          .map(o => `f${o.u.factionId}/u${o.u.unitType}@(${o.u.x},${o.u.z}): ${o.p}`);
+        expect(offenders).toEqual([]);
+      });
+
+      it(`${m.id}: no building or gold mine footprint in water, on the bank or in a rock wall`, () => {
+        const half = BUILDING_FOOTPRINT / 2;
+        const offenders = [
+          ...m.buildings.map(b => ({ s: `building f${b.factionId}/b${b.buildingType}@(${b.x},${b.z})`, p: terrainProblem(b.x, b.z, half) })),
+          ...m.goldMines.map(g => ({ s: `gold@(${g.x},${g.z})`, p: terrainProblem(g.x, g.z, half) })),
+          ...(m.treeResources ?? []).map(t => ({ s: `tree@(${t.x},${t.z})`, p: terrain.isRiver(t.x, t.z) ? 'in river' : null })),
+        ].filter(o => o.p).map(o => `${o.s}: ${o.p}`);
+        expect(offenders).toEqual([]);
+      });
+
+      it(`${m.id}: building and gold-mine footprints overlap neither each other nor unit spawns`, () => {
+        const structures = [
+          ...m.buildings.map(b => ({ s: `b${b.buildingType}@(${b.x},${b.z})`, x: b.x, z: b.z })),
+          ...m.goldMines.map(g => ({ s: `gold@(${g.x},${g.z})`, x: g.x, z: g.z })),
+        ];
+        const offenders: string[] = [];
+        for (let i = 0; i < structures.length; i++) {
+          for (let j = i + 1; j < structures.length; j++) {
+            const a = structures[i], b = structures[j];
+            if (Math.abs(a.x - b.x) < BUILDING_FOOTPRINT && Math.abs(a.z - b.z) < BUILDING_FOOTPRINT) {
+              offenders.push(`${a.s} overlaps ${b.s}`);
+            }
+          }
+          for (const u of getAllMissionUnitSpawns(m)) {
+            const a = structures[i];
+            if (Math.abs(a.x - u.x) < UNIT_IN_FOOTPRINT && Math.abs(a.z - u.z) < UNIT_IN_FOOTPRINT) {
+              offenders.push(`${a.s} covers f${u.factionId}/u${u.unitType}@(${u.x},${u.z})`);
+            }
+          }
+        }
+        expect(offenders).toEqual([]);
+      });
+    }
+  }
 });

@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.61.0] - 2026-10-16 — Bundel 4: pathfinding, multi-AI, populatie-accounting
+
+### Added
+- **Pathfinding** (`src/pathfinding/NavGrid.ts`, `UnitPathing.ts`): A* op een raster van 1 unit per cel, gebouwd uit de echte terreindata. `isRiver()` laat de bruggen beloopbaar; rotswanden krijgen 0,75 marge. Routes worden gladgetrokken met zichtlijnchecks en het aantal route-aanvragen per frame is begrensd. De oude Recast-`PathfindingSystem` uit v0.2 was nooit aangesloten, en een navmesh van `terrain.mesh` ziet de rivier niet: die is daar alleen een ondiepe kuil. Waypoints tellen pas als gepasseerd als de lijn naar het volgende punt vrij is. Een unit die vastloopt zoekt een nieuwe route en stopt na 3 mislukte pogingen. Units lopen nu via de bruggen om de rivier en om rotswanden heen. Gemeten: 8,3 ms/frame in een potje met 4 spelers.
+- **Multi-AI**: `AISystem` heeft één controller per AI-factie, met eigen state en timers. Skirmish is free-for-all. In missies zijn de AI's bondgenoten en richten ze zich alleen op de speler (`setFactions(..., { allied: true })`).
+
+### Fixed
+- **Populatie**: trainen, de wachtrij-check, sterven en het verlopen van summons gebruiken nu de echte unitkosten (Heavy 2, Siege 3-4, summons 0). Housing en TownHall geven pas ruimte als ze af zijn, en geven die bij vernietiging terug, maar alleen als die ook toegekend was. Barracks, torens en bruggen geven geen +5 meer. Bij de start van een missie corrigeert een bonus per factie (`grantMissionStartingCapBonus`) dit, zodat elke missie met dezelfde vrije ruimte begint als voorheen. Ook gefixt: de gratis worker van de Diplomatiek Salon telt nu mee in de populatie.
+- **Hergebruikte eid's erfden oude stats**: elk spawnpad zet nu elk veld van elk component (`spawnBasicUnit`, `addFreshComponent`). Gebouwen krijgen Armor van het type Building, dus de 2x schade van siege tegen gebouwen werkt nu eindelijk.
+- **Bekeringen** (persuade, Frietkoning-decreet, CEO-overname, bod-boven-vraagprijs) verplaatsen populatie, militaire telling en verleende ruimte via één helper, `transferOwnership`.
+- **Annuleren in de wachtrij** betaalt nu ook het hout terug.
+- **Helden en militaire telling**: spawn, training en revive tellen een held nu mee, dus zijn dood zet de telling niet meer negatief.
+- **Missie-spawns in de rivier of op een gebouw** zijn verplaatst. De structuuraudit controleert nu ook rivier, rotswanden en overlap van footprints, op het echte gegenereerde terrein.
+
+### Tests
+- Nieuw: pathfinding-navgrid, pathfinding-real-maps, AISystem-multi-faction, population-accounting, population-start-queue-transfer, spawn-recycled-eid-init, ownership-transfer-population, Game-cancel-queue-refund, en de salon-worker-populatie. 2965/2965 groen, UAT 2/2. In de browser: alle drie de AI's in een potje met 4 spelers groeien, een worker steekt via de brug over zonder in de rivier te staan, en de populatie-invariant klopte gedurende 180 s.
+
 ## [0.60.5] - 2026-10-16 — Bundel 3: UI/input, campagne-missies, audio-mix, instellingen
 
 ### Fixed — UI & input

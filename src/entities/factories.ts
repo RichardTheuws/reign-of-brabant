@@ -55,6 +55,8 @@ import {
   Healer,
   UnitAbility,
   MeleeBackup,
+  Selected,
+  GezeligheidBonus,
 } from '../ecs/components';
 
 import { getUnitAbilities } from '../data/unitAbilityMap';
@@ -93,6 +95,157 @@ function deriveAttackType(typeId: UnitTypeId, range: number): AttackType {
   if (typeId === UnitTypeId.Support || typeId === UnitTypeId.Special) return AttackType.Magic;
   if (range > 0) return AttackType.Ranged;
   return AttackType.Melee;
+}
+
+// ---------------------------------------------------------------------------
+// Fresh component init (bitECS recycles eids without clearing component data)
+// ---------------------------------------------------------------------------
+
+/** Zero every typed-array field of a SoA component for one eid. */
+export function clearComponentData(component: object, eid: number): void {
+  for (const field of Object.values(component)) {
+    if (ArrayBuffer.isView(field) && !(field instanceof DataView)) {
+      (field as unknown as { [i: number]: number })[eid] = 0;
+    }
+  }
+}
+
+/**
+ * addComponent + zero all its fields, so a recycled eid never inherits the
+ * previous entity's data. Callers then write the non-zero defaults.
+ */
+export function addFreshComponent(world: World, eid: number, component: object): void {
+  addComponent(world, eid, component);
+  clearComponentData(component, eid);
+}
+
+/** Population slots a unit of this faction/type costs (data-driven; 1 if unknown). */
+export function getUnitPopulationCost(factionId: FactionId, unitTypeId: UnitTypeId): number {
+  try {
+    return resolveUnitArchetype(factionId, unitTypeId).population;
+  } catch {
+    return 1;
+  }
+}
+
+/** Numeric stats for spawnBasicUnit (template- or archetype-sourced). */
+export interface BasicUnitStats {
+  hp: number;
+  attack: number;
+  attackSpeed: number;
+  armor: number;
+  speed: number;
+  range: number;
+  sightRange: number;
+  carryCapacity: number;
+}
+
+/**
+ * Spawn a unit with the legacy component set used by the ProductionSystem
+ * template path and Game.createUnitEntity (pre-placed units): Position, Health,
+ * Attack, Armor, Movement, Faction, UnitType, UnitAI, Visibility, Rotation,
+ * Selected, GezeligheidBonus, PopulationCost, IsUnit (+ IsWorker/Gatherer).
+ *
+ * Every field of every component is written: numeric stats come from `stats`,
+ * typing (attack/armor type, siege bonus, splash, population) from the faction
+ * archetype. Does NOT touch PlayerState -- callers do the bookkeeping using
+ * PopulationCost.cost[eid].
+ */
+export function spawnBasicUnit(
+  world: World,
+  unitTypeId: UnitTypeId,
+  factionId: FactionId,
+  x: number,
+  y: number,
+  z: number,
+  stats: BasicUnitStats,
+): number {
+  let arch: UnitArchetype | undefined;
+  try {
+    arch = resolveUnitArchetype(factionId, unitTypeId);
+  } catch {
+    arch = undefined;
+  }
+
+  const eid = addEntity(world);
+
+  addFreshComponent(world, eid, Position);
+  Position.x[eid] = x;
+  Position.y[eid] = y;
+  Position.z[eid] = z;
+
+  addFreshComponent(world, eid, Health);
+  Health.current[eid] = stats.hp;
+  Health.max[eid] = stats.hp;
+
+  addFreshComponent(world, eid, Attack);
+  Attack.damage[eid] = stats.attack;
+  Attack.speed[eid] = stats.attackSpeed;
+  Attack.range[eid] = stats.range;
+  Attack.cooldown[eid] = stats.attackSpeed;
+  Attack.timer[eid] = 0;
+  Attack.attackType[eid] = arch?.attackType ?? deriveAttackType(unitTypeId, arch?.range ?? stats.range);
+  Attack.siegeBonus[eid] = arch?.siegeBonus ?? 1.0;
+  Attack.splashRadius[eid] = arch?.splashRadius ?? 0;
+
+  addFreshComponent(world, eid, Armor);
+  Armor.value[eid] = stats.armor;
+  Armor.type[eid] = arch?.armorType ?? ArmorType.Unarmored;
+
+  addFreshComponent(world, eid, Movement);
+  Movement.targetX[eid] = x;
+  Movement.targetZ[eid] = z;
+  Movement.speed[eid] = stats.speed;
+  Movement.hasTarget[eid] = 0;
+
+  addFreshComponent(world, eid, Faction);
+  Faction.id[eid] = factionId;
+
+  addFreshComponent(world, eid, UnitType);
+  UnitType.id[eid] = unitTypeId;
+
+  addFreshComponent(world, eid, UnitAI);
+  UnitAI.state[eid] = UnitAIState.Idle;
+  UnitAI.targetEid[eid] = NO_ENTITY;
+  UnitAI.originX[eid] = x;
+  UnitAI.originZ[eid] = z;
+
+  addFreshComponent(world, eid, Visibility);
+  Visibility.range[eid] = stats.sightRange;
+
+  addFreshComponent(world, eid, Rotation);
+  Rotation.y[eid] = 0;
+
+  addFreshComponent(world, eid, Selected);
+  Selected.by[eid] = 255; // not selected
+
+  addFreshComponent(world, eid, GezeligheidBonus);
+  GezeligheidBonus.nearbyCount[eid] = 0;
+  GezeligheidBonus.attackMult[eid] = 1.0;
+  GezeligheidBonus.speedMult[eid] = 1.0;
+  GezeligheidBonus.armorMult[eid] = 1.0;
+  GezeligheidBonus.passiveHeal[eid] = 0;
+  GezeligheidBonus.damageReduction[eid] = 0;
+
+  addFreshComponent(world, eid, PopulationCost);
+  PopulationCost.cost[eid] = arch?.population ?? 1;
+
+  addComponent(world, eid, IsUnit);
+
+  if (unitTypeId === UnitTypeId.Worker) {
+    addComponent(world, eid, IsWorker);
+    addFreshComponent(world, eid, Gatherer);
+    Gatherer.state[eid] = 0;
+    Gatherer.targetEid[eid] = NO_ENTITY;
+    Gatherer.carrying[eid] = 0;
+    Gatherer.carryCapacity[eid] = stats.carryCapacity;
+    Gatherer.resourceType[eid] = ResourceType.Gold;
+    Gatherer.previousTarget[eid] = NO_ENTITY;
+    Gatherer.carryBonus[eid] = 0;
+    Gatherer.gatherSpeedMult[eid] = 1;
+  }
+
+  return eid;
 }
 
 // ---------------------------------------------------------------------------

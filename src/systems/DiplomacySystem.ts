@@ -32,6 +32,7 @@ import {
   Health,
   UnitType,
   Armor,
+  PopulationCost,
 } from '../ecs/components';
 import { IsBuilding, IsUnit, IsDead } from '../ecs/tags';
 import { playerState } from '../core/PlayerState';
@@ -44,6 +45,7 @@ import {
 } from '../types/index';
 import { getSalonProtocolCostMult } from './FactionSpecial1Passives';
 import { getPralinesDurationMult } from './ChocolaterieSystem';
+import { getGrantedPopulationCap } from './PopulationSystem';
 import type { GameWorld } from '../ecs/world';
 import type { CombatHitEvent } from '../types/index';
 
@@ -253,6 +255,51 @@ export function breakCompromis(targetFaction: number): boolean {
 }
 
 // ---------------------------------------------------------------------------
+// Public API -- Ownership transfer (persuasion, conversions, captures)
+// ---------------------------------------------------------------------------
+
+/**
+ * Change an entity's owner AND move the per-faction counters it carries.
+ *
+ * Units: population (the unit's stored PopulationCost, as DeathSystem uses)
+ * and the military count (non-workers). Pop-cap overflow is allowed for
+ * converted units -- they are counted, not refused.
+ * Buildings: move the capacity PopulationSystem actually granted for this eid
+ * (getGrantedPopulationCap), so its later revoke on destruction stays balanced.
+ *
+ * Without this a later death is subtracted from the new owner while the old
+ * owner stays inflated.
+ */
+export function transferOwnership(world: GameWorld, eid: number, newFaction: number): void {
+  const oldFaction = Faction.id[eid];
+  if (oldFaction === newFaction) return;
+
+  if (hasComponent(world, eid, IsUnit)) {
+    const popCost = hasComponent(world, eid, PopulationCost) ? PopulationCost.cost[eid] : 1;
+    if (popCost > 0) {
+      playerState.removePopulation(oldFaction, popCost);
+      playerState.addPopulation(newFaction, popCost);
+    }
+    if (UnitType.id[eid] !== UnitTypeId.Worker) {
+      playerState.removeMilitaryUnit(oldFaction);
+      playerState.addMilitaryUnit(newFaction);
+    }
+  }
+
+  if (hasComponent(world, eid, IsBuilding)) {
+    // Move exactly what PopulationSystem granted (0 for barracks/towers and
+    // unfinished buildings); its later revoke goes to the new owner.
+    const provided = getGrantedPopulationCap(eid);
+    if (provided > 0) {
+      playerState.removePopulationCapacity(oldFaction, provided);
+      playerState.addPopulationCapacity(newFaction, provided);
+    }
+  }
+
+  Faction.id[eid] = newFaction;
+}
+
+// ---------------------------------------------------------------------------
 // Public API -- Chocolade-Overtuiging
 // ---------------------------------------------------------------------------
 
@@ -287,7 +334,7 @@ export function persuadeUnit(world: GameWorld, targetEid: number): boolean {
 
   // Switch faction
   const originalFaction = Faction.id[targetEid];
-  Faction.id[targetEid] = FactionId.Belgen;
+  transferOwnership(world, targetEid, FactionId.Belgen);
 
   // Pralines voor Iedereen passive: extend duration based on chocolade voorraad.
   const duration = PERSUASION_DURATION * getPralinesDurationMult(FactionId.Belgen);
@@ -514,7 +561,7 @@ function processPersuadedUnits(world: GameWorld, elapsed: number): void {
     // Check if duration expired
     if (elapsed >= p.returnTime) {
       // Return to original faction
-      Faction.id[p.entityId] = p.originalFaction;
+      transferOwnership(world, p.entityId, p.originalFaction);
 
       eventBus.emit('unit-returned' as keyof import('../types/index').GameEvents, {
         entityId: p.entityId,

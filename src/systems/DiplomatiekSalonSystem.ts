@@ -17,7 +17,7 @@ import { IsDead, IsBuilding } from '../ecs/tags';
 import { FactionId, BuildingTypeId, UnitTypeId } from '../types/index';
 import { playerState } from '../core/PlayerState';
 import { eventBus } from '../core/EventBus';
-import { createUnit } from '../entities/factories';
+import { getUnitPopulationCost, createUnit } from '../entities/factories';
 import type { GameWorld } from '../ecs/world';
 
 const COOLDOWN_SECONDS = 90;
@@ -76,6 +76,8 @@ export function createDiplomatiekSalonSystem() {
       } else {
         outcome = 'spawn';
         createUnit(world, UnitTypeId.Worker, FactionId.Belgen, x + 2, z);
+        // DeathSystem subtracts the unit's cost on death, so count it now
+        playerState.addPopulation(FactionId.Belgen, getUnitPopulationCost(FactionId.Belgen, UnitTypeId.Worker));
       }
       eventBus.emit('diplomatiek-event', { outcome, x, z, eid });
       state.cooldown = COOLDOWN_SECONDS;

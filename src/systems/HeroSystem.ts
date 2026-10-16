@@ -41,6 +41,7 @@ import {
 } from '../types/index';
 import { HERO_ARCHETYPES } from '../entities/heroArchetypes';
 import { createHero, createMilitia, markHeroInactive } from '../entities/heroFactory';
+import { transferOwnership } from './DiplomacySystem';
 import type { GameWorld } from '../ecs/world';
 
 // ---------------------------------------------------------------------------
@@ -336,8 +337,8 @@ function executeAbility(
         if (hasComponent(world, abilityTargetEid, IsBuilding)) {
           const hpRatio = Health.current[abilityTargetEid] / Health.max[abilityTargetEid];
           if (hpRatio < 0.5 && Faction.id[abilityTargetEid] !== factionId) {
-            // Capture: change faction
-            Faction.id[abilityTargetEid] = factionId;
+            // Capture: change faction (moves pop-capacity with it)
+            transferOwnership(world, abilityTargetEid, factionId);
           }
         }
       }
@@ -569,7 +570,7 @@ function executeAbility(
       // Convert enemy unit for 10s -- simplified: stun + change faction temporarily
       if (abilityTargetEid !== NO_ENTITY && entityExists(world, abilityTargetEid)) {
         if (hasComponent(world, abilityTargetEid, IsUnit) && !hasComponent(world, abilityTargetEid, IsHero)) {
-          Faction.id[abilityTargetEid] = factionId;
+          transferOwnership(world, abilityTargetEid, factionId);
           applyStun(world, abilityTargetEid, 1); // Brief stun while converting
           // Track for revert (simplified: permanent for now)
         }
@@ -866,6 +867,9 @@ function tickRevivals(world: GameWorld, dt: number): void {
       if (eid >= 0) {
         // Add population back
         playerState.addPopulation(revival.factionId, HERO_POPULATION_COST);
+        // Heroes are Infantry: DeathSystem uncounts them on death, so the
+        // revived hero must be counted again (like the spawn paths do).
+        playerState.addMilitaryUnit(revival.factionId);
 
         eventBus.emit('hero-revived', {
           entityId: eid,

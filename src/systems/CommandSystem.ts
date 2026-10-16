@@ -28,6 +28,7 @@ import { UnitAIState, NO_ENTITY, NO_PRODUCTION } from '../types/index';
 import { gameConfig } from '../core/GameConfig';
 import { getFactionUnitArchetype } from '../data/factionData';
 import { getDifficultyProductionMult } from '../data/difficultyConfig';
+import { getUnitPopulationCost } from '../entities/factories';
 import type { GameWorld } from '../ecs/world';
 
 // ---------------------------------------------------------------------------
@@ -376,8 +377,9 @@ function handleTrain(world: GameWorld, cmd: TrainCommand): void {
   if (!playerState.canAfford(factionId, cost)) return;
   if (woodCost > 0 && !playerState.canAffordWood(factionId, woodCost)) return;
 
-  // Check population
-  if (!playerState.hasPopulationRoom(factionId)) return;
+  // Check population -- the unit's real cost (Heavy/Siege 2-4), the same
+  // amount ProductionSystem needs at spawn time.
+  if (!playerState.hasPopulationRoom(factionId, getUnitPopulationCost(factionId, cmd.unitTypeId))) return;
 
   // Deduct both resources at START of production
   playerState.spend(factionId, cost);

@@ -13,11 +13,12 @@
 import { addEntity, addComponent } from 'bitecs';
 import {
   Position, Health, Faction, Building, Visibility, Selected,
-  Production, RallyPoint,
+  Production, RallyPoint, Armor,
 } from '../ecs/components';
 import { IsBuilding } from '../ecs/tags';
 import { BUILDING_ARCHETYPES } from './archetypes';
-import { BuildingTypeId, type FactionId, NO_PRODUCTION, NO_ENTITY } from '../types/index';
+import { addFreshComponent } from './factories';
+import { ArmorType, BuildingTypeId, type FactionId, NO_PRODUCTION, NO_ENTITY } from '../types/index';
 import type { GameWorld } from '../ecs/world';
 
 export interface BuildingSpawnOptions {
@@ -34,7 +35,7 @@ const DEFAULT_ARCH = {
   buildTime: 25,
   sightRange: 8,
   produces: [] as readonly number[],
-  populationProvided: 5,
+  populationProvided: 0,
 };
 
 /**
@@ -58,41 +59,52 @@ export function spawnBuildingEntity(
   const arch = legacy ?? DEFAULT_ARCH;
   const y = opts.getHeightAt ? opts.getHeightAt(x, z) : 0;
 
-  addComponent(world, eid, Position);
+  // Every component is added fresh (zeroed) and every field written:
+  // bitECS recycles eids without clearing component data.
+  addFreshComponent(world, eid, Position);
   Position.x[eid] = x;
   Position.y[eid] = y;
   Position.z[eid] = z;
 
-  addComponent(world, eid, Health);
+  addFreshComponent(world, eid, Health);
   Health.current[eid] = arch.hp;
   Health.max[eid] = arch.hp;
 
-  addComponent(world, eid, Faction);
+  // Buildings have their own armor class (weak to Siege in the damage matrix),
+  // same as factories.ts initBuilding().
+  addFreshComponent(world, eid, Armor);
+  Armor.value[eid] = 0;
+  Armor.type[eid] = ArmorType.Building;
+
+  addFreshComponent(world, eid, Faction);
   Faction.id[eid] = faction;
 
-  addComponent(world, eid, Building);
+  addFreshComponent(world, eid, Building);
   Building.typeId[eid] = type;
   Building.complete[eid] = 1;
+  Building.progress[eid] = 1;
+  Building.maxProgress[eid] = arch.buildTime;
 
-  addComponent(world, eid, Visibility);
+  addFreshComponent(world, eid, Visibility);
   Visibility.range[eid] = arch.sightRange || 12;
 
-  addComponent(world, eid, Selected);
+  addFreshComponent(world, eid, Selected);
   Selected.by[eid] = opts.selectedBy ?? 255;
 
   addComponent(world, eid, IsBuilding);
 
   if (arch.produces.length > 0) {
-    addComponent(world, eid, Production);
+    addFreshComponent(world, eid, Production);
     Production.unitType[eid] = NO_PRODUCTION;
     Production.progress[eid] = 0;
+    Production.duration[eid] = 0;
     Production.queue0[eid] = NO_PRODUCTION;
     Production.queue1[eid] = NO_PRODUCTION;
     Production.queue2[eid] = NO_PRODUCTION;
     Production.queue3[eid] = NO_PRODUCTION;
     Production.queue4[eid] = NO_PRODUCTION;
 
-    addComponent(world, eid, RallyPoint);
+    addFreshComponent(world, eid, RallyPoint);
     RallyPoint.x[eid] = x + 3;
     RallyPoint.z[eid] = z;
     RallyPoint.resourceEid[eid] = NO_ENTITY;

@@ -20,6 +20,7 @@ import { playerState } from '../core/PlayerState';
 import { eventBus } from '../core/EventBus';
 import { FactionId, BuildingTypeId, ResourceType } from '../types/index';
 import { onRandstadActionCompleted } from './BureaucracySystem';
+import { syncBuildingPopulationCap } from './PopulationSystem';
 import type { GameWorld } from '../ecs/world';
 
 // ---------------------------------------------------------------------------
@@ -260,6 +261,9 @@ export function createBuildSystem() {
       if (Building.progress[bEid] >= maxProgress) {
         Building.progress[bEid] = maxProgress;
         Building.complete[bEid] = 1;
+        // Grant population cap now (before 'building-placed', whose Housing
+        // toast reads the new max).
+        syncBuildingPopulationCap(world, bEid);
 
         // Notify Bureaucracy system of completed action
         onRandstadActionCompleted(factionId);

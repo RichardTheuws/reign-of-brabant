@@ -25,9 +25,12 @@ import { generateMap, type GeneratedMap, DecoType } from '../world/MapGenerator'
 import { remapMapPlayerFaction } from '../world/factionRemap';
 import { checkBuildingAffordability, chargeBuildingCost } from '../world/buildingCost';
 import { createMapTunnelSystem } from '../systems/MapTunnelSystem';
-import { resetPopulationSystem } from '../systems/PopulationSystem';
+import { resetPopulationSystem, syncBuildingPopulationCap, grantMissionStartingCapBonus } from '../systems/PopulationSystem';
+import { spawnBasicUnit, getUnitPopulationCost } from '../entities/factories';
 import { queueCommand } from '../systems/CommandSystem';
 import { NavMeshManager } from '../pathfinding/NavMeshManager';
+import { NavGrid } from '../pathfinding/NavGrid';
+import { setActiveNavGrid } from '../pathfinding/UnitPathing';
 import { AISystem } from '../ai/AISystem';
 import { gameConfig } from '../core/GameConfig';
 import { UnitRenderer } from '../rendering/UnitRenderer';
@@ -367,7 +370,13 @@ export class Game {
     // and starting-gold seeding via difficultyConfig.ts).
     gameConfig.setPlayerFaction(this.playerFactionId);
     gameConfig.setDifficulty(this.difficulty as 'easy' | 'normal' | 'hard');
-    AISystem.setFaction(this.getAIFactionId(), this.difficulty);
+    // One AI controller per non-player spawn faction (3-4 player skirmish).
+    const aiFactions = [...new Set(
+      this.map.spawns
+        .map(s => s.factionId as FactionId)
+        .filter(f => f !== this.playerFactionId),
+    )];
+    AISystem.setFactions(aiFactions.length > 0 ? aiFactions : [this.getAIFactionId()], this.difficulty);
 
     // 2. Load GLB models (all active factions for performance)
     const activeFactions = new Set<number>(this.map.spawns.map(s => s.factionId));
@@ -397,6 +406,7 @@ export class Game {
     } catch (e) {
       console.warn('[Game] NavMesh failed, using direct movement fallback:', e);
     }
+    this.installNavGrid();
 
     // 4. Spawn all entities from map definition
     window.dispatchEvent(new CustomEvent('loading-progress', {
@@ -441,6 +451,21 @@ export class Game {
     console.log('[Game] Reign of Brabant initialized');
   }
 
+  /**
+   * Unit pathfinding grid (rivers minus bridges + rock walls). Movement falls
+   * back to straight lines when this fails. Also resets per-unit path state.
+   */
+  private installNavGrid(): void {
+    try {
+      const grid = NavGrid.fromTerrain(this.terrain, this.map.terrainFeatures?.rockWalls ?? []);
+      setActiveNavGrid(grid);
+      console.log(`[Game] NavGrid ready: ${grid.size}x${grid.size}, ${grid.blockedCount} blocked cells`);
+    } catch (e) {
+      console.warn('[Game] NavGrid failed, using direct movement fallback:', e);
+      setActiveNavGrid(null);
+    }
+  }
+
   async initMission(missionId: string): Promise<void> {
     const mission = getMissionById(missionId);
     if (!mission) throw new Error(`Unknown mission: ${missionId}`);
@@ -479,6 +504,7 @@ export class Game {
       detail: { progress: 0.7, label: 'Navigatie berekenen...' },
     }));
     try { await this.navMesh.init(this.terrain.mesh); } catch { /* fallback */ }
+    this.installNavGrid();
 
     // Use explicit faction fields from mission definition
     const missionPlayerFaction = mission.playerFactionId;
@@ -498,12 +524,15 @@ export class Game {
       detail: { progress: 0.85, label: 'Eenheden plaatsen...' },
     }));
     this._spawnMissionEntities(mission);
+    // Keep each faction's free population room at mission start as the layout
+    // was balanced for (old +5-per-building / 1-per-unit rules).
+    grantMissionStartingCapBonus(world);
     this.spawnProps();
 
-    // Configure AI system: set the primary AI faction and start production if enabled
+    // Configure AI system: one controller per AI faction (allied against the
+    // player, as the briefings describe), start production if enabled
     if (mission.aiFactionIds.length > 0) {
-      const primaryAiFaction = mission.aiFactionIds[0];
-      AISystem.setFaction(primaryAiFaction);
+      AISystem.setFactions(mission.aiFactionIds, undefined, { allied: true });
     }
     if (mission.hasAIProduction) this.configureAI();
 
@@ -1177,7 +1206,9 @@ export class Game {
   /**
    * Cancel a production queue item at the given index for a building.
    * Index 0 = currently producing item, 1-5 = queued items.
-   * Refunds gold for the cancelled unit.
+   * Refunds gold and wood for the cancelled unit. Training charges the plain
+   * archetype costGold + costSecondary (no multipliers, no tertiary), so the
+   * archetype is the exact record of what was charged.
    */
   private cancelProductionQueueItem(buildingId: number, queueIndex: number): void {
     if (!entityExists(world, buildingId)) return;
@@ -1192,10 +1223,11 @@ export class Game {
       const unitType = Production.unitType[buildingId];
       if (unitType === NO_PRODUCTION) return;
 
-      // Refund gold
+      // Refund gold + wood (exactly what CommandSystem.handleTrain charged)
       try {
         const arch = getFactionUnitArchetype(fid, unitType);
         this.playerState.addGold(fid, arch.costGold);
+        if ((arch.costSecondary ?? 0) > 0) this.playerState.addWood(fid, arch.costSecondary);
       } catch { /* no refund if archetype unknown */ }
 
       // Shift queue: move next queued item into production
@@ -1228,10 +1260,11 @@ export class Game {
       const unitType = slots[slotIndex][buildingId];
       if (unitType === NO_PRODUCTION) return;
 
-      // Refund gold
+      // Refund gold + wood (exactly what CommandSystem.handleTrain charged)
       try {
         const arch = getFactionUnitArchetype(fid, unitType);
         this.playerState.addGold(fid, arch.costGold);
+        if ((arch.costSecondary ?? 0) > 0) this.playerState.addWood(fid, arch.costSecondary);
       } catch { /* no refund if archetype unknown */ }
 
       // Remove from queue and shift remaining items down
@@ -1576,7 +1609,7 @@ export class Game {
         this.hud?.showAlert(`Niet genoeg hout! (${woodCost} nodig)`, 'warning');
         return;
       }
-      if (!this.playerState.hasPopulationRoom(this.playerFactionId)) {
+      if (!this.playerState.hasPopulationRoom(this.playerFactionId, getUnitPopulationCost(this.playerFactionId, unitType))) {
         this.hud?.showAlert(getFactionMessage(this.playerFactionId, 'pop-cap-full'), 'warning');
         return;
       }
@@ -1641,6 +1674,9 @@ export class Game {
     const heroEid = createHero(world, heroTypeId, this.playerFactionId, spawnX, spawnZ, thX, thZ);
     if (heroEid >= 0) {
       this.playerState.addPopulation(this.playerFactionId, HERO_POPULATION_COST);
+      // Heroes are UnitTypeId.Infantry: DeathSystem counts their death as a
+      // military loss, so count the spawn too.
+      this.playerState.addMilitaryUnit(this.playerFactionId);
       // Determine hero index within faction (0 = primary, 1 = secondary)
       const factionHeroes = getHeroTypesForFaction(this.playerFactionId);
       const heroIndex = factionHeroes.indexOf(heroTypeId);
@@ -2364,6 +2400,9 @@ export class Game {
       const arch = BUILDING_ARCHETYPES[type];
       Building.maxProgress[eid] = arch.buildTime;
     }
+    // Cap only while complete: revokes the placement grant for player
+    // construction sites; BuildSystem grants it on completion.
+    syncBuildingPopulationCap(world, eid);
 
     const factionIdx = faction;
     const typeName = this.getBuildingRendererType(type);
@@ -4138,7 +4177,6 @@ export class Game {
   // --- Entity creation helpers ---
 
   private createUnitEntity(type: UnitTypeId, faction: FactionId, x: number, z: number): number {
-    const eid = addEntity(world);
     let arch: UnitArchetype;
     try {
       arch = getFactionUnitArchetype(faction, type);
@@ -4152,36 +4190,21 @@ export class Game {
     }
     const y = this.terrain.getHeightAt(x, z);
 
-    addComponent(world, eid, Position); Position.x[eid] = x; Position.y[eid] = y; Position.z[eid] = z;
-    addComponent(world, eid, Health); Health.current[eid] = arch.hp; Health.max[eid] = arch.hp;
-    addComponent(world, eid, Attack); Attack.damage[eid] = arch.attack; Attack.speed[eid] = arch.attackSpeed; Attack.range[eid] = arch.range; Attack.timer[eid] = 0;
-    addComponent(world, eid, Armor); Armor.value[eid] = arch.armor;
-    addComponent(world, eid, Movement); Movement.speed[eid] = arch.speed; Movement.hasTarget[eid] = 0;
-    addComponent(world, eid, Faction); Faction.id[eid] = faction;
-    addComponent(world, eid, UnitType); UnitType.id[eid] = type;
-    addComponent(world, eid, UnitAI); UnitAI.state[eid] = UnitAIState.Idle;
-    addComponent(world, eid, Visibility); Visibility.range[eid] = arch.sightRange || 10;
-    addComponent(world, eid, Rotation);
-    addComponent(world, eid, Selected); Selected.by[eid] = 255; // Not selected
-    addComponent(world, eid, IsUnit);
+    // Shared helper writes every field of every component (recycled eids keep
+    // stale data) incl. attack/armor typing, siege/splash and PopulationCost.
+    const eid = spawnBasicUnit(world, type, faction, x, y, z, {
+      hp: arch.hp,
+      attack: arch.attack,
+      attackSpeed: arch.attackSpeed,
+      armor: arch.armor,
+      speed: arch.speed,
+      range: arch.range,
+      sightRange: arch.sightRange || 10,
+      carryCapacity: 10,
+    });
 
-    // Gezelligheid bonus component (all units get it; only Brabanders will have non-1.0 values)
-    addComponent(world, eid, GezeligheidBonus);
-    GezeligheidBonus.nearbyCount[eid] = 0;
-    GezeligheidBonus.attackMult[eid] = 1.0;
-    GezeligheidBonus.speedMult[eid] = 1.0;
-    GezeligheidBonus.armorMult[eid] = 1.0;
-    GezeligheidBonus.passiveHeal[eid] = 0;
-    GezeligheidBonus.damageReduction[eid] = 0;
-
-    if (type === UnitTypeId.Worker) {
-      addComponent(world, eid, IsWorker);
-      addComponent(world, eid, Gatherer);
-      Gatherer.carryCapacity[eid] = 10;
-      Gatherer.previousTarget[eid] = NO_ENTITY;
-    }
-
-    this.playerState.addPopulation(faction, 1);
+    // Same amount DeathSystem subtracts on death.
+    this.playerState.addPopulation(faction, getUnitPopulationCost(faction, type));
 
     // Track military units for upkeep
     if (type !== UnitTypeId.Worker) {
@@ -4199,11 +4222,11 @@ export class Game {
       getHeightAt: (px, pz) => this.terrain.getHeightAt(px, pz),
     });
 
-    // Game-level bookkeeping that's not part of the pure ECS spawn.
-    const arch = type < BUILDING_ARCHETYPES.length
-      ? BUILDING_ARCHETYPES[type]
-      : { populationProvided: 5 };
-    this.playerState.addPopulationCapacity(faction, arch.populationProvided ?? 5);
+    // Game-level bookkeeping: the helper spawns complete, so grant the cap
+    // (TownHall/Housing only). Callers that flip complete=0 afterwards must
+    // re-sync (spawnBuildingAtRuntime does; the PopulationSystem sweep
+    // reconciles any other path).
+    syncBuildingPopulationCap(world, eid);
     return eid;
   }
 

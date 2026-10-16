@@ -53,11 +53,13 @@ export function createDeathSystem() {
         const unitTypeId = UnitType.id[eid];
 
         if (hasComponent(world, eid, IsUnit)) {
-          // Heroes cost more population; use actual PopulationCost if available
+          // Subtract exactly what was added at spawn: PopulationCost (heroes 5,
+          // heavy/siege 2-4, summons 0 -- 0 stays 0). Legacy entities without
+          // the component count as 1.
           const popCost = hasComponent(world, eid, PopulationCost)
-            ? (PopulationCost.cost[eid] || 1)
+            ? PopulationCost.cost[eid]
             : 1;
-          playerState.removePopulation(factionId, popCost);
+          if (popCost > 0) playerState.removePopulation(factionId, popCost);
 
           // Track military unit loss for upkeep system
           if (unitTypeId !== UnitTypeId.Worker) {

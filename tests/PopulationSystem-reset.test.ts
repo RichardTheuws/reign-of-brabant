@@ -7,8 +7,10 @@
  * building dying next match with an eid that already died last match was
  * skipped — its population capacity was never subtracted.
  *
- * Contract: resetPopulationSystem() clears the processed set, and Game.cleanup()
- * calls it (asserted in Game-new-match-cleanup.test.ts).
+ * Contract: resetPopulationSystem() clears the per-eid bookkeeping (since
+ * 2026-10-16 the granted-cap map: cap is granted while a building is alive and
+ * complete, and removed only if it was granted), and Game.cleanup() calls it
+ * (asserted in Game-new-match-cleanup.test.ts).
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { addEntity, addComponent } from 'bitecs';
@@ -21,15 +23,17 @@ import { FactionId, BuildingTypeId } from '../src/types/index';
 
 type World = ReturnType<typeof replaceWorld>;
 
-function spawnDeadTownHall(world: World): number {
+/** Town hall that was alive + complete for one tick (cap granted), then dies. */
+function spawnDeadTownHall(world: World, system: ReturnType<typeof createPopulationSystem>): number {
   const eid = addEntity(world);
   addComponent(world, eid, Building);
   addComponent(world, eid, Faction);
   addComponent(world, eid, IsBuilding);
-  addComponent(world, eid, IsDead);
   Building.typeId[eid] = BuildingTypeId.TownHall;
   Building.complete[eid] = 1;
   Faction.id[eid] = FactionId.Brabanders;
+  system(world, 0.016); // grant
+  addComponent(world, eid, IsDead);
   return eid;
 }
 
@@ -45,7 +49,7 @@ describe('PopulationSystem — processed set across world resets', () => {
     // Match 1: town hall dies → capacity drops.
     let world = replaceWorld();
     playerState.addPopulationCapacity(FactionId.Brabanders, 20);
-    const eid1 = spawnDeadTownHall(world);
+    const eid1 = spawnDeadTownHall(world, system);
     const before1 = playerState.getPopulationMax(FactionId.Brabanders);
     system(world, 0.016);
     const after1 = playerState.getPopulationMax(FactionId.Brabanders);
@@ -56,7 +60,7 @@ describe('PopulationSystem — processed set across world resets', () => {
     playerState.reset();
     world = replaceWorld();
     playerState.addPopulationCapacity(FactionId.Brabanders, 20);
-    const eid2 = spawnDeadTownHall(world);
+    const eid2 = spawnDeadTownHall(world, system);
     expect(eid2).toBe(eid1); // eid recycled — the precondition for the bug
 
     const before2 = playerState.getPopulationMax(FactionId.Brabanders);

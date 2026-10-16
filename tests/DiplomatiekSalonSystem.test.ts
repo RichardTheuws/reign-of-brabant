@@ -93,6 +93,17 @@ describe('DiplomatiekSalonSystem — timer + outcomes', () => {
     expect(afterWorkers).toBe(beforeWorkers + 1);
   });
 
+  it('outcome = spawn: the free Worker is counted in Belgen population', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.9);
+    const world = replaceWorld();
+    const sys = createDiplomatiekSalonSystem();
+    spawnSalon(world, 0, 0);
+    const before = playerState.getPopulation(FactionId.Belgen);
+    sys(world, 0);
+    sys(world, 91);
+    expect(playerState.getPopulation(FactionId.Belgen)).toBe(before + 1);
+  });
+
   it('event-payload contains outcome + position + eid', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.5);
     const world = replaceWorld();

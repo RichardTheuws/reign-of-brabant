@@ -98,10 +98,10 @@ interface AISystemCallbacks {
   spawnBuilding: (type: BuildingTypeId, factionId: FactionId, x: number, z: number) => EntityId;
   /** Start training a unit from a building. */
   startTraining: (buildingEid: EntityId, unitType: UnitTypeId) => boolean;
-  /** Deduct gold from the AI player. */
-  deductGold: (amount: number) => boolean;
-  /** Get current AI gold. */
-  getGold: () => number;
+  /** Deduct gold from the given AI faction. */
+  deductGold: (amount: number, factionId?: number) => boolean;
+  /** Get current gold of the given AI faction. */
+  getGold: (factionId?: number) => number;
   /** Get all living entity IDs. */
   getAllEntityIds: () => readonly EntityId[];
 }
@@ -110,14 +110,35 @@ let ecs: ECSComponents | null = null;
 let callbacks: AISystemCallbacks | null = null;
 
 // ---------------------------------------------------------------------------
-// The AI controller instance
+// The AI controller instances -- one per AI faction
 // ---------------------------------------------------------------------------
 
-/** The faction the AI plays as. Default: Randstad for backwards compatibility. */
-let aiFactionId: FactionId = FactionId.Randstad;
+/** Per-faction AI state. Nothing mutable is shared between AI factions. */
+interface AIFactionState {
+  readonly factionId: FactionId;
+  readonly controller: AIController;
+  /** Update calls since the last hero-training check. */
+  heroTimer: number;
+}
+
 let aiDifficulty = 'normal';
 
-let aiController = new AIController(aiFactionId, aiDifficulty);
+/**
+ * Missions: the AI factions are allied against the player, so they never
+ * target each other. Skirmish (default): free-for-all, there are no teams.
+ */
+let aiAllied = false;
+
+/** AI factions in play. Default: Randstad for backwards compatibility. */
+let aiStates: AIFactionState[] = [createAIState(FactionId.Randstad)];
+
+function createAIState(factionId: FactionId): AIFactionState {
+  return { factionId, controller: new AIController(factionId, aiDifficulty), heroTimer: 0 };
+}
+
+function findState(factionId?: FactionId): AIFactionState | undefined {
+  return factionId == null ? aiStates[0] : aiStates.find(s => s.factionId === factionId);
+}
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -134,22 +155,44 @@ export const AISystem = {
   },
 
   /**
-   * Set the faction the AI plays as. Creates a new AIController with
-   * faction-specific strategy. Call before the game starts or after reset().
+   * Set a single AI faction. Shorthand for setFactions([factionId]).
    *
    * @default FactionId.Randstad (backwards compatible)
    */
   setFaction(factionId: FactionId, difficulty?: string): void {
-    aiFactionId = factionId;
-    if (difficulty) aiDifficulty = difficulty;
-    aiController = new AIController(factionId, aiDifficulty);
+    AISystem.setFactions([factionId], difficulty);
   },
 
   /**
-   * Get the faction the AI is currently playing as.
+   * Set the factions the AI plays as: one AIController (own strategy, state,
+   * base and timers) per faction. Duplicates are ignored. Call before the
+   * game starts or after reset(). Omitting difficulty keeps the current one.
+   * `allied: true` (missions) makes the AI factions allies: only non-AI
+   * factions are enemies. Omitted = free-for-all (skirmish).
+   */
+  setFactions(
+    factionIds: readonly FactionId[],
+    difficulty?: string,
+    opts?: { allied?: boolean },
+  ): void {
+    if (difficulty) aiDifficulty = difficulty;
+    aiAllied = opts?.allied ?? false;
+    const unique = [...new Set(factionIds)];
+    aiStates = unique.map(createAIState);
+  },
+
+  /**
+   * Get the primary AI faction (the first one set).
    */
   get factionId(): FactionId {
-    return aiFactionId;
+    return aiStates[0]?.factionId ?? FactionId.Randstad;
+  },
+
+  /**
+   * Get all AI factions currently in play.
+   */
+  get factionIds(): FactionId[] {
+    return aiStates.map(s => s.factionId);
   },
 
   /**
@@ -158,54 +201,66 @@ export const AISystem = {
   update(dt: number, elapsedTime: number): void {
     if (!ecs || !callbacks) return;
 
-    // Build world snapshot
-    const snapshot = buildSnapshot(ecs, callbacks, elapsedTime);
+    for (const state of aiStates) {
+      // Build world snapshot from this faction's point of view
+      const snapshot = buildSnapshot(ecs, callbacks, elapsedTime, state.factionId);
 
-    // Run AI decisions
-    const commands = aiController.update(snapshot, dt);
+      // Run AI decisions
+      const commands = state.controller.update(snapshot, dt);
 
-    // Execute commands
-    for (const cmd of commands) {
-      executeCommand(cmd, ecs, callbacks);
+      // Execute commands
+      for (const cmd of commands) {
+        executeCommand(cmd, ecs, callbacks, state.factionId);
+      }
+
+      // AI Hero training: train heroes when army is 10+ and can afford
+      tryTrainAIHeroes(ecs, callbacks, snapshot, state);
     }
-
-    // AI Hero training: train heroes when army is 10+ and can afford
-    tryTrainAIHeroes(ecs, callbacks, snapshot);
   },
 
   /**
-   * Reset the AI state (new game). Preserves the current faction setting.
+   * Reset the AI state (new game). Preserves the current faction settings.
    */
   reset(): void {
-    aiController = new AIController(aiFactionId, aiDifficulty);
+    aiStates = aiStates.map(s => createAIState(s.factionId));
   },
 
   /**
-   * Get current AI phase for debug display.
+   * Get an AI faction's phase (primary faction when omitted).
+   */
+  getPhase(factionId?: FactionId) {
+    return findState(factionId)?.controller.currentPhase;
+  },
+
+  /**
+   * Get current AI phase for debug display (primary faction).
    */
   get phase() {
-    return aiController.currentPhase;
+    return aiStates[0]?.controller.currentPhase;
   },
 
   /**
-   * Get number of attack waves sent.
+   * Get number of attack waves sent (primary faction).
    */
   get wavesSent() {
-    return aiController.wavesSent;
+    return aiStates[0]?.controller.wavesSent ?? 0;
   },
 
   /**
-   * Get the AI strategy name for debug display.
+   * Get the AI strategy name for debug display (primary faction).
    */
   get strategyName() {
-    return aiController.strategyName;
+    return aiStates[0]?.controller.strategyName ?? '';
   },
 
   /**
    * Dispose.
    */
   dispose(): void {
-    aiController.reset();
+    for (const s of aiStates) {
+      s.controller.reset();
+      s.heroTimer = 0;
+    }
     ecs = null;
     callbacks = null;
   },
@@ -219,15 +274,16 @@ function buildSnapshot(
   c: ECSComponents,
   cb: AISystemCallbacks,
   elapsedTime: number,
+  aiFaction: FactionId,
 ): AIWorldSnapshot {
   const allIds = cb.getAllEntityIds();
 
-  // Determine which faction the AI is and which faction the player is.
-  // The player faction is whichever faction is NOT the AI.
-  const aiFaction = aiFactionId;
-  // For player detection: any faction that isn't the AI's is a potential enemy.
-  // In a 2-player game, the player is always the "other" faction.
-  const isEnemyFaction = (fid: number): boolean => fid !== aiFaction;
+  // Skirmish (free-for-all): every faction that isn't this AI's own is an
+  // enemy -- the human player and the other AI factions alike (no teams).
+  // Missions (aiAllied): the AI factions are allies, only non-AI factions are
+  // enemies. Neutral entities (resources) are only read via isResource.
+  const isEnemyFaction = (fid: number): boolean =>
+    fid !== aiFaction && !(aiAllied && aiStates.some(s => s.factionId === fid));
 
   const workers: EntityId[] = [];
   const infantry: EntityId[] = [];
@@ -349,7 +405,7 @@ function buildSnapshot(
   }
 
   return {
-    gold: cb.getGold(),
+    gold: cb.getGold(aiFaction),
     elapsedTime,
     workers,
     infantry,
@@ -389,18 +445,19 @@ function buildSnapshot(
 // AI Hero Training
 // ---------------------------------------------------------------------------
 
-/** Timer to throttle hero training checks. */
-let aiHeroTimer = 0;
-
 function tryTrainAIHeroes(
   c: ECSComponents,
   cb: AISystemCallbacks,
   snapshot: AIWorldSnapshot,
+  state: AIFactionState,
 ): void {
-  // Only check every 5 seconds
-  aiHeroTimer += 1;
-  if (aiHeroTimer < 150) return; // ~5 seconds at 30 calls/sec (AISystem runs every other frame)
-  aiHeroTimer = 0;
+  // Throttle: one check per 150 update calls. AISystem.update() runs once per
+  // fixed-update tick (60 Hz), so that is ~2.5 seconds.
+  state.heroTimer += 1;
+  if (state.heroTimer < 150) return;
+  state.heroTimer = 0;
+
+  const aiFactionId = state.factionId;
 
   // Need 10+ army units before training heroes
   if (snapshot.army.length < 10) return;
@@ -410,7 +467,7 @@ function tryTrainAIHeroes(
     if (isHeroActive(aiFactionId, heroTypeId)) continue;
 
     const arch = HERO_ARCHETYPES[heroTypeId];
-    if (cb.getGold() < arch.costGold) continue;
+    if (cb.getGold(aiFactionId) < arch.costGold) continue;
     if (!playerState.hasPopulationRoom(aiFactionId, HERO_POPULATION_COST)) continue;
 
     // Find AI barracks for spawn point
@@ -431,7 +488,7 @@ function tryTrainAIHeroes(
       break;
     }
 
-    cb.deductGold(arch.costGold);
+    cb.deductGold(arch.costGold, aiFactionId);
     const heroEid = createHero(
       ecsWorld,
       heroTypeId,
@@ -443,6 +500,9 @@ function tryTrainAIHeroes(
     );
     if (heroEid >= 0) {
       playerState.addPopulation(aiFactionId, HERO_POPULATION_COST);
+      // Heroes are UnitTypeId.Infantry, so DeathSystem counts their death as a
+      // military loss -- count the spawn too, or a hero death uncounts a unit.
+      playerState.addMilitaryUnit(aiFactionId);
     }
     break; // Only one hero per check cycle
   }
@@ -456,6 +516,7 @@ function executeCommand(
   cmd: AICommand,
   c: ECSComponents,
   cb: AISystemCallbacks,
+  aiFactionId: FactionId,
 ): void {
   switch (cmd.type) {
     case AICommandType.GatherGold: {
@@ -495,7 +556,7 @@ function executeCommand(
 
       // Check gold
       const cost = 200; // BARRACKS_COST
-      if (!cb.deductGold(cost)) break;
+      if (!cb.deductGold(cost, aiFactionId)) break;
 
       // Spawn barracks entity (use the AI's actual faction)
       cb.spawnBuilding(BuildingTypeId.Barracks, aiFactionId, cmd.targetX, cmd.targetZ);
@@ -510,7 +571,7 @@ function executeCommand(
 
       // Tertiary building costs same as barracks (200 gold)
       const cost = 200;
-      if (!cb.deductGold(cost)) break;
+      if (!cb.deductGold(cost, aiFactionId)) break;
 
       // Spawn tertiary resource building (Mijnschacht / Chocolaterie)
       cb.spawnBuilding(BuildingTypeId.TertiaryResourceBuilding, aiFactionId, cmd.targetX, cmd.targetZ);
@@ -530,7 +591,7 @@ function executeCommand(
         cost = 50;
       }
 
-      if (!cb.deductGold(cost)) break;
+      if (!cb.deductGold(cost, aiFactionId)) break;
 
       cb.startTraining(cmd.targetEntityId, cmd.unitType);
       break;

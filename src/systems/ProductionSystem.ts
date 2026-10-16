@@ -8,27 +8,19 @@
  * Note: Gold is deducted at command time (in CommandSystem), not here.
  */
 
-import { query, addEntity, addComponent, hasComponent, entityExists } from 'bitecs';
+import { query, addComponent, hasComponent, entityExists } from 'bitecs';
 import {
   Position,
   Production,
   Building,
   Faction,
-  Health,
-  Attack,
-  Armor,
   Movement,
   UnitAI,
   Gatherer,
-  Visibility,
-  UnitType,
-  Rotation,
-  Selected,
-  GezeligheidBonus,
   RallyPoint,
   Resource,
 } from '../ecs/components';
-import { IsBuilding, IsUnit, IsWorker, IsResource, IsDead, NeedsPathfinding } from '../ecs/tags';
+import { IsBuilding, IsResource, IsDead, NeedsPathfinding } from '../ecs/tags';
 import { playerState } from '../core/PlayerState';
 import { eventBus } from '../core/EventBus';
 import {
@@ -48,7 +40,7 @@ import { ceoProductionBuff } from './HeroSystem';
 import { techTreeSystem } from './TechTreeSystem';
 import { getFactionUnitArchetype } from '../data/factionData';
 import { getDifficultyProductionMult } from '../data/difficultyConfig';
-import { createUnit } from '../entities/factories';
+import { createUnit, spawnBasicUnit, getUnitPopulationCost } from '../entities/factories';
 import { gameConfig } from '../core/GameConfig';
 import { getAIHPScaling } from './CombatSystem';
 import type { GameWorld } from '../ecs/world';
@@ -195,10 +187,12 @@ export function createProductionSystem() {
       if (Production.progress[bEid] >= 1.0) {
         const unitTypeId = Production.unitType[bEid];
 
-        // Check population cap before spawning
-        if (playerState.hasPopulationRoom(factionId)) {
+        // Check population cap before spawning -- with the unit's real cost
+        // (Heavy/Siege cost 2-4), the same value DeathSystem subtracts later.
+        const popCost = getUnitPopulationCost(factionId as FactionId, unitTypeId as UnitTypeId);
+        if (playerState.hasPopulationRoom(factionId, popCost)) {
           spawnUnit(world, bEid, unitTypeId, factionId);
-          playerState.addPopulation(factionId);
+          playerState.addPopulation(factionId, popCost);
 
           // Track military units for upkeep
           if (unitTypeId !== UnitTypeId.Worker) {
@@ -246,80 +240,24 @@ function spawnUnit(
 
   let eid: number;
   let isWorker = false;
-  let carryCapacity = 0;
 
   if (template) {
     // Legacy path for Worker/Infantry/Ranged: keep template-driven stats so
-    // existing balance + Randstad overrides stay intact.
-    eid = addEntity(world);
-
-    addComponent(world, eid, Position);
-    Position.x[eid] = spawnX;
-    Position.y[eid] = Position.y[buildingEid];
-    Position.z[eid] = spawnZ;
-
-    addComponent(world, eid, Health);
+    // existing balance + Randstad overrides stay intact. spawnBasicUnit writes
+    // every field (typing/population from factionData) so a recycled eid
+    // never inherits e.g. a dead siege unit's splashRadius / siegeBonus.
     let hp = template.hp;
     if (!gameConfig.isPlayerFaction(factionId)) {
       const hpScale = getAIHPScaling(world.meta.elapsed);
       if (hpScale > 1.0) hp = Math.round(hp * hpScale);
     }
-    Health.current[eid] = hp;
-    Health.max[eid] = hp;
-
-    addComponent(world, eid, Attack);
-    Attack.damage[eid] = template.attack;
-    Attack.speed[eid] = template.attackSpeed;
-    Attack.range[eid] = template.range;
-    Attack.timer[eid] = 0;
-
-    addComponent(world, eid, Armor);
-    Armor.value[eid] = template.armor;
-
-    addComponent(world, eid, Movement);
-    Movement.speed[eid] = template.speed;
-    Movement.hasTarget[eid] = 0;
-
-    addComponent(world, eid, Faction);
-    Faction.id[eid] = factionId;
-    addComponent(world, eid, UnitType);
-    UnitType.id[eid] = unitTypeId;
-
-    addComponent(world, eid, UnitAI);
-    UnitAI.state[eid] = UnitAIState.Idle;
-    UnitAI.targetEid[eid] = NO_ENTITY;
-
-    addComponent(world, eid, Visibility);
-    Visibility.range[eid] = template.sightRange;
-
-    addComponent(world, eid, Rotation);
-    Rotation.y[eid] = 0;
-
-    addComponent(world, eid, Selected);
-    Selected.by[eid] = 255;
-
-    addComponent(world, eid, GezeligheidBonus);
-    GezeligheidBonus.nearbyCount[eid] = 0;
-    GezeligheidBonus.attackMult[eid] = 1.0;
-    GezeligheidBonus.speedMult[eid] = 1.0;
-    GezeligheidBonus.armorMult[eid] = 1.0;
-    GezeligheidBonus.passiveHeal[eid] = 0;
-    GezeligheidBonus.damageReduction[eid] = 0;
-
-    addComponent(world, eid, IsUnit);
+    eid = spawnBasicUnit(
+      world, unitTypeId as UnitTypeId, factionId as FactionId,
+      spawnX, Position.y[buildingEid], spawnZ,
+      { ...template, hp },
+    );
 
     isWorker = template.isWorker;
-    carryCapacity = template.carryCapacity;
-
-    if (isWorker) {
-      addComponent(world, eid, IsWorker);
-      addComponent(world, eid, Gatherer);
-      Gatherer.state[eid] = 0;
-      Gatherer.carryCapacity[eid] = carryCapacity;
-      Gatherer.carrying[eid] = 0;
-      Gatherer.targetEid[eid] = NO_ENTITY;
-      Gatherer.previousTarget[eid] = NO_ENTITY;
-    }
   } else {
     // Heavy/Siege/Support/Special: data-driven spawn from factionData.
     eid = createUnit(world, unitTypeId as UnitTypeId, factionId as FactionId, spawnX, spawnZ);

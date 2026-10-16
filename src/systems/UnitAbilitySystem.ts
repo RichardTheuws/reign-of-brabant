@@ -38,6 +38,7 @@ import {
 import { getAbilityDef } from '../data/unitAbilityRegistry';
 import { gameConfig } from '../core/GameConfig';
 import { eventBus } from '../core/EventBus';
+import { transferOwnership } from './DiplomacySystem';
 import type { GameWorld } from '../ecs/world';
 
 // ---------------------------------------------------------------------------
@@ -418,7 +419,7 @@ function applyAbilityEffect(world: GameWorld, eid: number, def: ReturnType<typeo
     const targetEid = UnitAI.targetEid[eid];
     if (targetEid !== NO_ENTITY && hasComponent(world, targetEid, IsBuilding)) {
       if (Faction.id[targetEid] !== myFaction) {
-        Faction.id[targetEid] = myFaction;
+        transferOwnership(world, targetEid, myFaction);
       }
     }
   }

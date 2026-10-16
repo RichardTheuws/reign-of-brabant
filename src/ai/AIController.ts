@@ -219,7 +219,7 @@ export interface AIWorldSnapshot {
   /** All AI army entities (infantry + ranged + heavy + support). */
   army: readonly EntityId[];
 
-  /** Player's Town Hall positions (attack target). */
+  /** Enemy Town Hall positions (attack targets): skirmish = every other faction, missions = non-AI factions only. */
   playerTownHallPositions: readonly { x: number; z: number }[];
 
   /** Gold mine positions (for gathering). */
@@ -632,16 +632,24 @@ export class AIController {
   }
 
   /**
-   * Attack-move the entire army toward the player's Town Hall.
+   * Attack-move the entire army toward the nearest enemy Town Hall. In
+   * skirmish every other faction is an enemy (player and other AIs alike), so
+   * in a 3-4 player match each AI fights its closest neighbour; in missions
+   * the snapshot only lists the player's Town Halls (AIs are allied).
    */
   private issueAttackCommands(snapshot: AIWorldSnapshot): void {
-    // Find player town hall position
+    // Find nearest enemy town hall position
     let attackX = -MAP_SIZE / 4;
     let attackZ = -MAP_SIZE / 4;
 
-    if (snapshot.playerTownHallPositions.length > 0) {
-      attackX = snapshot.playerTownHallPositions[0].x;
-      attackZ = snapshot.playerTownHallPositions[0].z;
+    let bestDist = Infinity;
+    for (const th of snapshot.playerTownHallPositions) {
+      const d = distance2D(snapshot.baseX, snapshot.baseZ, th.x, th.z);
+      if (d < bestDist) {
+        bestDist = d;
+        attackX = th.x;
+        attackZ = th.z;
+      }
     }
 
     // Send all army units
