@@ -86,14 +86,29 @@ import {
   ExtendedUnitTypeId,
 } from '../data/factionData';
 
+import { registerBuildingFootprint } from '../pathfinding/BuildingFootprints';
+
 // ---------------------------------------------------------------------------
 // Internal: derive attack type from unit type/range when not explicitly set
 // ---------------------------------------------------------------------------
 
-function deriveAttackType(typeId: UnitTypeId, range: number): AttackType {
+/**
+ * Largest attack range that still counts as melee (contact range).
+ * Data: every melee archetype and melee hero uses MINIMUM_MELEE_RANGE (1.5);
+ * the shortest genuinely ranged attack is 4 (Heuvelwacht), then 5 (Hipster,
+ * Manager). 2 sits safely between them and matches MELEE_BACKUP_THRESHOLD.
+ * Before v0.61.x this was `range > 0`, which made all contact-range units Ranged.
+ */
+export const MELEE_RANGE_MAX = 2;
+
+/**
+ * Derive the AttackType for an archetype without an explicit `attackType`.
+ * `typeId` is null for heroes (they have no UnitTypeId); range decides then.
+ */
+export function deriveAttackType(typeId: UnitTypeId | null, range: number): AttackType {
   if (typeId === UnitTypeId.Siege) return AttackType.Siege;
   if (typeId === UnitTypeId.Support || typeId === UnitTypeId.Special) return AttackType.Magic;
-  if (range > 0) return AttackType.Ranged;
+  if (range > MELEE_RANGE_MAX) return AttackType.Ranged;
   return AttackType.Melee;
 }
 
@@ -656,6 +671,9 @@ function initBuilding(
 
   // RenderRef
   RenderRef.meshId[eid] = eid;
+
+  // Block the footprint in the unit NavGrid (no-op without an active grid).
+  registerBuildingFootprint(eid, x, z, buildingTypeId);
 
   return eid;
 }

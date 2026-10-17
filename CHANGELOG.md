@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.62.0] - 2026-10-17 — Bundel 5: gebouw-footprints, Recast weg, melee-attacktype
+
+### Added
+- **Gebouwen blokkeren de pathfinding** (`src/pathfinding/BuildingFootprints.ts`, `NavGrid.ts`). De NavGrid kreeg een dynamische laag die per cel telt hoeveel gebouwen er staan, dus overlappende footprints worden correct vrijgegeven. Per gebouw-eid worden de exacte cellen geregistreerd: bij `spawnBuildingEntity` en `initBuilding`, voor bouwplaatsen, missie- en AI-gebouwen. Ze komen vrij zodra `IsDead` gezet wordt, zodat puin niet blokkeert. Een sync per frame in `MovementSystem` vangt hergebruikte en verdwenen eid's af. `Game.cleanup()` reset het register. Een doel binnen een gebouw snapt naar de vrije rand aan de kant van de unit; werkers en aanvallers blijven daarmee binnen hun interactie-range. Zodra er een gebouw bijkomt, plant een unit meteen opnieuw als zijn route erdoor loopt, zonder eerst vast te lopen.
+
+### Removed
+- **De dode Recast-navmesh**: `NavMeshManager.ts`, `PathfindingSystem.ts` en de pakketten `@recast-navigation/three` en `recast-navigation`. Ze werden geïnitialiseerd maar door niets gebruikt. De JS-bundle gaat van 2240 naar 1412 kB (−828 kB, −37%), en de wasm-init valt weg uit het laden.
+
+### Fixed
+- **Melee-units kregen AttackType Ranged**, omdat de afleiding `range > 0` gebruikte terwijl melee range 1,5 heeft. Dat gold voor 14 archetypes en 5 helden. De drempel is nu `MELEE_RANGE_MAX = 2`: alle melee staat op 1,5 en de kortste echte afstandsaanval op 4. `heroFactory` gebruikt dezelfde afleiding. Effect volgens de schadematrix: melee doet nu ×1,5 tegen Light (eerst ×1,0) en ×1,0 tegen Medium (eerst ×1,5). Stats zijn niet aangepast.
+
+### Tests
+- Nieuw: `pathfinding-building-footprints` (22 tests), `damage-matrix` (87 tests, data-gedreven over alle archetypes en helden plus de multipliers), en 2 echte-kaarttests. 3076/3076 groen, UAT 2/2. In de browser, 1v1 over 120 s: 0 console-errors, 0 4xx/5xx, nooit een unit binnen een footprint, 8,3 ms/frame.
+
 ## [0.61.0] - 2026-10-16 — Bundel 4: pathfinding, multi-AI, populatie-accounting
 
 ### Added

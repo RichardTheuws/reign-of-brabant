@@ -20,6 +20,7 @@ import { BUILDING_ARCHETYPES } from './archetypes';
 import { addFreshComponent } from './factories';
 import { ArmorType, BuildingTypeId, type FactionId, NO_PRODUCTION, NO_ENTITY } from '../types/index';
 import type { GameWorld } from '../ecs/world';
+import { registerBuildingFootprint } from '../pathfinding/BuildingFootprints';
 
 export interface BuildingSpawnOptions {
   /** Height callback so Position.y matches terrain. Defaults to 0. */
@@ -109,6 +110,10 @@ export function spawnBuildingEntity(
     RallyPoint.z[eid] = z;
     RallyPoint.resourceEid[eid] = NO_ENTITY;
   }
+
+  // Block the footprint in the unit NavGrid (no-op before the grid exists;
+  // Game.installNavGrid() sweeps those up).
+  registerBuildingFootprint(eid, x, z, type);
 
   return eid;
 }

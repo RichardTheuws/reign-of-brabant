@@ -11,6 +11,12 @@
  * Cell size defaults to 1 world unit: 128x128 = 16k cells for a medium map,
  * 192x192 = 37k for huge. Search state lives in reusable typed arrays, so a
  * path request allocates nothing but the returned waypoint list.
+ *
+ * Two layers: the static terrain mask (rivers, rock walls) and a dynamic,
+ * refcounted occupancy layer for building footprints. `blocked` is the
+ * combined view (static || occupancy > 0) so the A* hot loop reads one array.
+ * Overlapping footprints stack; a cell frees only when its last footprint is
+ * removed and it is not statically blocked.
  */
 
 import type { PathPoint, RockWallSpawn } from '../types/index';
@@ -20,6 +26,13 @@ const ROCK_WALL_MARGIN = 0.75;
 
 /** Max ring radius (cells) when snapping a blocked start/goal to a walkable cell. */
 const SNAP_SEARCH_RADIUS = 12;
+/**
+ * Goal inside a building footprint: walkable cells up to this much farther
+ * from the goal than the closest one are equally good; among those the one
+ * nearest the start wins, so a unit approaches a building from its own side
+ * instead of walking around it.
+ */
+const GOAL_SNAP_SLACK = 1.0;
 
 const SQRT2 = Math.SQRT2;
 
@@ -47,13 +60,27 @@ function distanceToPolyline(px: number, pz: number, path: readonly PathPoint[]):
   return min;
 }
 
+/** Cell bounds (inclusive) of a rasterised footprint; pass back to removeFootprint(). */
+export interface FootprintCells {
+  readonly c0x: number;
+  readonly c1x: number;
+  readonly c0z: number;
+  readonly c1z: number;
+}
+
 export class NavGrid {
   readonly size: number;
   readonly cellSize: number;
   readonly mapSize: number;
   private readonly half: number;
-  /** 1 = blocked. */
+  /** 1 = blocked (combined: static terrain || occupancy > 0). */
   readonly blocked: Uint8Array;
+  /** 1 = blocked by terrain (river / rock wall). Never changes after construction. */
+  readonly staticBlocked: Uint8Array;
+  /** Number of building footprints covering each cell. */
+  readonly occupancy: Uint16Array;
+  /** Bumped whenever a footprint is added (UnitPathing re-validates live routes). */
+  version = 0;
 
   // Reusable A* scratch
   private readonly g: Float32Array;
@@ -75,6 +102,7 @@ export class NavGrid {
     this.half = mapSize / 2;
     const n = this.size * this.size;
     this.blocked = new Uint8Array(n);
+    this.occupancy = new Uint16Array(n);
     this.g = new Float32Array(n);
     this.parent = new Int32Array(n);
     this.stamp = new Uint32Array(n);
@@ -89,6 +117,7 @@ export class NavGrid {
         if (isBlocked(x, z)) this.blocked[cz * this.size + cx] = 1;
       }
     }
+    this.staticBlocked = this.blocked.slice();
   }
 
   /** Build from the live terrain (river mask, bridges excluded) + rock walls. */
@@ -106,6 +135,56 @@ export class NavGrid {
     let c = 0;
     for (let i = 0; i < this.blocked.length; i++) c += this.blocked[i];
     return c;
+  }
+
+  /**
+   * Block the cells whose centre lies inside the axis-aligned rect
+   * (x +- halfW, z +- halfD); at least the cell containing (x,z). Returns the
+   * exact cell bounds -- removeFootprint() with the same object frees exactly
+   * those cells, independent of any later change to the caller's data.
+   * Returns null when the rect lies entirely off-map.
+   */
+  addFootprint(x: number, z: number, halfW: number, halfD: number): FootprintCells | null {
+    const eps = 1e-6;
+    const cs = this.cellSize;
+    let c0x = Math.ceil((x - halfW + this.half) / cs - 0.5 - eps);
+    let c1x = Math.floor((x + halfW + this.half) / cs - 0.5 + eps);
+    let c0z = Math.ceil((z - halfD + this.half) / cs - 0.5 - eps);
+    let c1z = Math.floor((z + halfD + this.half) / cs - 0.5 + eps);
+    if (c1x < c0x) { c0x = c1x = Math.floor((x + this.half) / cs); }
+    if (c1z < c0z) { c0z = c1z = Math.floor((z + this.half) / cs); }
+    c0x = Math.max(0, c0x); c0z = Math.max(0, c0z);
+    c1x = Math.min(this.size - 1, c1x); c1z = Math.min(this.size - 1, c1z);
+    if (c1x < c0x || c1z < c0z) return null;
+    const s = this.size;
+    for (let cz = c0z; cz <= c1z; cz++) {
+      for (let cx = c0x; cx <= c1x; cx++) {
+        const i = cz * s + cx;
+        if (this.occupancy[i] < 0xffff) this.occupancy[i]++;
+        this.blocked[i] = 1;
+      }
+    }
+    this.version++;
+    return { c0x, c1x, c0z, c1z };
+  }
+
+  /** Release a footprint returned by addFootprint() (refcounted: overlaps stay blocked). */
+  removeFootprint(fp: FootprintCells): void {
+    const s = this.size;
+    for (let cz = fp.c0z; cz <= fp.c1z; cz++) {
+      for (let cx = fp.c0x; cx <= fp.c1x; cx++) {
+        const i = cz * s + cx;
+        if (this.occupancy[i] > 0) this.occupancy[i]--;
+        if (this.occupancy[i] === 0) this.blocked[i] = this.staticBlocked[i];
+      }
+    }
+  }
+
+  /** Drop every footprint (back to the static terrain mask). */
+  clearFootprints(): void {
+    this.occupancy.fill(0);
+    this.blocked.set(this.staticBlocked);
+    this.version++;
   }
 
   cellCenterX(cx: number): number { return (cx + 0.5) * this.cellSize - this.half; }
@@ -141,27 +220,66 @@ export class NavGrid {
     return true;
   }
 
-  /** Nearest walkable cell index around `idx` (ring search), or -1. */
-  private nearestWalkable(idx: number): number {
+  /**
+   * Nearest walkable cell index around `idx` (ring search), or -1. With a
+   * `prefer` point (the path start), cells up to GOAL_SNAP_SLACK farther than
+   * the closest one count as ties and the one nearest `prefer` wins.
+   */
+  private nearestWalkable(idx: number, preferX?: number, preferZ?: number): number {
     if (this.blocked[idx] === 0) return idx;
     const s = this.size;
     const cx = idx % s, cz = (idx / s) | 0;
-    for (let r = 1; r <= SNAP_SEARCH_RADIUS; r++) {
-      let best = -1, bestD = Infinity;
+    if (preferX === undefined || preferZ === undefined) {
+      for (let r = 1; r <= SNAP_SEARCH_RADIUS; r++) {
+        let best = -1, bestD = Infinity;
+        for (let dz = -r; dz <= r; dz++) {
+          for (let dx = -r; dx <= r; dx++) {
+            if (Math.abs(dx) !== r && Math.abs(dz) !== r) continue;
+            const x = cx + dx, z = cz + dz;
+            if (x < 0 || z < 0 || x >= s || z >= s) continue;
+            const i = z * s + x;
+            if (this.blocked[i]) continue;
+            const d = dx * dx + dz * dz;
+            if (d < bestD) { bestD = d; best = i; }
+          }
+        }
+        if (best >= 0) return best;
+      }
+      return -1;
+    }
+
+    // Two-pass: closest distance m (in cells), then the start-nearest cell
+    // among those within m + slack. Rings beyond m + slack cannot qualify.
+    const slack = GOAL_SNAP_SLACK / this.cellSize;
+    let m = Infinity;
+    for (let r = 1; r <= SNAP_SEARCH_RADIUS && r <= m + slack; r++) {
       for (let dz = -r; dz <= r; dz++) {
         for (let dx = -r; dx <= r; dx++) {
           if (Math.abs(dx) !== r && Math.abs(dz) !== r) continue;
           const x = cx + dx, z = cz + dz;
           if (x < 0 || z < 0 || x >= s || z >= s) continue;
-          const i = z * s + x;
-          if (this.blocked[i]) continue;
-          const d = dx * dx + dz * dz;
-          if (d < bestD) { bestD = d; best = i; }
+          if (this.blocked[z * s + x]) continue;
+          const d = Math.sqrt(dx * dx + dz * dz);
+          if (d < m) m = d;
         }
       }
-      if (best >= 0) return best;
     }
-    return -1;
+    if (m === Infinity) return -1;
+    let best = -1, bestP = Infinity;
+    const rMax = Math.min(SNAP_SEARCH_RADIUS, Math.floor(m + slack));
+    for (let dz = -rMax; dz <= rMax; dz++) {
+      for (let dx = -rMax; dx <= rMax; dx++) {
+        const x = cx + dx, z = cz + dz;
+        if (x < 0 || z < 0 || x >= s || z >= s) continue;
+        const i = z * s + x;
+        if (this.blocked[i]) continue;
+        if (Math.sqrt(dx * dx + dz * dz) > m + slack + 1e-6) continue;
+        const px = this.cellCenterX(x) - preferX, pz = this.cellCenterZ(z) - preferZ;
+        const p = px * px + pz * pz;
+        if (p < bestP) { bestP = p; best = i; }
+      }
+    }
+    return best;
   }
 
   /**
@@ -174,7 +292,12 @@ export class NavGrid {
     const s = this.size;
     const start = this.nearestWalkable(this.cellIndex(sx, sz));
     const goalRaw = this.cellIndex(gx, gz);
-    const goal = this.nearestWalkable(goalRaw);
+    // Goal inside a building footprint: approach from the start's side. Goals
+    // in the terrain mask (river resources) keep the plain nearest snap -- the
+    // start-side cell there may be on the other bank.
+    const goal = this.occupancy[goalRaw] > 0
+      ? this.nearestWalkable(goalRaw, sx, sz)
+      : this.nearestWalkable(goalRaw);
     if (start < 0 || goal < 0) return null;
     const goalBlocked = goal !== goalRaw;
     const endX = goalBlocked ? this.cellCenterX(goal % s) : gx;

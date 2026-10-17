@@ -22,9 +22,11 @@ import { IsUnit } from '../src/ecs/tags';
 import { createMovementSystem } from '../src/systems/MovementSystem';
 import { NavGrid } from '../src/pathfinding/NavGrid';
 import { setActiveNavGrid } from '../src/pathfinding/UnitPathing';
+import { resetBuildingFootprints } from '../src/pathfinding/BuildingFootprints';
+import { spawnBuildingEntity } from '../src/entities/buildingSpawn';
 import { generateMap, type MapTemplate } from '../src/world/MapGenerator';
 import { Terrain } from '../src/world/Terrain';
-import { FactionId, GATHER_ARRIVAL_DISTANCE, type MapSizeOption } from '../src/types/index';
+import { FactionId, GATHER_ARRIVAL_DISTANCE, DEPOSIT_ARRIVAL_DISTANCE, type MapSizeOption } from '../src/types/index';
 
 type World = ReturnType<typeof replaceWorld>;
 
@@ -55,7 +57,7 @@ beforeAll(() => {
   GLTFLoader.prototype.load = (() => {}) as never;
 });
 
-beforeEach(() => setActiveNavGrid(null));
+beforeEach(() => { setActiveNavGrid(null); resetBuildingFootprints(); });
 
 function buildMap(template: MapTemplate, size: number) {
   const map = generateMap(42, () => 0, 2, template, size as MapSizeOption);
@@ -158,4 +160,50 @@ describe('resources inside blocked cells stay gatherable', () => {
       }
     });
   }
+});
+
+describe('with building footprints (start TownHalls) on classic 128', () => {
+  it('workers shuttle mine <-> TownHall and stay in gather / deposit range', () => {
+    const { map, grid } = buildMap('classic', 128);
+    const world = replaceWorld();
+    for (const b of map.buildings) spawnBuildingEntity(world, b.buildingType, b.factionId, b.x, b.z);
+    const sys = createMovementSystem(flatTerrain);
+    sys(world, 1 / 30); // footprint sweep
+    for (const b of map.buildings) expect(grid.isBlockedAt(b.x, b.z)).toBe(true);
+
+    for (const th of map.buildings.slice(0, 2)) {
+      const mine = [...map.goldMines].sort((a, b) =>
+        Math.hypot(a.x - th.x, a.z - th.z) - Math.hypot(b.x - th.x, b.z - th.z))[0];
+      const u = spawnUnit(world, th.x + 4, th.z + 4);
+      for (let trip = 0; trip < 2; trip++) {
+        expect(drive(world, sys, u, mine.x, mine.z)).toBeGreaterThanOrEqual(0);
+        expect(Math.hypot(Position.x[u] - mine.x, Position.z[u] - mine.z)).toBeLessThan(GATHER_ARRIVAL_DISTANCE);
+        expect(drive(world, sys, u, th.x, th.z)).toBeGreaterThanOrEqual(0);
+        expect(Math.hypot(Position.x[u] - th.x, Position.z[u] - th.z)).toBeLessThan(DEPOSIT_ARRIVAL_DISTANCE);
+      }
+    }
+  });
+
+  it('150 random pairs with TownHalls in place: none stuck, all arrive', () => {
+    const { map, grid } = buildMap('classic', 128);
+    const world = replaceWorld();
+    for (const b of map.buildings) spawnBuildingEntity(world, b.buildingType, b.factionId, b.x, b.z);
+    const sys = createMovementSystem(flatTerrain);
+    let seed = 11;
+    const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+    let stuck = 0;
+    let far = 0;
+    for (let k = 0; k < 150; k++) {
+      let sx: number, sz: number, tx: number, tz: number;
+      do { sx = rnd() * 110 - 55; sz = rnd() * 110 - 55; } while (grid.isBlockedAt(sx, sz));
+      do { tx = rnd() * 110 - 55; tz = rnd() * 110 - 55; } while (grid.isBlockedAt(tx, tz));
+      const u = spawnUnit(world, sx, sz);
+      if (drive(world, sys, u, tx, tz) < 0) stuck++;
+      else if (Math.hypot(Position.x[u] - tx, Position.z[u] - tz) > 0.6) far++;
+      Movement.hasTarget[u] = 0;
+      sys(world, 1 / 30);
+    }
+    expect(stuck).toBe(0);
+    expect(far).toBe(0);
+  });
 });

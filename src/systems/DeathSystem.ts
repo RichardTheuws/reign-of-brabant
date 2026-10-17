@@ -23,6 +23,7 @@ import { eventBus } from '../core/EventBus';
 import { playerState } from '../core/PlayerState';
 import { FactionId, UnitTypeId, BuildingTypeId, DEATH_TIMER } from '../types/index';
 import type { GameWorld } from '../ecs/world';
+import { unregisterBuildingFootprint } from '../pathfinding/BuildingFootprints';
 
 /**
  * Create the death system.
@@ -41,6 +42,9 @@ export function createDeathSystem() {
         if (hasComponent(world, eid, Health)) {
           Health.current[eid] = 0;
         }
+        // A destroyed (or cancelled) building stops blocking paths at once;
+        // the rubble is not an obstacle during the death animation.
+        if (hasComponent(world, eid, IsBuilding)) unregisterBuildingFootprint(eid);
         continue;
       }
 
@@ -81,6 +85,9 @@ export function createDeathSystem() {
             buildingTypeId: Building.typeId[eid] as BuildingTypeId,
           });
         }
+
+        // Release before the eid can be recycled (no-op if already released).
+        unregisterBuildingFootprint(eid);
 
         // Remove entity from ECS world
         removeEntity(world, eid);

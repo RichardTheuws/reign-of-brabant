@@ -20,7 +20,7 @@ export const IsDead = {};
 /** Marks a unit as a worker (can gather and build). */
 export const IsWorker = {};
 
-/** Marks an entity as needing a new path from PathfindingSystem. */
+/** Legacy marker set when a unit gets a new move target (routing: UnitPathing/NavGrid). */
 export const NeedsPathfinding = {};
 
 /** Marks an entity as a hero unit. */

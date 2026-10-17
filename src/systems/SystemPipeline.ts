@@ -8,7 +8,7 @@
  *   Phase 1: Input Capture (InputSystem, CameraSystem)
  *   Phase 2: Player Intent (SelectionSystem, CommandSystem)
  *   Phase 3: AI Decisions (AISystem, StrategicAISystem)
- *   Phase 4: Movement (PathfindingSystem, MovementSystem)
+ *   Phase 4: Movement (MovementSystem -- NavGrid pathing via UnitPathing)
  *   Phase 5: Combat & Economy (CombatSystem, GatherSystem, ProductionSystem, BuildSystem)
  *   Phase 6: Cleanup (DeathSystem)
  *   Phase 7: Presentation (VisionSystem, RenderSyncSystem, UISystem, MinimapSystem)

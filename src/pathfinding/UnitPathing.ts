@@ -11,6 +11,10 @@
  * - Goal inside a blocked cell (resource placed in the river mask) but close to
  *   a reachable point -> path to that point, then a short free final leg into
  *   the goal so gather/attack arrival distances still work.
+ * - A building placed across a live route (NavGrid.version bumped) -> the
+ *   remaining route is re-checked on the unit's next step and re-planned when
+ *   it now crosses a blocked cell (stuck detection would also catch it, but
+ *   only after the unit has slid along the wall for STUCK_TIME).
  * - No progress for STUCK_TIME -> re-plan from the current position; after
  *   STUCK_MAX_REPATHS the unit stops (hasTarget=0) instead of freezing with a
  *   live order (e.g. at the bank of an unreachable goal, or behind a crowd).
@@ -64,6 +68,8 @@ interface UnitPath {
   progZ: number;
   progTime: number;
   stuckRepaths: number;
+  /** NavGrid.version the route was last validated against. */
+  gridVersion: number;
 }
 
 /** Steering result codes. */
@@ -135,14 +141,19 @@ export function steerUnit(eid: number, px: number, pz: number, tx: number, tz: n
     if (!st) {
       st = {
         goalX: tx, goalZ: tz, waypoints: [], idx: 0, approx: false, pending: false, direct: false, free: false,
-        lastX: px, lastZ: pz, progX: px, progZ: pz, progTime: 0, stuckRepaths: 0,
+        lastX: px, lastZ: pz, progX: px, progZ: pz, progTime: 0, stuckRepaths: 0, gridVersion: grid.version,
       };
       paths.set(eid, st);
     }
     st.goalX = tx; st.goalZ = tz;
     st.stuckRepaths = 0;
     planFrom(st, eid, px, pz);
+  } else if (st.gridVersion !== grid.version) {
+    // Footprints changed since this route was planned: re-plan only when the
+    // rest of the route now crosses a blocked cell.
+    if (!st.direct && !routeStillClear(st, px, pz)) planFrom(st, eid, px, pz);
   }
+  st.gridVersion = grid.version;
   st.lastX = px; st.lastZ = pz;
 
   // Stuck detection: no real progress for STUCK_TIME -> re-plan from here.
@@ -191,6 +202,27 @@ export function steerUnit(eid: number, px: number, pz: number, tx: number, tz: n
   }
   if (st.pending) return Steer.Wait;
   return Steer.Target;
+}
+
+/**
+ * True when the remaining route from (px,pz) is still free of blocked cells.
+ * The leg into a blocked goal (free leg, or the approx end) is not checked:
+ * it is allowed to enter blocked cells by design.
+ */
+function routeStillClear(st: UnitPath, px: number, pz: number): boolean {
+  const g = grid!;
+  let ax = px, az = pz;
+  for (let i = st.idx; i < st.waypoints.length; i++) {
+    const w = st.waypoints[i];
+    const last = i === st.waypoints.length - 1;
+    if (last && st.free) return true;
+    if (!g.isLineClear(ax, az, w.x, w.z)) return false;
+    ax = w.x; az = w.z;
+  }
+  if (st.approx || st.pending) return true;
+  // Final leg (or the whole route when steering straight) to the live goal.
+  // A goal that just became blocked needs a re-plan to get the free leg.
+  return g.isLineClear(ax, az, st.goalX, st.goalZ);
 }
 
 /** (Re)plan toward st.goal from (px,pz): direct when clear, else share or queue a search. */

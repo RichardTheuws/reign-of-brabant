@@ -20,6 +20,7 @@ import {
   steerUnit, steerOut, clearUnitPath, processPathRequests, getActiveNavGrid, Steer,
   BLOCKED_GOAL_STOP_DISTANCE,
 } from '../pathfinding/UnitPathing';
+import { syncBuildingFootprints } from '../pathfinding/BuildingFootprints';
 
 // Reusable scratch values to avoid per-frame allocations
 let _dx = 0;
@@ -38,6 +39,10 @@ const _reqPos = { x: 0, z: 0 };
  */
 export function createMovementSystem(terrain: Terrain) {
   return function movementSystem(world: GameWorld, dt: number): void {
+    // Building footprints in the NavGrid follow the live world (spawns,
+    // deaths, recycled eids) before anyone steers this frame.
+    syncBuildingFootprints(world);
+
     const entities = query(world, [Position, Movement, IsUnit]);
 
     for (const eid of entities) {

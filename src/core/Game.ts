@@ -28,9 +28,9 @@ import { createMapTunnelSystem } from '../systems/MapTunnelSystem';
 import { resetPopulationSystem, syncBuildingPopulationCap, grantMissionStartingCapBonus } from '../systems/PopulationSystem';
 import { spawnBasicUnit, getUnitPopulationCost } from '../entities/factories';
 import { queueCommand } from '../systems/CommandSystem';
-import { NavMeshManager } from '../pathfinding/NavMeshManager';
 import { NavGrid } from '../pathfinding/NavGrid';
 import { setActiveNavGrid } from '../pathfinding/UnitPathing';
+import { resetBuildingFootprints, syncBuildingFootprints } from '../pathfinding/BuildingFootprints';
 import { AISystem } from '../ai/AISystem';
 import { gameConfig } from '../core/GameConfig';
 import { UnitRenderer } from '../rendering/UnitRenderer';
@@ -198,7 +198,6 @@ export class Game {
   private pipeline: SystemPipeline;
   private map!: GeneratedMap;
 
-  private navMesh: typeof NavMeshManager;
   private unitRenderer: UnitRenderer;
   private buildingRenderer: BuildingRenderer;
   private propRenderer: PropRenderer;
@@ -300,7 +299,6 @@ export class Game {
     this.damagePopups = new DamagePopups();
 
     this.pipeline = createGamePipeline(terrain, import.meta.env.DEV);
-    this.navMesh = NavMeshManager;
 
     // Create render groups and add to scene
     const unitGroup = new THREE.Group(); unitGroup.name = 'units'; scene.add(unitGroup);
@@ -396,16 +394,10 @@ export class Game {
       this.selectionRenderer.preload(),
     ]);
 
-    // 3. Init navmesh (with fallback)
+    // 3. Build the unit pathfinding grid
     window.dispatchEvent(new CustomEvent('loading-progress', {
       detail: { progress: 0.7, label: 'Navigatie berekenen...' },
     }));
-    try {
-      await this.navMesh.init(this.terrain.mesh);
-      console.log('[Game] NavMesh initialized');
-    } catch (e) {
-      console.warn('[Game] NavMesh failed, using direct movement fallback:', e);
-    }
     this.installNavGrid();
 
     // 4. Spawn all entities from map definition
@@ -452,13 +444,19 @@ export class Game {
   }
 
   /**
-   * Unit pathfinding grid (rivers minus bridges + rock walls). Movement falls
-   * back to straight lines when this fails. Also resets per-unit path state.
+   * Unit pathfinding grid (rivers minus bridges + rock walls + building
+   * footprints). Movement falls back to straight lines when this fails. Also
+   * resets per-unit path state. Buildings that already exist (none today --
+   * entities spawn after this call -- but cheap insurance against reordering)
+   * get their footprints registered right away; later spawns register
+   * themselves via spawnBuildingEntity().
    */
   private installNavGrid(): void {
     try {
       const grid = NavGrid.fromTerrain(this.terrain, this.map.terrainFeatures?.rockWalls ?? []);
       setActiveNavGrid(grid);
+      resetBuildingFootprints();
+      syncBuildingFootprints(world);
       console.log(`[Game] NavGrid ready: ${grid.size}x${grid.size}, ${grid.blockedCount} blocked cells`);
     } catch (e) {
       console.warn('[Game] NavGrid failed, using direct movement fallback:', e);
@@ -503,7 +501,6 @@ export class Game {
     window.dispatchEvent(new CustomEvent('loading-progress', {
       detail: { progress: 0.7, label: 'Navigatie berekenen...' },
     }));
-    try { await this.navMesh.init(this.terrain.mesh); } catch { /* fallback */ }
     this.installNavGrid();
 
     // Use explicit faction fields from mission definition
@@ -4441,6 +4438,7 @@ export class Game {
 
     // Clear eid-keyed state that outlives the world reset (eids get recycled)
     resetPopulationSystem();
+    resetBuildingFootprints();
 
     // Reset player state (gold, population, resources)
     this.playerState.reset();

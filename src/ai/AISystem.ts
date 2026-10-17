@@ -27,7 +27,6 @@ import {
   type AICommand,
   type AIWorldSnapshot,
 } from './AIController';
-import { NavMeshManager } from '../pathfinding/NavMeshManager';
 import {
   isVergaderingReady,
   activateVergadering,
@@ -558,11 +557,9 @@ function executeCommand(
       const cost = 200; // BARRACKS_COST
       if (!cb.deductGold(cost, aiFactionId)) break;
 
-      // Spawn barracks entity (use the AI's actual faction)
+      // Spawn barracks entity (use the AI's actual faction). Its NavGrid
+      // footprint is registered by spawnBuildingEntity().
       cb.spawnBuilding(BuildingTypeId.Barracks, aiFactionId, cmd.targetX, cmd.targetZ);
-
-      // Add obstacle to navmesh
-      NavMeshManager.addBoxObstacle(cmd.targetX, cmd.targetZ, 2, 2, 4);
       break;
     }
 
@@ -575,9 +572,6 @@ function executeCommand(
 
       // Spawn tertiary resource building (Mijnschacht / Chocolaterie)
       cb.spawnBuilding(BuildingTypeId.TertiaryResourceBuilding, aiFactionId, cmd.targetX, cmd.targetZ);
-
-      // Add obstacle to navmesh
-      NavMeshManager.addBoxObstacle(cmd.targetX, cmd.targetZ, 2, 2, 4);
       break;
     }
 

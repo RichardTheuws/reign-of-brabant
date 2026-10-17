@@ -48,6 +48,7 @@ import {
 } from '../ecs/tags';
 
 import { HERO_ARCHETYPES } from './heroArchetypes';
+import { deriveAttackType } from './factories';
 
 // ---------------------------------------------------------------------------
 // Tracking: which heroes exist per faction (max 1 per type)
@@ -167,7 +168,7 @@ export function createHero(
   Attack.range[eid] = arch.range;
   Attack.cooldown[eid] = arch.attackSpeed;
   Attack.timer[eid] = 0;
-  Attack.attackType[eid] = arch.attackType ?? (arch.range > 0 ? AttackType.Ranged : AttackType.Melee);
+  Attack.attackType[eid] = arch.attackType ?? deriveAttackType(null, arch.range);
   Attack.siegeBonus[eid] = 1.0;
   Attack.splashRadius[eid] = 0;
 

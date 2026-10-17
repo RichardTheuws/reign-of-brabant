@@ -110,7 +110,7 @@ export function resourceNodes(world: World) {
 // Pathfinding Queries
 // ---------------------------------------------------------------------------
 
-/** Entities requesting pathfinding calculation (consumed by PathfindingSystem). */
+/** Entities tagged NeedsPathfinding (legacy marker; routing is done by UnitPathing/NavGrid). */
 export function entitiesNeedingPathfinding(world: World) {
   return query(world, [NeedsPathfinding, Position, Movement]);
 }

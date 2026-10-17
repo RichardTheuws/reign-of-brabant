@@ -20,7 +20,7 @@ import { IsUnit } from '../src/ecs/tags';
 import { createProductionSystem } from '../src/systems/ProductionSystem';
 import { createCombatSystem } from '../src/systems/CombatSystem';
 import { spawnBuildingEntity } from '../src/entities/buildingSpawn';
-import { createUnit, spawnBasicUnit } from '../src/entities/factories';
+import { createUnit, spawnBasicUnit, deriveAttackType } from '../src/entities/factories';
 import { getFactionUnitArchetype } from '../src/data/factionData';
 import { playerState } from '../src/core/PlayerState';
 import { eventBus } from '../src/core/EventBus';
@@ -66,9 +66,9 @@ describe('recycled eid -- unit spawn paths reset combat stats', () => {
     const arch = getFactionUnitArchetype(F, UnitTypeId.Infantry);
     expect(Attack.splashRadius[eid]).toBe(0);
     expect(Attack.siegeBonus[eid]).toBe(1);
-    // Same derivation as the archetype factory (range > 0 -> Ranged); the
+    // Same derivation as the archetype factory (deriveAttackType); the
     // point here is that it is not the dead siege unit's AttackType.Siege.
-    expect(Attack.attackType[eid]).toBe(arch.attackType ?? (arch.range > 0 ? AttackType.Ranged : AttackType.Melee));
+    expect(Attack.attackType[eid]).toBe(arch.attackType ?? deriveAttackType(arch.typeId, arch.range));
     expect(Attack.attackType[eid]).not.toBe(AttackType.Siege);
     expect(Attack.cooldown[eid]).toBeCloseTo(Attack.speed[eid], 5);
     expect(Armor.type[eid]).toBe(arch.armorType);
