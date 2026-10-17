@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.63.0] - 2026-10-17 — Bundel 6: AI-bouwvolgorde, herstel van vastgelopen werkers
+
+### Added
+- **De AI heeft een bouwvolgorde** (`AIController.ts`, `AISystem.ts`). Eerst Housing als de populatie bijna vol is, dan het leger trainen, dan uitbreiden met een extra Barracks en daarna een Tertiary. Het maximum aantal Barracks is 1 op easy, 2 op normal en 3 op hard. Elke vrije Barracks traint. Er is een goudbudget per beslissing. Nieuwe functie `findAIBuildSite`: zoekt in ringen rond de basis een geldige plek, vrij op de NavGrid. Gemeten op v0.61 en v0.62: de AI bleef na één Barracks steken op 20/20 populatie met 1500 goud ongebruikt. Dat was geen regressie, er ontbrak gewoon logica. Nu, op normal: 4 nieuwe gebouwen in 300 s, alles afgebouwd, een leger van 19 tegen 11.
+- **Vastgelopen werkers worden weer aan het werk gezet** (`GatherSystem.ts`). Dat geldt voor een werker in de verzamel- of inleverstatus die buiten bereik staat en geen looporder heeft, of die 5 s niet vooruitkomt. Het herstel gaat in stappen: hetzelfde doel opnieuw, dan een omweg, dan een andere bron of inleverplek dichtbij. Daartussen wacht hij 0,5 tot 4 s. Werkers die vechten, hold position houden, gestund zijn of in een Vergadering zitten blijven met rust gelaten (`isVergaderingStunned`). Werkers die na een gevecht op Idle bleven staan, gaan weer verzamelen.
+
+### Fixed
+- AI-gebouwen kosten nu wat het archetype zegt (`getBuildingCost`). De AI betaalde voor een Tertiary 200 in plaats van 250.
+- Limburgers en Belgen konden in één beslissing twee tertiary-gebouwen neerzetten (gevonden in de review).
+- Een werker die met omleiden naar een goudmijn 58 eenheden verderop werd gestuurd. Omleiden is nu begrensd: bij goud nooit, bij hout tot 10 eenheden, bij inleveren tot 10 eenheden extra route (gevonden in de review).
+
+### Tests
+- Nieuw: `AI-build-order` (16 tests) en `GatherSystem-jam-recovery` (14 tests; zonder de fix falen ze allemaal). 3106/3106 groen, UAT 2/2. Browser-sim, 1v1 op normal, 300 s: de AI zette 4 gebouwen neer, 0 werkers langer dan 10 s vast, 0 errors, gemiddeld 8,3 ms per frame.
+
 ## [0.62.0] - 2026-10-17 — Bundel 5: gebouw-footprints, Recast weg, melee-attacktype
 
 ### Added

@@ -19,6 +19,7 @@ import {
   type EntityId,
   MAP_SIZE,
   ResourceType,
+  NO_PRODUCTION,
 } from '../types/index';
 import { getFactionUnitArchetype } from '../data/factionData';
 import {
@@ -37,8 +38,13 @@ import { createHero, isHeroActive } from '../entities/heroFactory';
 import { HERO_ARCHETYPES, getHeroTypesForFaction } from '../entities/heroArchetypes';
 import { playerState } from '../core/PlayerState';
 import { world as ecsWorld } from '../ecs/world';
-import { hasComponent } from 'bitecs';
-import { Building, Production, Resource } from '../ecs/components';
+import { hasComponent, query } from 'bitecs';
+import { Building, Production, Resource, Position } from '../ecs/components';
+import { IsResource } from '../ecs/tags';
+import { validateBuildingPlacement } from '../systems/BuildSystem';
+import { getBuildingCost } from '../world/buildingCost';
+import { getActiveNavGrid } from '../pathfinding/UnitPathing';
+import type { GameWorld } from '../ecs/world';
 
 // ---------------------------------------------------------------------------
 // ECS component arrays -- set via configure()
@@ -292,6 +298,8 @@ function buildSnapshot(
   const townHalls: EntityId[] = [];
   const barracks: EntityId[] = [];
   const tertiaryBuildings: EntityId[] = [];
+  const idleBarracks: EntityId[] = [];
+  const housing: EntityId[] = [];
   const army: EntityId[] = [];
   const playerTownHallPositions: { x: number; z: number }[] = [];
   const goldMines: { eid: EntityId; x: number; z: number; amount: number }[] = [];
@@ -350,6 +358,12 @@ function buildSnapshot(
         // heal, so a damaged barracks must still count as complete)
         if (Building.complete[eid] === 1) {
           barracks.push(eid);
+          if (
+            !hasComponent(ecsWorld, eid, Production) ||
+            c.productionUnitType[eid] === NO_PRODUCTION
+          ) {
+            idleBarracks.push(eid);
+          }
         } else {
           barracksUnderConstruction = true;
         }
@@ -360,6 +374,8 @@ function buildSnapshot(
         } else {
           tertiaryUnderConstruction = true;
         }
+      } else if (buildingType === BuildingTypeId.Housing) {
+        housing.push(eid);
       }
 
       // Check if any completed production building is training (buildings
@@ -428,6 +444,11 @@ function buildSnapshot(
     werkoverlegActive: isWerkoverlegActive(),
     vergaderingReady: isVergaderingReady(),
     enemyUnitPositions,
+
+    population: playerState.getPopulation(aiFaction),
+    populationMax: playerState.getPopulationMax(aiFaction),
+    idleBarracks,
+    housing,
 
     getEntityPosition: (eid: EntityId) => {
       // Always return position -- entities always have a position
@@ -552,26 +573,21 @@ function executeCommand(
 
     case AICommandType.BuildBarracks: {
       if (cmd.targetX == null || cmd.targetZ == null) break;
-
-      // Check gold
-      const cost = 200; // BARRACKS_COST
-      if (!cb.deductGold(cost, aiFactionId)) break;
-
-      // Spawn barracks entity (use the AI's actual faction). Its NavGrid
-      // footprint is registered by spawnBuildingEntity().
-      cb.spawnBuilding(BuildingTypeId.Barracks, aiFactionId, cmd.targetX, cmd.targetZ);
+      // Its NavGrid footprint is registered by spawnBuildingEntity().
+      buildAIStructure(BuildingTypeId.Barracks, aiFactionId, cmd.targetX, cmd.targetZ, cb);
       break;
     }
 
     case AICommandType.BuildTertiaryBuilding: {
       if (cmd.targetX == null || cmd.targetZ == null) break;
+      // Tertiary resource building (Mijnschacht / Chocolaterie)
+      buildAIStructure(BuildingTypeId.TertiaryResourceBuilding, aiFactionId, cmd.targetX, cmd.targetZ, cb);
+      break;
+    }
 
-      // Tertiary building costs same as barracks (200 gold)
-      const cost = 200;
-      if (!cb.deductGold(cost, aiFactionId)) break;
-
-      // Spawn tertiary resource building (Mijnschacht / Chocolaterie)
-      cb.spawnBuilding(BuildingTypeId.TertiaryResourceBuilding, aiFactionId, cmd.targetX, cmd.targetZ);
+    case AICommandType.BuildStructure: {
+      if (cmd.buildingType == null || cmd.targetX == null || cmd.targetZ == null) break;
+      buildAIStructure(cmd.buildingType, aiFactionId, cmd.targetX, cmd.targetZ, cb);
       break;
     }
 
@@ -623,4 +639,94 @@ function executeCommand(
       break;
     }
   }
+}
+
+// ---------------------------------------------------------------------------
+// AI building placement
+// ---------------------------------------------------------------------------
+
+/** Min centre distance between an AI building and any other building (4x4 box + a walkable lane). */
+const AI_BUILD_SPACING = 6;
+/** Keep AI buildings off the gold mines and the space workers use around them. */
+const AI_MINE_CLEARANCE = 7;
+/** Keep AI buildings off trees (trees are entities, not NavGrid cells). */
+const AI_TREE_CLEARANCE = 3;
+/** Rings searched around the preferred spot (world units). */
+const AI_SITE_RINGS = [0, 6, 9, 12, 15, 18, 22, 26];
+
+/**
+ * Find a free spot for an AI building near (prefX, prefZ): the spot itself
+ * first, then rings around it. A spot is free when the regular placement
+ * rules pass (no overlap, not on the river, not next to an enemy building),
+ * the 4x4 box is clear of NavGrid-blocked cells (river, rock walls, other
+ * footprints), it keeps a walkable lane to other buildings and stays clear of
+ * gold mines and trees. Returns null when nothing fits.
+ */
+export function findAIBuildSite(
+  world: GameWorld,
+  type: BuildingTypeId,
+  factionId: FactionId,
+  prefX: number,
+  prefZ: number,
+): { x: number; z: number } | null {
+  const grid = getActiveNavGrid();
+  const half = (grid?.mapSize ?? MAP_SIZE) / 2 - 4;
+  const blockedAt = (x: number, z: number): boolean => grid?.isBlockedAt(x, z) ?? false;
+  const terrain = {
+    getHeightAt: () => 1,
+    isWater: () => false,
+    isRiver: (x: number, z: number) => blockedAt(x, z),
+  };
+
+  const resources = [...query(world, [Position, Resource, IsResource])];
+  const buildings = [...query(world, [Position, Building])];
+
+  const isFree = (x: number, z: number): boolean => {
+    if (Math.abs(x) > half || Math.abs(z) > half) return false;
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        if (blockedAt(x + dx, z + dz)) return false;
+      }
+    }
+    for (const b of buildings) {
+      if (Math.abs(Position.x[b] - x) < AI_BUILD_SPACING && Math.abs(Position.z[b] - z) < AI_BUILD_SPACING) {
+        return false;
+      }
+    }
+    for (const r of resources) {
+      const clearance = Resource.type[r] === ResourceType.Gold ? AI_MINE_CLEARANCE : AI_TREE_CLEARANCE;
+      const dx = Position.x[r] - x;
+      const dz = Position.z[r] - z;
+      if (dx * dx + dz * dz < clearance * clearance) return false;
+    }
+    return validateBuildingPlacement(world, type, factionId, x, z, terrain).valid;
+  };
+
+  for (const r of AI_SITE_RINGS) {
+    const steps = r === 0 ? 1 : Math.max(8, Math.round((2 * Math.PI * r) / 3));
+    for (let i = 0; i < steps; i++) {
+      const a = (i / steps) * Math.PI * 2;
+      const x = prefX + Math.cos(a) * r;
+      const z = prefZ + Math.sin(a) * r;
+      if (isFree(x, z)) return { x, z };
+    }
+  }
+  return null;
+}
+
+/**
+ * Pay for and spawn an AI building at a free site near (prefX, prefZ). Gold
+ * is only taken once a site is found, so a crowded base does not eat gold.
+ */
+function buildAIStructure(
+  type: BuildingTypeId,
+  factionId: FactionId,
+  prefX: number,
+  prefZ: number,
+  cb: AISystemCallbacks,
+): EntityId | null {
+  const site = findAIBuildSite(ecsWorld, type, factionId, prefX, prefZ);
+  if (!site) return null;
+  if (!cb.deductGold(getBuildingCost(type).goldCost, factionId)) return null;
+  return cb.spawnBuilding(type, factionId, site.x, site.z);
 }

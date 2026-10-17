@@ -403,6 +403,15 @@ export function isVergaderingReady(): boolean {
   return vergaderingCooldown <= 0 && !vergaderingStunActive;
 }
 
+/**
+ * Whether `eid` is currently held by the Eindeloze Vergadering stun. That stun
+ * does not use the Stunned component: it forces UnitAI Idle + no move order
+ * every frame, so other systems must ask here to tell it apart from real idling.
+ */
+export function isVergaderingStunned(eid: number): boolean {
+  return vergaderingStunActive && stunnedUnits.has(eid);
+}
+
 /** Get current vergadering cooldown remaining (0 = ready). */
 export function getVergaderingCooldown(): number {
   return Math.max(0, vergaderingCooldown);

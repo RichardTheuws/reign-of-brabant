@@ -27,6 +27,7 @@
 import {
   FactionId,
   UnitTypeId,
+  BuildingTypeId,
   UnitAIState,
   StrategicAIPhase,
   MAP_SIZE,
@@ -34,6 +35,7 @@ import {
 } from '../types/index';
 import { getFactionUnitArchetype } from '../data/factionData';
 import { distance2D } from '../utils/math';
+import { getBuildingCost } from '../world/buildingCost';
 
 // ---------------------------------------------------------------------------
 // Configuration
@@ -71,6 +73,33 @@ const BARRACKS_BUILD_TIME = 30;
 
 /** How long each unit takes to train (simplified, same for all). */
 const UNIT_TRAIN_TIME = 15;
+
+/**
+ * Population capacity above which the AI stops building Housing. Beyond this
+ * the army is big enough; more houses would only soak up gold.
+ */
+const AI_POP_SOFT_CAP = 80;
+
+/**
+ * Build-order knobs per difficulty (faction-independent). Before v0.62.1 the
+ * AI had no build order past its first Barracks: it never built Housing (so
+ * production stalled at the Town Hall's population cap), never added a second
+ * Barracks, and floated 1500+ gold by minute 5.
+ */
+interface BuildOrderConfig {
+  /** Max Barracks the AI keeps (complete + under construction). */
+  maxBarracks: number;
+  /** Build Housing when free population (max - current) drops to this. */
+  housingSlack: number;
+  /** Gold kept back for the army before an optional (non-Housing) building. */
+  buildReserve: number;
+}
+
+const BUILD_ORDER_BY_DIFFICULTY: Record<'easy' | 'normal' | 'hard', BuildOrderConfig> = {
+  easy: { maxBarracks: 1, housingSlack: 3, buildReserve: 150 },
+  normal: { maxBarracks: 2, housingSlack: 5, buildReserve: 50 },
+  hard: { maxBarracks: 3, housingSlack: 6, buildReserve: 0 },
+};
 
 // ---------------------------------------------------------------------------
 // Per-Faction Strategy Configuration
@@ -176,6 +205,8 @@ export enum AICommandType {
   AttackMove = 'attack_move',
   /** Activate Eindeloze Vergadering at a target point. */
   Vergadering = 'vergadering',
+  /** Build any building type (`buildingType`) near the AI base. */
+  BuildStructure = 'build_structure',
 }
 
 export interface AICommand {
@@ -184,6 +215,8 @@ export interface AICommand {
   targetEntityId?: EntityId;
   /** Unit type to train. */
   unitType?: UnitTypeId;
+  /** Building type to construct (BuildStructure). */
+  buildingType?: BuildingTypeId;
   /** World position target. */
   targetX?: number;
   targetZ?: number;
@@ -252,6 +285,17 @@ export interface AIWorldSnapshot {
 
   /** All enemy unit positions (for Vergadering targeting). */
   enemyUnitPositions: readonly { eid: EntityId; x: number; z: number }[];
+
+  // -- Build order data (optional: older callers/tests omit it) --
+
+  /** Current population of the AI faction. */
+  population?: number;
+  /** Population capacity of the AI faction. */
+  populationMax?: number;
+  /** Complete Barracks that are not producing anything right now. */
+  idleBarracks?: readonly EntityId[];
+  /** Housing buildings (complete or not). */
+  housing?: readonly EntityId[];
 }
 
 // ---------------------------------------------------------------------------
@@ -270,6 +314,12 @@ export class AIController {
   private hasScouted = false;
   private attackWaveCount = 0;
   private lastArmySize = 0;
+
+  /** Build-order knobs for this difficulty. */
+  private readonly buildOrder: BuildOrderConfig;
+
+  /** Gold still unspent in the current decision tick. */
+  private budget = 0;
 
   /** Pending commands to be consumed by the AISystem. */
   private pendingCommands: AICommand[] = [];
@@ -296,6 +346,8 @@ export class AIController {
     } else {
       this.strategy = base;
     }
+    this.buildOrder = BUILD_ORDER_BY_DIFFICULTY[difficulty as 'easy' | 'normal' | 'hard']
+      ?? BUILD_ORDER_BY_DIFFICULTY.normal;
   }
 
   /**
@@ -310,6 +362,7 @@ export class AIController {
       return this.pendingCommands;
     }
     this.decisionTimer = 0;
+    this.budget = snapshot.gold;
 
     // Detect current phase
     this.phase = this.detectPhase(snapshot);
@@ -388,13 +441,14 @@ export class AIController {
     if (
       snapshot.barracks.length === 0 &&
       !snapshot.barracksUnderConstruction &&
-      snapshot.gold >= BARRACKS_COST
+      this.budget >= BARRACKS_COST
     ) {
+      this.budget -= BARRACKS_COST;
       this.issueBuildBarracks(snapshot);
     }
 
     // 4. Train extra workers if we have few
-    if (snapshot.workers.length < this.strategy.maxWorkers && snapshot.gold >= this.getUnitCost(UnitTypeId.Worker)) {
+    if (snapshot.workers.length < this.strategy.maxWorkers && this.budget >= this.getUnitCost(UnitTypeId.Worker)) {
       this.issueTrainWorker(snapshot);
     }
   }
@@ -408,7 +462,7 @@ export class AIController {
     this.issueGatherCommands(snapshot);
 
     // 2. Train workers if below minimum
-    if (snapshot.workers.length < 4 && snapshot.gold >= this.getUnitCost(UnitTypeId.Worker)) {
+    if (snapshot.workers.length < 4 && this.budget >= this.getUnitCost(UnitTypeId.Worker)) {
       this.issueTrainWorker(snapshot);
     }
 
@@ -417,10 +471,14 @@ export class AIController {
       this.tryBuildTertiaryBuilding(snapshot);
     }
 
-    // 4. Train army units (faction-specific composition)
-    if (!snapshot.isTraining && snapshot.barracks.length > 0) {
-      this.issueTrainArmy(snapshot);
-    }
+    // 4. Housing first: without population room no unit comes out
+    this.tryBuildHousing(snapshot);
+
+    // 5. Train army units (faction-specific composition)
+    this.trainArmyIfIdle(snapshot);
+
+    // 6. Expand with the gold that is left (extra Barracks, tertiary)
+    this.tryExpandBase(snapshot);
 
     // 5. Scout with first military unit (defensive factions skip early scouting)
     if (!this.hasScouted && snapshot.army.length >= SCOUT_THRESHOLD) {
@@ -443,10 +501,10 @@ export class AIController {
     // 1. Workers keep gathering
     this.issueGatherCommands(snapshot);
 
-    // 2. Keep training
-    if (!snapshot.isTraining && snapshot.barracks.length > 0) {
-      this.issueTrainArmy(snapshot);
-    }
+    // 2. Keep training (Housing first, then army, then expansion)
+    this.tryBuildHousing(snapshot);
+    this.trainArmyIfIdle(snapshot);
+    this.tryExpandBase(snapshot);
 
     // 3. Randstad: try to use Eindeloze Vergadering before attacking
     if (this.strategy.useVergadering && snapshot.vergaderingReady && snapshot.enemyUnitPositions.length >= 3) {
@@ -518,8 +576,9 @@ export class AIController {
     // Need at least a barracks first (don't delay military)
     if (snapshot.barracks.length === 0) return;
 
-    // Tertiary building costs same as barracks for simplicity
-    if (snapshot.gold < BARRACKS_COST) return;
+    const cost = getBuildingCost(BuildingTypeId.TertiaryResourceBuilding).goldCost;
+    if (this.budget < cost) return;
+    this.budget -= cost;
 
     // Place offset from barracks in opposite direction
     const offsetX = snapshot.baseX + (snapshot.baseX > 0 ? -16 : 16);
@@ -537,6 +596,7 @@ export class AIController {
    */
   private issueTrainWorker(snapshot: AIWorldSnapshot): void {
     if (snapshot.townHalls.length === 0) return;
+    this.budget -= this.getUnitCost(UnitTypeId.Worker);
 
     this.pendingCommands.push({
       type: AICommandType.TrainUnit,
@@ -551,10 +611,9 @@ export class AIController {
    * Each faction has preferred unit types and a ratio controlling the mix.
    * Falls back to Infantry if the preferred unit type can't be afforded.
    */
-  private issueTrainArmy(snapshot: AIWorldSnapshot): void {
+  private issueTrainArmy(snapshot: AIWorldSnapshot, barracksId: EntityId = snapshot.barracks[0]): void {
     if (snapshot.barracks.length === 0) return;
 
-    const barracksId = snapshot.barracks[0];
     const primary = this.strategy.preferredUnits[0];
     const secondary = this.strategy.preferredUnits[1] ?? primary;
     const ratio = this.strategy.primaryToSecondaryRatio;
@@ -568,20 +627,99 @@ export class AIController {
     const unitToTrain = shouldTrainSecondary ? secondary : primary;
     const cost = this.getUnitCost(unitToTrain);
 
-    if (snapshot.gold >= cost) {
+    if (this.budget >= cost) {
+      this.budget -= cost;
       this.pendingCommands.push({
         type: AICommandType.TrainUnit,
         targetEntityId: barracksId,
         unitType: unitToTrain,
       });
-    } else if (snapshot.gold >= this.getUnitCost(UnitTypeId.Infantry) && unitToTrain !== UnitTypeId.Infantry) {
+    } else if (this.budget >= this.getUnitCost(UnitTypeId.Infantry) && unitToTrain !== UnitTypeId.Infantry) {
       // Fallback: train Infantry if we can't afford the preferred unit
+      this.budget -= this.getUnitCost(UnitTypeId.Infantry);
       this.pendingCommands.push({
         type: AICommandType.TrainUnit,
         targetEntityId: barracksId,
         unitType: UnitTypeId.Infantry,
       });
     }
+  }
+
+  /**
+   * Train from every idle Barracks. Snapshots without `idleBarracks` (older
+   * callers) fall back to the global isTraining gate and the first Barracks.
+   */
+  private trainArmyIfIdle(snapshot: AIWorldSnapshot): void {
+    if (snapshot.barracks.length === 0) return;
+    if (!snapshot.idleBarracks) {
+      if (!snapshot.isTraining) this.issueTrainArmy(snapshot);
+      return;
+    }
+    for (const barracksId of snapshot.idleBarracks) {
+      this.issueTrainArmy(snapshot, barracksId);
+    }
+  }
+
+  /**
+   * Build Housing when the population is about to hit its cap. Housing goes
+   * before army training: a full population pauses every production queue.
+   */
+  private tryBuildHousing(snapshot: AIWorldSnapshot): void {
+    if (snapshot.population == null || snapshot.populationMax == null) return;
+    if (snapshot.populationMax >= AI_POP_SOFT_CAP) return;
+    if (snapshot.populationMax - snapshot.population > this.buildOrder.housingSlack) return;
+    this.issueBuild(snapshot, BuildingTypeId.Housing, 0);
+  }
+
+  /**
+   * Spend surplus gold on the base: extra Barracks up to the difficulty cap,
+   * then a tertiary resource building. One optional building per decision,
+   * and only with `buildReserve` gold left for the army afterwards.
+   */
+  private tryExpandBase(snapshot: AIWorldSnapshot): void {
+    if (snapshot.idleBarracks == null) return; // legacy snapshot: no build order
+    if (snapshot.barracks.length === 0) return;
+
+    const barracksTotal = snapshot.barracks.length + (snapshot.barracksUnderConstruction ? 1 : 0);
+    if (barracksTotal < this.buildOrder.maxBarracks) {
+      if (this.issueBuild(snapshot, BuildingTypeId.Barracks, this.buildOrder.buildReserve)) return;
+    }
+    if (
+      snapshot.tertiaryBuildings.length === 0 &&
+      !snapshot.tertiaryUnderConstruction &&
+      !this.tertiaryQueuedThisTick()
+    ) {
+      this.issueBuild(snapshot, BuildingTypeId.TertiaryResourceBuilding, this.buildOrder.buildReserve);
+    }
+  }
+
+  /**
+   * True when a tertiary building was already queued in this decision tick
+   * (e.g. by the buildTertiaryEarly path). The snapshot does not change within
+   * a tick, so without this check Limburgers/Belgen would queue — and pay for —
+   * two tertiary buildings in one decision.
+   */
+  private tertiaryQueuedThisTick(): boolean {
+    return this.pendingCommands.some(c =>
+      c.type === AICommandType.BuildTertiaryBuilding ||
+      (c.type === AICommandType.BuildStructure && c.buildingType === BuildingTypeId.TertiaryResourceBuilding));
+  }
+
+  /**
+   * Queue a BuildStructure command when the budget covers cost + reserve.
+   * The AISystem picks the actual site near the base. Returns true if issued.
+   */
+  private issueBuild(snapshot: AIWorldSnapshot, type: BuildingTypeId, reserve: number): boolean {
+    const cost = getBuildingCost(type).goldCost;
+    if (this.budget < cost + reserve) return false;
+    this.budget -= cost;
+    this.pendingCommands.push({
+      type: AICommandType.BuildStructure,
+      buildingType: type,
+      targetX: snapshot.baseX,
+      targetZ: snapshot.baseZ,
+    });
+    return true;
   }
 
   /**
