@@ -79,3 +79,73 @@ export function warmModelKeys(factions: Iterable<number>, playerFaction: number,
     buildings: [...new Set(buildings)].filter((k) => !skipB.has(k)),
   };
 }
+
+/**
+ * Every building type a faction can place, in the order the player usually
+ * reaches them. Used to warm the player's whole build menu after the HUD.
+ */
+export const PLAYER_BUILDING_TYPES: readonly string[] = [
+  'housing', 'barracks', 'lumbercamp', 'blacksmith', 'tower', 'tertiary',
+  'upgrade', 'special1', 'advanced', 'siege-workshop', 'townhall',
+];
+
+/**
+ * The rest of the player's own build menu: every building of the player's
+ * faction that is neither critical nor already in the warm set. Game starts
+ * this after the critical set, in the same one-at-a-time building queue, so
+ * the first Tower / Blacksmith ghost usually has its model already.
+ */
+export function playerBuildingTailKeys(playerFaction: number, critical: ModelKeySet, warm: ModelKeySet): string[] {
+  const skip = new Set([...critical.buildings, ...warm.buildings]);
+  return PLAYER_BUILDING_TYPES.map((t) => `${t}_${playerFaction}`).filter((k) => !skip.has(k));
+}
+
+/** A failed model is tried again on the next request after this delay (ms). */
+export const MODEL_RETRY_DELAY_MS = 15_000;
+/** Downloads per model per match (first try + retries) before giving up. */
+export const MODEL_MAX_LOAD_ATTEMPTS = 3;
+
+/**
+ * Failure memo for model loads (UnitRenderer / BuildingRenderer). A load that
+ * failed is not retried on every frame's request, but after a backoff
+ * (MODEL_RETRY_DELAY_MS) on the next request, up to MODEL_MAX_LOAD_ATTEMPTS
+ * per match. A new match calls reset(): every failed key gets a fresh start.
+ * Successful loads never come here; they stay cached in the renderer.
+ */
+export class ModelLoadFailures {
+  private failures = new Map<string, { at: number; attempts: number; retrying: boolean }>();
+
+  constructor(private readonly now: () => number = () => performance.now()) {}
+
+  recordFailure(key: string): void {
+    const prev = this.failures.get(key);
+    this.failures.set(key, { at: this.now(), attempts: (prev?.attempts ?? 0) + 1, retrying: false });
+  }
+
+  /** A retry of `key` started: no second retry until this one has settled. */
+  markRetrying(key: string): void {
+    const f = this.failures.get(key);
+    if (f) f.retrying = true;
+  }
+
+  recordSuccess(key: string): void {
+    this.failures.delete(key);
+  }
+
+  hasFailed(key: string): boolean {
+    return this.failures.has(key);
+  }
+
+  /** True when `key` failed, its backoff has passed and attempts remain. */
+  canRetry(key: string): boolean {
+    const f = this.failures.get(key);
+    return !!f && !f.retrying && f.attempts < MODEL_MAX_LOAD_ATTEMPTS && this.now() - f.at >= MODEL_RETRY_DELAY_MS;
+  }
+
+  /** Forget all failures (new match); returns the keys that had failed. */
+  reset(): string[] {
+    const keys = [...this.failures.keys()];
+    this.failures.clear();
+    return keys;
+  }
+}

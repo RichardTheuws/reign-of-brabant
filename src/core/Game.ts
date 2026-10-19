@@ -35,7 +35,7 @@ import { AISystem } from '../ai/AISystem';
 import { gameConfig } from '../core/GameConfig';
 import { UnitRenderer } from '../rendering/UnitRenderer';
 import { BuildingRenderer } from '../rendering/BuildingRenderer';
-import { criticalModelKeys, warmModelKeys, type ModelKeySet, type StartEntity } from '../rendering/modelPreloadPlan';
+import { criticalModelKeys, warmModelKeys, playerBuildingTailKeys, type ModelKeySet, type StartEntity } from '../rendering/modelPreloadPlan';
 import { PropRenderer } from '../rendering/PropRenderer';
 import { SelectionRenderer, type SelectionData } from '../rendering/SelectionRenderer';
 import { TowerRangeRenderer } from '../rendering/TowerRangeRenderer';
@@ -389,7 +389,8 @@ export class Game {
     );
     // The warm set starts alongside; only the critical set gates the HUD.
     const loading = this.loadCriticalModels(critical);
-    this.warmModels(warmModelKeys(activeFactions, this.playerFactionId, critical));
+    const warm = warmModelKeys(activeFactions, this.playerFactionId, critical);
+    this.warmModels(warm, loading, playerBuildingTailKeys(this.playerFactionId, critical, warm));
     await loading;
 
     // 3. Build the unit pathfinding grid
@@ -449,6 +450,9 @@ export class Game {
     window.dispatchEvent(new CustomEvent('loading-progress', {
       detail: { progress: 0.1, label: 'Modellen laden...' },
     }));
+    // New match: models that failed last match get a fresh set of attempts.
+    this.unitRenderer.resetFailedLoads();
+    this.buildingRenderer.resetFailedLoads();
     const total = critical.units.length + critical.buildings.length;
     let loaded = 0;
     const tick = (): void => {
@@ -465,10 +469,20 @@ export class Game {
     ]);
   }
 
-  /** Background download, one model at a time per renderer, so on-demand loads are not starved. */
-  private warmModels(warm: ModelKeySet): void {
+  /**
+   * Background download, one model at a time per renderer, so on-demand loads
+   * are not starved. Once the critical set is in and the warm buildings are
+   * done, the same building queue continues with the rest of the player's
+   * own build menu (`playerTail`), so a first Tower/Blacksmith ghost usually
+   * finds its model loaded.
+   */
+  private warmModels(warm: ModelKeySet, critical: Promise<void>, playerTail: string[] = []): void {
     void this.unitRenderer.prefetch(warm.units, 1);
-    void this.buildingRenderer.prefetch(warm.buildings, 1);
+    const warmBuildings = this.buildingRenderer.prefetch(warm.buildings, 1);
+    if (playerTail.length === 0) return;
+    void Promise.all([warmBuildings, critical])
+      .then(() => this.buildingRenderer.prefetch(playerTail, 1))
+      .catch(() => { /* prefetch never rejects; critical failures surface in init */ });
   }
 
   /** Throttle for prefetchQueuedUnitModels (seconds until the next scan). */
@@ -552,7 +566,7 @@ export class Game {
       ...scripted.map(e => `${e.type}_${e.factionId}`).filter(k => !criticalUnits.has(k)),
       ...warm.units,
     ])];
-    this.warmModels(warm);
+    this.warmModels(warm, loading, playerBuildingTailKeys(mission.playerFactionId, critical, warm));
     await loading;
 
     window.dispatchEvent(new CustomEvent('loading-progress', {

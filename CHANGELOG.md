@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.65.1] - 2026-10-20 — Bundel 9: plaatsings-ghost, opnieuw proberen na mislukte download, portraits op weergavemaat
+
+### Fixed
+- **Plaatsings-ghost bij gebouwen die nog laden**: `showGhost()` toont direct het 4x4-plaatsingsvlak in de groen/rood-kleuren totdat het model binnen is. Er komt geen placeholder-model. Na de kritieke set laden de gebouwen uit het eigen bouwmenu op de achtergrond (`playerBuildingTailKeys`).
+- **Mislukte modeldownload werd nooit opnieuw geprobeerd**: nu wel, met minstens 15 s ertussen, maximaal 3 pogingen per match en nooit twee pogingen tegelijk. Een nieuwe match wist de mislukkingen (`resetFailedLoads`). Units die als fallback getekend waren, krijgen het echte model zodra dat binnenkomt.
+- **Doodseffect op de spawnplek**: units waarvan het model nog laadt, volgen nu met hun proxy de ECS-positie.
+- **Multi-select-portraits werden afgesneden**: de regel `.multi-portrait img` met `object-fit: cover` ontbrak.
+
+### Performance
+- **179 HUD-portraits en -iconen geschaald naar 2x hun grootste weergavemaat**: gebouwen 128 px, units, commando's en upgrades 256 px. De heroes blijven 512 px, want `/updates/` toont ze groter. Lossless, met alpha behouden; bestanden die JPEG-data in een .png bevatten blijven JPEG (q90, 4:4:4). Totaal van 129,7 naar 8,7 MB. In de eerste 120 s van een 1v1 gaat het beeldverkeer van 21,6 naar 2,3 MB, en alles samen van 53,0 naar 42,2 MB, inclusief de nieuwe achtergrondlading van gebouwen. De HUD staat er nog steeds na 15,2 s op Fast 4G: wat er vóór de HUD laadt is niet veranderd.
+
+### Tests
+- `portrait-asset-coverage`: de regel "minstens 800 KB" is vervangen door een eis op exacte afmetingen per categorie plus een niet-leeg-check (pixelspreiding en aantal kleuren). Nieuw: `model-load-followups` (17 tests). Resultaat: 3351/3351 groen, UAT 2/2, en in de A/B-meting 0 errors en 0 4xx.
+
 ## [0.65.0] - 2026-10-19 — Bundel 8: match laadt 5x sneller, campagne open, stemmen-schuif
 
 ### Added

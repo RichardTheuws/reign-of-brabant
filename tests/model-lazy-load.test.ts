@@ -178,15 +178,20 @@ describe('BuildingRenderer — building placed before its model', () => {
     expect(requested).toEqual(['/assets/models/v02/brabanders/barracks.glb']);
   });
 
-  it('showing a ghost for an unloaded type starts the download; the ghost appears after', async () => {
+  it('showing a ghost for an unloaded type starts the download; the model ghost replaces the footprint after', async () => {
     const group = new THREE.Group();
     const r = new BuildingRenderer(group);
+    const n = group.children.length;
     r.showGhost('blacksmith', 0, 1, 0, 1, true);
     expect(requested).toEqual(['/assets/models/v02/brabanders/blacksmith.glb']);
-    const n = group.children.length;
+    expect(r.isFootprintGhost()).toBe(true);
+    expect(group.children.length).toBe(n + 1);
     await resolveUrl('/assets/models/v02/brabanders/blacksmith.glb');
     r.showGhost('blacksmith', 0, 1, 0, 1, true);
-    expect(group.children.length).toBe(n + 1);
+    expect(r.isFootprintGhost()).toBe(false);
+    expect(group.children.length).toBe(n + 1); // footprint swapped for the model, not added
+    const ghost = group.children[group.children.length - 1];
+    expect(ghost.name).not.toBe('building_ghost_footprint');
     expect(requested).toHaveLength(1);
   });
 });

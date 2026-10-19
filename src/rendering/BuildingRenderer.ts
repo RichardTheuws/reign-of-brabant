@@ -7,6 +7,7 @@
 import * as THREE from 'three';
 import { MeshToonMaterial } from 'three';
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import { ModelLoadFailures } from './modelPreloadPlan';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -138,6 +139,12 @@ const FACTION_TINTS: Record<number, THREE.Color> = {
 const GHOST_VALID_COLOR = new THREE.Color(0x00ff00);
 const GHOST_INVALID_COLOR = new THREE.Color(0xff0000);
 const GHOST_OPACITY = 0.45;
+/**
+ * Side of the placement box drawn while a ghost's model is still downloading
+ * (BuildSystem's BUILDING_FOOTPRINT: buildings may not overlap within 4x4).
+ */
+const FOOTPRINT_GHOST_SIZE = 4;
+const FOOTPRINT_FILL_OPACITY = 0.3;
 
 /** Production indicator: spinning gear above producing buildings. */
 const GEAR_SPIN_SPEED = 2.0; // radians per second
@@ -170,6 +177,13 @@ export class BuildingRenderer {
   private group: THREE.Group;
   /** One download + setup job per key, shared by every caller. */
   private keyLoads = new Map<ModelCacheKey, Promise<void>>();
+  /** Keys whose last download failed: retried after a backoff (see ensureLoaded). */
+  private loadFailures = new ModelLoadFailures();
+  /** Shared geometry/materials of the footprint ghost (created on first use). */
+  private footprintGhostParts: {
+    fillGeo: THREE.PlaneGeometry; fillMat: THREE.MeshBasicMaterial;
+    edgeGeo: THREE.BufferGeometry; edgeMat: THREE.LineBasicMaterial;
+  } | null = null;
   /** Buildings placed before their model finished: eid -> key. */
   private pendingBuildings = new Map<number, { key: ModelCacheKey; factionId: number; since: number }>();
   /** Wait-time bookkeeping for buildings placed before their model. */
@@ -285,7 +299,8 @@ export class BuildingRenderer {
 
   /** Background download of `keys`, at most `concurrency` at a time. Never rejects. */
   prefetch(keys: Iterable<string>, concurrency = 2): Promise<void> {
-    const queue = [...new Set(keys)].filter((k) => k in BUILDING_MODEL_PATHS && !this.keyLoads.has(k as ModelCacheKey));
+    const queue = [...new Set(keys)].filter((k) => k in BUILDING_MODEL_PATHS
+      && (!this.keyLoads.has(k as ModelCacheKey) || this.loadFailures.canRetry(k)));
     const worker = async (): Promise<void> => {
       for (let key = queue.shift(); key; key = queue.shift()) {
         await this.ensureLoaded(key);
@@ -302,6 +317,8 @@ export class BuildingRenderer {
   /**
    * Download + set up the model for `key` once (v02 -> fallback chain).
    * Buildings placed while it loads get their model when it resolves.
+   * A failed download is tried again on a later request once its backoff has
+   * passed (ModelLoadFailures); a loaded model stays cached.
    * Unknown keys resolve immediately; never rejects.
    */
   ensureLoaded(key: string): Promise<void> {
@@ -309,6 +326,10 @@ export class BuildingRenderer {
     if (!path) return Promise.resolve();
     const cacheKey = key as ModelCacheKey;
     let job = this.keyLoads.get(cacheKey);
+    if (job && this.loadFailures.canRetry(key)) {
+      this.loadFailures.markRetrying(key);
+      job = undefined;
+    }
     if (!job) {
       job = this.loader.loadAsync(path).catch(() => {
         const fallback = BUILDING_MODEL_FALLBACKS[key];
@@ -328,7 +349,9 @@ export class BuildingRenderer {
           }
         });
         this.modelCache.set(cacheKey, root);
+        this.loadFailures.recordSuccess(key);
       }).catch((err) => {
+        this.loadFailures.recordFailure(key);
         console.warn(`[BuildingRenderer] Model load failed for "${key}":`, err);
       }).then(() => this.flushPending(cacheKey));
       this.keyLoads.set(cacheKey, job);
@@ -364,6 +387,14 @@ export class BuildingRenderer {
       holder.userData.buildingYOffset = yOffset;
       this.applyBuildProgress(holder, holder.userData.buildProgress ?? 1);
     }
+  }
+
+  /**
+   * New match: failed downloads get a fresh set of attempts, starting with
+   * the next request (no backoff). Loaded models are kept.
+   */
+  resetFailedLoads(): void {
+    for (const key of this.loadFailures.reset()) this.keyLoads.delete(key as ModelCacheKey);
   }
 
   /** Buildings currently waiting for their model. */
@@ -528,18 +559,29 @@ export class BuildingRenderer {
   /**
    * Show a semi-transparent ghost building at the given world position.
    * `valid` determines the tint colour (green = can place, red = blocked).
+   * While the type's model is still downloading, the ghost is the 4x4
+   * placement box (fill + outline) in the same colours; the model replaces
+   * it on the first call after it arrived.
    */
   showGhost(type: BuildingTypeName, factionId: number, x: number, y: number, z: number, valid: boolean): void {
     const key: ModelCacheKey = `${type}_${factionId}`;
     const source = this.modelCache.get(key);
     if (!source) {
-      // First placement of this type: fetch it; the ghost shows once loaded.
+      // First placement of this type: fetch it, show the footprint meanwhile.
       void this.ensureLoaded(key);
+      if (!this.ghost || this.ghost.userData.ghostKey !== key || !this.ghost.userData.footprint) {
+        this.hideGhost();
+        this.ghost = this.createFootprintGhost(key);
+        this.group.add(this.ghost);
+      }
+      this.ghost.position.set(x, y, z);
+      this.ghostValid = valid;
+      this.tintGhost(valid);
       return;
     }
 
     // Reuse ghost if already showing the same type; otherwise recreate
-    if (!this.ghost || this.ghost.userData.ghostKey !== key) {
+    if (!this.ghost || this.ghost.userData.ghostKey !== key || this.ghost.userData.footprint) {
       this.hideGhost();
       const clone = source.clone(true);
       clone.traverse((child) => {
@@ -576,13 +618,59 @@ export class BuildingRenderer {
   hideGhost(): void {
     if (!this.ghost) return;
     this.group.remove(this.ghost);
-    this.disposeObject(this.ghost);
+    // The footprint ghost uses shared geometry/materials (disposed in destroy()).
+    if (!this.ghost.userData.footprint) this.disposeObject(this.ghost);
     this.ghost = null;
+  }
+
+  /** Is the current ghost the placement-box stand-in (model not loaded yet)? */
+  isFootprintGhost(): boolean {
+    return !!this.ghost?.userData.footprint;
+  }
+
+  /** Flat 4x4 placement box + outline, lying just above the cursor point. */
+  private createFootprintGhost(key: ModelCacheKey): THREE.Group {
+    if (!this.footprintGhostParts) {
+      const fillGeo = new THREE.PlaneGeometry(FOOTPRINT_GHOST_SIZE, FOOTPRINT_GHOST_SIZE);
+      fillGeo.rotateX(-Math.PI / 2);
+      const h = FOOTPRINT_GHOST_SIZE / 2;
+      const edgeGeo = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(-h, 0, -h), new THREE.Vector3(h, 0, -h),
+        new THREE.Vector3(h, 0, h), new THREE.Vector3(-h, 0, h),
+      ]);
+      this.footprintGhostParts = {
+        fillGeo,
+        fillMat: new THREE.MeshBasicMaterial({
+          color: GHOST_VALID_COLOR, transparent: true, opacity: FOOTPRINT_FILL_OPACITY,
+          depthWrite: false, side: THREE.DoubleSide,
+        }),
+        edgeGeo,
+        edgeMat: new THREE.LineBasicMaterial({ color: GHOST_VALID_COLOR, transparent: true, opacity: 0.9, depthWrite: false }),
+      };
+    }
+    const { fillGeo, fillMat, edgeGeo, edgeMat } = this.footprintGhostParts;
+    const ghost = new THREE.Group();
+    ghost.name = 'building_ghost_footprint';
+    const fill = new THREE.Mesh(fillGeo, fillMat);
+    fill.position.y = 0.06;
+    fill.renderOrder = 2;
+    const edge = new THREE.LineLoop(edgeGeo, edgeMat);
+    edge.position.y = 0.08;
+    edge.renderOrder = 2;
+    ghost.add(fill, edge);
+    ghost.userData.ghostKey = key;
+    ghost.userData.footprint = true;
+    return ghost;
   }
 
   private tintGhost(valid: boolean): void {
     if (!this.ghost) return;
     const color = valid ? GHOST_VALID_COLOR : GHOST_INVALID_COLOR;
+    if (this.ghost.userData.footprint && this.footprintGhostParts) {
+      this.footprintGhostParts.fillMat.color.copy(color);
+      this.footprintGhostParts.edgeMat.color.copy(color);
+      return;
+    }
     this.ghost.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
@@ -985,6 +1073,12 @@ export class BuildingRenderer {
     this.modelCache.clear();
     this.pendingBuildings.clear();
     this.keyLoads.clear();
+    this.loadFailures.reset();
+    if (this.footprintGhostParts) {
+      const { fillGeo, fillMat, edgeGeo, edgeMat } = this.footprintGhostParts;
+      fillGeo.dispose(); fillMat.dispose(); edgeGeo.dispose(); edgeMat.dispose();
+      this.footprintGhostParts = null;
+    }
   }
 
   private disposeObject(obj: THREE.Object3D): void {

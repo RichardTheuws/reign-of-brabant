@@ -8,6 +8,7 @@
 import * as THREE from 'three';
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as skeletonClone } from 'three/addons/utils/SkeletonUtils.js';
+import { ModelLoadFailures } from './modelPreloadPlan';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -420,6 +421,10 @@ export class UnitRenderer {
   private urlLoads = new Map<string, Promise<GLTF>>();
   /** One setup job per key (template / bucket); shared by all callers. */
   private keyLoads = new Map<ModelCacheKey, Promise<void>>();
+  /** Keys whose models all failed (drawn as fallback box): retried after a backoff. */
+  private loadFailures = new ModelLoadFailures();
+  /** URLs whose download failed: dropped from urlLoads when a retry starts. */
+  private failedUrls = new Set<string>();
   /** Units spawned before their model finished: drawn once it arrives. */
   private pendingUnits = new Map<number, { key: ModelCacheKey; since: number }>();
   /** Wait-time bookkeeping for units that spawned before their model. */
@@ -538,7 +543,8 @@ export class UnitRenderer {
    * on-demand load (a unit that just spawned) is not starved. Never rejects.
    */
   prefetch(keys: Iterable<string>, concurrency = 2): Promise<void> {
-    const queue = [...new Set(keys)].filter((k) => isUnitModelKey(k) && !this.keyLoads.has(k as ModelCacheKey));
+    const queue = [...new Set(keys)].filter((k) => isUnitModelKey(k)
+      && (!this.keyLoads.has(k as ModelCacheKey) || this.loadFailures.canRetry(k)));
     const worker = async (): Promise<void> => {
       for (let key = queue.shift(); key; key = queue.shift()) {
         await this.ensureLoaded(key);
@@ -556,15 +562,28 @@ export class UnitRenderer {
    * Download + set up the model for `key` once; later calls share the same
    * promise. Units added while it loads are attached when it resolves.
    * Unknown keys resolve immediately. Never rejects (a failed chain ends in
-   * the static fallback, exactly as before).
+   * the static fallback, exactly as before). A failed chain is tried again on
+   * a later request once its backoff has passed (ModelLoadFailures); units
+   * drawn with the fallback move to the real model when it arrives.
    */
   ensureLoaded(key: string): Promise<void> {
     if (!isUnitModelKey(key)) return Promise.resolve();
     const cacheKey = key as ModelCacheKey;
     let job = this.keyLoads.get(cacheKey);
+    if (job && this.loadFailures.canRetry(key)) {
+      this.loadFailures.markRetrying(key);
+      this.forgetFailedUrls();
+      job = undefined;
+    }
     if (!job) {
       job = this.loadKey(cacheKey)
-        .catch((err) => console.warn(`[UnitRenderer] Model setup failed for "${key}":`, err))
+        .then(
+          (ok) => (ok ? this.loadFailures.recordSuccess(key) : this.loadFailures.recordFailure(key)),
+          (err) => {
+            this.loadFailures.recordFailure(key);
+            console.warn(`[UnitRenderer] Model setup failed for "${key}":`, err);
+          },
+        )
         .then(() => this.flushPending(cacheKey));
       this.keyLoads.set(cacheKey, job);
     }
@@ -576,25 +595,82 @@ export class UnitRenderer {
     let req = this.urlLoads.get(url);
     if (!req) {
       req = this.loader.loadAsync(url);
-      req.catch(() => {}); // rejection is handled by each consumer
+      // Rejection is handled by each consumer; the URL is remembered as failed
+      // so a retry (forgetFailedUrls) downloads it again.
+      req.catch(() => this.failedUrls.add(url));
       this.urlLoads.set(url, req);
     }
     return req;
   }
 
-  private async loadKey(key: ModelCacheKey): Promise<void> {
+  /**
+   * Download and install the model for `key`. True when a real model is
+   * installed; false when every URL failed (the key is drawn as fallback box
+   * until a retry succeeds).
+   */
+  private async loadKey(key: ModelCacheKey): Promise<boolean> {
     const load = (url: string): Promise<GLTF> => this.loadUrl(url);
     const animPath = ANIMATED_MODEL_PATHS[key];
+    let anim: GLTF | null = null;
     if (animPath) {
       try {
-        this.registerAnimated(key, await load(animPath));
-        return;
+        anim = await load(animPath);
       } catch (err) {
         console.warn(`[UnitRenderer] Failed to load animated model "${key}":`, err);
       }
     }
     // No animated model (or it failed): static v02 -> v01 chain.
-    await this.loadStatic(key, load, animPath);
+    const stat = anim ? null : await this.fetchStatic(key, load, animPath);
+    if (!anim && !stat) {
+      console.warn(`[UnitRenderer] Model load failed for "${key}", using fallback box`);
+      if (!this.buckets.has(key)) this.createFallbackBucket(key, parseInt(key.split('_')[1], 10));
+      return false;
+    }
+    // A retry that succeeded: units drawn as fallback box move to the model.
+    const moved = this.detachFallbackUnits(key);
+    if (anim) this.registerAnimated(key, anim);
+    else this.installStatic(key, stat!.gltf, stat!.path);
+    for (const [eid, proxy] of moved) {
+      if (this.hasAnimated(key)) this.addAnimatedUnit(eid, key, proxy);
+      else this.addStaticUnit(eid, key, proxy);
+    }
+    return true;
+  }
+
+  /**
+   * Remove the fallback-box bucket of `key` (if any) and return its units
+   * with their proxies, so they can be re-added with the real model.
+   */
+  private detachFallbackUnits(key: ModelCacheKey): Array<[number, THREE.Object3D]> {
+    const bucket = this.buckets.get(key);
+    if (!bucket || !bucket.mesh.name.startsWith('fallback_')) return [];
+    const moved: Array<[number, THREE.Object3D]> = [];
+    for (const eid of [...bucket.entityToIndex.keys()]) {
+      const proxy = this.proxies.get(eid);
+      this.removeUnit(eid);
+      if (proxy) moved.push([eid, proxy]);
+    }
+    this.group.remove(bucket.mesh);
+    bucket.mesh.geometry.dispose();
+    (bucket.mesh.material as THREE.Material).dispose();
+    bucket.mesh.dispose();
+    this.buckets.delete(key);
+    return moved;
+  }
+
+  /**
+   * New match: failed models get a fresh set of attempts, starting with the
+   * next request (no backoff). Loaded models are kept.
+   */
+  resetFailedLoads(): void {
+    for (const key of this.loadFailures.reset()) this.keyLoads.delete(key as ModelCacheKey);
+    this.forgetFailedUrls();
+  }
+
+  /** Let failed URLs be downloaded again (each URL still once per attempt). */
+  private forgetFailedUrls(): void {
+    for (const url of this.failedUrls) this.urlLoads.delete(url);
+    this.failedUrls.clear();
   }
 
   /** Attach every unit that spawned while `key` was still downloading. */
@@ -656,16 +732,15 @@ export class UnitRenderer {
   }
 
   /**
-   * Load the static model for `key` (v02 -> v01 fallback chain) into an
-   * InstancedMesh bucket; fallback box when nothing loads. `skipUrl` is a URL
-   * that already failed as the animated model (heroes share their path).
+   * Download the static model for `key` (v02 -> v01 fallback chain); null
+   * when nothing loads. `skipUrl` is a URL that already failed as the
+   * animated model (heroes share their path).
    */
-  private async loadStatic(
+  private async fetchStatic(
     key: ModelCacheKey,
     load: (url: string) => Promise<GLTF>,
     skipUrl?: string,
-  ): Promise<void> {
-    const factionId = parseInt(key.split('_')[1], 10);
+  ): Promise<{ gltf: GLTF; path: string } | null> {
     const candidates = [UNIT_MODEL_PATHS[key], UNIT_MODEL_FALLBACKS[key]]
       .filter((url): url is string => !!url && url !== skipUrl);
 
@@ -681,12 +756,12 @@ export class UnitRenderer {
       }
     }
 
-    if (!gltf) {
-      console.warn(`[UnitRenderer] Model load failed for "${key}", using fallback box`);
-      this.createFallbackBucket(key, factionId);
-      return;
-    }
+    return gltf ? { gltf, path } : null;
+  }
 
+  /** Put a loaded static model into an InstancedMesh bucket (fallback box if it has no mesh). */
+  private installStatic(key: ModelCacheKey, gltf: GLTF, path: string): void {
+    const factionId = parseInt(key.split('_')[1], 10);
     const root = gltf.scene;
     const isV02 = path.includes('/v02/');
     if (isV02) this.v02Models.add(key);
@@ -822,6 +897,8 @@ export class UnitRenderer {
     if (this.proxies.has(eid)) return this.proxies.get(eid)!;
 
     const key: ModelCacheKey = `${type}_${factionId}`;
+    // Model failed earlier (fallback box): this request may start a retry.
+    if (this.loadFailures.hasFailed(key)) void this.ensureLoaded(key);
 
     // --- Animated path: individual SkinnedMesh per unit ---
     if (this.hasAnimated(key)) {
@@ -1177,6 +1254,17 @@ export class UnitRenderer {
       const animUnit = this.animatedUnits.get(data.eid);
       if (animUnit) {
         this.updateAnimatedUnit(dt, data, animUnit);
+        continue;
+      }
+
+      // --- Model still downloading: nothing drawn, but keep the proxy on the
+      // unit so position queries (death effect, selection) are right. ---
+      if (this.pendingUnits.has(data.eid)) {
+        const proxy = this.proxies.get(data.eid);
+        if (proxy) {
+          proxy.position.set(data.x, data.y + 1.0, data.z);
+          proxy.rotation.y = data.ry;
+        }
         continue;
       }
 
@@ -1590,6 +1678,8 @@ export class UnitRenderer {
     this.pendingUnits.clear();
     this.keyLoads.clear();
     this.urlLoads.clear();
+    this.failedUrls.clear();
+    this.loadFailures.reset();
   }
 
   private disposeObject(obj: THREE.Object3D): void {

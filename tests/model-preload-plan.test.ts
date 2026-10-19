@@ -140,7 +140,8 @@ describe('Game wiring', () => {
   });
 
   it('warms in the background and prefetches queued unit types', () => {
-    expect(game).toMatch(/this\.warmModels\(warmModelKeys\(/);
+    expect(game).toMatch(/const warm = warmModelKeys\(/);
+    expect(game).toMatch(/this\.warmModels\(warm, /);
     expect(game).toMatch(/this\.prefetchQueuedUnitModels\(dt\)/);
   });
 });
