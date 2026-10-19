@@ -361,6 +361,29 @@ function extractFirstMesh(
   return { geometry: geo, material: mat.clone() };
 }
 
+/**
+ * Perf: give every SkinnedMesh in an animated template its culling sphere up
+ * front. three.js computes a SkinnedMesh bounding sphere lazily on its first
+ * frustum test by CPU-skinning every vertex (~3 ms per unit for our models),
+ * and SkeletonUtils.clone() copies an existing sphere to the clone. Without
+ * this every spawned unit paid that cost in its first rendered frame (a 40-unit
+ * wave = a ~220 ms hitch). Computed once per template while loading; the clones
+ * inherit it via SkinnedMesh.copy(). The sphere is only used for frustum
+ * culling (it is computed once and never refreshed by three.js either way).
+ */
+export function precomputeSkinnedBounds(root: THREE.Object3D): number {
+  let n = 0;
+  root.updateMatrixWorld(true);
+  root.traverse((child) => {
+    const sm = child as THREE.SkinnedMesh;
+    if (sm.isSkinnedMesh && sm.boundingSphere === null) {
+      sm.computeBoundingSphere();
+      n++;
+    }
+  });
+  return n;
+}
+
 // ---------------------------------------------------------------------------
 // UnitRenderer
 // ---------------------------------------------------------------------------
@@ -526,6 +549,7 @@ export class UnitRenderer {
         child.receiveShadow = false;
       }
     });
+    precomputeSkinnedBounds(root);
 
     this.animatedTemplates.set(key, {
       scene: root,

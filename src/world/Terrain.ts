@@ -1435,8 +1435,17 @@ export class Terrain {
  */
 export function updateWater(elapsed: number): void {
   if (!waterGeometry) return;
+  if (animateWaterFast(waterGeometry, elapsed)) return;
+  animateWaterReference(waterGeometry, elapsed);
+}
 
-  const positions = waterGeometry.attributes.position as THREE.BufferAttribute;
+/**
+ * Reference implementation (three.js accessors + computeVertexNormals).
+ * Kept as the fallback for geometries the fast path does not support and as
+ * the oracle the unit tests compare the fast path against.
+ */
+export function animateWaterReference(geometry: THREE.BufferGeometry, elapsed: number): void {
+  const positions = geometry.attributes.position as THREE.BufferAttribute;
   for (let i = 0; i < positions.count; i++) {
     const x = positions.getX(i);
     const z = positions.getZ(i);
@@ -1447,5 +1456,79 @@ export function updateWater(elapsed: number): void {
     positions.setY(i, y);
   }
   positions.needsUpdate = true;
-  waterGeometry.computeVertexNormals();
+  geometry.computeVertexNormals();
+}
+
+/**
+ * Perf (v0.63 40v40 profile: updateWater was ~1/3 of all main-thread JS, it
+ * runs every rendered frame): the same wave + the same vertex-normal
+ * algorithm as `animateWaterReference`, but on the raw typed arrays instead of
+ * per-vertex Vector3/BufferAttribute calls. The arithmetic and the order of
+ * operations (including the float32 store after every accumulation step that
+ * computeVertexNormals does) are identical, so the output is bit-for-bit the
+ * same. Returns false (caller falls back) for layouts it does not handle.
+ */
+export function animateWaterFast(geometry: THREE.BufferGeometry, elapsed: number): boolean {
+  const posAttr = geometry.attributes.position as THREE.BufferAttribute | undefined;
+  const nrmAttr = geometry.attributes.normal as THREE.BufferAttribute | undefined;
+  const index = geometry.index;
+  if (
+    !posAttr || !nrmAttr || !index ||
+    !(posAttr instanceof THREE.BufferAttribute) || !(nrmAttr instanceof THREE.BufferAttribute) ||
+    !(posAttr.array instanceof Float32Array) || !(nrmAttr.array instanceof Float32Array) ||
+    posAttr.itemSize !== 3 || nrmAttr.itemSize !== 3 || posAttr.normalized || nrmAttr.normalized ||
+    index.normalized || index.itemSize !== 1 || nrmAttr.count !== posAttr.count
+  ) {
+    return false;
+  }
+
+  const p = posAttr.array;
+  const n = nrmAttr.array;
+  const idx = index.array;
+  const count = posAttr.count;
+
+  // 1. Wave heights (same expression as the reference path).
+  for (let i = 0, o = 0; i < count; i++, o += 3) {
+    const x = p[o];
+    const z = p[o + 2];
+    p[o + 1] = Math.sin(x * 0.3 + elapsed * 0.7) * 0.12
+             + Math.sin(z * 0.2 + elapsed * 0.5) * 0.10
+             + Math.sin((x + z) * 0.15 + elapsed * 1.1) * 0.06;
+  }
+  posAttr.needsUpdate = true;
+
+  // 2. computeVertexNormals (indexed branch), inlined.
+  n.fill(0, 0, count * 3);
+  for (let i = 0, il = index.count; i < il; i += 3) {
+    const a = idx[i] * 3, b = idx[i + 1] * 3, c = idx[i + 2] * 3;
+    const bx = p[b], by = p[b + 1], bz = p[b + 2];
+    // cb = C - B, ab = A - B, cb x ab
+    const cbx = p[c] - bx, cby = p[c + 1] - by, cbz = p[c + 2] - bz;
+    const abx = p[a] - bx, aby = p[a + 1] - by, abz = p[a + 2] - bz;
+    const nx = cby * abz - cbz * aby;
+    const ny = cbz * abx - cbx * abz;
+    const nz = cbx * aby - cby * abx;
+    if (a === b || b === c || a === c) {
+      // Degenerate triangle: the reference reads all three normals before
+      // writing, so a shared vertex gets the sum only once. Mirror that.
+      const ax0 = n[a] + nx, ay0 = n[a + 1] + ny, az0 = n[a + 2] + nz;
+      const bx0 = n[b] + nx, by0 = n[b + 1] + ny, bz0 = n[b + 2] + nz;
+      const cx0 = n[c] + nx, cy0 = n[c + 1] + ny, cz0 = n[c + 2] + nz;
+      n[a] = ax0; n[a + 1] = ay0; n[a + 2] = az0;
+      n[b] = bx0; n[b + 1] = by0; n[b + 2] = bz0;
+      n[c] = cx0; n[c + 1] = cy0; n[c + 2] = cz0;
+      continue;
+    }
+    n[a] += nx; n[a + 1] += ny; n[a + 2] += nz;
+    n[b] += nx; n[b + 1] += ny; n[b + 2] += nz;
+    n[c] += nx; n[c + 1] += ny; n[c + 2] += nz;
+  }
+  // normalizeNormals(): v.multiplyScalar(1 / (v.length() || 1))
+  for (let o = 0, ol = count * 3; o < ol; o += 3) {
+    const x = n[o], y = n[o + 1], z = n[o + 2];
+    const s = 1 / (Math.sqrt(x * x + y * y + z * z) || 1);
+    n[o] = x * s; n[o + 1] = y * s; n[o + 2] = z * s;
+  }
+  nrmAttr.needsUpdate = true;
+  return true;
 }

@@ -1,9 +1,14 @@
-import * as THREE from 'three';
+/**
+ * main.ts -- /play/ menu shell.
+ *
+ * Only the menu, campaign UI, state machine and input routing load up front.
+ * The game engine (three.js, Game, systems, renderers) lives in
+ * engineRuntime.ts and arrives through a dynamic import(): prefetched once the
+ * menu is idle, awaited before a match starts (see core/engineLoader.ts).
+ * Import nothing here that pulls three.js or Game into the initial chunk;
+ * tests/play-initial-bundle.test.ts guards that.
+ */
 import { GameLoop } from './core/GameLoop';
-import { EventBus } from './core/EventBus';
-import { Terrain } from './world/Terrain';
-import { RTSCamera } from './camera/RTSCamera';
-import { Game } from './core/Game';
 import { GameStateMachine, GameStateId } from './core/GameState';
 import { MenuState, FactionSelectState, CampaignSelectState, BriefingState, LoadingState, TutorialState, PlayingState, GameOverState, setGameFlowDeps } from './core/GameStates';
 import { MenuScreens } from './ui/MenuScreens';
@@ -13,11 +18,8 @@ import { getMissionById } from './campaign/MissionDefinitions';
 import { Tutorial } from './core/Tutorial';
 import type { TutorialState as TutorialStateData } from './core/Tutorial';
 import { FeedbackReporter } from './ui/FeedbackReporter';
-import { initAtmosphere, updateAtmosphere } from './rendering/Atmosphere';
-import { updateWater } from './world/Terrain';
-import { PostProcessing } from './rendering/PostProcessing';
-import { ParticleSystem } from './rendering/ParticleSystem';
-import { ProjectileRenderer } from './rendering/ProjectileRenderer';
+import { createEngineLoader, retryableImport, startWithEngine, type StartWithEngineUi } from './core/engineLoader';
+import type { EngineRuntime } from './engineRuntime';
 import { isTypingTarget, panelClaimsKey, routeEscape } from './ui/inputRouting';
 
 // ---------------------------------------------------------------------------
@@ -37,54 +39,28 @@ if (debugVersion) {
 }
 
 // ---------------------------------------------------------------------------
-// Renderer
+// Engine (lazy): renderer, scene, terrain, camera, Game -- see engineRuntime.ts
 // ---------------------------------------------------------------------------
 const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
 if (!canvas) throw new Error('Canvas #game-canvas not found');
 
-const renderer = new THREE.WebGLRenderer({
-  canvas,
-  antialias: true,
-  powerPreference: 'high-performance',
+const importEngine = retryableImport(() => import('./engineRuntime'));
+const engineLoader = createEngineLoader<EngineRuntime>(async () => {
+  const { createEngineRuntime } = await importEngine();
+  const rt = createEngineRuntime(canvas);
+  if (import.meta.env.DEV) {
+    const w = globalThis as { __rob?: Record<string, unknown> };
+    w.__rob = { ...(w.__rob ?? {}), game: rt.game, eventBus: rt.eventBus };
+  }
+  return rt;
 });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setClearColor(0x1a3a5c);
 
-// ---------------------------------------------------------------------------
-// Scene
-// ---------------------------------------------------------------------------
-const scene = new THREE.Scene();
-
-// Atmosphere: sky dome, fog, shadow-casting sun, dust particles
-const sun = initAtmosphere(scene, renderer);
-scene.add(sun);
-
-// Ambient: slightly warm for a Brabant afternoon
-scene.add(new THREE.AmbientLight(0xfff8e8, 0.55));
-
-// Fill light from opposite side for softer shadows
-const fill = new THREE.DirectionalLight(0xccddff, 0.25);
-fill.position.set(30, 40, 40);
-scene.add(fill);
-
-// ---------------------------------------------------------------------------
-// Terrain
-// ---------------------------------------------------------------------------
-const terrain = new Terrain();
-scene.add(terrain.mesh);
-scene.add(terrain.waterMesh);
-if (terrain.gridMesh) scene.add(terrain.gridMesh);
-
-// ---------------------------------------------------------------------------
-// Camera
-// ---------------------------------------------------------------------------
-const rtsCamera = new RTSCamera(terrain.mapSize);
-
-// ---------------------------------------------------------------------------
-// Post-processing (bloom + outlines)
-// ---------------------------------------------------------------------------
-const postProcessing = new PostProcessing(renderer, scene, rtsCamera.camera);
+/** The engine; only valid in states that are entered after LOADING. */
+function engine(): EngineRuntime {
+  const rt = engineLoader.current;
+  if (!rt) throw new Error('[RoB] Game engine not loaded');
+  return rt;
+}
 
 // ---------------------------------------------------------------------------
 // Input state
@@ -103,7 +79,7 @@ window.addEventListener('keydown', (e) => {
     const action = routeEscape({
       playing: gameInitialized && stateMachine.currentId === GameStateId.PLAYING,
       overlayOpen: false,
-      modeActive: game.hasActiveInputMode(),
+      modeActive: engineLoader.current?.game.hasActiveInputMode() ?? false,
     });
     if (action === 'toggle-pause') togglePause();
     return;
@@ -130,31 +106,8 @@ document.documentElement.addEventListener('mouseleave', () => { mouseX = -1; mou
 canvas.addEventListener('wheel', (e) => { e.preventDefault(); scrollDelta += e.deltaY > 0 ? 1 : -1; }, { passive: false });
 window.addEventListener('contextmenu', (e) => e.preventDefault());
 window.addEventListener('resize', () => {
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  rtsCamera.resize(window.innerWidth, window.innerHeight);
-  postProcessing.resize(window.innerWidth, window.innerHeight);
+  engineLoader.current?.resize(window.innerWidth, window.innerHeight);
 });
-
-// ---------------------------------------------------------------------------
-// Event bus
-// ---------------------------------------------------------------------------
-const eventBus = new EventBus();
-
-// ---------------------------------------------------------------------------
-// Game instance (created but NOT initialized until loading state)
-// ---------------------------------------------------------------------------
-const particles = new ParticleSystem(scene);
-// Projectile group attached to scene; preloaded async during boot.
-const projectileGroup = new THREE.Group();
-projectileGroup.name = 'projectiles';
-scene.add(projectileGroup);
-const projectiles = new ProjectileRenderer(projectileGroup);
-projectiles.preload().catch((err) => console.warn('[main] projectile preload failed', err));
-const game = new Game(scene, terrain, rtsCamera, eventBus, particles, projectiles);
-
-if (import.meta.env.DEV) {
-  (globalThis as { __rob?: { game: Game; eventBus: typeof eventBus } }).__rob = { game, eventBus };
-}
 
 // ---------------------------------------------------------------------------
 // Menu screens controller
@@ -228,6 +181,21 @@ if (import.meta.env.DEV) {
   if (w.__rob) w.__rob.stateMachine = stateMachine;
   else w.__rob = { stateMachine } as never;
 }
+
+// Engine load at match start: loading-screen label while the chunk comes in;
+// on a load failure a message on the main menu and back to the menu.
+const engineLoadUi: StartWithEngineUi = {
+  showLoading: (label) => menuScreens.updateLoadingProgress(0.05, label),
+  showError: (message) => {
+    const el = document.getElementById('engine-load-error');
+    if (el) { el.textContent = message; el.hidden = false; }
+  },
+  clearError: () => {
+    const el = document.getElementById('engine-load-error');
+    if (el) { el.hidden = true; el.textContent = ''; }
+  },
+  backToMenu: () => stateMachine.requestTransition(GameStateId.MENU),
+};
 let gameInitialized = false;
 let gamePaused = false;
 
@@ -266,7 +234,7 @@ setGameFlowDeps({
   updateLoadingProgress: (p, l) => menuScreens.updateLoadingProgress(p, l),
   isGameInitialized: () => gameInitialized,
 
-  startGame: async (isTutorial: boolean) => {
+  startGame: (isTutorial: boolean) => startWithEngine(engineLoader, engineLoadUi, async ({ game }) => {
     if (!gameInitialized) {
       await game.init(selectedPlayerFaction, selectedMapTemplate, selectedDifficulty, selectedPlayerCount, selectedMapSize, selectedStartingResources, selectedFogOfWar);
       gameInitialized = true;
@@ -275,9 +243,9 @@ setGameFlowDeps({
     if (isTutorial) {
       resetTutorialState();
     }
-  },
+  }),
 
-  startMission: async (missionId: string) => {
+  startMission: (missionId: string) => startWithEngine(engineLoader, engineLoadUi, async ({ game }) => {
     activeMissionId = missionId;
     await game.initMission(missionId);
     gameInitialized = true;
@@ -302,10 +270,11 @@ setGameFlowDeps({
       const mission = getMissionById(missionId);
       campaignUI.showDefeatOverlay(mission?.title ?? 'Missie');
     };
-  },
+  }),
 
   updateGame: (dt: number) => {
     if (gamePaused) return;
+    const { game, rtsCamera } = engine();
     // Camera input (only when in-game, not during intro)
     if (!cameraIntroActive) {
       rtsCamera.update(dt, keysDown, mouseX, mouseY, window.innerWidth, window.innerHeight, scrollDelta);
@@ -352,6 +321,9 @@ setGameFlowDeps({
   updateMenuCamera: (dt: number) => {
     // Slowly rotate camera around the center of the map
     menuCameraAngle += dt * 0.15;
+    // The engine (and its 3D backdrop) may still be loading in the menu.
+    const rtsCamera = engineLoader.current?.rtsCamera;
+    if (!rtsCamera) return;
     const radius = 60;
     const height = 45;
     const cx = Math.cos(menuCameraAngle) * radius;
@@ -363,6 +335,7 @@ setGameFlowDeps({
   startCameraIntro: () => {
     cameraIntroActive = true;
     cameraIntroTimer = 0;
+    const { game, rtsCamera } = engine();
 
     // Start camera high above the map
     const playerBase = game.getPlayerBasePosition();
@@ -439,14 +412,14 @@ feedbackReporter.init(
     version: appVersion,
     faction: FACTION_NAMES[selectedPlayerFaction] ?? 'unknown',
     difficulty: selectedDifficulty,
-    elapsedSeconds: Math.floor(game.getElapsedTime()),
+    elapsedSeconds: Math.floor(engineLoader.current?.game.getElapsedTime() ?? 0),
     mission: activeMissionId,
     stats: {
-      unitsProduced: game.getStats().unitsProduced,
-      unitsLost: game.getStats().unitsLost,
-      enemiesKilled: game.getStats().enemiesKilled,
-      buildingsBuilt: game.getStats().buildingsBuilt,
-      resourcesGathered: game.getStats().resourcesGathered,
+      unitsProduced: engineLoader.current?.game.getStats().unitsProduced ?? 0,
+      unitsLost: engineLoader.current?.game.getStats().unitsLost ?? 0,
+      enemiesKilled: engineLoader.current?.game.getStats().enemiesKilled ?? 0,
+      buildingsBuilt: engineLoader.current?.game.getStats().buildingsBuilt ?? 0,
+      resourcesGathered: engineLoader.current?.game.getStats().resourcesGathered ?? 0,
     },
     browser: {
       userAgent: navigator.userAgent,
@@ -542,6 +515,7 @@ let devStats: { update: () => void; dom: HTMLElement } | null = null;
 function fixedUpdate(dt: number): void {
   // Camera intro animation
   if (cameraIntroActive) {
+    const { rtsCamera } = engine();
     cameraIntroTimer += dt;
     const t = Math.min(cameraIntroTimer / CAMERA_INTRO_DURATION, 1);
     const eased = t < 0.5
@@ -581,15 +555,8 @@ function fixedUpdate(dt: number): void {
   stateMachine.update(dt);
 }
 
-let renderElapsed = 0;
 function render(_alpha: number): void {
-  const dt = 1 / 60;
-  renderElapsed += dt;
-  updateAtmosphere(dt);
-  updateWater(renderElapsed);
-  particles.update(dt);
-  projectiles.update(dt);
-  postProcessing.render();
+  engineLoader.current?.render(1 / 60);
   devStats?.update();
 }
 
@@ -625,6 +592,15 @@ async function boot(): Promise<void> {
   stateMachine.start(GameStateId.MENU);
 
   console.log('[RoB] Reign of Brabant started -- Main Menu');
+
+  // Prefetch + build the engine once the menu is idle: the rotating 3D
+  // backdrop appears when it is in, and starting a match does not wait.
+  const prefetch = () => engineLoader.prefetch();
+  if (typeof window.requestIdleCallback === 'function') {
+    window.requestIdleCallback(prefetch, { timeout: 1500 });
+  } else {
+    setTimeout(prefetch, 200);
+  }
 }
 
 boot().catch((err) => {

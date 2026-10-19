@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.64.0] - 2026-10-19 — Bundel 7: haperingen in gevechten weg, menu laadt eerst
+
+### Changed
+- **Het menu laadt vóór de engine**: `src/main.ts` bevat nu alleen de menu-shell. Renderer, terrein, camera en `Game` zitten in `src/engineRuntime.ts`. Die chunk wordt opgehaald zodra het menu idle is, of anders bij de start van een potje (`src/core/engineLoader.ts`). JS voor het menu gaat van 1417 naar 341 kB (gzip 349 naar 79 kB). Op Fast 4G staat het menu na 0,58 s in plaats van 1,43 s. Lukt het laden van de engine niet, dan verschijnt er een melding in het menu en kan de speler het opnieuw proberen met een cache-bustend adres. `vite.config.ts` is niet gewijzigd.
+
+### Performance
+- **Pieken van 90-230 ms bij nieuwe units zijn weg**: de culling-bol van een skinned model wordt één keer per template vooraf berekend (`UnitRenderer.precomputeSkinnedBounds`), en niet meer per nieuwe unit.
+- **Water-animatie** werkt direct op de typed arrays (`Terrain.animateWaterFast`), met een uitkomst die bit voor bit gelijk is aan de oude.
+- **Minimap-fog** wordt op de CPU samengesteld uit de terrain-cache (`src/ui/minimapFog.ts`). Het terugkopiëren met `getImageData` per update valt weg.
+- Gemeten in een gevecht van 40 tegen 40, 4 runs om en om onder dezelfde machinebelasting: p95 tussen 9,1 en 9,3 ms (de 120 Hz-cap ligt op 8,33 ms), max 25-33 ms tegen 91-108 ms eerst. JS-tijd per frame daalde van 2,7 naar 1,9 ms. Gameplay is ongewijzigd.
+
+### Tests
+- Nieuw: `engineLoader` (15), `play-initial-bundle` (5: menu-JS onder 400 kB, geen engine in de initiële chunk, geen module in twee chunks), en `perf-water-animation`, `perf-minimap-fog` en `perf-skinned-bounds`. Resultaat: 3136/3136 groen en UAT 2/2. In de productie-preview: 0 console-errors en 0 4xx/5xx, en een tweede potje na terugkeer naar het menu draait met precies één game-loop.
+
 ## [0.63.0] - 2026-10-17 — Bundel 6: AI-bouwvolgorde, herstel van vastgelopen werkers
 
 ### Added

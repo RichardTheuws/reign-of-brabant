@@ -94,6 +94,7 @@ import type { RTSCamera } from '../camera/RTSCamera';
 import type { EventBus as EventBusType } from '../core/EventBus';
 import type { ParticleSystem } from '../rendering/ParticleSystem';
 import { initAbilityEffects } from '../rendering/AbilityEffects';
+import { composeMinimapFog } from '../ui/minimapFog';
 
 const MINIMAP_COLORS: Record<number, string> = {
   [FactionId.Brabanders]: '#FF8C00',
@@ -3961,6 +3962,8 @@ export class Game {
   }
 
   private minimapTerrainCache: ImageData | null = null;
+  /** Reused output buffer for the fog-composited minimap terrain. */
+  private minimapFogImage: ImageData | null = null;
 
   /**
    * Render terrain colors onto a cached ImageData (only done once).
@@ -4021,37 +4024,22 @@ export class Game {
       this.minimapTerrainCache = this.buildMinimapTerrainCache(w, h);
     }
 
-    // Draw cached terrain
-    ctx.putImageData(this.minimapTerrainCache, 0, 0);
-
-    // Apply fog of war overlay
-    const visibleBuf = visionData.visibleBuffer;
-    const exploredBuf = visionData.exploredBuffer;
-    const fowImg = ctx.getImageData(0, 0, w, h);
-    const fowData = fowImg.data;
-
-    for (let py = 0; py < h; py++) {
-      for (let px = 0; px < w; px++) {
-        // Map minimap pixel to vision buffer
-        const bx = Math.floor((px / w) * 128);
-        const bz = Math.floor((py / h) * 128);
-        const bufIdx = bz * 128 + bx;
-        const pixIdx = (py * w + px) * 4;
-
-        if (visibleBuf[bufIdx] > 0) {
-          // Fully visible: keep terrain colors as-is
-        } else if (exploredBuf[bufIdx] > 0) {
-          // Explored but not visible: darken
-          fowData[pixIdx] = Math.round(fowData[pixIdx] * 0.4);
-          fowData[pixIdx + 1] = Math.round(fowData[pixIdx + 1] * 0.4);
-          fowData[pixIdx + 2] = Math.round(fowData[pixIdx + 2] * 0.4);
-        } else {
-          // Unexplored: black
-          fowData[pixIdx] = 0;
-          fowData[pixIdx + 1] = 0;
-          fowData[pixIdx + 2] = 0;
-        }
-      }
+    // Draw cached terrain with the fog-of-war overlay composed on the CPU
+    // (no getImageData read-back; see composeMinimapFog).
+    let fowImg = this.minimapFogImage;
+    if (!fowImg || fowImg.width !== w || fowImg.height !== h) {
+      fowImg = this.minimapFogImage = new ImageData(w, h);
+    }
+    const terrainCache = this.minimapTerrainCache;
+    if (terrainCache.width === w && terrainCache.height === h) {
+      composeMinimapFog(terrainCache.data, fowImg.data, w, h, visionData.visibleBuffer, visionData.exploredBuffer);
+    } else {
+      // Height changed without a width change: the cache does not cover the
+      // canvas, keep the original put + read-back path for that case.
+      ctx.putImageData(terrainCache, 0, 0);
+      fowImg = ctx.getImageData(0, 0, w, h);
+      const raw = new Uint8ClampedArray(fowImg.data);
+      composeMinimapFog(raw, fowImg.data, w, h, visionData.visibleBuffer, visionData.exploredBuffer);
     }
     ctx.putImageData(fowImg, 0, 0);
 

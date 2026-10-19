@@ -399,6 +399,15 @@
       background: rgba(212, 168, 83, 0.12); border-color: rgba(212, 168, 83, 0.5);
     }
 
+    /* ---- Engine load failure (dynamic import of the game engine failed) ---- */
+    .engine-load-error {
+      max-width: 340px; margin: 0 0 14px; padding: 10px 14px;
+      border: 1px solid rgba(244, 67, 54, 0.55); border-radius: 6px;
+      background: rgba(139, 26, 26, 0.35); color: var(--color-parchment);
+      font-size: 0.85rem; line-height: 1.4; text-align: center;
+    }
+    .engine-load-error[hidden] { display: none; }
+
     /* ---- Version badge ---- */
     .menu-version {
       margin-top: clamp(6px, 1vh, 12px);
@@ -2345,6 +2354,8 @@
               Open Beta
             </span>
           </div>
+
+          <p id="engine-load-error" class="engine-load-error" role="alert" hidden></p>
 
           <nav class="menu-buttons" role="navigation" aria-label="Hoofdmenu">
             <button class="menu-btn" id="btn-campaign">
