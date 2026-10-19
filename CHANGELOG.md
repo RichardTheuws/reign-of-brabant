@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.65.0] - 2026-10-19 — Bundel 8: match laadt 5x sneller, campagne open, stemmen-schuif
+
+### Added
+- **Alle campagnemissies zijn direct speelbaar** (projectregel: geen progressive locks). Voortgang, sterren en beste tijd blijven bewaard. De eerste nog niet voltooide missie in verhaalvolgorde krijgt per factie het label "Aanbevolen" (`getRecommendedMissionId`). Oude saves met "locked"-regels worden bij het laden omgezet.
+- **Eigen schuif "Stemmen"** in de instellingen, ook in het pauzemenu. Stemmen volgen nu de voice-categorie en niet meer de geluidseffecten. Bestaande spelers krijgen een startwaarde die afgeleid is van hun geluidseffecten-stand, zodat ze hetzelfde blijven horen. Een stem die al speelt, past zich meteen aan.
+
+### Performance
+- **Match laden op Fast 4G: HUD na 15,2 s in plaats van 72,3 s.** `Game.init` wachtte op alle modellen van beide facties. Nu wacht het alleen op de start-TownHalls, de start-workers en de eerste AI-gebouwen (`src/rendering/modelPreloadPlan.ts`). De rest laadt op de achtergrond, één model tegelijk. Een unit in de productiewachtrij laadt zijn model al tijdens de trainingstijd, een gebouw zodra zijn ghost onder de muis verschijnt. Zolang het model er nog niet is, is er niets zichtbaar: geen placeholder.
+- **56 GLB's: PNG-textures omgezet naar JPEG.** Normal maps op q92 met 4:4:4, de overige maps op q90, PSNR 44-55 dB. Samen gingen ze van 429 naar 348 MB. In de eerste 120 s van een 1v1 wordt nu 53,0 MB gedownload, dat was 105,8 MB.
+
+### Fixed
+- **Lekken per match** (gemeten over 5-8 potjes, nu vlak vanaf het tweede potje):
+  - HUD-tooltip-listeners worden bijgehouden en weer losgemaakt, ook bij het opnieuw opbouwen van de gebouwkaart en de worker-knoppen;
+  - `SelectionRenderer` en `PropRenderer` laden maar één keer vooraf. Eerst kwamen er per potje 50 cirkels, 64 health-bar-canvassen en 6 InstancedMeshes bij;
+  - `Terrain` haalt bij een rebuild de bruggen, tunnels en gloeiringen van de vorige kaart uit de scene. Eerst bleven die renderen en hielden ze ongeveer 4 MB per potje vast.
+
+### Tests
+- Nieuw: `model-preload-plan`, `model-lazy-load`, `match-teardown-leaks`, `CampaignUI-open-missions`. Bijgewerkt: payload-budget (geen PNG meer in runtime-GLB's), save-migratie, audio-routing, settings. Resultaat: 3326/3326 groen, UAT 2/2. Fast 4G A/B tegen v0.64: 0 errors, 0 4xx.
+
 ## [0.64.0] - 2026-10-19 — Bundel 7: haperingen in gevechten weg, menu laadt eerst
 
 ### Changed

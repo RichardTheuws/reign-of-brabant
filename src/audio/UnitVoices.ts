@@ -525,7 +525,7 @@ function playVoiceLine(src: string, baseVolume: number, duckMs: number): void {
 }
 
 // ---------------------------------------------------------------------------
-// Volume — voices follow the user's SFX setting (no separate voice slider)
+// Volume — voices follow the user's voice setting ("Stemmen" slider)
 // ---------------------------------------------------------------------------
 
 /** Lines that are loaded/playing, with their base volume, for live updates. */

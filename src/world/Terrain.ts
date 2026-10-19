@@ -356,8 +356,12 @@ export class Terrain {
     this.riverMask = new Uint8Array(vertexCount);
     this.roadMask = new Uint8Array(vertexCount);
 
-    // Dispose old feature meshes.
+    // Dispose old feature meshes AND detach them from the scene: Game adds
+    // featureMeshes to the scene on every match, so without removeFromParent()
+    // the previous map's bridges/tunnels/glows stayed rendered (and their
+    // buffers alive) in every later match.
     for (const obj of this.featureMeshes) {
+      obj.removeFromParent();
       obj.traverse((child) => {
         if ((child as THREE.Mesh).isMesh) {
           const m = child as THREE.Mesh;
@@ -421,6 +425,7 @@ export class Terrain {
     }
     // Dispose feature meshes
     for (const obj of this.featureMeshes) {
+      obj.removeFromParent();
       obj.traverse((child) => {
         if ((child as THREE.Mesh).isMesh) {
           const m = child as THREE.Mesh;

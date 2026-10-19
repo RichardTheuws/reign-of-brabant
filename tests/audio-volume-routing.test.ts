@@ -95,22 +95,28 @@ describe('AudioManager.playSound — per playback id volume', () => {
   });
 });
 
-describe('UnitVoices — follow the SFX volume setting', () => {
+describe('UnitVoices — follow the voice volume setting ("Stemmen")', () => {
   it('default settings keep the historic voice loudness (0.6)', () => {
     playUnitVoice(FactionId.Brabanders, 'select');
     const h = howls[howls.length - 1];
     expect(h._opts.volume).toBeCloseTo(0.6, 5);
   });
 
-  it('SFX slider at 0 silences voices; halving it halves them', () => {
-    audioManager.setCategoryVolume('sfx', 0);
+  it('voice slider at 0 silences voices; halving it halves them', () => {
+    audioManager.setCategoryVolume('voice', 0);
     playUnitVoice(FactionId.Brabanders, 'select');
     expect(howls[howls.length - 1]._opts.volume).toBe(0);
 
     nextVoiceSlot();
-    audioManager.setCategoryVolume('sfx', 0.35);
+    audioManager.setCategoryVolume('voice', 0.4);
     playUnitVoice(FactionId.Brabanders, 'move');
     expect(howls[howls.length - 1]._opts.volume).toBeCloseTo(0.3, 5);
+  });
+
+  it('the SFX slider no longer changes voice loudness', () => {
+    audioManager.setCategoryVolume('sfx', 0);
+    playUnitVoice(FactionId.Brabanders, 'select');
+    expect(howls[howls.length - 1]._opts.volume).toBeCloseTo(0.6, 5);
   });
 
   it('a slider change while a line plays updates that line live', () => {
@@ -118,13 +124,13 @@ describe('UnitVoices — follow the SFX volume setting', () => {
     const h = howls[howls.length - 1];
     h.volume.mockClear();
 
-    audioManager.setCategoryVolume('sfx', 0);
+    audioManager.setCategoryVolume('voice', 0);
     expect(h.volume).toHaveBeenLastCalledWith(0);
 
     // after the line ends it is no longer touched
     h._opts.onend();
     h.volume.mockClear();
-    audioManager.setCategoryVolume('sfx', 0.7);
+    audioManager.setCategoryVolume('voice', 0.8);
     expect(h.volume).not.toHaveBeenCalled();
   });
 });

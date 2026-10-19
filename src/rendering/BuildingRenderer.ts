@@ -168,6 +168,12 @@ export class BuildingRenderer {
   private ghostValid = true;
   private loader = new GLTFLoader();
   private group: THREE.Group;
+  /** One download + setup job per key, shared by every caller. */
+  private keyLoads = new Map<ModelCacheKey, Promise<void>>();
+  /** Buildings placed before their model finished: eid -> key. */
+  private pendingBuildings = new Map<number, { key: ModelCacheKey; factionId: number; since: number }>();
+  /** Wait-time bookkeeping for buildings placed before their model. */
+  private modelWaits = { count: 0, maxMs: 0, maxKey: '' };
 
   /** Production gear indicators: eid -> gear mesh. */
   private gearIndicators = new Map<number, THREE.Mesh>();
@@ -257,24 +263,61 @@ export class BuildingRenderer {
    * @param onProgress  Called after each model finishes loading with (loaded, total) counts.
    */
   async preload(factions?: Set<number>, onProgress?: (loaded: number, total: number) => void): Promise<void> {
-    const entries = Object.entries(BUILDING_MODEL_PATHS).filter(([key]) => {
+    const keys = Object.keys(BUILDING_MODEL_PATHS).filter((key) => {
       if (!factions) return true;
       const factionId = parseInt(key.split('_')[1], 10);
       return factions.has(factionId);
     });
+    await this.preloadKeys(keys, onProgress);
+  }
 
+  /** Load exactly these building keys (e.g. `townhall_0`); unknown keys are ignored. */
+  async preloadKeys(keys: Iterable<string>, onProgress?: (loaded: number, total: number) => void): Promise<void> {
+    const known = [...new Set(keys)].filter((k) => k in BUILDING_MODEL_PATHS);
     let loaded = 0;
-    const total = entries.length;
+    const total = known.length;
+    await Promise.all(known.map(async (key) => {
+      await this.ensureLoaded(key);
+      loaded++;
+      onProgress?.(loaded, total);
+    }));
+  }
 
-    const promises = entries.map(([key, path]) =>
-      this.loader.loadAsync(path).catch(() => {
+  /** Background download of `keys`, at most `concurrency` at a time. Never rejects. */
+  prefetch(keys: Iterable<string>, concurrency = 2): Promise<void> {
+    const queue = [...new Set(keys)].filter((k) => k in BUILDING_MODEL_PATHS && !this.keyLoads.has(k as ModelCacheKey));
+    const worker = async (): Promise<void> => {
+      for (let key = queue.shift(); key; key = queue.shift()) {
+        await this.ensureLoaded(key);
+      }
+    };
+    return Promise.all(Array.from({ length: Math.max(1, concurrency) }, worker)).then(() => undefined);
+  }
+
+  /** True once `key` is cached (addBuilding shows the model immediately). */
+  isModelReady(key: string): boolean {
+    return this.modelCache.has(key as ModelCacheKey);
+  }
+
+  /**
+   * Download + set up the model for `key` once (v02 -> fallback chain).
+   * Buildings placed while it loads get their model when it resolves.
+   * Unknown keys resolve immediately; never rejects.
+   */
+  ensureLoaded(key: string): Promise<void> {
+    const path = BUILDING_MODEL_PATHS[key];
+    if (!path) return Promise.resolve();
+    const cacheKey = key as ModelCacheKey;
+    let job = this.keyLoads.get(cacheKey);
+    if (!job) {
+      job = this.loader.loadAsync(path).catch(() => {
         const fallback = BUILDING_MODEL_FALLBACKS[key];
         if (fallback) return this.loader.loadAsync(fallback);
         throw new Error(`No model found for ${key}`);
       }).then((gltf: GLTF) => {
         const root = gltf.scene;
         const isV02 = path.includes('/v02/');
-        if (isV02) this.v02Models.add(key as ModelCacheKey);
+        if (isV02) this.v02Models.add(cacheKey);
         // v02 buildings at commanding scale; v01 needs more upscale
         root.scale.set(isV02 ? 2.8 : 1.8, isV02 ? 2.8 : 1.8, isV02 ? 2.8 : 1.8);
         // Enable shadow casting on all child meshes
@@ -284,13 +327,54 @@ export class BuildingRenderer {
             child.receiveShadow = false;
           }
         });
-        this.modelCache.set(key as ModelCacheKey, root);
+        this.modelCache.set(cacheKey, root);
+      }).catch((err) => {
+        console.warn(`[BuildingRenderer] Model load failed for "${key}":`, err);
+      }).then(() => this.flushPending(cacheKey));
+      this.keyLoads.set(cacheKey, job);
+    }
+    return job;
+  }
 
-        loaded++;
-        onProgress?.(loaded, total);
-      }),
-    );
-    await Promise.all(promises);
+  /** Give every building placed while `key` was downloading its model. */
+  private flushPending(key: ModelCacheKey): void {
+    const source = this.modelCache.get(key);
+    if (!source) return;
+    for (const [eid, pending] of this.pendingBuildings) {
+      if (pending.key !== key) continue;
+      this.pendingBuildings.delete(eid);
+      const holder = this.instances.get(eid);
+      // A building that is already being torn down stays empty.
+      if (!holder || this.destroyingBuildings.has(eid)) continue;
+      const waited = performance.now() - pending.since;
+      this.modelWaits.count++;
+      if (waited > this.modelWaits.maxMs) {
+        this.modelWaits.maxMs = waited;
+        this.modelWaits.maxKey = key;
+      }
+
+      const model = this.createInstanceModel(source, key, pending.factionId);
+      // The holder becomes the model root: same transform, same children.
+      holder.scale.copy(model.scale);
+      holder.quaternion.copy(model.quaternion);
+      for (const child of [...model.children]) holder.add(child);
+      const isV02 = this.v02Models.has(key);
+      const yOffset = isV02 ? 2.5 : 1.2;
+      holder.position.y += yOffset - (holder.userData.buildingYOffset ?? 0);
+      holder.userData.buildingYOffset = yOffset;
+      this.applyBuildProgress(holder, holder.userData.buildProgress ?? 1);
+    }
+  }
+
+  /** Buildings currently waiting for their model. */
+  pendingCount(): number {
+    return this.pendingBuildings.size;
+  }
+
+  /** How long placed buildings waited for their model (ms), and the slowest key. */
+  getModelWaitStats(): { pending: number; waited: number; maxMs: number; maxKey: string } {
+    const { count, maxMs, maxKey } = this.modelWaits;
+    return { pending: this.pendingBuildings.size, waited: count, maxMs: Math.round(maxMs), maxKey };
   }
 
   // -----------------------------------------------------------------------
@@ -315,10 +399,44 @@ export class BuildingRenderer {
     const key: ModelCacheKey = `${type}_${factionId}`;
     const source = this.modelCache.get(key);
     if (!source) {
-      console.warn(`[BuildingRenderer] No cached model for key "${key}"`);
-      return null;
+      if (!(key in BUILDING_MODEL_PATHS)) {
+        console.warn(`[BuildingRenderer] No cached model for key "${key}"`);
+        return null;
+      }
+      // Model still downloading: an empty holder takes the building's place
+      // (selection, footprint, bars) and receives the model when it arrives.
+      const holder = new THREE.Group();
+      holder.position.set(x, y, z);
+      holder.name = `building_${eid}`;
+      holder.userData.eid = eid;
+      holder.userData.buildingYOffset = 0;
+      holder.userData.buildProgress = progress;
+      this.instances.set(eid, holder);
+      this.group.add(holder);
+      this.pendingBuildings.set(eid, { key, factionId, since: performance.now() });
+      void this.ensureLoaded(key);
+      return holder;
     }
 
+    const clone = this.createInstanceModel(source, key, factionId);
+    const isV02 = this.v02Models.has(key);
+
+    // Lift buildings above terrain to prevent sinking (v02 models have center pivots)
+    const yOffset = isV02 ? 2.5 : 1.2;
+    clone.position.set(x, y + yOffset, z);
+    clone.name = `building_${eid}`;
+    clone.userData.eid = eid;
+    clone.userData.buildingYOffset = yOffset;
+
+    this.applyBuildProgress(clone, progress);
+
+    this.instances.set(eid, clone);
+    this.group.add(clone);
+    return clone;
+  }
+
+  /** Clone a cached model with per-instance materials (v02 PBR / v01 toon + tint). */
+  private createInstanceModel(source: THREE.Group, key: ModelCacheKey, factionId: number): THREE.Group {
     const clone = source.clone(true);
     const isV02 = this.v02Models.has(key);
     const tint = FACTION_TINTS[factionId];
@@ -350,23 +468,12 @@ export class BuildingRenderer {
         }
       }
     });
-
-    // Lift buildings above terrain to prevent sinking (v02 models have center pivots)
-    const yOffset = isV02 ? 2.5 : 1.2;
-    clone.position.set(x, y + yOffset, z);
-    clone.name = `building_${eid}`;
-    clone.userData.eid = eid;
-    clone.userData.buildingYOffset = yOffset;
-
-    this.applyBuildProgress(clone, progress);
-
-    this.instances.set(eid, clone);
-    this.group.add(clone);
     return clone;
   }
 
   /** Remove and dispose a building (destroyed or torn down). */
   removeBuilding(eid: number): void {
+    this.pendingBuildings.delete(eid);
     const obj = this.instances.get(eid);
     if (!obj) return;
     this.group.remove(obj);
@@ -399,6 +506,7 @@ export class BuildingRenderer {
   }
 
   private applyBuildProgress(obj: THREE.Object3D, progress: number): void {
+    obj.userData.buildProgress = progress;
     // Clamp between 0.15 (minimum visible) and 1.0
     const opacity = 0.15 + Math.min(Math.max(progress, 0), 1) * 0.85;
     obj.traverse((child) => {
@@ -424,7 +532,11 @@ export class BuildingRenderer {
   showGhost(type: BuildingTypeName, factionId: number, x: number, y: number, z: number, valid: boolean): void {
     const key: ModelCacheKey = `${type}_${factionId}`;
     const source = this.modelCache.get(key);
-    if (!source) return;
+    if (!source) {
+      // First placement of this type: fetch it; the ghost shows once loaded.
+      void this.ensureLoaded(key);
+      return;
+    }
 
     // Reuse ghost if already showing the same type; otherwise recreate
     if (!this.ghost || this.ghost.userData.ghostKey !== key) {
@@ -871,6 +983,8 @@ export class BuildingRenderer {
       this.disposeObject(root);
     }
     this.modelCache.clear();
+    this.pendingBuildings.clear();
+    this.keyLoads.clear();
   }
 
   private disposeObject(obj: THREE.Object3D): void {

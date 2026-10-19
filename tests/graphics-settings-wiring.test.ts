@@ -110,6 +110,34 @@ describe('gameSettings store', () => {
     expect(getGameSettings().particles).toBe(false);
   });
 
+  it('voiceVolume: defaults to 80 on a fresh install', () => {
+    expect(getGameSettings().voiceVolume).toBe(80);
+  });
+
+  it('voiceVolume: an old save without it migrates from the SFX level', () => {
+    // Before the voice slider, voices followed SFX scaled as sfx/70 * 80.
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ sfxVolume: 35 }));
+    expect(getGameSettings().voiceVolume).toBe(40);
+    resetGameSettingsForTests();
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ sfxVolume: 70 }));
+    expect(getGameSettings().voiceVolume).toBe(80);
+    resetGameSettingsForTests();
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ sfxVolume: 100 }));
+    expect(getGameSettings().voiceVolume).toBe(100); // clamped to the slider range
+    resetGameSettingsForTests();
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ sfxVolume: 0 }));
+    expect(getGameSettings().voiceVolume).toBe(0);
+  });
+
+  it('voiceVolume: a stored value wins over the migration and persists', () => {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ sfxVolume: 20, voiceVolume: 65 }));
+    expect(getGameSettings().voiceVolume).toBe(65);
+    updateGameSettings({ voiceVolume: 30 });
+    expect(JSON.parse(localStorage.getItem(SETTINGS_KEY)!).voiceVolume).toBe(30);
+    resetGameSettingsForTests();
+    expect(getGameSettings().voiceVolume).toBe(30);
+  });
+
   it('persists updates', () => {
     updateGameSettings({ edgeScroll: false });
     expect(JSON.parse(localStorage.getItem(SETTINGS_KEY)!).edgeScroll).toBe(false);

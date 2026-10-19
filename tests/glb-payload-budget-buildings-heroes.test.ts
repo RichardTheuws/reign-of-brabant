@@ -4,6 +4,10 @@
 // heroes 6-9.5MB — a 1v1 skirmish pulled ~200MB of building/hero payload.
 // Also guards that no decoder-dependent compression (Draco / meshopt / KTX2)
 // sneaks in: none of our GLTFLoaders configure a decoder.
+// v0.65: normal maps (and every other opaque map) are JPEG instead of PNG
+// (q92, 4:4:4 for normals): -81MB over the runtime set, render PSNR 44-55dB.
+// Every runtime GLB (units included) must stay PNG-free; the per-texture
+// budget dropped from 3MB to 1.25MB accordingly.
 import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -13,7 +17,7 @@ const PUBLIC_ROOT = resolve(ROOT, 'public');
 
 const MAX_BYTES = 6 * 1024 * 1024;
 const MAX_TRIS = 150_000;
-const MAX_TEXTURE_BYTES = 3 * 1024 * 1024;
+const MAX_TEXTURE_BYTES = 1.25 * 1024 * 1024;
 const FORBIDDEN_EXTENSIONS = ['KHR_draco_mesh_compression', 'EXT_meshopt_compression', 'KHR_texture_basisu'];
 
 /** Collect every '/assets/models/(v02|heroes)/...glb' literal from the renderer sources. */
@@ -34,12 +38,30 @@ function runtimeModelPaths(): string[] {
   return [...paths].sort();
 }
 
+/** Every '/assets/models/...glb' literal any runtime source references. */
+function allRuntimeModelPaths(): string[] {
+  const sources = [
+    'src/rendering/BuildingRenderer.ts',
+    'src/rendering/UnitRenderer.ts',
+    'src/rendering/PropRenderer.ts',
+    'src/rendering/SelectionRenderer.ts',
+    'src/rendering/ProjectileRenderer.ts',
+    'src/world/Terrain.ts',
+  ];
+  const paths = new Set<string>();
+  for (const src of sources) {
+    const text = readFileSync(resolve(ROOT, src), 'utf8');
+    for (const m of text.matchAll(/'(\/assets\/models\/[^']+\.glb)'/g)) paths.add(m[1]);
+  }
+  return [...paths].sort();
+}
+
 interface GlbJson {
   extensionsUsed?: string[];
   extensionsRequired?: string[];
   meshes?: { primitives: { indices?: number; attributes: Record<string, number> }[] }[];
   accessors?: { count: number }[];
-  images?: { bufferView?: number }[];
+  images?: { bufferView?: number; mimeType?: string }[];
   bufferViews?: { byteLength: number }[];
 }
 
@@ -83,5 +105,20 @@ describe('GLB payload budget — v02 buildings/props + heroes', () => {
     }
     const exts = [...(json.extensionsUsed ?? []), ...(json.extensionsRequired ?? [])];
     for (const ext of FORBIDDEN_EXTENSIONS) expect(exts).not.toContain(ext);
+  });
+});
+
+const ALL_PATHS = allRuntimeModelPaths().filter((url) => existsSync(resolve(PUBLIC_ROOT, url.replace(/^\//, ''))));
+
+describe('GLB texture format — no PNG in runtime models', () => {
+  it('scans the full runtime set (units, buildings, heroes, props)', () => {
+    expect(ALL_PATHS.length).toBeGreaterThanOrEqual(100);
+    expect(ALL_PATHS).toContain('/assets/models/v03/brabanders/worker.glb');
+  });
+
+  it.each(ALL_PATHS)('%s embeds only JPEG textures', (url) => {
+    const json = readGlbJson(resolve(PUBLIC_ROOT, url.replace(/^\//, '')));
+    const png = (json.images ?? []).filter((img) => img.mimeType === 'image/png');
+    expect(png).toEqual([]);
   });
 });

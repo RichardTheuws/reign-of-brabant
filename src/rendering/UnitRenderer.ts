@@ -152,6 +152,21 @@ const ANIMATED_MODEL_PATHS: Record<string, string> = {
   hero1_3: '/assets/models/heroes/belgen-abdijbrouwer.glb',
 };
 
+/** Every renderable unit key (`<type>_<faction>`), animated or static. */
+const ALL_UNIT_MODEL_KEYS: readonly string[] = [...new Set([
+  ...Object.keys(ANIMATED_MODEL_PATHS),
+  ...Object.keys(UNIT_MODEL_PATHS),
+])];
+
+function isUnitModelKey(key: string): boolean {
+  return key in ANIMATED_MODEL_PATHS || key in UNIT_MODEL_PATHS;
+}
+
+/** The GLB a key downloads first (animated model, else static v02). */
+export function primaryUnitModelUrl(key: string): string | null {
+  return ANIMATED_MODEL_PATHS[key] ?? UNIT_MODEL_PATHS[key] ?? null;
+}
+
 /** UnitAIState values (mirrored from types/index.ts to avoid circular imports). */
 const enum AnimUnitAIState {
   Idle = 0,
@@ -401,6 +416,14 @@ export class UnitRenderer {
   private entityBucketKey = new Map<number, ModelCacheKey>();
   /** Shared loader instance. */
   private loader = new GLTFLoader();
+  /** One download per GLB URL for the renderer's lifetime. */
+  private urlLoads = new Map<string, Promise<GLTF>>();
+  /** One setup job per key (template / bucket); shared by all callers. */
+  private keyLoads = new Map<ModelCacheKey, Promise<void>>();
+  /** Units spawned before their model finished: drawn once it arrives. */
+  private pendingUnits = new Map<number, { key: ModelCacheKey; since: number }>();
+  /** Wait-time bookkeeping for units that spawned before their model. */
+  private modelWaits = { count: 0, totalMs: 0, maxMs: 0, maxKey: '' };
   /** Scene group that hosts all unit meshes. */
   private group: THREE.Group;
 
@@ -484,54 +507,124 @@ export class UnitRenderer {
   /** Pre-load unit models and create InstancedMeshes / animated templates.
    *  Per key the animated (v03/hero) model is tried first; the static
    *  v02 -> v01 chain is only downloaded when a key has no animated path or
-   *  the animated load failed. Each URL is fetched at most once per preload.
+   *  the animated load failed. Each URL is fetched at most once per renderer
+   *  (and each key is set up once), so a second match reuses the models.
    *  @param factions  Optional set of faction IDs to load. If omitted, loads all factions.
    *  @param onProgress  Called once per unit key with (loaded, total) counts.
    */
   async preload(factions?: Set<number>, onProgress?: (loaded: number, total: number) => void): Promise<void> {
-    const keys = [...new Set([
-      ...Object.keys(ANIMATED_MODEL_PATHS),
-      ...Object.keys(UNIT_MODEL_PATHS),
-    ])].filter((key) => {
+    const keys = ALL_UNIT_MODEL_KEYS.filter((key) => {
       if (!factions) return true;
       const factionId = parseInt(key.split('_')[1], 10);
       return factions.has(factionId);
     });
+    await this.preloadKeys(keys, onProgress);
+  }
 
+  /** Load exactly these unit keys (e.g. `worker_0`); unknown keys are ignored. */
+  async preloadKeys(keys: Iterable<string>, onProgress?: (loaded: number, total: number) => void): Promise<void> {
+    const known = [...new Set(keys)].filter(isUnitModelKey);
     let loaded = 0;
-    const total = keys.length;
-
-    // One request per URL per preload (heroes share paths, fallbacks are shared).
-    const requests = new Map<string, Promise<GLTF>>();
-    const load = (url: string): Promise<GLTF> => {
-      let req = requests.get(url);
-      if (!req) {
-        req = this.loader.loadAsync(url);
-        req.catch(() => {}); // rejection is handled by each consumer
-        requests.set(url, req);
-      }
-      return req;
-    };
-
-    const promises = keys.map(async (key) => {
-      const cacheKey = key as ModelCacheKey;
-      const animPath = ANIMATED_MODEL_PATHS[key];
-      if (animPath) {
-        try {
-          this.registerAnimated(cacheKey, await load(animPath));
-          loaded++;
-          onProgress?.(loaded, total);
-          return;
-        } catch (err) {
-          console.warn(`[UnitRenderer] Failed to load animated model "${key}":`, err);
-        }
-      }
-      // No animated model (or it failed): static v02 -> v01 chain.
-      await this.loadStatic(cacheKey, load, animPath);
+    const total = known.length;
+    await Promise.all(known.map(async (key) => {
+      await this.ensureLoaded(key);
       loaded++;
       onProgress?.(loaded, total);
-    });
-    await Promise.all(promises);
+    }));
+  }
+
+  /**
+   * Background download of `keys`, at most `concurrency` at a time so an
+   * on-demand load (a unit that just spawned) is not starved. Never rejects.
+   */
+  prefetch(keys: Iterable<string>, concurrency = 2): Promise<void> {
+    const queue = [...new Set(keys)].filter((k) => isUnitModelKey(k) && !this.keyLoads.has(k as ModelCacheKey));
+    const worker = async (): Promise<void> => {
+      for (let key = queue.shift(); key; key = queue.shift()) {
+        await this.ensureLoaded(key);
+      }
+    };
+    return Promise.all(Array.from({ length: Math.max(1, concurrency) }, worker)).then(() => undefined);
+  }
+
+  /** True once `key` has a template or bucket (addUnit renders immediately). */
+  isModelReady(key: string): boolean {
+    return this.animatedTemplates.has(key as ModelCacheKey) || this.buckets.has(key as ModelCacheKey);
+  }
+
+  /**
+   * Download + set up the model for `key` once; later calls share the same
+   * promise. Units added while it loads are attached when it resolves.
+   * Unknown keys resolve immediately. Never rejects (a failed chain ends in
+   * the static fallback, exactly as before).
+   */
+  ensureLoaded(key: string): Promise<void> {
+    if (!isUnitModelKey(key)) return Promise.resolve();
+    const cacheKey = key as ModelCacheKey;
+    let job = this.keyLoads.get(cacheKey);
+    if (!job) {
+      job = this.loadKey(cacheKey)
+        .catch((err) => console.warn(`[UnitRenderer] Model setup failed for "${key}":`, err))
+        .then(() => this.flushPending(cacheKey));
+      this.keyLoads.set(cacheKey, job);
+    }
+    return job;
+  }
+
+  /** One request per URL per renderer (heroes share paths, fallbacks are shared). */
+  private loadUrl(url: string): Promise<GLTF> {
+    let req = this.urlLoads.get(url);
+    if (!req) {
+      req = this.loader.loadAsync(url);
+      req.catch(() => {}); // rejection is handled by each consumer
+      this.urlLoads.set(url, req);
+    }
+    return req;
+  }
+
+  private async loadKey(key: ModelCacheKey): Promise<void> {
+    const load = (url: string): Promise<GLTF> => this.loadUrl(url);
+    const animPath = ANIMATED_MODEL_PATHS[key];
+    if (animPath) {
+      try {
+        this.registerAnimated(key, await load(animPath));
+        return;
+      } catch (err) {
+        console.warn(`[UnitRenderer] Failed to load animated model "${key}":`, err);
+      }
+    }
+    // No animated model (or it failed): static v02 -> v01 chain.
+    await this.loadStatic(key, load, animPath);
+  }
+
+  /** Attach every unit that spawned while `key` was still downloading. */
+  private flushPending(key: ModelCacheKey): void {
+    for (const [eid, pending] of this.pendingUnits) {
+      if (pending.key !== key) continue;
+      this.pendingUnits.delete(eid);
+      const proxy = this.proxies.get(eid);
+      if (!proxy) continue;
+      const waited = performance.now() - pending.since;
+      this.modelWaits.count++;
+      this.modelWaits.totalMs += waited;
+      if (waited > this.modelWaits.maxMs) {
+        this.modelWaits.maxMs = waited;
+        this.modelWaits.maxKey = key;
+      }
+      if (this.hasAnimated(key)) this.addAnimatedUnit(eid, key, proxy);
+      else this.addStaticUnit(eid, key, proxy);
+    }
+  }
+
+  /** Units currently waiting for their model (not drawn yet). */
+  pendingCount(): number {
+    return this.pendingUnits.size;
+  }
+
+  /** How long spawned units waited for their model (ms), since construction. */
+  getModelWaitStats(): { pending: number; waited: number; maxMs: number; avgMs: number; maxKey: string } {
+    const { count, totalMs, maxMs, maxKey } = this.modelWaits;
+    return { pending: this.pendingUnits.size, waited: count, maxMs: Math.round(maxMs), avgMs: count ? Math.round(totalMs / count) : 0, maxKey };
   }
 
   /** Store a loaded animated GLB as the template for `key`. */
@@ -720,6 +813,10 @@ export class UnitRenderer {
    * Create a visible unit instance for an ECS entity.
    * Returns a lightweight proxy Object3D so the caller can set initial position,
    * userData.eid, and store it in entityMeshMap for raycasting.
+   *
+   * When the unit's model is still downloading, the proxy is returned right
+   * away but nothing is drawn (no placeholder, no blob shadow, not pickable):
+   * the unit appears as soon as its model arrives (see flushPending).
    */
   addUnit(eid: number, type: UnitTypeName, factionId: number): THREE.Object3D | null {
     if (this.proxies.has(eid)) return this.proxies.get(eid)!;
@@ -731,7 +828,30 @@ export class UnitRenderer {
       return this.addAnimatedUnit(eid, key);
     }
 
+    // --- Model not downloaded yet: wait for it ---
+    if (!this.buckets.has(key) && isUnitModelKey(key)) {
+      const proxy = this.createProxy(eid);
+      this.proxies.set(eid, proxy);
+      this.entityBucketKey.set(eid, key);
+      this.pendingUnits.set(eid, { key, since: performance.now() });
+      void this.ensureLoaded(key);
+      return proxy;
+    }
+
     // --- Static path: InstancedMesh batching ---
+    return this.addStaticUnit(eid, key);
+  }
+
+  /** Invisible hit-proxy for raycasting / entityMeshMap compatibility. */
+  private createProxy(eid: number): THREE.Mesh {
+    const proxy = new THREE.Mesh(this.hitProxyGeo, this.hitProxyMat);
+    proxy.name = `unit_${eid}`;
+    proxy.userData.eid = eid;
+    return proxy;
+  }
+
+  /** Static (InstancedMesh) unit; reuses `existingProxy` for a pending unit. */
+  private addStaticUnit(eid: number, key: ModelCacheKey, existingProxy?: THREE.Object3D): THREE.Object3D | null {
     const bucket = this.buckets.get(key);
     if (!bucket) {
       console.warn(`[UnitRenderer] No InstancedMesh bucket for key "${key}"`);
@@ -763,11 +883,8 @@ export class UnitRenderer {
     // Create a lightweight proxy Object3D for raycasting compatibility.
     // This is an invisible mesh that the caller's entityMeshMap and raycaster
     // can interact with normally (intersectObjects, userData.eid walk-up).
-    const proxy = new THREE.Mesh(this.hitProxyGeo, this.hitProxyMat);
-    proxy.name = `unit_${eid}`;
-    proxy.userData.eid = eid;
     // The proxy intercepts `.scale` sets from the caller (e.g. heroes at 1.8x).
-    // We watch for scale changes via a custom setter on userData.
+    const proxy = existingProxy ?? this.createProxy(eid);
     this.proxies.set(eid, proxy);
     this.group.add(proxy);
 
@@ -784,7 +901,7 @@ export class UnitRenderer {
    * Add an animated unit: clone the template scene, set up AnimationMixer,
    * create proxy and blob shadow.
    */
-  private addAnimatedUnit(eid: number, key: ModelCacheKey): THREE.Object3D | null {
+  private addAnimatedUnit(eid: number, key: ModelCacheKey, existingProxy?: THREE.Object3D): THREE.Object3D | null {
     const template = this.animatedTemplates.get(key);
     if (!template) return null;
 
@@ -861,10 +978,8 @@ export class UnitRenderer {
       }
     });
 
-    // Create proxy for raycasting
-    const proxy = new THREE.Mesh(this.hitProxyGeo, this.hitProxyMat);
-    proxy.name = `unit_${eid}`;
-    proxy.userData.eid = eid;
+    // Create proxy for raycasting (a pending unit already has one)
+    const proxy = existingProxy ?? this.createProxy(eid);
     this.proxies.set(eid, proxy);
     this.group.add(proxy);
 
@@ -907,6 +1022,7 @@ export class UnitRenderer {
   removeUnit(eid: number): void {
     const key = this.entityBucketKey.get(eid);
     if (!key) return;
+    this.pendingUnits.delete(eid);
 
     // --- Animated path cleanup ---
     const animUnit = this.animatedUnits.get(eid);
@@ -1471,6 +1587,9 @@ export class UnitRenderer {
     }
     this.modelCache.clear();
     this.v02Models.clear();
+    this.pendingUnits.clear();
+    this.keyLoads.clear();
+    this.urlLoads.clear();
   }
 
   private disposeObject(obj: THREE.Object3D): void {

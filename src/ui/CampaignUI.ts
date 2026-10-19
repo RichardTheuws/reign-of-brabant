@@ -2,7 +2,8 @@
  * CampaignUI.ts -- DOM controllers for campaign select and briefing screens.
  *
  * Creates and manages two overlay screens:
- * 1. Campaign Select: list of missions with status (locked/available/completed + stars)
+ * 1. Campaign Select: list of missions, all playable, with progress (completed +
+ *    stars + best time) and an 'Aanbevolen' label on the next story mission
  * 2. Briefing: mission description + objectives + start button
  *
  * All text is in Dutch.
@@ -355,43 +356,44 @@ export class CampaignUI {
     const starsDisplay = document.getElementById('campaign-stars-display');
     if (starsDisplay) starsDisplay.textContent = `${totalStars} / ${maxStars}`;
 
+    const recommendedId = this.campaignManager.getRecommendedMissionId(factionId);
     for (const { definition, progress } of missionsWithProgress) {
-      const card = this.createMissionCard(definition, progress);
+      const card = this.createMissionCard(definition, progress, definition.id === recommendedId);
       listEl.appendChild(card);
     }
   }
 
-  private createMissionCard(def: MissionDefinition, progress: MissionProgress): HTMLElement {
+  private createMissionCard(def: MissionDefinition, progress: MissionProgress, isRecommended = false): HTMLElement {
     const card = document.createElement('div');
-    const isLocked = progress.status === 'locked';
     const isCompleted = progress.status === 'completed';
-    const isAvailable = progress.status === 'available';
+    const restBorder = isRecommended ? '#d4a853' : isCompleted ? 'rgba(76,175,80,0.4)' : 'rgba(212,168,83,0.4)';
+    const restShadow = isRecommended ? '0 0 14px rgba(212,168,83,0.22)' : 'none';
 
+    card.dataset.missionId = def.id;
+    if (isRecommended) card.dataset.recommended = 'true';
     card.style.cssText = `
       display: flex; align-items: center; gap: 16px; padding: 16px 20px;
-      border: 2px solid ${isLocked ? 'rgba(100,100,100,0.2)' : isCompleted ? 'rgba(76,175,80,0.4)' : 'rgba(212,168,83,0.4)'};
+      border: 2px solid ${restBorder};
       border-radius: 10px;
-      background: ${isLocked ? 'rgba(30,25,20,0.6)' : 'rgba(20,15,10,0.88)'};
-      cursor: ${isLocked ? 'not-allowed' : 'pointer'};
-      opacity: ${isLocked ? '0.45' : '1'};
+      background: ${isRecommended ? 'rgba(40,30,15,0.92)' : 'rgba(20,15,10,0.88)'};
+      box-shadow: ${restShadow};
+      cursor: pointer;
       transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
     `;
 
-    if (!isLocked) {
-      card.addEventListener('mouseenter', () => {
-        card.style.borderColor = '#d4a853';
-        card.style.transform = 'translateX(4px)';
-        card.style.boxShadow = '0 2px 16px rgba(212,168,83,0.15)';
-      });
-      card.addEventListener('mouseleave', () => {
-        card.style.borderColor = isCompleted ? 'rgba(76,175,80,0.4)' : 'rgba(212,168,83,0.4)';
-        card.style.transform = 'translateX(0)';
-        card.style.boxShadow = 'none';
-      });
-      card.addEventListener('click', () => {
-        this.events?.onMissionSelected(def.id);
-      });
-    }
+    card.addEventListener('mouseenter', () => {
+      card.style.borderColor = '#d4a853';
+      card.style.transform = 'translateX(4px)';
+      card.style.boxShadow = '0 2px 16px rgba(212,168,83,0.15)';
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.borderColor = restBorder;
+      card.style.transform = 'translateX(0)';
+      card.style.boxShadow = restShadow;
+    });
+    card.addEventListener('click', () => {
+      this.events?.onMissionSelected(def.id);
+    });
 
     // Mission number
     const numEl = document.createElement('div');
@@ -399,11 +401,11 @@ export class CampaignUI {
       width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
       font-family: 'Cinzel', serif; font-weight: 700; font-size: 1.2rem;
-      background: ${isLocked ? 'rgba(100,100,100,0.15)' : isCompleted ? 'rgba(76,175,80,0.2)' : 'rgba(212,168,83,0.15)'};
-      color: ${isLocked ? '#666' : isCompleted ? '#4CAF50' : '#d4a853'};
-      border: 2px solid ${isLocked ? 'rgba(100,100,100,0.2)' : isCompleted ? 'rgba(76,175,80,0.3)' : 'rgba(212,168,83,0.3)'};
+      background: ${isCompleted ? 'rgba(76,175,80,0.2)' : 'rgba(212,168,83,0.15)'};
+      color: ${isCompleted ? '#4CAF50' : '#d4a853'};
+      border: 2px solid ${isCompleted ? 'rgba(76,175,80,0.3)' : 'rgba(212,168,83,0.3)'};
     `;
-    numEl.textContent = isLocked ? '?' : `${def.missionIndex + 1}`;
+    numEl.textContent = `${def.missionIndex + 1}`;
 
     // Info container
     const infoEl = document.createElement('div');
@@ -411,20 +413,32 @@ export class CampaignUI {
 
     const titleEl = document.createElement('div');
     titleEl.style.cssText = `
+      display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
       font-family: 'Cinzel', serif; font-weight: 700; font-size: 1.05rem;
-      color: ${isLocked ? '#666' : '#e8e6e3'}; margin-bottom: 4px;
+      color: #e8e6e3; margin-bottom: 4px;
     `;
-    titleEl.textContent = isLocked ? 'Vergrendeld' : def.title;
+    const titleText = document.createElement('span');
+    titleText.textContent = def.title;
+    titleEl.appendChild(titleText);
+    if (isRecommended) {
+      const badge = document.createElement('span');
+      badge.className = 'campaign-recommended-badge';
+      badge.textContent = 'Aanbevolen';
+      badge.style.cssText = `
+        font-family: inherit; font-size: 0.62rem; font-weight: 700;
+        letter-spacing: 0.06em; text-transform: uppercase;
+        padding: 2px 8px; border-radius: 10px;
+        background: rgba(212,168,83,0.2); color: #d4a853;
+        border: 1px solid rgba(212,168,83,0.5);
+      `;
+      titleEl.appendChild(badge);
+    }
 
     const descEl = document.createElement('div');
     descEl.style.cssText = 'font-size: 0.8rem; color: #a0a0a0; line-height: 1.4;';
-    if (isLocked) {
-      descEl.textContent = 'Voltooi de vorige missie om deze te ontgrendelen.';
-    } else {
-      // Short description from briefing (first sentence)
-      const firstSentence = def.briefingText.split('.')[0] + '.';
-      descEl.textContent = firstSentence.length > 80 ? firstSentence.slice(0, 77) + '...' : firstSentence;
-    }
+    // Short description from briefing (first sentence)
+    const firstSentence = def.briefingText.split('.')[0] + '.';
+    descEl.textContent = firstSentence.length > 80 ? firstSentence.slice(0, 77) + '...' : firstSentence;
 
     infoEl.appendChild(titleEl);
     infoEl.appendChild(descEl);
@@ -442,15 +456,11 @@ export class CampaignUI {
     // Stars
     const starsEl = document.createElement('div');
     starsEl.style.cssText = 'flex-shrink: 0; font-size: 1.3rem; letter-spacing: 2px;';
-    if (isLocked) {
-      starsEl.innerHTML = starSvg('#333') + starSvg('#333', '1em', 'margin-left:2px') + starSvg('#333', '1em', 'margin-left:2px');
-    } else {
-      let starsHtml = '';
-      for (let i = 0; i < 3; i++) {
-        starsHtml += starSvg(i < progress.stars ? '#d4a853' : '#333', '1em', i > 0 ? 'margin-left:2px' : '');
-      }
-      starsEl.innerHTML = starsHtml;
+    let starsHtml = '';
+    for (let i = 0; i < 3; i++) {
+      starsHtml += starSvg(i < progress.stars ? '#d4a853' : '#333', '1em', i > 0 ? 'margin-left:2px' : '');
     }
+    starsEl.innerHTML = starsHtml;
 
     card.appendChild(numEl);
     card.appendChild(infoEl);

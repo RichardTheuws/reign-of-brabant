@@ -895,7 +895,11 @@ export class HUD {
     // Optional info-text + stats line (rendered below status)
     this.renderBuildingCardExtras(data);
 
-    // Build action buttons (hide grid + preceding divider when no actions)
+    // Build action buttons (hide grid + preceding divider when no actions).
+    // Release the previous buttons' tracked handlers first, otherwise every
+    // building selection adds entries to boundHandlers that pin the detached
+    // buttons until destroy() at match end.
+    this.unbindWithin(this.bcardActions);
     this.bcardActions.innerHTML = '';
     const actionDivider = this.bcardActions.previousElementSibling;
     if (data.actions.length === 0) {
@@ -993,7 +997,7 @@ export class HUD {
       btn.appendChild(hotkeySpan);
 
       // Wire click to command handler
-      btn.addEventListener('click', () => {
+      this.listen(btn, 'click', () => {
         audioManager.playSound('click');
         this.events?.onCommand(act.action);
       });
@@ -1964,6 +1968,7 @@ export class HUD {
    */
   private rebuildWorkerCommands(faction: Faction): void {
     if (!this.cmdWorker) return;
+    this.unbindWithin(this.cmdWorker);
     this.cmdWorker.innerHTML = '';
 
     const builds = FACTION_WORKER_BUILDS[faction] ?? FACTION_WORKER_BUILDS.brabant;
@@ -2624,9 +2629,40 @@ export class HUD {
     };
     const onLeave = () => this.hideTooltip();
 
-    btn.addEventListener('mouseenter', onEnter as EventListener);
-    btn.addEventListener('mousemove', onMove as EventListener);
-    btn.addEventListener('mouseleave', onLeave as EventListener);
+    // Tracked in boundHandlers so destroy() removes them: the static
+    // train/rally buttons in the HTML outlive the HUD, and untracked tooltip
+    // handlers stacked +3 per button on every new match.
+    this.listen(btn, 'mouseenter', onEnter as EventListener);
+    this.listen(btn, 'mousemove', onMove as EventListener);
+    this.listen(btn, 'mouseleave', onLeave as EventListener);
+  }
+
+  /** addEventListener + record it so destroy()/unbindWithin() can remove it. */
+  private listen(el: HTMLElement | Document, event: string, handler: EventListener): void {
+    el.addEventListener(event, handler);
+    this.boundHandlers.push({ el, event, handler });
+  }
+
+  /**
+   * Remove (and stop tracking) every bound handler on `container` or its
+   * descendants. Called before a panel is rebuilt with innerHTML='', so the
+   * discarded buttons are not kept alive by boundHandlers until destroy().
+   */
+  private unbindWithin(container: HTMLElement): void {
+    let kept = 0;
+    for (const entry of this.boundHandlers) {
+      if (entry.el !== document && container.contains(entry.el as Node)) {
+        entry.el.removeEventListener(entry.event, entry.handler);
+      } else {
+        this.boundHandlers[kept++] = entry;
+      }
+    }
+    this.boundHandlers.length = kept;
+  }
+
+  /** Number of DOM listeners this HUD currently holds (leak tests). */
+  get boundListenerCount(): number {
+    return this.boundHandlers.length;
   }
 
   // -----------------------------------------------------------------------

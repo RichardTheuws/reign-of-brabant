@@ -2,7 +2,8 @@
  * CampaignManager.ts -- Tracks campaign progress and persistence.
  *
  * Responsibilities:
- * - Track which missions are completed, locked, or available
+ * - Track which missions are completed (every mission is playable: no locks)
+ * - Pick the recommended next mission per campaign (story order)
  * - Store star ratings per mission
  * - Persist to localStorage
  * - Provide mission list for the campaign select screen
@@ -14,7 +15,12 @@ import { BRABANDERS_MISSIONS, LIMBURGERS_MISSIONS, BELGEN_MISSIONS, RANDSTAD_MIS
 // Types
 // ---------------------------------------------------------------------------
 
-export type MissionStatus = 'locked' | 'available' | 'completed';
+/**
+ * Every mission is playable from the start (project rule: no progressive
+ * locks). 'locked' only exists in saves written before that rule; normalize()
+ * turns it into 'available' on load.
+ */
+export type MissionStatus = 'available' | 'completed';
 
 export interface MissionProgress {
   readonly missionId: string;
@@ -92,7 +98,8 @@ export class CampaignManager {
 
   /**
    * Rebuild progress against the current mission definitions: match by id,
-   * map renamed ids, drop unknown ids, add missing missions, recompute unlocks.
+   * map renamed ids, drop unknown ids, add missing missions. Old 'locked'
+   * entries become 'available': all missions are open, progress is kept.
    */
   private normalize(saved: CampaignSaveData): CampaignSaveData {
     const savedById = new Map<string, MissionProgress>();
@@ -106,18 +113,15 @@ export class CampaignManager {
     return {
       version: SAVE_VERSION,
       campaigns: CAMPAIGN_MISSIONS.map(([campaignId, definitions]) => {
-        const missions: MissionProgress[] = [];
-        definitions.forEach((def, i) => {
+        const missions: MissionProgress[] = definitions.map((def) => {
           const old = savedById.get(def.id);
-          const completed = old?.status === 'completed';
-          const unlocked = i === 0 || missions[i - 1].status === 'completed' || old?.status === 'available';
-          missions.push({
+          return {
             missionId: def.id,
-            status: completed ? 'completed' : unlocked ? 'available' : 'locked',
-            stars: old?.stars ?? 0,
-            bestTimeSeconds: old?.bestTimeSeconds ?? 0,
+            status: old?.status === 'completed' ? 'completed' : 'available',
+            stars: typeof old?.stars === 'number' ? old.stars : 0,
+            bestTimeSeconds: typeof old?.bestTimeSeconds === 'number' ? old.bestTimeSeconds : 0,
             bonusesCompleted: Array.isArray(old?.bonusesCompleted) ? [...old.bonusesCompleted] : [],
-          });
+          };
         });
         return { campaignId, missions };
       }),
@@ -147,9 +151,9 @@ export class CampaignManager {
   private createCampaignProgress(campaignId: string, missions: readonly MissionDefinition[]): CampaignProgress {
     return {
       campaignId,
-      missions: missions.map((m, i) => ({
+      missions: missions.map((m) => ({
         missionId: m.id,
-        status: i === 0 ? 'available' : 'locked',
+        status: 'available',
         stars: 0,
         bestTimeSeconds: 0,
         bonusesCompleted: [],
@@ -185,7 +189,7 @@ export class CampaignManager {
       definition: def,
       progress: campaign.missions.find(m => m.missionId === def.id) ?? {
         missionId: def.id,
-        status: 'locked' as MissionStatus,
+        status: 'available' as MissionStatus,
         stars: 0,
         bestTimeSeconds: 0,
         bonusesCompleted: [],
@@ -193,10 +197,20 @@ export class CampaignManager {
     }));
   }
 
-  /** Check if a specific mission is available to play. */
+  /** Every known mission is playable (no progressive locks). */
   isMissionAvailable(missionId: string): boolean {
-    const progress = this.getMissionProgress(missionId);
-    return progress !== undefined && (progress.status === 'available' || progress.status === 'completed');
+    return this.getMissionProgress(missionId) !== undefined;
+  }
+
+  /**
+   * The mission we suggest playing next: the first mission in story order that
+   * is not completed yet. Only drives the 'Aanbevolen' label, never access.
+   * Returns null when the campaign is unknown or fully completed.
+   */
+  getRecommendedMissionId(campaignId: string): string | null {
+    const campaign = this.getCampaignProgress(campaignId);
+    if (!campaign) return null;
+    return campaign.missions.find(m => m.status !== 'completed')?.missionId ?? null;
   }
 
   /** Get total stars earned across all missions in a campaign. */
@@ -217,10 +231,7 @@ export class CampaignManager {
   // Mutations
   // -----------------------------------------------------------------------
 
-  /**
-   * Complete a mission with a given rating.
-   * Unlocks the next mission if applicable.
-   */
+  /** Complete a mission with a given rating (keeps the best stars and time). */
   completeMission(
     missionId: string,
     stars: number,
@@ -243,14 +254,6 @@ export class CampaignManager {
       for (const bonus of bonusesCompleted) {
         if (!mission.bonusesCompleted.includes(bonus)) {
           mission.bonusesCompleted.push(bonus);
-        }
-      }
-
-      // Unlock next mission
-      if (missionIndex + 1 < campaign.missions.length) {
-        const next = campaign.missions[missionIndex + 1];
-        if (next.status === 'locked') {
-          next.status = 'available';
         }
       }
 

@@ -105,12 +105,26 @@ describe('CampaignManager v1 save migration', () => {
     expect(cm.isMissionAvailable('brabant-9-de-brabantse-raad')).toBe(true);
   });
 
-  it('unlocks the mission after the last completed one for extended campaigns', () => {
+  it('opens every mission, including old locked entries and new missions', () => {
     const cm = loadManagerWith(v1Save());
     expect(cm.getMissionProgress('limburgers-6-tunneloorlog')?.status).toBe('available');
-    expect(cm.getMissionProgress('limburgers-7-de-grote-sjtoelgang')?.status).toBe('locked');
-    expect(cm.getMissionProgress('belgen-2-het-chocolade-verdrag')?.status).toBe('available');
-    expect(cm.getMissionProgress('belgen-4-wafeltjeswar')?.status).toBe('locked');
+    expect(cm.getMissionProgress('limburgers-7-de-grote-sjtoelgang')?.status).toBe('available');
+    expect(cm.getMissionProgress('belgen-3-de-commissievergadering')?.status).toBe('available');
+    expect(cm.getMissionProgress('belgen-4-wafeltjeswar')?.status).toBe('available');
+    for (const campaignId of ['brabanders', 'limburgers', 'belgen', 'randstad']) {
+      for (const m of cm.getCampaignProgress(campaignId)!.missions) {
+        expect(m.status).not.toBe('locked');
+        expect(cm.isMissionAvailable(m.missionId)).toBe(true);
+      }
+    }
+  });
+
+  it('recommends the first uncompleted mission in story order', () => {
+    const cm = loadManagerWith(v1Save());
+    expect(cm.getRecommendedMissionId('brabanders')).toBe('brabant-9-de-brabantse-raad');
+    expect(cm.getRecommendedMissionId('limburgers')).toBe('limburgers-6-tunneloorlog');
+    expect(cm.getRecommendedMissionId('belgen')).toBe('belgen-2-het-chocolade-verdrag');
+    expect(cm.getRecommendedMissionId('randstad')).toBe('randstad-1-de-eerste-vergadering');
   });
 
   it('creates entries for every current mission and drops obsolete ids', () => {
@@ -128,10 +142,10 @@ describe('CampaignManager v1 save migration', () => {
     }
   });
 
-  it('makes the first Randstad mission available', () => {
+  it('makes every Randstad mission available', () => {
     const cm = loadManagerWith(v1Save());
     expect(cm.getMissionProgress('randstad-1-de-eerste-vergadering')?.status).toBe('available');
-    expect(cm.getMissionProgress('randstad-2-het-consultancy-rapport')?.status).toBe('locked');
+    expect(cm.getMissionProgress('randstad-2-het-consultancy-rapport')?.status).toBe('available');
     const withProgress = cm.getMissionsWithProgress('randstad');
     expect(withProgress).toHaveLength(RANDSTAD_MISSIONS.length);
     expect(withProgress[0].progress.status).toBe('available');
@@ -147,14 +161,17 @@ describe('CampaignManager v1 save migration', () => {
     }
   });
 
-  it('completing a renamed mission unlocks the next one', () => {
+  it('completing a renamed mission moves the recommendation to the next one', () => {
     const save = v1Save();
     save.campaigns[0].missions[7] = entry('brabant-8-het-beleg-van-eindhansen', 'available');
     save.campaigns[0].missions[8] = entry('brabant-9-de-brabantse-nansen', 'locked');
     const cm = loadManagerWith(save);
     expect(cm.getMissionProgress('brabant-8-het-beleg-van-eindhoven')?.status).toBe('available');
+    expect(cm.getRecommendedMissionId('brabanders')).toBe('brabant-8-het-beleg-van-eindhoven');
     cm.completeMission('brabant-8-het-beleg-van-eindhoven', 2, 900, []);
+    expect(cm.getMissionProgress('brabant-8-het-beleg-van-eindhoven')?.status).toBe('completed');
     expect(cm.getMissionProgress('brabant-9-de-brabantse-raad')?.status).toBe('available');
+    expect(cm.getRecommendedMissionId('brabanders')).toBe('brabant-9-de-brabantse-raad');
   });
 
   it('persists the migrated save as version 2', () => {

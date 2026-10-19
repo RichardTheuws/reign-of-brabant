@@ -537,6 +537,10 @@ export class MenuScreens {
       audioManager.setCategoryVolume('sfx', val / 100);
       updateGameSettings({ sfxVolume: val });
     });
+    this.bindSlider('setting-voice', 'setting-voice-val', (val) => {
+      audioManager.setCategoryVolume('voice', val / 100);
+      updateGameSettings({ voiceVolume: val });
+    });
     this.bindSlider('setting-ambient', 'setting-ambient-val', (val) => {
       audioManager.setCategoryVolume('ambient', val / 100);
       updateGameSettings({ ambientVolume: val });
@@ -571,11 +575,13 @@ export class MenuScreens {
     // Sliders
     this.setSliderValue('setting-music', 'setting-music-val', s.musicVolume);
     this.setSliderValue('setting-sfx', 'setting-sfx-val', s.sfxVolume);
+    this.setSliderValue('setting-voice', 'setting-voice-val', s.voiceVolume);
     this.setSliderValue('setting-ambient', 'setting-ambient-val', s.ambientVolume);
 
     // Audio system
     audioManager.setCategoryVolume('music', s.musicVolume / 100);
     audioManager.setCategoryVolume('sfx', s.sfxVolume / 100);
+    audioManager.setCategoryVolume('voice', s.voiceVolume / 100);
     audioManager.setCategoryVolume('ambient', s.ambientVolume / 100);
 
     // Checkboxes

@@ -78,6 +78,9 @@ export class SelectionRenderer {
   // Time accumulator for pulsing
   private elapsedTime = 0;
 
+  // Shared in-flight/finished preload, so pools are built exactly once
+  private preloadPromise: Promise<void> | null = null;
+
   constructor(selectionGroup: THREE.Group, healthBarGroup: THREE.Group) {
     this.selectionGroup = selectionGroup;
     this.healthBarGroup = healthBarGroup;
@@ -88,7 +91,33 @@ export class SelectionRenderer {
   // Loading
   // -----------------------------------------------------------------------
 
-  async preload(): Promise<void> {
+  /**
+   * Load the circle model and fill the circle + health-bar pools. Idempotent:
+   * Game calls this on every match start, and re-running it appended another
+   * 50 circles + 64 canvas health bars (canvas, texture, sprite) to the scene
+   * per match that were never used or freed.
+   */
+  preload(): Promise<void> {
+    if (!this.preloadPromise) {
+      this.preloadPromise = this.loadPools().catch((err) => {
+        this.preloadPromise = null; // allow a retry after a failed load
+        throw err;
+      });
+    }
+    return this.preloadPromise;
+  }
+
+  /** Number of pooled health-bar sprites (leak tests). */
+  get healthBarPoolSize(): number {
+    return this.healthBarPool.length;
+  }
+
+  /** Number of pooled selection circles (leak tests). */
+  get circlePoolSize(): number {
+    return this.circlePool.length;
+  }
+
+  private async loadPools(): Promise<void> {
     const gltf: GLTF = await this.loader.loadAsync(SELECTION_CIRCLE_PATH);
     const root = gltf.scene;
     root.traverse((child) => {

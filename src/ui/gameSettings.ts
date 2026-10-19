@@ -19,6 +19,7 @@ export const SETTINGS_KEY = 'rob-settings';
 export interface GameSettings {
   musicVolume: number;   // 0-100
   sfxVolume: number;     // 0-100
+  voiceVolume: number;   // 0-100 (unit voice lines)
   ambientVolume: number; // 0-100
   shadows: boolean;
   bloom: boolean;
@@ -30,6 +31,7 @@ export interface GameSettings {
 export const DEFAULT_SETTINGS: Readonly<GameSettings> = {
   musicVolume: 40,
   sfxVolume: 70,
+  voiceVolume: 80,
   ambientVolume: 30,
   shadows: true,
   bloom: true,
@@ -49,11 +51,28 @@ export function loadSettings(): GameSettings {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (parsed && typeof parsed === 'object') {
-        return { ...DEFAULT_SETTINGS, ...parsed };
+        const merged: GameSettings = { ...DEFAULT_SETTINGS, ...parsed };
+        if (typeof parsed.voiceVolume !== 'number') {
+          merged.voiceVolume = migratedVoiceVolume(merged.sfxVolume);
+        }
+        return merged;
       }
     }
   } catch { /* ignore corrupt data / unavailable storage */ }
   return { ...DEFAULT_SETTINGS };
+}
+
+/**
+ * Saves from before the voice slider existed: voices followed the SFX slider,
+ * scaled so SFX 70 gave the default voice loudness (voice 80). Carry that
+ * effective level over so existing players hear the same as before.
+ */
+export function migratedVoiceVolume(sfxVolume: unknown): number {
+  const sfx = typeof sfxVolume === 'number' && Number.isFinite(sfxVolume)
+    ? sfxVolume
+    : DEFAULT_SETTINGS.sfxVolume;
+  const v = Math.round((sfx * DEFAULT_SETTINGS.voiceVolume) / DEFAULT_SETTINGS.sfxVolume);
+  return Math.max(0, Math.min(100, v));
 }
 
 function saveSettings(s: GameSettings): void {

@@ -35,6 +35,7 @@ import { AISystem } from '../ai/AISystem';
 import { gameConfig } from '../core/GameConfig';
 import { UnitRenderer } from '../rendering/UnitRenderer';
 import { BuildingRenderer } from '../rendering/BuildingRenderer';
+import { criticalModelKeys, warmModelKeys, type ModelKeySet, type StartEntity } from '../rendering/modelPreloadPlan';
 import { PropRenderer } from '../rendering/PropRenderer';
 import { SelectionRenderer, type SelectionData } from '../rendering/SelectionRenderer';
 import { TowerRangeRenderer } from '../rendering/TowerRangeRenderer';
@@ -88,7 +89,7 @@ import { validateBuildingPlacement, formatConstructionStatus } from '../systems/
 import { createMusicSystem, type MusicSystem } from '../systems/MusicSystem';
 import { getUpkeepPerTick, resetUpkeepTimers } from '../systems/UpkeepSystem';
 import { MissionSystem, type MissionCallbacks } from '../campaign/MissionSystem';
-import { getMissionById, getMissionFactionIds, type MissionDefinition, type MissionUnitSpawn } from '../campaign/MissionDefinitions';
+import { getMissionById, getMissionFactionIds, getAllMissionUnitSpawns, type MissionDefinition, type MissionUnitSpawn } from '../campaign/MissionDefinitions';
 import type { Terrain } from '../world/Terrain';
 import type { RTSCamera } from '../camera/RTSCamera';
 import type { EventBus as EventBusType } from '../core/EventBus';
@@ -377,23 +378,19 @@ export class Game {
     )];
     AISystem.setFactions(aiFactions.length > 0 ? aiFactions : [this.getAIFactionId()], this.difficulty);
 
-    // 2. Load GLB models (all active factions for performance)
+    // 2. Load GLB models: only what is on the map at the start (start Town
+    // Halls + workers) and the AI's opening buildings. The rest follows in
+    // the background / on demand (see modelPreloadPlan).
     const activeFactions = new Set<number>(this.map.spawns.map(s => s.factionId));
-
-    window.dispatchEvent(new CustomEvent('loading-progress', {
-      detail: { progress: 0.1, label: 'Modellen laden...' },
-    }));
-
-    await Promise.all([
-      this.unitRenderer.preload(activeFactions, (_loaded, _total) => {
-        window.dispatchEvent(new CustomEvent('loading-progress', {
-          detail: { progress: 0.1 + (_loaded / _total) * 0.5, label: `Modellen laden... (${_loaded}/${_total})` },
-        }));
-      }),
-      this.buildingRenderer.preload(activeFactions),
-      this.propRenderer.preload(),
-      this.selectionRenderer.preload(),
-    ]);
+    const critical = criticalModelKeys(
+      this.map.units.map(u => ({ type: unitTypeName(u.unitType), factionId: u.factionId })),
+      this.map.buildings.map(b => ({ type: this.getBuildingRendererType(b.buildingType), factionId: b.factionId })),
+      aiFactions,
+    );
+    // The warm set starts alongside; only the critical set gates the HUD.
+    const loading = this.loadCriticalModels(critical);
+    this.warmModels(warmModelKeys(activeFactions, this.playerFactionId, critical));
+    await loading;
 
     // 3. Build the unit pathfinding grid
     window.dispatchEvent(new CustomEvent('loading-progress', {
@@ -445,6 +442,59 @@ export class Game {
   }
 
   /**
+   * Load the models the first frame needs (see modelPreloadPlan) plus props
+   * and the selection ring. Progress drives the loading-screen bar.
+   */
+  private async loadCriticalModels(critical: ModelKeySet): Promise<void> {
+    window.dispatchEvent(new CustomEvent('loading-progress', {
+      detail: { progress: 0.1, label: 'Modellen laden...' },
+    }));
+    const total = critical.units.length + critical.buildings.length;
+    let loaded = 0;
+    const tick = (): void => {
+      loaded++;
+      window.dispatchEvent(new CustomEvent('loading-progress', {
+        detail: { progress: 0.1 + (loaded / total) * 0.5, label: `Modellen laden... (${loaded}/${total})` },
+      }));
+    };
+    await Promise.all([
+      this.unitRenderer.preloadKeys(critical.units, tick),
+      this.buildingRenderer.preloadKeys(critical.buildings, tick),
+      this.propRenderer.preload(),
+      this.selectionRenderer.preload(),
+    ]);
+  }
+
+  /** Background download, one model at a time per renderer, so on-demand loads are not starved. */
+  private warmModels(warm: ModelKeySet): void {
+    void this.unitRenderer.prefetch(warm.units, 1);
+    void this.buildingRenderer.prefetch(warm.buildings, 1);
+  }
+
+  /** Throttle for prefetchQueuedUnitModels (seconds until the next scan). */
+  private queuedModelScanTimer = 0;
+
+  /**
+   * Start downloading the model of every unit type that sits in a production
+   * queue, so it is there when the unit pops out (train time hides it).
+   * ensureLoaded is memoised: an already-loaded key costs one Map lookup.
+   */
+  private prefetchQueuedUnitModels(dt: number): void {
+    this.queuedModelScanTimer -= dt;
+    if (this.queuedModelScanTimer > 0) return;
+    this.queuedModelScanTimer = 0.5;
+    const slots = [Production.unitType, Production.queue0, Production.queue1, Production.queue2, Production.queue3, Production.queue4];
+    for (const eid of query(world, [Production, IsBuilding])) {
+      const factionId = Faction.id[eid];
+      for (const slot of slots) {
+        const t = slot[eid];
+        if (t === NO_PRODUCTION) continue;
+        void this.unitRenderer.ensureLoaded(`${unitTypeName(t)}_${factionId}`);
+      }
+    }
+  }
+
+  /**
    * Unit pathfinding grid (rivers minus bridges + rock walls + building
    * footprints). Movement falls back to straight lines when this fails. Also
    * resets per-unit path state. Buildings that already exist (none today --
@@ -484,20 +534,26 @@ export class Game {
     // and any faction used by buildings/waves/scripted spawns) for performance
     const activeFactions = getMissionFactionIds(mission);
 
-    window.dispatchEvent(new CustomEvent('loading-progress', {
-      detail: { progress: 0.1, label: 'Modellen laden...' },
-    }));
-
-    await Promise.all([
-      this.unitRenderer.preload(activeFactions, (_loaded, _total) => {
-        window.dispatchEvent(new CustomEvent('loading-progress', {
-          detail: { progress: 0.1 + (_loaded / _total) * 0.5, label: `Modellen laden... (${_loaded}/${_total})` },
-        }));
-      }),
-      this.buildingRenderer.preload(activeFactions),
-      this.propRenderer.preload(),
-      this.selectionRenderer.preload(),
-    ]);
+    // Wait only for the models of what the mission places up front; scripted
+    // spawns (waves, reinforcements) are warmed in the background below.
+    const critical = criticalModelKeys(
+      mission.units.map(u => ({ type: unitTypeName(u.unitType), factionId: u.factionId })),
+      mission.buildings.map(b => ({ type: this.getBuildingRendererType(b.buildingType), factionId: b.factionId })),
+      mission.hasAIProduction ? mission.aiFactionIds : [],
+    );
+    const loading = this.loadCriticalModels(critical);
+    // Warm scripted spawns first (waves appear without a train time), then
+    // the usual first-minutes set of every mission faction.
+    const scripted: StartEntity[] = getAllMissionUnitSpawns(mission)
+      .map(u => ({ type: unitTypeName(u.unitType), factionId: u.factionId }));
+    const warm = warmModelKeys(activeFactions, mission.playerFactionId, critical);
+    const criticalUnits = new Set(critical.units);
+    warm.units = [...new Set([
+      ...scripted.map(e => `${e.type}_${e.factionId}`).filter(k => !criticalUnits.has(k)),
+      ...warm.units,
+    ])];
+    this.warmModels(warm);
+    await loading;
 
     window.dispatchEvent(new CustomEvent('loading-progress', {
       detail: { progress: 0.7, label: 'Navigatie berekenen...' },
@@ -3434,6 +3490,7 @@ export class Game {
     this.detectDamageFlash();
 
     // Sync ECS positions to Three.js meshes
+    this.prefetchQueuedUnitModels(dt);
     this.syncRenderPositions(dt);
 
     // Update building progress visuals

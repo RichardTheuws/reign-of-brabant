@@ -141,7 +141,30 @@ export class PropRenderer {
   // Loading
   // -----------------------------------------------------------------------
 
-  async preload(): Promise<void> {
+  /** Shared in-flight/finished preload so the instanced meshes exist once. */
+  private preloadPromise: Promise<void> | null = null;
+
+  /**
+   * Load tree/rock/gold-mine models and build the instanced meshes. Idempotent:
+   * Game calls this on every match start, and re-running it added 6 more
+   * (empty) InstancedMeshes plus their parsed geometry to the scene per match.
+   */
+  preload(): Promise<void> {
+    if (!this.preloadPromise) {
+      this.preloadPromise = this.loadModels().catch((err) => {
+        this.preloadPromise = null; // allow a retry after a failed load
+        throw err;
+      });
+    }
+    return this.preloadPromise;
+  }
+
+  /** Number of tree + rock InstancedMeshes (leak tests). */
+  get instancedMeshCount(): number {
+    return this.treeInstances.length + this.rockInstances.length;
+  }
+
+  private async loadModels(): Promise<void> {
     const [treeGltfs, rockGltfs, mineGltf] = await Promise.all([
       Promise.all(TREE_PATHS.map((p) => this.loader.loadAsync(p))),
       Promise.all(ROCK_PATHS.map((p) => this.loader.loadAsync(p))),
@@ -441,6 +464,7 @@ export class PropRenderer {
       this.disposeObject(this.treeResourceSource);
       this.treeResourceSource = null;
     }
+    this.preloadPromise = null; // a later preload() rebuilds from scratch
   }
 
   private disposeObject(obj: THREE.Object3D): void {

@@ -231,16 +231,14 @@ class AudioManager {
   /**
    * Effective volume for a voice line with the given base volume.
    *
-   * The settings menu has no voice slider, so voices follow the SFX slider
-   * (and the 'voice' category, which has no UI yet). Both are normalised to
-   * their defaults so voice loudness at default settings is unchanged.
+   * Voices follow the 'voice' category (the "Stemmen" slider), normalised to
+   * its default so voice loudness at default settings is unchanged. The SFX
+   * slider no longer affects voices.
    * Master volume is not multiplied in: setMasterVolume applies it globally
    * through Howler.volume().
    */
   getVoiceVolume(baseVolume: number): number {
-    const v = baseVolume
-      * (this.categoryVolumes.sfx / DEFAULT_CATEGORY_VOLUMES.sfx)
-      * (this.categoryVolumes.voice / DEFAULT_CATEGORY_VOLUMES.voice);
+    const v = baseVolume * (this.categoryVolumes.voice / DEFAULT_CATEGORY_VOLUMES.voice);
     return Math.max(0, Math.min(1, v));
   }
 
