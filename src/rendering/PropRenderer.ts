@@ -6,7 +6,7 @@
 
 import * as THREE from 'three';
 import { MeshToonMaterial } from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { createGLTFLoader } from './gltfLoader';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -106,7 +106,7 @@ function toToonMaterial(
 // ---------------------------------------------------------------------------
 
 export class PropRenderer {
-  private loader = new GLTFLoader();
+  private loader = createGLTFLoader();
   private group: THREE.Group;
 
   /** InstancedMeshes per tree variant (index 0-2). */

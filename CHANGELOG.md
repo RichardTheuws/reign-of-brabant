@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.66.0] - 2026-10-20 — Bundel 10: match staat er binnen 9 s, voor elke factie
+
+### Performance
+- **Klik tot HUD op Fast 4G**, A/B om en om tegen v0.65.1, per gekozen factie:
+
+  | Factie | Was | Nu |
+  |---|---|---|
+  | Belgen | 24,3 s | 8,5 s |
+  | Limburgers | 19,9 s | 8,2 s |
+  | Brabanders | 15,2 s | 8,1 s |
+  | Randstad | 14,4 s | 7,7 s |
+
+  De eerste 120 s gaan van 42-50 MB naar 23-25 MB. In alle runs 0 errors en 0 4xx.
+- **Alle 87 GLB's die een match normaal laadt zijn gecomprimeerd met meshopt**, via `scripts/compress-glb.mjs`. De geometrie en animaties zijn gekwantiseerd met `EXT_meshopt_compression`, en de loaders krijgen de decoder via `createGLTFLoader()` (`src/rendering/gltfLoader.ts`). De engine-chunk wordt daardoor 30 kB groter. Totaal van 118,4 naar 49,6 MB.
+- **Uitschieters in geometrie vereenvoudigd** van 63.000-98.000 naar 28.000-47.000 vertices:
+  - de TownHall en Barracks van de Belgen en de Limburgers;
+  - de Randstad-infantry.
+
+  De Randstad advanced is niet vereenvoudigd: zijn vlakke muren kregen deuken.
+- **Normal maps en metallic-roughness-maps van de v02-gebouwen naar 512 px.** De baseColor-textures blijven 1024 px.
+- **Beeldkwaliteit:** gemeten met PSNR op spelafstand, origineel tegen nieuw, voor 11 modellen. De vereenvoudigde modellen scoren 37,5-43,8 dB. Modellen die alleen gecomprimeerd zijn halen 47-57 dB, wat in de praktijk niet van het origineel te onderscheiden is.
+
+### Fixed
+- **`/updates/`**: model-viewer kan meshopt-modellen alleen lezen als er een decoder ingesteld is. De decoder komt nu van de eigen site (`/assets/vendor/meshopt_decoder-1.2.0.js`).
+
+### Tests
+- `glb-payload-budget`: meshopt is nu verplicht in plaats van verboden, en de grens per bestand gaat van 6 naar 1,5 MB.
+- Dezelfde test dekt nu ook de v03-units en de props.
+- Nieuwe checks:
+  - elke renderer maakt zijn loader via `createGLTFLoader()`;
+  - `/updates/` stelt de decoder in vóórdat model-viewer laadt.
+- De GLTFLoader-mocks hebben `setMeshoptDecoder` gekregen.
+- Dev-dependencies voor het script: `@gltf-transform/*` 4.5.0, `meshoptimizer` 1.2.0 en `sharp` 0.35.4.
+
 ## [0.65.1] - 2026-10-20 — Bundel 9: plaatsings-ghost, opnieuw proberen na mislukte download, portraits op weergavemaat
 
 ### Fixed

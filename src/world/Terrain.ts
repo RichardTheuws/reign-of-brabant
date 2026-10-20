@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { createNoise2D } from 'simplex-noise';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { createGLTFLoader } from '../rendering/gltfLoader';
 import { getGameSettings, onGameSettingsChange, updateGameSettings } from '../ui/gameSettings';
 import { isTypingTarget } from '../ui/inputRouting';
 import type { BiomeType, RiverSpawn, BridgeSpawn, RockWallSpawn, RoadSpawn, TunnelSpawn, PathPoint } from '../types/index';
@@ -885,7 +885,7 @@ export class Terrain {
    * These get added to featureMeshes array for the Game to add to the scene.
    */
   private buildFeatureVisuals(): void {
-    const loader = new GLTFLoader();
+    const loader = createGLTFLoader();
 
     // --- Bridge GLB models ---
     for (const bridge of this.features.bridges) {

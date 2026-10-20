@@ -6,7 +6,8 @@
  */
 
 import * as THREE from 'three';
-import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import { createGLTFLoader } from './gltfLoader';
 import { clone as skeletonClone } from 'three/addons/utils/SkeletonUtils.js';
 import { ModelLoadFailures } from './modelPreloadPlan';
 
@@ -416,7 +417,7 @@ export class UnitRenderer {
   /** Entity id -> which bucket key it belongs to. */
   private entityBucketKey = new Map<number, ModelCacheKey>();
   /** Shared loader instance. */
-  private loader = new GLTFLoader();
+  private loader = createGLTFLoader();
   /** One download per GLB URL for the renderer's lifetime. */
   private urlLoads = new Map<string, Promise<GLTF>>();
   /** One setup job per key (template / bucket); shared by all callers. */

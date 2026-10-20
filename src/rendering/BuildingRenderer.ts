@@ -6,7 +6,8 @@
 
 import * as THREE from 'three';
 import { MeshToonMaterial } from 'three';
-import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import { createGLTFLoader } from './gltfLoader';
 import { ModelLoadFailures } from './modelPreloadPlan';
 
 // ---------------------------------------------------------------------------
@@ -173,7 +174,7 @@ export class BuildingRenderer {
   /** The active placement ghost, if any. Null when no ghost is shown. */
   private ghost: THREE.Object3D | null = null;
   private ghostValid = true;
-  private loader = new GLTFLoader();
+  private loader = createGLTFLoader();
   private group: THREE.Group;
   /** One download + setup job per key, shared by every caller. */
   private keyLoads = new Map<ModelCacheKey, Promise<void>>();

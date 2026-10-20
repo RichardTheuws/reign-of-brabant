@@ -5,7 +5,8 @@
  */
 
 import * as THREE from 'three';
-import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import { createGLTFLoader } from './gltfLoader';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -59,7 +60,7 @@ interface HealthBarEntry {
 // ---------------------------------------------------------------------------
 
 export class SelectionRenderer {
-  private loader = new GLTFLoader();
+  private loader = createGLTFLoader();
   private selectionGroup: THREE.Group;
   private healthBarGroup: THREE.Group;
 

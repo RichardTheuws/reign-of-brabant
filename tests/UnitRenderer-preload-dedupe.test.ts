@@ -20,6 +20,7 @@ let failAll = false;
 
 vi.mock('three/addons/loaders/GLTFLoader.js', () => {
   class GLTFLoader {
+    setMeshoptDecoder(): this { return this; }
     loadAsync(url: string): Promise<unknown> {
       requested.push(url);
       if (failAll || failUrls.has(url)) return Promise.reject(new Error(`404 ${url}`));

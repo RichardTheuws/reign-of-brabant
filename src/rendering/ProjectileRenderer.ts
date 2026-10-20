@@ -8,7 +8,8 @@
  */
 
 import * as THREE from 'three';
-import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import { createGLTFLoader } from './gltfLoader';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -121,7 +122,7 @@ interface TrailSpark {
 // ---------------------------------------------------------------------------
 
 export class ProjectileRenderer {
-  private loader = new GLTFLoader();
+  private loader = createGLTFLoader();
   private group: THREE.Group;
 
   private arrowSource: THREE.Object3D | null = null;
