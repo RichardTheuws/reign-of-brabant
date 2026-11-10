@@ -1362,7 +1362,7 @@ const MISSION_9_RAAD: MissionDefinition = {
   title: 'De Brabantse Raad',
   briefingTitle: 'Missie 9: De Brabantse Raad',
   briefingText:
-    'Dit is het. De CEO van de Randstad Ontwikkelingsmaatschappij heeft zijn laatste troef ' +
+    'Dit is het. De CEO van Polderdam Holding heeft zijn laatste troef ' +
     'gespeeld. Twee legers marcheren naar het hart van Brabant — een vanuit het noordoosten, ' +
     'een vanuit het noordwesten. Pincerbeweging. Klassiek management-tactiek.\n\n' +
     'Maar wij hebben iets wat zij niet hebben: de Prins van Brabant EN de Boer van Brabant. ' +
@@ -2486,7 +2486,7 @@ const MISSION_12_GOUDEN_WORSTENBROODJE: MissionDefinition = {
   ],
 
   objectives: [
-    { id: 'destroy-corporate-tower', type: 'destroy-building', description: 'Vernietig het Corporate Tower (Randstad HQ)', targetValue: 1, isBonus: false },
+    { id: 'destroy-corporate-tower', type: 'destroy-building', description: 'Vernietig het Corporate Tower (Polderdam HQ)', targetValue: 1, isBonus: false },
     { id: 'destroy-ring-defenses', type: 'destroy-building', description: 'Doorbreek de verdedigingsringen (vernietig 5+ vijandelijke gebouwen)', targetValue: 5, isBonus: false },
     { id: 'no-th-loss', type: 'no-townhall-loss', description: 'Verlies je eigen basis niet', targetValue: 0, isBonus: false },
     { id: 'total-victory', type: 'destroy-building', description: 'Totale Overwinning: vernietig ALLE vijandelijke gebouwen', targetValue: 8, isBonus: true },
@@ -4354,7 +4354,7 @@ const RANDSTAD_MISSION_1_EERSTE_VERGADERING: MissionDefinition = {
     {
       id: 'r1-intro',
       condition: { type: 'time', seconds: 3 },
-      actions: [{ type: 'message', text: 'Welkom bij de Randstad Corporation. Stuur je Stagiairs naar de PowerPoint-bronnen. Ze worden niet betaald, maar ze doen het voor de "ervaring".' }],
+      actions: [{ type: 'message', text: 'Welkom bij Polderdam Holding. Stuur je Stagiairs naar de PowerPoint-bronnen. Ze worden niet betaald, maar ze doen het voor de "ervaring".' }],
       once: true,
     },
     {
@@ -4499,7 +4499,7 @@ const RANDSTAD_MISSION_2_CONSULTANCY_RAPPORT: MissionDefinition = {
       id: 'r2-victory',
       condition: { type: 'building-destroyed', factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall },
       actions: [
-        { type: 'message', text: 'Acquisitie voltooid! De Brabantse Boerderij is nu eigendom van Randstad Corp. De worstenbroodjes worden vervangen door quinoa bowls.' },
+        { type: 'message', text: 'Acquisitie voltooid! De Brabantse Boerderij is nu eigendom van Polderdam Holding. De worstenbroodjes worden vervangen door quinoa bowls.' },
         { type: 'victory' },
       ],
       once: true,
@@ -4646,7 +4646,7 @@ const RANDSTAD_MISSION_3_VIJANDIGE_OVERNAME: MissionDefinition = {
     {
       id: 'r3-victory-msg',
       condition: { type: 'building-destroyed', factionId: FactionId.Limburgers, buildingType: BuildingTypeId.TownHall },
-      actions: [{ type: 'message', text: 'Vijandige overname geslaagd! De Limburgse mijnbouw-operaties zijn nu eigendom van Randstad Corporation. De Board applaudisseert.' }],
+      actions: [{ type: 'message', text: 'Vijandige overname geslaagd! De Limburgse mijnbouw-operaties zijn nu eigendom van Polderdam Holding. De Board applaudisseert.' }],
       once: true,
     },
   ],
@@ -7147,12 +7147,12 @@ const RANDSTAD_MISSION_8_IPO_DAY: MissionDefinition = {
   aiFactionIds: [FactionId.Brabanders, FactionId.Limburgers, FactionId.Belgen],
   briefingTitle: 'Missie 8: IPO Day',
   briefingText:
-    'Het is IPO Day. Randstad Corporation gaat naar de beurs. Maar de voorwaarde van de ' +
+    'Het is IPO Day. Polderdam Holding gaat naar de beurs. Maar de voorwaarde van de ' +
     'underwriters is duidelijk: "Totale marktdominantie. Geen concurrentie. Nul."\n\n' +
     'Brabanders in het zuidwesten, Limburgers in het noordwesten, Belgen in het noordoosten — ' +
     'drie facties, drie hoofdkwartieren, drie vijanden die allemaal kapot moeten.\n\n' +
     'De CEO heeft haar beste pak aan. De Board zit in de front row. De hele wereld kijkt mee.\n\n' +
-    'De CEO: "Vandaag is de dag dat Randstad Corporation het enige bedrijf wordt dat er toe doet. ' +
+    'De CEO: "Vandaag is de dag dat Polderdam Holding het enige bedrijf wordt dat er toe doet. ' +
     'De IPO gaat door zodra de laatste concurrent is uitgeschakeld. Maak het zo."',
 
   mapSize: 128,
@@ -7373,7 +7373,7 @@ const RANDSTAD_MISSION_8_IPO_DAY: MissionDefinition = {
     {
       id: 'r8-victory-msg',
       condition: { type: 'building-destroyed', factionId: FactionId.Belgen, buildingType: BuildingTypeId.TownHall },
-      actions: [{ type: 'message', text: 'IPO GESLAAGD! Alle concurrenten zijn uitgeschakeld! De CEO luidt de beursbel. Randstad Corporation is nu de enige macht die ertoe doet.' }],
+      actions: [{ type: 'message', text: 'IPO GESLAAGD! Alle concurrenten zijn uitgeschakeld! De CEO luidt de beursbel. Polderdam Holding is nu de enige macht die ertoe doet.' }],
       once: true,
     },
   ],

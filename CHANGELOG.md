@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.66.3] - 2026-11-10 — De Randstad is een regio, het bedrijf heet Polderdam Holding
+
+### Changed
+- **Het fictieve bedrijf achter de Randstad-factie heet nu Polderdam Holding.** Weg zijn "Randstad Corporatie", "Randstad Corporation", "Randstad Corp.", "Randstad HQ" en "Randstad Ontwikkelingsmaatschappij". De factie zelf blijft "Randstad", de regio.
+  - Landing: de factiekaart heet "De Randstad" en de omschrijving noemt Polderdam Holding als werkgever.
+  - Campagne (`MissionDefinitions.ts`): "Corporate Tower (Polderdam HQ)", "Welkom bij Polderdam Holding", de overnames en de IPO ("Polderdam Holding gaat naar de beurs").
+  - `/het-verhaal/` (CEO-profiel) en `/updates/` (alt-tekst "CEO van Polderdam Holding", "Randstad kantoorblauw").
+- Interne ids, enums en code-commentaar zijn niet veranderd.
+
 ## [0.66.2] - 2026-11-10 — Review-fixes op de merken-ronde
 
 ### Changed
