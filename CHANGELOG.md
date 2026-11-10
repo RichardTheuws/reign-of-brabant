@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.66.6] - 2026-11-10 — Deploy stuurt alleen gewijzigde bestanden
+
+### Fixed
+- `scripts/deploy.sh` vergelijkt op inhoud (`rsync --checksum`). Een nieuwe build geeft elk bestand een nieuwe mtime, waardoor bij de eerste echte deploy alle 376 MB opnieuw werd geschreven en de vorige release geen schijfruimte deelde.
+
 ## [0.66.5] - 2026-11-10 — Deployscript naar Hetzner
 
 ### Changed

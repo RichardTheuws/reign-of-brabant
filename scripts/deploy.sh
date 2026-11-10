@@ -104,7 +104,9 @@ purge() {
 # 1. Staging copy of the live folder (hardlinks), then rsync the new build into it. The live folder is not touched.
 hz_ssh sudo rm -rf "$NEXT"
 hz_ssh sudo cp -al "$LIVE" "$NEXT"
-HZ_DIR="$NEXT" hz_sync "$STAGE"
+# --checksum: a fresh build gives every file a new mtime; compare content instead, so unchanged models and audio
+# keep their hardlink (and are not sent again).
+HZ_DIR="$NEXT" hz_sync "$STAGE" --checksum
 
 # 2. Swap: live → prev, next → live.
 hz_ssh sudo rm -rf "$PREV"
