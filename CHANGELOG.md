@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.66.5] - 2026-11-10 — Deployscript naar Hetzner
+
+### Changed
+- **`scripts/deploy.sh` deployt naar Hetzner** (`theuws-prod:/srv/apps/static/reign-of-brabant`), waar de site sinds 04-11 draait. Het oude `deploy-rob.sh` in de games-map bouwde op de M4 en wees daar ook naar; het is nu een doorverwijzing naar dit script.
+- Werkwijze: een tijdelijke worktree van de gepushte commit, `npm ci --ignore-scripts`, de regressiepoort (`test:all`), de build, dan rsync (gedeelde `scripts/deploy-hetzner-lib.sh`) naar een staging-kopie naast de live map (hardlinks, dus vrijwel gratis) en één wissel van de twee mappen. Daarna een Cloudflare-purge en een controle dat `/VERSION` en `/REVISION` exact deze versie tonen. Faalt die controle, dan zet het script de vorige release automatisch terug (`reign-of-brabant-prev`). Niet-gecommit werk gaat nooit mee.
+- Zero downtime blijft: de live map wordt tijdens de overdracht niet aangeraakt. `--skip-purge` werkt nog, voor de oude gewoonte.
+- Het Cloudflare-token komt uit het gedeelde credentials-bestand en staat niet meer in een script.
+- Nieuw: `/VERSION` en `/REVISION` in de site, voor de livecontrole.
+
 ## [0.66.4] - 2026-11-10 — Polderdam Holding overal, CEO consequent een hij
 
 ### Changed
