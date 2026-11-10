@@ -269,7 +269,7 @@ Henk vecht voor de grond. Niet als concept, niet als metafoor — letterlijk de 
 
 ---
 
-**Naam & Titel**: Victor van der Berg, CEO van de Randstad Ontwikkelingsmaatschappij, Voorzitter van de Raad van Commissarissen, Eigenaar van 47 Vinex-wijken
+**Naam & Titel**: Victor van der Berg, CEO van Polderdam Holding, Voorzitter van de Raad van Commissarissen, Eigenaar van 47 Vinex-wijken
 
 **Factie**: Randstad — "De Bureaucraten"
 **Rol**: Commander / Buffer — strategische aanvoerder die zijn leger versterkt door economische dominantie
@@ -351,7 +351,7 @@ Victor wil orde. Hij wil een wereld waarin alles efficient is, alles meetbaar, a
 | Hero | Dialoog |
 |------|---------|
 | De Prins | *"Uw contract is beeindigd, Prins. De exit-clausule was... niet in uw voordeel."* |
-| De Boer | *"Eindelijk. Die grond is nu van de Randstad Ontwikkelingsmaatschappij. Parkeergelegenheid: voldoende."* |
+| De Boer | *"Eindelijk. Die grond is nu van Polderdam Holding. Parkeergelegenheid: voldoende."* |
 
 **Bij het veroveren van een vijandelijk gebouw:**
 - *"Vijandige overname afgerond. Voeg het toe aan de portfolio."*
@@ -477,7 +477,7 @@ Macht. Niet omdat Herman weet wat hij ermee moet doen, maar omdat hij zonder mac
 - *(fluisterend)* *"De CEO... de CEO gaat me niet redden, he?"*
 
 **Victory celebration:**
-- *"Een overwinning voor de democratie! En met democratie bedoel ik uiteraard de Randstad Ontwikkelingsmaatschappij."*
+- *"Een overwinning voor de democratie! En met democratie bedoel ik uiteraard Polderdam Holding."*
 - *"Ik wil iedereen bedanken. Vooral mezelf. Maar ook iedereen."*
 
 **Idle banter (4 lines):**

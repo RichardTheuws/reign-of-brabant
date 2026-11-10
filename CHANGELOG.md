@@ -1,13 +1,25 @@
 # Changelog
 
+## [0.66.4] - 2026-11-10 — Polderdam Holding overal, CEO consequent een hij
+
+### Changed
+- **Ook de rest van de campagne noemt het bedrijf Polderdam Holding**: de hoofdkantoren in alle missiedoelen en meldingen ("Vernietig het hoofdkantoor van Polderdam Holding", ook in Eindhoven, Venlo, oost en noord), "De CEO van Polderdam Holding is woedend" en de managers bij de hostile takeover en de culturele due diligence. De Randstad als factie, regio en troepen blijft.
+- **CEO consequent mannelijk** (Victor van der Berg): missie 7 "Hij stuurt zijn volledige invasiemacht", missie 8 "De CEO heeft zijn beste pak aan".
+- **`/updates/`**: "Randstad CEO" wordt "CEO van Polderdam Holding" (2×).
+- **Landing**: alt-tekst van de factiekaart is nu "De Randstad", net als bij de andere kaarten; "memo's" met apostrof.
+- **Canonieke docs** omgezet naar Polderdam Holding: `PRD.md`, `docs/HERO-CHARACTERS.md`, `docs/SUB-PRD-CAMPAIGN.md`, `docs/design-bible.html` en `cinematic/CINEMATIC-SCRIPT-ONTSTAAN.md` ("Randstad Development Corporation").
+
+### Tests
+- `randstad-company-name`: scant `src/**/*.ts`, `index.html`, `play/index.html` en `public/**/*.html` op Randstad Corporat*, Corp, HQ, Ontwikkelingsmaatschappij, Development, CEO, N.V. en B.V. Moet 0 zijn.
+
 ## [0.66.3] - 2026-11-10 — De Randstad is een regio, het bedrijf heet Polderdam Holding
 
 ### Changed
-- **Het fictieve bedrijf achter de Randstad-factie heet nu Polderdam Holding.** Weg zijn "Randstad Corporatie", "Randstad Corporation", "Randstad Corp.", "Randstad HQ" en "Randstad Ontwikkelingsmaatschappij". De factie zelf blijft "Randstad", de regio.
+- **Het fictieve bedrijf achter de Randstad-factie heet nu Polderdam Holding.** "Randstad Corporatie", "Randstad Corporation", "Randstad Corp.", "Randstad HQ" en "Randstad Ontwikkelingsmaatschappij" zijn op de genoemde plekken vervangen. Dat was nog niet overal: de rest volgde in 0.66.4. De factie zelf blijft "Randstad", de regio.
   - Landing: de factiekaart heet "De Randstad" en de omschrijving noemt Polderdam Holding als werkgever.
   - Campagne (`MissionDefinitions.ts`): "Corporate Tower (Polderdam HQ)", "Welkom bij Polderdam Holding", de overnames en de IPO ("Polderdam Holding gaat naar de beurs").
   - `/het-verhaal/` (CEO-profiel) en `/updates/` (alt-tekst "CEO van Polderdam Holding", "Randstad kantoorblauw").
-- Interne ids, enums en code-commentaar zijn niet veranderd.
+- Interne ids en enums zijn niet veranderd.
 
 ## [0.66.2] - 2026-11-10 — Review-fixes op de merken-ronde
 

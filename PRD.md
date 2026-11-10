@@ -17,7 +17,7 @@ Een 3D browser-based RTS game waarin vier Nederlandse/Belgische facties strijden
 
 ### 1.2 Setting
 
-Het jaar 1473, alternatief Brabant. Het Hertogdom Brabant staat op een kruispunt. Het legendarische **Gouden Worstenbroodje** — gesmeed in de ovens van de Sint-Janskathedraal — is gestolen. Op de plaats delict: een visitekaartje van de *Randstad Ontwikkelingsmaatschappij*. De oorlog begint.
+Het jaar 1473, alternatief Brabant. Het Hertogdom Brabant staat op een kruispunt. Het legendarische **Gouden Worstenbroodje** — gesmeed in de ovens van de Sint-Janskathedraal — is gestolen. Op de plaats delict: een visitekaartje van *Polderdam Holding*. De oorlog begint.
 
 ### 1.3 Unique Selling Points
 
@@ -926,7 +926,7 @@ Maps worden opgeslagen als JSON:
 | 9 | De Mijn van Waarheid | Alliance | Limburgers als allies | Limburg |
 | 10 | Brainport Sabotage | Infiltratie | Eindeloze Vergadermachine ontdekt | Eindhoven |
 | 11 | De Slag om Brabant | Episch gevecht | Alle facties, alle units | Brabant breed |
-| 12 | Het Gouden Worstenbroodje | Finale | Boss: CEO + Politicus | Randstad HQ |
+| 12 | Het Gouden Worstenbroodje | Finale | Boss: CEO + Politicus | Polderdam HQ |
 
 **Post-credits**: Limburger zegt: *"En nu... willen wij OOK een Gouden Worstenbroodje."* Sequel tease.
 

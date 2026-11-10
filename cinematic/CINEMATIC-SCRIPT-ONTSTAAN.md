@@ -56,7 +56,7 @@ Richard Theuws zit 's nachts achter zijn laptop. Het scherm werpt een oranje glo
 
 **Beeld**: De Sint-Janskathedraal van binnen. Kaarsen verlichten een altaar. Daarop: het **Gouden Worstenbroodje** — stralend, mythisch, een zacht gouden aura eromheen. 
 
-Een schaduw valt over het altaar. Een hand in een zakelijk blauw pak (Randstad) grijpt het Worstenbroodje. Quick cut naar: het visitekaartje dat achterblijft — "Randstad Development Corporation". De schaduwen trekken zich terug, het altaar is leeg, de kaarsen doven.
+Een schaduw valt over het altaar. Een hand in een zakelijk blauw pak (Randstad) grijpt het Worstenbroodje. Quick cut naar: het visitekaartje dat achterblijft — "Polderdam Holding". De schaduwen trekken zich terug, het altaar is leeg, de kaarsen doven.
 
 **Camera**: 
 - (0:10-0:12) Slow tilt up over het altaar naar het Worstenbroodje — eerbied, schoonheid

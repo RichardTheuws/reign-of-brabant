@@ -28,7 +28,7 @@ import type { SystemFn } from './SystemPipeline';
 
 const UPDATE_INTERVAL = 1.0;
 
-/** Randstad Corporate Synergy — per Boardroom: +1 efficiency stack-cap. */
+/** Randstad: Corporate Synergy — per Boardroom: +1 efficiency stack-cap. */
 export const CORPORATE_SYNERGY_PER_BOARDROOM = 1;
 export const CORPORATE_SYNERGY_CAP = 3;
 

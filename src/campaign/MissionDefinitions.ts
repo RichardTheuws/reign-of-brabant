@@ -1263,7 +1263,7 @@ const MISSION_8_BELEG: MissionDefinition = {
   ],
 
   objectives: [
-    { id: 'destroy-eindhoven-th', type: 'destroy-building', description: 'Vernietig het Randstad-hoofdkantoor in Eindhoven', targetValue: 1, isBonus: false },
+    { id: 'destroy-eindhoven-th', type: 'destroy-building', description: 'Vernietig het hoofdkantoor van Polderdam Holding in Eindhoven', targetValue: 1, isBonus: false },
     { id: 'no-th-loss', type: 'no-townhall-loss', description: 'Houd de Prins in leven (verlies je Boerderij niet)', targetValue: 0, isBonus: true },
     { id: 'train-15-units', type: 'train-units', description: 'Train 15 extra eenheden', targetValue: 15, isBonus: true },
   ],
@@ -1444,7 +1444,7 @@ const MISSION_9_RAAD: MissionDefinition = {
   ],
 
   objectives: [
-    { id: 'destroy-both-hq', type: 'destroy-building', description: 'Vernietig beide Randstad-hoofdkantoren', targetValue: 2, isBonus: false },
+    { id: 'destroy-both-hq', type: 'destroy-building', description: 'Vernietig beide hoofdkantoren van Polderdam Holding', targetValue: 2, isBonus: false },
     { id: 'no-th-loss', type: 'no-townhall-loss', description: 'Verlies je Boerderij niet', targetValue: 0, isBonus: true },
     { id: 'train-25-units', type: 'train-units', description: 'Train 25 eenheden totaal', targetValue: 25, isBonus: true },
   ],
@@ -1459,7 +1459,7 @@ const MISSION_9_RAAD: MissionDefinition = {
     {
       id: 'tip-strategy',
       condition: { type: 'time', seconds: 15 },
-      actions: [{ type: 'message', text: 'Resources zijn schaars! Verdeel je leger slim. Vernietig beide Randstad-hoofdkantoren om te winnen.' }],
+      actions: [{ type: 'message', text: 'Resources zijn schaars! Verdeel je leger slim. Vernietig beide hoofdkantoren van Polderdam Holding om te winnen.' }],
       once: true,
     },
     {
@@ -2991,7 +2991,7 @@ const MISSION_B2_CHOCOLADE_VERDRAG: MissionDefinition = {
   objectives: [
     { id: 'b2-build-chocolaterie', type: 'build-building', description: 'Bouw een Chocolaterie (Tertiaire Resource Gebouw)', targetValue: 1, isBonus: false, targetBuildingType: BuildingTypeId.TertiaryResourceBuilding },
     { id: 'b2-gather-800', type: 'gather-gold', description: 'Verzamel 800 Frieten voor het Chocolade Verdrag', targetValue: 800, isBonus: false },
-    { id: 'b2-destroy-enemy-th', type: 'destroy-building', description: 'Vernietig het Randstad Hoofdkantoor (als het verdrag mislukt)', targetValue: 1, isBonus: false },
+    { id: 'b2-destroy-enemy-th', type: 'destroy-building', description: 'Vernietig het hoofdkantoor van Polderdam Holding (als het verdrag mislukt)', targetValue: 1, isBonus: false },
     { id: 'b2-train-10', type: 'train-units', description: 'Train 10 militaire eenheden', targetValue: 10, isBonus: true },
     { id: 'b2-no-th-loss', type: 'no-townhall-loss', description: 'Verlies het Belgisch Raadhuis niet', targetValue: 0, isBonus: true },
   ],
@@ -3075,7 +3075,7 @@ const MISSION_B2_CHOCOLADE_VERDRAG: MissionDefinition = {
       actions: [
         {
           type: 'message',
-          text: 'Het Randstad Hoofdkantoor is vernietigd! De Frietkoning: "Het Chocolade Verdrag is getekend — in ONZE voorwaarden. Alle pralines blijven in Belgie. Punt."',
+          text: 'Het hoofdkantoor van Polderdam Holding is vernietigd! De Frietkoning: "Het Chocolade Verdrag is getekend — in ONZE voorwaarden. Alle pralines blijven in Belgie. Punt."',
         },
         { type: 'victory' },
       ],
@@ -3879,7 +3879,7 @@ const LIMBURGERS_MISSION_4_VERRASSINGSAANVAL: MissionDefinition = {
     'de handelsroutes. Een frontale aanval is zelfmoord — ze hebben te veel troepen.\n\n' +
     'Maar ze vergeten een ding: Limburgers komen niet over de weg. Wij komen van onder de grond.\n\n' +
     'Bouw een tunnelnetwerk tot achter hun linies, sla toe waar ze het niet verwachten, en ' +
-    'vernietig het Randstad-Hoofdkantoor voordat ze doorhebben wat er gebeurt.\n\n' +
+    'vernietig het hoofdkantoor van Polderdam Holding voordat ze doorhebben wat er gebeurt.\n\n' +
     'De Mijnbaas: "Laat ze voelen hoe het is als de grond onder hun voeten vandaan wordt gehaald."',
 
   mapSize: 128,
@@ -3938,7 +3938,7 @@ const LIMBURGERS_MISSION_4_VERRASSINGSAANVAL: MissionDefinition = {
   ],
 
   objectives: [
-    { id: 'destroy-enemy-th', type: 'destroy-building', description: 'Vernietig het Randstad-Hoofdkantoor', targetValue: 1, isBonus: false },
+    { id: 'destroy-enemy-th', type: 'destroy-building', description: 'Vernietig het hoofdkantoor van Polderdam Holding', targetValue: 1, isBonus: false },
     { id: 'train-10-units', type: 'train-units', description: 'Train 10 militaire eenheden', targetValue: 10, isBonus: false },
     { id: 'no-th-loss', type: 'no-townhall-loss', description: 'Verlies je Grottentempel niet', targetValue: 0, isBonus: true },
     { id: 'destroy-all-barracks', type: 'destroy-building', description: 'Vernietig alle vijandelijke Kazernes', targetValue: 2, isBonus: true },
@@ -3990,7 +3990,7 @@ const LIMBURGERS_MISSION_4_VERRASSINGSAANVAL: MissionDefinition = {
       id: 'victory-destroy',
       condition: { type: 'building-destroyed', factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall },
       actions: [
-        { type: 'message', text: 'Het Randstad-Hoofdkantoor ligt in puin! De Mijnbaas: "Venlo is van ons. Ze hadden moeten weten: de Limburger komt altijd van onderen."' },
+        { type: 'message', text: 'Het hoofdkantoor van Polderdam Holding ligt in puin! De Mijnbaas: "Venlo is van ons. Ze hadden moeten weten: de Limburger komt altijd van onderen."' },
         { type: 'victory' },
       ],
       once: true,
@@ -5276,8 +5276,8 @@ const LIMBURGERS_MISSION_7_GROTE_SJTOELGANG: MissionDefinition = {
   aiFactionIds: [FactionId.Randstad],
   briefingTitle: 'Missie 7: De Grote Sjtoelgang',
   briefingText:
-    'De Randstad CEO is woedend. "Die mijnwormen hebben onze commandoposten vernietigd!" ' +
-    'Ze stuurt haar volledige invasiemacht naar het Limburgse mijncomplex.\n\n' +
+    'De CEO van Polderdam Holding is woedend. "Die mijnwormen hebben onze commandoposten vernietigd!" ' +
+    'Hij stuurt zijn volledige invasiemacht naar het Limburgse mijncomplex.\n\n' +
     'Dit is het moment waar we voor hebben gegraven. Het mijncomplex is het hart van ' +
     'Limburg — als dat valt, valt alles. Alle gebouwtypen zijn beschikbaar. Bouw torens, ' +
     'train Mergelridders, versterk de tunnels.\n\n' +
@@ -5686,7 +5686,7 @@ const LIMBURGERS_MISSION_8_KONINGIN_VAN_DE_MIJN: MissionDefinition = {
 
   objectives: [
     { id: 'l8-destroy-brab-th', type: 'destroy-building', description: 'Vernietig de Brabanders Boerderij (west)', targetValue: 1, isBonus: false, targetFactionId: FactionId.Brabanders, targetBuildingType: BuildingTypeId.TownHall },
-    { id: 'l8-destroy-rand-th', type: 'destroy-building', description: 'Vernietig het Randstad Hoofdkantoor (oost)', targetValue: 1, isBonus: false, targetFactionId: FactionId.Randstad, targetBuildingType: BuildingTypeId.TownHall },
+    { id: 'l8-destroy-rand-th', type: 'destroy-building', description: 'Vernietig het hoofdkantoor van Polderdam Holding (oost)', targetValue: 1, isBonus: false, targetFactionId: FactionId.Randstad, targetBuildingType: BuildingTypeId.TownHall },
     { id: 'l8-no-th-loss', type: 'no-townhall-loss', description: 'Verlies je Grottentempel niet', targetValue: 0, isBonus: true },
     { id: 'l8-have-35-units', type: 'have-units-at-end', description: 'Heb 35+ eenheden aan het einde (mijnimperium)', targetValue: 35, isBonus: true },
   ],
@@ -5726,7 +5726,7 @@ const LIMBURGERS_MISSION_8_KONINGIN_VAN_DE_MIJN: MissionDefinition = {
       id: 'l8-rand-raid',
       condition: { type: 'time', seconds: 240 },
       actions: [
-        { type: 'message', text: 'Randstad-Managers stormen van het oosten! Ze willen een "hostile takeover" van de mijn!' },
+        { type: 'message', text: 'Managers van Polderdam Holding stormen van het oosten! Ze willen een "hostile takeover" van de mijn!' },
         {
           type: 'spawn-units',
           units: [
@@ -6715,7 +6715,7 @@ const MISSION_B8_HET_LAATSTE_BIER: MissionDefinition = {
   ],
 
   objectives: [
-    { id: 'b8-destroy-rand-th', type: 'destroy-building', description: 'Vernietig het Randstad Hoofdkantoor (noord)', targetValue: 1, isBonus: false, targetFactionId: FactionId.Randstad, targetBuildingType: BuildingTypeId.TownHall },
+    { id: 'b8-destroy-rand-th', type: 'destroy-building', description: 'Vernietig het hoofdkantoor van Polderdam Holding (noord)', targetValue: 1, isBonus: false, targetFactionId: FactionId.Randstad, targetBuildingType: BuildingTypeId.TownHall },
     { id: 'b8-destroy-brab-th', type: 'destroy-building', description: 'Vernietig de Brabanders Boerderij (oost)', targetValue: 1, isBonus: false, targetFactionId: FactionId.Brabanders, targetBuildingType: BuildingTypeId.TownHall },
     { id: 'b8-no-th-loss', type: 'no-townhall-loss', description: 'Verlies het Belgisch Raadhuis niet', targetValue: 0, isBonus: true },
     { id: 'b8-have-35-units', type: 'have-units-at-end', description: 'Heb 35+ eenheden aan het einde (Belgisch imperium)', targetValue: 35, isBonus: true },
@@ -6738,7 +6738,7 @@ const MISSION_B8_HET_LAATSTE_BIER: MissionDefinition = {
       id: 'b8-rand-raid',
       condition: { type: 'time', seconds: 180 },
       actions: [
-        { type: 'message', text: 'Randstad-managers naderen vanuit het noorden! Ze willen een "culturele due diligence"!' },
+        { type: 'message', text: 'Managers van Polderdam Holding naderen vanuit het noorden! Ze willen een "culturele due diligence"!' },
         {
           type: 'spawn-units',
           units: [
@@ -7151,7 +7151,7 @@ const RANDSTAD_MISSION_8_IPO_DAY: MissionDefinition = {
     'underwriters is duidelijk: "Totale marktdominantie. Geen concurrentie. Nul."\n\n' +
     'Brabanders in het zuidwesten, Limburgers in het noordwesten, Belgen in het noordoosten — ' +
     'drie facties, drie hoofdkwartieren, drie vijanden die allemaal kapot moeten.\n\n' +
-    'De CEO heeft haar beste pak aan. De Board zit in de front row. De hele wereld kijkt mee.\n\n' +
+    'De CEO heeft zijn beste pak aan. De Board zit in de front row. De hele wereld kijkt mee.\n\n' +
     'De CEO: "Vandaag is de dag dat Polderdam Holding het enige bedrijf wordt dat er toe doet. ' +
     'De IPO gaat door zodra de laatste concurrent is uitgeschakeld. Maak het zo."',
 

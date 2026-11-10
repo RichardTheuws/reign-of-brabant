@@ -47,7 +47,7 @@
 
 **Totale speelduur**: 6-10 uur (afhankelijk van difficulty)
 **Unlock**: Beschikbaar vanaf het begin
-**Verhaallijn**: De Brabanders ontdekken dat het Gouden Worstenbroodje is gestolen door de Randstad Ontwikkelingsmaatschappij. Wat begint als een simpele zoektocht wordt een oorlog die heel Brabant verandert. Onderweg ontmoeten ze de mysterieuze Limburgers en de chaotische Belgen, en ontdekken ze dat het Worstenbroodje slechts een symptoom is van een veel groter complot.
+**Verhaallijn**: De Brabanders ontdekken dat het Gouden Worstenbroodje is gestolen door Polderdam Holding. Wat begint als een simpele zoektocht wordt een oorlog die heel Brabant verandert. Onderweg ontmoeten ze de mysterieuze Limburgers en de chaotische Belgen, en ontdekken ze dat het Worstenbroodje slechts een symptoom is van een veel groter complot.
 
 ---
 
@@ -191,7 +191,7 @@
 **Objectives**:
 - **Primair**: Bouw een functionele basis met minstens 15 units
 - **Primair**: Verover de Kermis (neutraal gebouw in het centrum — stuur 5 units naar het plein en houd het 60 seconden vast)
-- **Primair**: Vernietig het Randstad-Hoofdkantoor
+- **Primair**: Vernietig het hoofdkantoor van Polderdam Holding
 - **Bonus**: Behoud alle 4 kermiskramen intact (gebouwen op het plein die de Randstad probeert te slopen)
 - **Bonus**: Win binnen 20 minuten (unlocks: Kermis-decoratie voor Town Hall skin)
 
@@ -225,7 +225,7 @@
 - **Medium**: Standaard timing. Speler start met 100/50.
 - **Hard**: Randstad produceert sneller (1 per 20s). Eerste golf na 6 min. Extra golf na 12 min. Speler start met 50/25.
 
-**Victory condition**: Kermisplein veroverd + Randstad-Hoofdkantoor vernietigd.
+**Victory condition**: Kermisplein veroverd + hoofdkantoor van Polderdam Holding vernietigd.
 **Defeat condition**: Eigen Boerderij vernietigd OF alle 4 kermiskramen vernietigd.
 
 **Nieuwe mechanics geintroduceerd**:
@@ -779,7 +779,7 @@
 **Geschatte speelduur**: 35 min (Easy) / 50 min (Medium) / 65 min (Hard)
 
 **Briefing tekst**:
-> *Dit is het. De Randstad zelf. Een stad van glas en staal, waar de zon nauwelijks doorheen komt. Ergens in deze betonnen jungle ligt het Gouden Worstenbroodje — opgesloten in de kluis van het Corporate Tower, het 40-verdiepingen-hoge hoofdkantoor van de Randstad Ontwikkelingsmaatschappij.*
+> *Dit is het. De Randstad zelf. Een stad van glas en staal, waar de zon nauwelijks doorheen komt. Ergens in deze betonnen jungle ligt het Gouden Worstenbroodje — opgesloten in de kluis van het Corporate Tower, het 40-verdiepingen-hoge hoofdkantoor van Polderdam Holding.*
 >
 > *Je leger marcheert. De Limburgers flanken. De Belgen brengen de frieten. Dit is het uur van Brabant.*
 >
@@ -1493,11 +1493,11 @@ Na de credits, in een donkere mergelgrot. De Mijnbaas van Limburg kijkt naar het
 
 ### Missie 1: "De Boardroom"
 
-**Locatie**: Amsterdam — het hoofdkantoor van de Randstad Ontwikkelingsmaatschappij
+**Locatie**: Amsterdam — het hoofdkantoor van Polderdam Holding
 **Geschatte speelduur**: 20 min / 25 min / 35 min
 
 **Briefing tekst**:
-> *Welkom bij de Randstad Ontwikkelingsmaatschappij. U bent de nieuwe COO — Chief Operating Officer. De CEO heeft een visie: moderniseer het achtergestelde zuiden. Breng innovatie, infrastructuur en... Starbucks.*
+> *Welkom bij Polderdam Holding. U bent de nieuwe COO — Chief Operating Officer. De CEO heeft een visie: moderniseer het achtergestelde zuiden. Breng innovatie, infrastructuur en... Starbucks.*
 >
 > *Uw eerste opdracht: bouw het perfecte hoofdkantoor. Efficientie is alles.*
 
@@ -2439,7 +2439,7 @@ Missies worden lineair unlocked (missie N+1 na voltooiing missie N), BEHALVE:
 - **Duur**: 45 seconden (3 panels)
 - **Panel 1**: Kaart van Brabant, 1473. Narrator: *"Het jaar 1473. Het Hertogdom Brabant..."*
 - **Panel 2**: De Sint-Janskathedraal, gloeiend worstenbroodje op een altaar.
-- **Panel 3**: Een hand grijpt het worstenbroodje. Een visitekaartje dwarrelt neer. Zoom in: "Randstad Ontwikkelingsmaatschappij — Innovatie. Efficiëntie. Synergieën."
+- **Panel 3**: Een hand grijpt het worstenbroodje. Een visitekaartje dwarrelt neer. Zoom in: "Polderdam Holding — Innovatie. Efficiëntie. Synergieën."
 
 **C-02: Na Brabanders M5 — De Alliantie**
 - **Duur**: 30 seconden (2 panels)
