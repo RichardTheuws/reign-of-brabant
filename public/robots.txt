@@ -8,8 +8,6 @@ Allow: /
 Disallow: /api/
 Disallow: /assets/audio/
 Disallow: /assets/models/
-Disallow: /animation-preview.html
-Disallow: /voice-preview.html
 
 # Sitemap
 Sitemap: https://reign-of-brabant.nl/sitemap.xml

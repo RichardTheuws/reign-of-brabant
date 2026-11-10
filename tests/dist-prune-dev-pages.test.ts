@@ -9,7 +9,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { readdirSync, readFileSync, existsSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'fs';
-import { join, resolve } from 'path';
+import { basename, join, resolve } from 'path';
 import { tmpdir } from 'os';
 import { DIST_PRUNE_DEV_PAGES, DIST_PRUNE_FILE_PATTERNS, pruneDistDir } from '../vite.config';
 
@@ -67,22 +67,40 @@ describe('dev/audit pages are pruned from dist', () => {
     expect(hits).toEqual([]);
   });
 
-  it('prompt-log batch JSON (_*-batch.json) is pruned and not loaded by the app', () => {
-    expect(DIST_PRUNE_FILE_PATTERNS.some((re) => re.test('_randstad-v047-batch.json'))).toBe(true);
-    expect(DIST_PRUNE_FILE_PATTERNS.some((re) => re.test('randstad-worker.png'))).toBe(false);
+  it('every assets-generated.json and *-batch.json under public/ is pruned, in any folder', () => {
+    const isPrunedFile = (name: string) => DIST_PRUNE_FILE_PATTERNS.some((re) => re.test(name));
+    const logs: string[] = [];
+    const walkPublic = (dir: string) => {
+      for (const e of readdirSync(dir, { withFileTypes: true })) {
+        const p = join(dir, e.name);
+        if (e.isDirectory()) walkPublic(p);
+        else if (e.name === 'assets-generated.json' || e.name.endsWith('-batch.json')) logs.push(p);
+      }
+    };
+    walkPublic(PUBLIC);
+    expect(logs.length).toBeGreaterThan(0);
+    expect(logs.filter((p) => !isPrunedFile(basename(p)))).toEqual([]);
+    expect(isPrunedFile('randstad-worker.png')).toBe(false);
+    expect(isPrunedFile('structured-data.json')).toBe(false);
+  });
+
+  it('prompt logs are not loaded by the app', () => {
     const srcHits: string[] = [];
     const walkSrc = (dir: string) => {
       for (const e of readdirSync(dir, { withFileTypes: true })) {
         const p = join(dir, e.name);
         if (e.isDirectory()) walkSrc(p);
-        else if (/\.(ts|js|json|html)$/.test(e.name) && readFileSync(p, 'utf8').includes('-batch.json')) srcHits.push(p);
+        else if (/\.(ts|js|json|html)$/.test(e.name)) {
+          const text = readFileSync(p, 'utf8');
+          if (text.includes('-batch.json') || text.includes('assets-generated.json')) srcHits.push(p);
+        }
       }
     };
     walkSrc(join(ROOT, 'src'));
     expect(srcHits).toEqual([]);
   });
 
-  it('pruneDistDir removes them from the outDir root only', () => {
+  it('pruneDistDir removes dev pages from the root and prompt logs anywhere', () => {
     const dir = mkdtempSync(join(tmpdir(), 'rob-prune-dev-'));
     try {
       for (const f of [
@@ -93,6 +111,8 @@ describe('dev/audit pages are pruned from dist', () => {
         'index.html',
         'steun/index.html',
         'assets/steun/cinematic-preview.mp4',
+        'assets/portraits/buildings/assets-generated.json',
+        'assets/ui/commands/_build-menu-batch.json',
       ]) {
         mkdirSync(join(dir, f, '..'), { recursive: true });
         writeFileSync(join(dir, f), 'x');
@@ -102,6 +122,8 @@ describe('dev/audit pages are pruned from dist', () => {
       expect(existsSync(join(dir, 'voices-audit-brabant.html'))).toBe(false);
       expect(existsSync(join(dir, '_preview'))).toBe(false);
       expect(existsSync(join(dir, 'voice-preview'))).toBe(false);
+      expect(existsSync(join(dir, 'assets/portraits/buildings/assets-generated.json'))).toBe(false);
+      expect(existsSync(join(dir, 'assets/ui/commands/_build-menu-batch.json'))).toBe(false);
       expect(existsSync(join(dir, 'index.html'))).toBe(true);
       expect(existsSync(join(dir, 'steun/index.html'))).toBe(true);
       expect(existsSync(join(dir, 'assets/steun/cinematic-preview.mp4'))).toBe(true);

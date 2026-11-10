@@ -40,8 +40,6 @@ export const DIST_PRUNE_PATHS: readonly string[] = [
   'assets/ui/logo-new.png',
   'assets/ui/logo-recraft.png',
   'assets/ui/logo-transparent.png',
-  // Image-generation prompt log (social source material, not shown on any page)
-  'assets/social/assets-generated.json',
 ];
 
 /**
@@ -62,7 +60,10 @@ export const DIST_PRUNE_DEV_PAGES: readonly RegExp[] = [
 export const DIST_PRUNE_FILE_PATTERNS: readonly RegExp[] = [
   /\.bak(\.[^/]+)?$/, // foo.bak, foo.bak.png, foo.bak.glb, foo.bak.mp3
   /^\.DS_Store$/,
-  /^_[^/]*-batch\.json$/, // image-generation prompt logs (_randstad-v047-batch.json etc.)
+  // Image-generation prompt logs, in any folder: assets-generated.json and
+  // *-batch.json (_randstad-v047-batch.json etc.). Never loaded by the app or a page.
+  /^assets-generated\.json$/,
+  /-batch\.json$/,
 ];
 
 function sizeOf(p: string): number {

@@ -1,15 +1,30 @@
 # Changelog
 
+## [0.66.2] - 2026-11-10 — Review-fixes op de merken-ronde
+
+### Changed
+- **Enum-lid `ExtendedBuildingTypeId.Starbucks = 13` heet nu `FlatWhiteBar = 13`.** De waarde blijft 13; nergens wordt de naam gebruikt, dus saves blijven werken.
+- **`/het-verhaal/`**: de herschreven oorsprong bevatte een jaartal en een genre-claim die niet klopten. Nu: "een tattoo van zijn favoriete strategiegame", zonder nieuwe feiten.
+- **`/het-verhaal/`**: de resources van de Randstad volgen het spel (PowerPoints, hout en Havermoutmelk, met de Netwerkborrel als extra bron) in plaats van "LinkedIn Connections".
+- **Nederlandse teksten**: "real-time strategygame" (of "strategiegame") in plaats van het kale "een real-time strategy". De meta-omschrijving van `/play/` noemt het genre niet meer twee keer.
+- **`robots.txt`**: de Disallow-regels voor de dev-pagina's zijn weg, want die staan niet meer in productie.
+
+### Build
+- **Prompt-logs uit elke map gesnoeid**: elke `assets-generated.json` en elke `*-batch.json` gaat via een basename-patroon uit `dist/`, in plaats van één vast pad.
+
+### Tests
+- `dist-prune-dev-pages`: loopt `public/` af en eist dat elke `assets-generated.json` en `*-batch.json` gesnoeid wordt.
+
 ## [0.66.1] - 2026-11-10 — Eigen namen in plaats van andermans merken
 
 ### Changed
-- **Randstad-gebouw "Starbucks" heet nu "Flat White Bar"**: in het bouwmenu, de gebouwkaart en de missiezin "elke kroeg een Flat White Bar". Het interne enum-lid `ExtendedBuildingTypeId.Starbucks = 13` blijft, dus saves en id's veranderen niet.
+- **Randstad-gebouw "Starbucks" heet nu "Flat White Bar"**: in het bouwmenu, de gebouwkaart en de missiezin "elke kroeg een Flat White Bar". Het enum-lid heet nu `ExtendedBuildingTypeId.FlatWhiteBar`; de waarde blijft 13, dus saves en id's veranderen niet (zie 0.66.2).
 - **"WarCraft" uit metadata, JSON-LD en deelteksten** (`index.html`, `play/`, `structured-data.json`, `/deel/`, `/steun/`, `/steun/bedankt/`, `/het-verhaal/`, `/press/`, `/updates/`). De omschrijving is nu "real-time strategy in je browser". De FAQ op `/steun/` vraagt nu "Wat voor game is dit?" en beschrijft het genre in eigen woorden.
 - **Randstad blijft de regio, niet het bedrijf**: "laptops met RANDSTAD-logo's" wordt "laptops vol KPI-dashboards", en "Randstad Innovation Hub" wordt "Innovation Hub".
 - **Kleine merkgrappen generiek**: "De CEO vlucht in een taxi!" en "efficiënter dan een adviesbureau".
 
 ### Build
-- **Audit- en previewpagina's gaan niet meer mee naar `dist/`**: `*-preview.html`, `voices-audit-*.html`, `_preview/` en `voice-preview/` worden na de build weggehaald (`DIST_PRUNE_DEV_PAGES` in `vite.config.ts`). Ook de prompt-logs (`assets/social/assets-generated.json` en alle `_*-batch.json`, waaronder een negative prompt met een merknaam) gaan niet meer mee. De bronbestanden in `public/` blijven staan.
+- **Audit- en previewpagina's gaan niet meer mee naar `dist/`**: `*-preview.html`, `voices-audit-*.html`, `_preview/` en `voice-preview/` worden na de build weggehaald (`DIST_PRUNE_DEV_PAGES` in `vite.config.ts`). Ook de prompt-logs (`assets-generated.json` en `*-batch.json`, waaronder een negative prompt met een merknaam) gaan niet meer mee. De bronbestanden in `public/` blijven staan.
 
 ### Tests
 - `dist-prune-dev-pages`: elke `*preview*`/`*audit*`-entry in de root van `public/` moet onder de prune vallen, en geen gewone pagina linkt ernaar.

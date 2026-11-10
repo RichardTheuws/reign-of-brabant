@@ -4,7 +4,7 @@
     "@type": "WebApplication",
     "name": "Reign of Brabant",
     "alternateName": "RoB",
-    "description": "Een satirische real-time strategy browser game met 4 facties, Brabants dialect en 3D graphics. Gebouwd door 1 persoon met AI.",
+    "description": "Een satirische real-time strategygame voor de browser met 4 facties, Brabants dialect en 3D graphics. Gebouwd door 1 persoon met AI.",
     "url": "https://reign-of-brabant.nl/",
     "applicationCategory": "Game",
     "applicationSubCategory": "Real-Time Strategy",

@@ -97,7 +97,7 @@ export enum ExtendedBuildingTypeId {
   // --- Randstad (11-18) ---
   Hoofdkantoor = 11,        // Town Hall
   Vergaderzaal = 12,        // Barracks
-  Starbucks = 13,           // Resource gen + buff
+  FlatWhiteBar = 13,        // Resource gen + buff
   Netwerkborrel = 14,       // Resource gen (secondary)
   CoworkingSpace = 15,      // Tech / Upgrade
   Parkeergarage = 16,       // Advanced unit building
