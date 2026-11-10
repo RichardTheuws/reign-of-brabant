@@ -647,7 +647,7 @@ const MISSION_4_BINNENDIEZE: MissionDefinition = {
       id: 'victory-archief',
       condition: { type: 'building-destroyed', factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall },
       actions: [
-        { type: 'message', text: 'Documenten gevonden! "Project Gentrificatie — Elke stad een Vinex-wijk, elke kroeg een Starbucks." Dit is veel groter dan een Worstenbroodje...' },
+        { type: 'message', text: 'Documenten gevonden! "Project Gentrificatie — Elke stad een Vinex-wijk, elke kroeg een Flat White Bar." Dit is veel groter dan een Worstenbroodje...' },
         { type: 'victory' },
       ],
       once: true,
@@ -1557,7 +1557,7 @@ const MISSION_9_RAAD: MissionDefinition = {
       id: 'victory-both-destroyed',
       condition: { type: 'building-destroyed', factionId: FactionId.Randstad, buildingType: BuildingTypeId.TownHall },
       actions: [
-        { type: 'message', text: 'BEIDE BASISSEN VERNIETIGD! De CEO vlucht in een Uber! "Ik ga naar een coworking space in Bali!" Brabant is gered! De Prins en de Boer omhelzen elkaar. Vandaag is een dag die nooit vergeten wordt.' },
+        { type: 'message', text: 'BEIDE BASISSEN VERNIETIGD! De CEO vlucht in een taxi! "Ik ga naar een coworking space in Bali!" Brabant is gered! De Prins en de Boer omhelzen elkaar. Vandaag is een dag die nooit vergeten wordt.' },
       ],
       once: true,
     },
@@ -1738,7 +1738,7 @@ const MISSION_10_RAAD: MissionDefinition = {
       condition: { type: 'time', seconds: 690 },
       actions: [{
         type: 'message',
-        text: '"Die Stagiaires op het plein — dat zijn GEEN Stagiaires! Ze hebben laptops met RANDSTAD-logo\'s!"',
+        text: '"Die Stagiaires op het plein — dat zijn GEEN Stagiaires! Ze hebben laptops vol KPI-dashboards!"',
       }],
       once: true,
     },
@@ -6913,7 +6913,7 @@ const RANDSTAD_MISSION_6_MARKTMANIPULATIE: MissionDefinition = {
     { id: 'r6-destroy-limb-th', type: 'destroy-building', description: 'Vernietig de Limburgse Grottentempel', targetValue: 1, isBonus: false },
     { id: 'r6-train-12', type: 'train-units', description: 'Train 12 militaire eenheden (snel!)', targetValue: 12, isBonus: false },
     { id: 'r6-no-th-loss', type: 'no-townhall-loss', description: 'Verlies je Hoofdkantoor niet', targetValue: 0, isBonus: true },
-    { id: 'r6-gather-500', type: 'gather-gold', description: 'Heb aan het einde nog 500 PowerPoints over (bonus: efficienter dan McKinsey)', targetValue: 500, isBonus: true },
+    { id: 'r6-gather-500', type: 'gather-gold', description: 'Heb aan het einde nog 500 PowerPoints over (bonus: efficiënter dan een adviesbureau)', targetValue: 500, isBonus: true },
   ],
 
   triggers: [
@@ -7117,7 +7117,7 @@ const RANDSTAD_MISSION_7_REORGANISATIE: MissionDefinition = {
       id: 'r7-victory',
       condition: { type: 'building-destroyed', factionId: FactionId.Brabanders, buildingType: BuildingTypeId.TownHall },
       actions: [
-        { type: 'message', text: 'Reorganisatie voltooid! De boerderij is nu officieel een "Randstad Innovation Hub". De CEO op LinkedIn: "Trots op ons team dat deze transformatie mogelijk heeft gemaakt. #Leiderschap #Synergie"' },
+        { type: 'message', text: 'Reorganisatie voltooid! De boerderij is nu officieel een "Innovation Hub". De CEO op LinkedIn: "Trots op ons team dat deze transformatie mogelijk heeft gemaakt. #Leiderschap #Synergie"' },
         { type: 'victory' },
       ],
       once: true,

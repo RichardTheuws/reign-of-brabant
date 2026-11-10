@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.66.1] - 2026-11-10 — Eigen namen in plaats van andermans merken
+
+### Changed
+- **Randstad-gebouw "Starbucks" heet nu "Flat White Bar"**: in het bouwmenu, de gebouwkaart en de missiezin "elke kroeg een Flat White Bar". Het interne enum-lid `ExtendedBuildingTypeId.Starbucks = 13` blijft, dus saves en id's veranderen niet.
+- **"WarCraft" uit metadata, JSON-LD en deelteksten** (`index.html`, `play/`, `structured-data.json`, `/deel/`, `/steun/`, `/steun/bedankt/`, `/het-verhaal/`, `/press/`, `/updates/`). De omschrijving is nu "real-time strategy in je browser". De FAQ op `/steun/` vraagt nu "Wat voor game is dit?" en beschrijft het genre in eigen woorden.
+- **Randstad blijft de regio, niet het bedrijf**: "laptops met RANDSTAD-logo's" wordt "laptops vol KPI-dashboards", en "Randstad Innovation Hub" wordt "Innovation Hub".
+- **Kleine merkgrappen generiek**: "De CEO vlucht in een taxi!" en "efficiënter dan een adviesbureau".
+
+### Build
+- **Audit- en previewpagina's gaan niet meer mee naar `dist/`**: `*-preview.html`, `voices-audit-*.html`, `_preview/` en `voice-preview/` worden na de build weggehaald (`DIST_PRUNE_DEV_PAGES` in `vite.config.ts`). Ook de prompt-logs (`assets/social/assets-generated.json` en alle `_*-batch.json`, waaronder een negative prompt met een merknaam) gaan niet meer mee. De bronbestanden in `public/` blijven staan.
+
+### Tests
+- `dist-prune-dev-pages`: elke `*preview*`/`*audit*`-entry in de root van `public/` moet onder de prune vallen, en geen gewone pagina linkt ernaar.
+
 ## [0.66.0] - 2026-10-20 — Bundel 10: match staat er binnen 9 s, voor elke factie
 
 ### Performance

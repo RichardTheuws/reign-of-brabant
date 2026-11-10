@@ -1054,11 +1054,11 @@ export const FACTION_BUILDINGS: Record<number, readonly BuildingArchetype[]> = {
       sightRange: 10,
       produces: [UnitTypeId.Infantry, UnitTypeId.Ranged],
     },
-    // Starbucks (Resource gen + buff)
+    // Flat White Bar (Resource gen + buff)
     {
       typeId: BuildingTypeId.LumberCamp,
-      name: 'Starbucks',
-      brabantName: 'Starbucks',
+      name: 'Flat White Bar',
+      brabantName: 'Flat White Bar',
       hp: 600,
       costGold: 200,
       costSecondary: 75,

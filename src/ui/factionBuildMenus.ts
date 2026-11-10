@@ -96,7 +96,7 @@ export const FACTION_WORKER_BUILDS: Record<Faction, WorkerBuildCmdExt[]> = {
   randstad: [
     { action: 'build-townhall',        icon: 'TH',  label: 'Hoofdkantoor',    hotkey: 'H', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.TownHall,                  tier: 1 },
     { action: 'build-barracks',        icon: 'BRK', label: 'Vergaderzaal',    hotkey: 'Q', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Barracks,                 tier: 1 },
-    { action: 'build-lumbercamp',      icon: 'LMB', label: 'Starbucks',       hotkey: 'E', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.LumberCamp,               tier: 1 },
+    { action: 'build-lumbercamp',      icon: 'LMB', label: 'Flat White Bar',  hotkey: 'E', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.LumberCamp,               tier: 1 },
     { action: 'build-blacksmith',      icon: 'BSM', label: 'CoworkingSpace',  hotkey: 'R', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Blacksmith,                tier: 1 },
     { action: 'build-housing',         icon: 'HSE', label: 'Vinex-wijk',      hotkey: 'T', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.Housing,                   tier: 2 },
     { action: 'build-tower',           icon: 'TWR', label: 'Kantoor-toren',   hotkey: 'F', iconClass: 'btn-icon--build', buildingTypeId: BuildingTypeId.DefenseTower,              tier: 2 },

@@ -40,12 +40,29 @@ export const DIST_PRUNE_PATHS: readonly string[] = [
   'assets/ui/logo-new.png',
   'assets/ui/logo-recraft.png',
   'assets/ui/logo-transparent.png',
+  // Image-generation prompt log (social source material, not shown on any page)
+  'assets/social/assets-generated.json',
+];
+
+/**
+ * Internal audit and preview pages in the public/ root (voice casting, music
+ * A/B, animation checks) plus the test audio they load. Useful in dev, not
+ * meant for players. Matched against the names of top-level entries in the
+ * outDir only, so a new `foo-preview.html` or `voices-audit-x.html` is
+ * caught without editing this list. Guarded by tests/dist-prune-dev-pages.test.ts.
+ */
+export const DIST_PRUNE_DEV_PAGES: readonly RegExp[] = [
+  /-preview\.html$/, // voice-, music-, audio-ab-, animation-, voice-cast-preview.html
+  /^voices-audit-[^/]*\.html$/,
+  /^_preview$/, // audio behind voice-cast-preview / music-preview
+  /^voice-preview$/, // test mp3s behind voice-preview.html
 ];
 
 /** Basename patterns removed anywhere in the outDir: backups and Finder junk. */
 export const DIST_PRUNE_FILE_PATTERNS: readonly RegExp[] = [
   /\.bak(\.[^/]+)?$/, // foo.bak, foo.bak.png, foo.bak.glb, foo.bak.mp3
   /^\.DS_Store$/,
+  /^_[^/]*-batch\.json$/, // image-generation prompt logs (_randstad-v047-batch.json etc.)
 ];
 
 function sizeOf(p: string): number {
@@ -66,6 +83,11 @@ export function pruneDistDir(outDir: string): { count: number; bytes: number } {
   for (const rel of DIST_PRUNE_PATHS) {
     const p = join(outDir, rel);
     if (existsSync(p)) remove(p);
+  }
+  if (existsSync(outDir)) {
+    for (const name of readdirSync(outDir)) {
+      if (DIST_PRUNE_DEV_PAGES.some((re) => re.test(name))) remove(join(outDir, name));
+    }
   }
   const walk = (dir: string) => {
     for (const e of readdirSync(dir, { withFileTypes: true })) {
